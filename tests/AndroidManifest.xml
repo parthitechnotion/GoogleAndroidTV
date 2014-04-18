@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.tv.tests" >
+
+    <uses-sdk android:minSdkVersion="19" />
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:targetPackage="com.android.tv" />
+
+    <application android:label="TVTest" >
+        <uses-library android:name="android.test.runner" />
+    </application>
+
+</manifest>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2014 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:keepScreenOn="true" >
+
+    <android.tv.TvView android:id="@+id/tv_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+
+    <android.tv.TvView android:id="@+id/pip_view"
+        android:visibility="invisible"
+        android:layout_margin="30dp"
+        android:layout_width="240dp"
+        android:layout_height="135dp"
+        android:layout_gravity="right|top" />
+
+    <LinearLayout
+        android:id="@+id/control_guide"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:orientation="horizontal" >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:background="@android:drawable/ic_media_previous" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@android:drawable/ic_media_next" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/channel_banner"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:layout_margin="8dp"
+        android:orientation="horizontal"
+        android:background="@drawable/btn_white_matte" >
+
+        <TextView android:id="@+id/channel_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical"
+            android:padding="8dp"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <TextView android:id="@+id/program_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="left|center_vertical"
+            android:padding="8dp"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </LinearLayout>
+</FrameLayout>
