@@ -71,27 +71,6 @@ abstract public class BaseLocalTvInputService extends TvInputService {
             mPlayer.setVolume(volume, volume);
         }
 
-        public boolean dispatchKeyEvent(KeyEvent event) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                if (event.getKeyCode() == KeyEvent.KEYCODE_M) {
-                    mMute = !mMute;
-                    if (mMute) {
-                        mPlayer.setVolume(0.0f, 0.0f);
-                    } else {
-                        mPlayer.setVolume(mVolume, mVolume);
-                    }
-                    return true;
-                } else if (event.getKeyCode() == KeyEvent.KEYCODE_A) {
-                    // It simulates availability changes such as HDMI cable plug-off/plug-in.
-                    // The availability is toggled whenever 'a' key is dispatched from a TV app.
-                    mAvailable = !mAvailable;
-                    setAvailable(mAvailable);
-                    return true;
-                }
-            }
-            return false;
-        }
-
         @Override
         public boolean onTune(Uri channelUri) {
             Log.d(TAG, "tune(" + channelUri + ")");
@@ -144,6 +123,26 @@ abstract public class BaseLocalTvInputService extends TvInputService {
                     new AddProgramRunnable(channelUri, sample.getProgramTitle()),
                     DELAY_FOR_TESTING_IN_MILLIS);
             return true;
+        }
+
+        @Override
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_M) {
+                mMute = !mMute;
+                if (mMute) {
+                    mPlayer.setVolume(0.0f, 0.0f);
+                } else {
+                    mPlayer.setVolume(mVolume, mVolume);
+                }
+                return true;
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_A) {
+                // It simulates availability changes such as HDMI cable plug-off/plug-in.
+                // The availability is toggled whenever 'a' key is dispatched from a TV app.
+                mAvailable = !mAvailable;
+                setAvailable(mAvailable);
+                return true;
+            }
+            return false;
         }
 
         private class AddProgramRunnable implements Runnable {

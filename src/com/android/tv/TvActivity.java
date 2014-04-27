@@ -42,6 +42,7 @@ import android.tv.TvView;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -117,6 +118,23 @@ public class TvActivity extends Activity implements
 
         setContentView(R.layout.activity_tv);
         mTvView = (TvView) findViewById(R.id.tv_view);
+        mTvView.setOnUnhandledInputEventListener(new TvView.OnUnhandledInputEventListener() {
+            @Override
+            public boolean onUnhandledInputEvent(InputEvent event) {
+                if (event instanceof KeyEvent) {
+                    KeyEvent keyEvent = (KeyEvent) event;
+                    if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                        return onKeyUp(keyEvent.getKeyCode(), keyEvent);
+                    }
+                } else if (event instanceof MotionEvent) {
+                    MotionEvent motionEvent = (MotionEvent) event;
+                    if (motionEvent.isTouchEvent()) {
+                        return onTouchEvent(motionEvent);
+                    }
+                }
+                return false;
+            }
+        });
         mPipView = (TvView) findViewById(R.id.pip_view);
         mPipView.setZOrderMediaOverlay(true);
 
