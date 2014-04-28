@@ -16,6 +16,7 @@
 
 package com.example.sampletvinput;
 
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.res.AssetFileDescriptor;
@@ -103,12 +104,9 @@ abstract public class BaseLocalTvInputService extends TvInputService {
             mPlayer.start();
 
             try {
-                String[] selectionArgs = new String[] {
-                        String.valueOf(ContentUris.parseId(channelUri)) };
                 // Delete existing program information of the channel.
-                String selection = TvContract.Programs.CHANNEL_ID + " = ?";
-                getContentResolver().delete(TvContract.Programs.CONTENT_URI, selection,
-                        selectionArgs);
+                Uri uri = TvContract.buildProgramsUriForChannel(channelUri);
+                getContentResolver().delete(uri, null, null);
             } catch (RuntimeException e) {
                 Log.w(TAG, "Fail to get id from uri: " + channelUri);
                 getContentResolver().delete(TvContract.Programs.CONTENT_URI, null, null);
@@ -206,17 +204,12 @@ abstract public class BaseLocalTvInputService extends TvInputService {
     }
 
     protected void loadChannelMap() {
-        String[] projection = {TvContract.Channels._ID};
-        String selection = TvContract.Channels.SERVICE_NAME + " = ?";
-        String[] selectionArgs = new String[] {
-            getServiceName()
-        };
-        String order = null;
+        Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()));
+        String[] projection = { TvContract.Channels._ID };
 
         Cursor cursor = null;
         try {
-            cursor = getContentResolver().query(TvContract.Channels.CONTENT_URI, projection,
-                    selection, selectionArgs, order);
+            cursor = getContentResolver().query(uri, projection, null, null, null);
             if (cursor == null || cursor.getCount() < 1) {
                 Log.d(TAG, "Couldn't find the channel list. Perform auto-scan.");
                 scan();
@@ -225,10 +218,11 @@ abstract public class BaseLocalTvInputService extends TvInputService {
 
             int index = 0;
             while (cursor.moveToNext()) {
-                long id = cursor.getLong(0);
-                Uri uri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, id);
-                Log.d(TAG, "Channel mapping " + id + " to " + uri);
-                mChannelToSampleMap.put(uri, mSamples[index++ % mSamples.length]);
+                long channelId = cursor.getLong(0);
+                Uri channelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI,
+                        channelId);
+                Log.d(TAG, "Channel mapping " + channelId + " to " + channelUri);
+                mChannelToSampleMap.put(channelUri, mSamples[index++ % mSamples.length]);
             }
         } finally {
             if (cursor != null) {

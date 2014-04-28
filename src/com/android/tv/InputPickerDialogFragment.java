@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.TvContract;
@@ -205,21 +206,17 @@ public class InputPickerDialogFragment extends DialogFragment {
     }
 
     private boolean hasChannel(TvInputInfo name) {
-        String[] projection = {
-                TvContract.Channels._ID
-        };
-        String selection = TvContract.Channels.PACKAGE_NAME + " = ? AND " +
-                TvContract.Channels.SERVICE_NAME + " = ?";
-        String[] selectionArgs = {
-                name.getPackageName(), name.getServiceName()
-        };
-        Cursor cursor = getActivity().getContentResolver().query(TvContract.Channels.CONTENT_URI,
-                projection, selection, selectionArgs, null);
-        boolean hasChannel = cursor != null && cursor.getCount() > 0;
-        if (cursor != null) {
-            cursor.close();
+        Uri uri = TvContract.buildChannelsUriForInput(name.getComponent());
+        String[] projection = { TvContract.Channels._ID };
+        Cursor cursor = null;
+        try {
+            cursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
+            return cursor != null && cursor.getCount() > 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        return hasChannel;
     }
 
     private void showSetupActivity(TvInputInfo inputInfo, String displayName) {

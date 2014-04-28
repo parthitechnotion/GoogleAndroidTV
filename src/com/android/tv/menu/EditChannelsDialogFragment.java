@@ -56,6 +56,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
     private static final String TAG = EditChannelsDialogFragment.class.getSimpleName();
 
+    private ComponentName mComponentName;
     private String mServiceName;
     private SimpleCursorAdapter mAdapter;
 
@@ -75,7 +76,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
         mServiceName = arg.getString(ARG_CURRENT_SERVICE_NAME);
         assert(packageName != null && mServiceName != null);
 
-        ComponentName name = new ComponentName(packageName, mServiceName);
+        mComponentName = new ComponentName(packageName, mServiceName);
 
         String displayName = getActivity()
                 .getSharedPreferences(TvSettings.PREFS_FILE, Context.MODE_PRIVATE)
@@ -85,10 +86,10 @@ public class EditChannelsDialogFragment extends DialogFragment {
         if (TextUtils.isEmpty(displayName)) {
             try {
                 PackageManager pm = getActivity().getPackageManager();
-                ServiceInfo info = pm.getServiceInfo(name, 0);
+                ServiceInfo info = pm.getServiceInfo(mComponentName, 0);
                 displayName = String.valueOf(info.loadLabel(pm));
             } catch (NameNotFoundException e) {
-                Log.e(TAG, "The service '" + name + "' is not found.", e);
+                Log.e(TAG, "The service '" + mComponentName + "' is not found.", e);
                 displayName = mServiceName;
             }
         }
@@ -126,21 +127,12 @@ public class EditChannelsDialogFragment extends DialogFragment {
         getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                Uri uri = TvContract.Channels.CONTENT_URI;
+                Uri uri = TvContract.buildChannelsUriForInput(mComponentName, false);
                 String[] projections = { TvContract.Channels._ID,
                         TvContract.Channels.DISPLAY_NUMBER,
                         TvContract.Channels.DISPLAY_NAME,
                         TvContract.Channels.BROWSABLE};
-                String selection = TvContract.Channels.SERVICE_NAME + " = ?";
-                String[] selectArgs = { mServiceName };
-
-                return new CursorLoader(
-                        getActivity(),
-                        uri,
-                        projections,
-                        selection,
-                        selectArgs,
-                        null);
+                return new CursorLoader(getActivity(), uri, projections, null, null, null);
             }
 
             @Override
@@ -198,10 +190,9 @@ public class EditChannelsDialogFragment extends DialogFragment {
                 boolean checked = checkedTextView.isChecked();
                 int fromTop = view.getTop();
 
+                Uri uri = TvContract.buildChannelUri(id);
                 ContentValues values = new ContentValues();
                 values.put(TvContract.Channels.BROWSABLE, checked ? 0 : 1);
-
-                Uri uri = Uri.parse(TvContract.Channels.CONTENT_URI + "/" + id);
                 getActivity().getContentResolver().update(uri, values, null, null);
 
                 mListView.setSelectionFromTop(position, fromTop);
@@ -213,16 +204,10 @@ public class EditChannelsDialogFragment extends DialogFragment {
         if (mAdapter == null || mAdapter.getCursor() == null) {
             return;
         }
-
+        Uri uri = TvContract.buildChannelsUriForInput(mComponentName, false);
         ContentValues values = new ContentValues();
         values.put(TvContract.Channels.BROWSABLE, browsable ? 1 : 0);
-        String where = TvContract.Channels.SERVICE_NAME + " = ?";
-        String[] selectionArgs = { mServiceName };
 
-        getActivity().getContentResolver().update(
-                TvContract.Channels.CONTENT_URI,
-                values,
-                where,
-                selectionArgs);
+        getActivity().getContentResolver().update(uri, values, null, null);
     }
 }

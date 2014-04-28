@@ -79,15 +79,10 @@ public class TvInputUtils {
         if (channelUri == null) {
             return null;
         }
+        long time = System.currentTimeMillis();
+        Uri uri = TvContract.buildProgramsUriForChannel(channelUri, time, time);
         String[] projection = { TvContract.Programs.TITLE };
-        String selection = TvContract.Programs.CHANNEL_ID + " = ? AND "
-                + TvContract.Programs.START_TIME_UTC_MILLIS + " <= ? AND "
-                + TvContract.Programs.END_TIME_UTC_MILLIS + " > ?";
-        String channelId = String.valueOf(ContentUris.parseId(channelUri));
-        String currentTime = String.valueOf(System.currentTimeMillis());
-        String[] selectionArgs = { channelId, currentTime, currentTime };
-        Cursor cursor = context.getContentResolver().query(TvContract.Programs.CONTENT_URI,
-                projection, selection, selectionArgs, null);
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         String title = null;
         if (cursor.moveToNext()) {
             title = cursor.getString(0);
