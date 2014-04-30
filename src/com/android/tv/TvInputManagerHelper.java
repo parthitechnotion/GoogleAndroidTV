@@ -35,15 +35,15 @@ import java.util.Set;
 
 public class TvInputManagerHelper {
     private final TvInputManager mTvInputManager;
-    private final Map<ComponentName, Boolean> mInputAvailabilityMap =
-            new HashMap<ComponentName, Boolean>();
-    private final Map<ComponentName, TvInputInfo> mInputMap =
-            new HashMap<ComponentName, TvInputInfo>();
+    private final Map<String, Boolean> mInputAvailabilityMap =
+            new HashMap<String, Boolean>();
+    private final Map<String, TvInputInfo> mInputMap =
+            new HashMap<String, TvInputInfo>();
     private final TvInputManager.TvInputListener mListener =
             new TvInputManager.TvInputListener() {
                 @Override
-                public void onAvailabilityChanged(ComponentName name, boolean isAvailable) {
-                    mInputAvailabilityMap.put(name, Boolean.valueOf(isAvailable));
+                public void onAvailabilityChanged(String inputId, boolean isAvailable) {
+                    mInputAvailabilityMap.put(inputId, Boolean.valueOf(isAvailable));
                 }
             };
     private final Handler mHandler = new Handler();
@@ -63,11 +63,11 @@ public class TvInputManagerHelper {
             return;
         }
         for (TvInputInfo input : inputs) {
-            ComponentName inputName = input.getComponent();
-            mTvInputManager.registerListener(inputName, mListener, mHandler);
-            boolean available = mTvInputManager.getAvailability(inputName);
-            mInputAvailabilityMap.put(inputName, available);
-            mInputMap.put(inputName, input);
+            String inputId = input.getId();
+            mTvInputManager.registerListener(inputId, mListener, mHandler);
+            boolean available = mTvInputManager.getAvailability(inputId);
+            mInputAvailabilityMap.put(inputId, available);
+            mInputMap.put(inputId, input);
         }
         Assert.assertEquals(mInputAvailabilityMap.size(), mInputMap.size());
     }
@@ -78,24 +78,24 @@ public class TvInputManagerHelper {
         if (!mStarted) {
             throw new IllegalStateException("AvailabilityManager doesn't started");
         }
-        Set<ComponentName> inputNames = new HashSet<ComponentName>();
+        Set<String> inputIds = new HashSet<String>();
         mInputMap.clear();
         for (TvInputInfo input : mTvInputManager.getTvInputList()) {
-            inputNames.add(input.getComponent());
-            mInputMap.put(input.getComponent(), input);
+            inputIds.add(input.getId());
+            mInputMap.put(input.getId(), input);
         }
-        for (ComponentName inputName : inputNames) {
-            if (mInputAvailabilityMap.get(inputName) != null) {
+        for (String inputId : inputIds) {
+            if (mInputAvailabilityMap.get(inputId) != null) {
                 continue;
             }
-            mTvInputManager.registerListener(inputName, mListener, mHandler);
-            boolean available = mTvInputManager.getAvailability(inputName);
-            mInputAvailabilityMap.put(inputName, available);
+            mTvInputManager.registerListener(inputId, mListener, mHandler);
+            boolean available = mTvInputManager.getAvailability(inputId);
+            mInputAvailabilityMap.put(inputId, available);
         }
-        for (ComponentName name : mInputAvailabilityMap.keySet()) {
-            if (!inputNames.contains(name)) {
-                mTvInputManager.unregisterListener(name, mListener);
-                mInputAvailabilityMap.remove(name);
+        for (String inputId : mInputAvailabilityMap.keySet()) {
+            if (!inputIds.contains(inputId)) {
+                mTvInputManager.unregisterListener(inputId, mListener);
+                mInputAvailabilityMap.remove(inputId);
             }
         }
         Assert.assertEquals(mInputAvailabilityMap.size(), mInputMap.size());
@@ -106,8 +106,8 @@ public class TvInputManagerHelper {
             return;
         }
         mStarted = false;
-        for (ComponentName inputName : mInputAvailabilityMap.keySet()) {
-            mTvInputManager.unregisterListener(inputName, mListener);
+        for (String inputId : mInputAvailabilityMap.keySet()) {
+            mTvInputManager.unregisterListener(inputId, mListener);
         }
         mInputAvailabilityMap.clear();
         mInputMap.clear();
@@ -118,10 +118,10 @@ public class TvInputManagerHelper {
             return mInputMap.values();
         } else {
             ArrayList<TvInputInfo> list = new ArrayList<TvInputInfo>();
-            Iterator<Map.Entry<ComponentName, Boolean>> it =
+            Iterator<Map.Entry<String, Boolean>> it =
                     mInputAvailabilityMap.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<ComponentName, Boolean> pair = it.next();
+                Map.Entry<String, Boolean> pair = it.next();
                 if (pair.getValue() == true) {
                     list.add(getTvInputInfo(pair.getKey()));
                 }
@@ -130,14 +130,14 @@ public class TvInputManagerHelper {
         }
     }
 
-    public TvInputInfo getTvInputInfo(ComponentName name) {
+    public TvInputInfo getTvInputInfo(String inputId) {
         if (!mStarted) {
             throw new IllegalStateException("AvailabilityManager doesn't started");
         }
-        TvInputInfo input = mInputMap.get(name);
+        TvInputInfo input = mInputMap.get(inputId);
         if (input == null) {
             update();
-            input = mInputMap.get(name);
+            input = mInputMap.get(inputId);
         }
         return input;
     }
@@ -146,16 +146,16 @@ public class TvInputManagerHelper {
         return mInputAvailabilityMap.size();
     }
 
-    public boolean isAvaliable(ComponentName inputName) {
+    public boolean isAvaliable(String inputId) {
         if (!mStarted) {
             throw new IllegalStateException("AvailabilityManager doesn't started");
         }
-        Boolean available = mInputAvailabilityMap.get(inputName);
+        Boolean available = mInputAvailabilityMap.get(inputId);
         if (available == null) {
             update();
-            available = mInputAvailabilityMap.get(inputName);
+            available = mInputAvailabilityMap.get(inputId);
             if (available == null) {
-                throw new IllegalArgumentException("inputName (" + inputName + ") doesn't exist");
+                throw new IllegalArgumentException("inputName (" + inputId + ") doesn't exist");
             }
         }
         return available;

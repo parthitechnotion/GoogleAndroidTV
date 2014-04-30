@@ -54,15 +54,20 @@ public class TvInputUtils {
     // preferences stored in the preference of a specific tv input.
     private static final String PREF_KEY_LAST_WATCHED_CHANNEL = "last_watched_channel";
 
-    public static ComponentName getInputNameForChannel(Context context, long channelId) {
+    // TODO: Remove this and add inputId into TvProvider.
+    public static String getInputIdForComponentName(ComponentName name) {
+        return name.flattenToShortString();
+    }
+
+    public static String getInputIdForChannel(Context context, long channelId) {
         if (channelId == Channel.INVALID_ID) {
             return null;
         }
         Uri channelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channelId);
-        return getInputNameForChannel(context, channelUri);
+        return getInputIdForChannel(context, channelUri);
     }
 
-    public static ComponentName getInputNameForChannel(Context context, Uri channelUri) {
+    public static String getInputIdForChannel(Context context, Uri channelUri) {
         String[] projection = { TvContract.Channels.PACKAGE_NAME,
                 TvContract.Channels.SERVICE_NAME };
         if (channelUri == null) {
@@ -80,7 +85,7 @@ public class TvInputUtils {
         cursor.moveToNext();
         ComponentName componentName = new ComponentName(cursor.getString(0), cursor.getString(1));
         cursor.close();
-        return componentName;
+        return getInputIdForComponentName(componentName);
     }
 
     public static void setLastWatchedChannel(Context context, String inputId, Uri channelUri) {

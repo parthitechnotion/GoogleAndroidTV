@@ -343,18 +343,18 @@ public class TvActivity extends Activity implements
             showInputPickerDialog();
             return;
         }
-        ComponentName inputName = TvInputUtils.getInputNameForChannel(this, channelId);
-        if (inputName == null) {
+        String inputId = TvInputUtils.getInputIdForChannel(this, channelId);
+        if (TextUtils.isEmpty(inputId)) {
             // If failed to determine the input for that channel, try a different input.
             showInputPickerDialog();
             return;
         }
-        TvInputInfo input = mTvInputManagerHelper.getTvInputInfo(inputName);
+        TvInputInfo input = mTvInputManagerHelper.getTvInputInfo(inputId);
         startSessionIfAvailableOrRetry(input, channelId, 0);
     }
 
     private void startSessionIfAvailableOrRetry(TvInputInfo input, long channelId, int retryCount) {
-        if (!mTvInputManagerHelper.isAvaliable(input.getComponent())) {
+        if (!mTvInputManagerHelper.isAvaliable(input.getId())) {
             if (retryCount >= START_DEFAULT_SESSION_MAX_RETRY) {
                 showInputPickerDialog();
                 return;
@@ -561,10 +561,10 @@ public class TvActivity extends Activity implements
         mTuningFromTvInputChange = true;
 
         // Prepare a new channel map for the current input.
-        mChannelMap = new ChannelMap(this, mIsUnifiedTvInput ? null : inputInfo.getComponent(),
+        mChannelMap = new ChannelMap(this, mIsUnifiedTvInput ? null : inputInfo,
                 channelId, mTvInputManagerHelper, mOnChannelsLoadFinished);
         // Create a new session and start.
-        mTvView.bindTvInput(inputInfo.getComponent(), mSessionCreated);
+        mTvView.bindTvInput(inputInfo.getId(), mSessionCreated);
         tune();
     }
 
@@ -579,7 +579,7 @@ public class TvActivity extends Activity implements
             e.printStackTrace();
         }
         mTvInputInfo = inputInfo;
-        mTvView.bindTvInput(inputInfo.getComponent(), mSessionCreated);
+        mTvView.bindTvInput(inputInfo.getId(), mSessionCreated);
         tune();
     }
 
@@ -612,7 +612,7 @@ public class TvActivity extends Activity implements
         }
         Log.d(TAG, "startPipSession");
         mPipInputInfo = mTvInputInfo;
-        mPipView.bindTvInput(mPipInputInfo.getComponent(), mPipSessionCreated);
+        mPipView.bindTvInput(mPipInputInfo.getId(), mPipSessionCreated);
         mPipShowing = true;
     }
 
@@ -678,10 +678,10 @@ public class TvActivity extends Activity implements
                 Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
                 return;
             }
-            ComponentName inputName = TvInputUtils.getInputNameForChannel(this, currentChannelUri);
-            if (!inputName.equals(mTvInputInfo.getComponent())) {
+            String inputId = TvInputUtils.getInputIdForChannel(this, currentChannelUri);
+            if (!mTvInputInfo.getId().equals(inputId)) {
                 Log.d(TAG, "TV input is changed");
-                changeSession(mTvInputManagerHelper.getTvInputInfo(inputName));
+                changeSession(mTvInputManagerHelper.getTvInputInfo(inputId));
                 mTunePendding = true;
                 return;
             }

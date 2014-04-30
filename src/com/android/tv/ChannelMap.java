@@ -26,6 +26,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.TvContract;
+import android.text.TextUtils;
+import android.tv.TvInputInfo;
 import android.util.Log;
 
 /**
@@ -39,7 +41,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int BROWSABLE = 1;
 
     private final Activity mActivity;
-    private final ComponentName mInputName;
+    private final TvInputInfo mInputInfo;
     private long mCurrentChannelId;
     private Cursor mCursor;
     private final TvInputManagerHelper mTvInputManagerHelper;
@@ -54,11 +56,11 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mIndexBrowsable;
     private int mBrowsableChannelCount;
 
-    public ChannelMap(Activity activity, ComponentName inputName, long initChannelId,
+    public ChannelMap(Activity activity, TvInputInfo tvInputInfo, long initChannelId,
             TvInputManagerHelper tvInputManagerHelper, Runnable onLoadFinished) {
         mActivity = activity;
-        mInputName = inputName;
-        mIsUnifiedTvInput = mInputName == null;
+        mInputInfo = tvInputInfo;
+        mIsUnifiedTvInput = mInputInfo == null;
         mCurrentChannelId = initChannelId;
         mTvInputManagerHelper = tvInputManagerHelper;
         mOnLoadFinished = onLoadFinished;
@@ -117,7 +119,8 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         while(browsableChannelCount > 0 && (mCursor.moveToNext() || mCursor.moveToFirst())) {
             if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
                 --browsableChannelCount;
-                if (!mTvInputManagerHelper.isAvaliable(getComponentName())) {
+                if (!mTvInputManagerHelper.isAvaliable(
+                        TvInputInfo.generateInputIdForComponenetName(getComponentName()))) {
                     continue;
                 }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
@@ -141,7 +144,8 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         while(browsableChannelCount > 0 && (mCursor.moveToPrevious() || mCursor.moveToLast())) {
             if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
                 --browsableChannelCount;
-                if (!mTvInputManagerHelper.isAvaliable(getComponentName())) {
+                if (!mTvInputManagerHelper.isAvaliable(
+                        TvInputInfo.generateInputIdForComponenetName(getComponentName()))) {
                     continue;
                 }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
@@ -174,7 +178,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         if (mIsUnifiedTvInput) {
             uri = TvContract.Channels.CONTENT_URI;
         } else {
-            uri = TvContract.buildChannelsUriForInput(mInputName, false);
+            uri = TvContract.buildChannelsUriForInput(mInputInfo.getComponent(), false);
         }
         String[] projection = {
                 TvContract.Channels._ID,

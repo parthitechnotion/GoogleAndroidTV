@@ -55,8 +55,8 @@ public class InputPickerDialogFragment extends DialogFragment {
     private static final int UNIFIED_TV_INPUT_POSITION = 0;
 
     private final Map<String, TvInputInfo> mInputMap = new HashMap<String, TvInputInfo>();
-    private final Map<ComponentName, Boolean> mInputAvailabilityMap =
-            new HashMap<ComponentName, Boolean>();
+    private final Map<String, Boolean> mInputAvailabilityMap =
+            new HashMap<String, Boolean>();
 
     private String mSelectedInputId;
     private String mSelectedPipInputId;
@@ -72,8 +72,8 @@ public class InputPickerDialogFragment extends DialogFragment {
     private final TvInputManager.TvInputListener mAvailabilityListener =
             new TvInputManager.TvInputListener() {
                 @Override
-                public void onAvailabilityChanged(ComponentName name, boolean isAvailable) {
-                    mInputAvailabilityMap.put(name, Boolean.valueOf(isAvailable));
+                public void onAvailabilityChanged(String inputId, boolean isAvailable) {
+                    mInputAvailabilityMap.put(inputId, Boolean.valueOf(isAvailable));
                     mAdapter.notifyDataSetChanged();
                 }
             };
@@ -150,7 +150,7 @@ public class InputPickerDialogFragment extends DialogFragment {
                         || inputId.equals(mSelectedPipInputId)) {
                     return false;
                 }
-                return mInputAvailabilityMap.get(inputInfo.getComponent());
+                return mInputAvailabilityMap.get(inputInfo.getId());
             }
         };
         mTvInputManager = (TvInputManager) getActivity().getSystemService(Context.TV_INPUT_SERVICE);
@@ -172,11 +172,9 @@ public class InputPickerDialogFragment extends DialogFragment {
         }
 
         for (TvInputInfo input : inputs) {
-            ComponentName inputName = input.getComponent();
-            mTvInputManager.registerListener(inputName, mAvailabilityListener, mHandler);
-            mInputAvailabilityMap.put(inputName, mTvInputManager.getAvailability(inputName));
-
             String inputId = input.getId();
+            mTvInputManager.registerListener(inputId, mAvailabilityListener, mHandler);
+            mInputAvailabilityMap.put(inputId, mTvInputManager.getAvailability(inputId));
             String name = TvInputUtils.getDisplayNameForInput(getActivity(), input);
             if (inputId.equals(mSelectedInputId) && !mIsUnifiedTvInput) {
                 name += " " + getResources().getString(R.string.selected);
@@ -242,7 +240,7 @@ public class InputPickerDialogFragment extends DialogFragment {
         List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
         if (inputs.size() > 0) {
             for (TvInputInfo input : inputs) {
-                mTvInputManager.unregisterListener(input.getComponent(), mAvailabilityListener);
+                mTvInputManager.unregisterListener(input.getId(), mAvailabilityListener);
             }
         }
     }
