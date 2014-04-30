@@ -17,19 +17,19 @@
 package com.example.sampletvinput;
 
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.TvContract;
+import android.provider.TvContract.Channels;
+import android.provider.TvContract.Programs;
 import android.tv.TvInputService;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
-
-import com.android.tv.Channel;
-import com.android.tv.Program;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -146,7 +146,7 @@ abstract public class BaseLocalTvInputService extends TvInputService {
         }
 
         private class AddProgramRunnable implements Runnable {
-            private static final int DEFAULT_PROGRAM_LENGTH_IN_MILLIS = 5 * 60 * 1000;
+            private static final int DEFAULT_PROGRAM_DURATION_IN_MILLIS = 30000; // 5 minutes
             private final Uri mChannelUri;
             private final String mTitle;
 
@@ -162,17 +162,15 @@ abstract public class BaseLocalTvInputService extends TvInputService {
                     duration = mPlayer.getDuration();
                 }
                 if (duration == -1) {
-                    duration = DEFAULT_PROGRAM_LENGTH_IN_MILLIS;
+                    duration = DEFAULT_PROGRAM_DURATION_IN_MILLIS;
                 }
-                long currentTimeSec = System.currentTimeMillis() / 1000;
-                Program program = new Program.Builder()
-                        .setChannelId(ContentUris.parseId(mChannelUri))
-                        .setTitle(mTitle)
-                        .setStartTimeUtcMillis(currentTimeSec)
-                        .setEndTimeUtcMillis(currentTimeSec + duration / 1000)
-                        .build();
-                getContentResolver().insert(TvContract.Programs.CONTENT_URI,
-                        program.toContentValues());
+                long time = System.currentTimeMillis();
+                ContentValues values = new ContentValues();
+                values.put(Programs.CHANNEL_ID, ContentUris.parseId(mChannelUri));
+                values.put(Programs.TITLE, mTitle);
+                values.put(Programs.START_TIME_UTC_MILLIS, time);
+                values.put(Programs.END_TIME_UTC_MILLIS, time + duration);
+                getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);
             }
         }
     }
@@ -235,17 +233,15 @@ abstract public class BaseLocalTvInputService extends TvInputService {
         }
     }
 
-    // Perform (fake) channel scan and push the result into the database.
+    // Perform fake channel scan and push the result into the database.
     private void scan() {
-        // Generate dummy channels.
         for (int i = 1; i < mNumberOfChannels + 1; i++) {
-            Channel channel = new Channel.Builder()
-                    .setDisplayName("CH-" + i)
-                    .setServiceName(getServiceName())
-                    .setDisplayNumber(String.valueOf(i))
-                    .build();
-            Uri uri = getContentResolver().insert(TvContract.Channels.CONTENT_URI,
-                    channel.toContentValues());
+            // Generate a dummy channel.
+            ContentValues values = new ContentValues();
+            values.put(Channels.SERVICE_NAME, getServiceName());
+            values.put(Channels.DISPLAY_NUMBER, i);
+            values.put(Channels.DISPLAY_NAME, "CH" + i);
+            Uri uri = getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
             mChannelToSampleMap.put(uri, mSamples[(i - 1) % mSamples.length]);
         }
     }
