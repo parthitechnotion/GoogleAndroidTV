@@ -212,24 +212,28 @@ abstract public class BaseLocalTvInputService extends TvInputService {
             getServiceName()
         };
         String order = null;
-        Cursor cursor = getContentResolver().query(TvContract.Channels.CONTENT_URI, projection,
-                selection, selectionArgs, order);
 
-        if (cursor == null || cursor.getCount() < 1) {
-            Log.d(TAG, "Couldn't find the channel list. Perform auto-scan.");
+        Cursor cursor = null;
+        try {
+            cursor = getContentResolver().query(TvContract.Channels.CONTENT_URI, projection,
+                    selection, selectionArgs, order);
+            if (cursor == null || cursor.getCount() < 1) {
+                Log.d(TAG, "Couldn't find the channel list. Perform auto-scan.");
+                scan();
+                return;
+            }
+
+            int index = 0;
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(0);
+                Uri uri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, id);
+                Log.d(TAG, "Channel mapping " + id + " to " + uri);
+                mChannelToSampleMap.put(uri, mSamples[index++ % mSamples.length]);
+            }
+        } finally {
             if (cursor != null) {
                 cursor.close();
             }
-            scan();
-            return;
-        }
-
-        int index = 0;
-        while (cursor.moveToNext()) {
-            long id = cursor.getLong(0);
-            Uri uri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, id);
-            Log.d(TAG, "Channel mapping " + id + " to " + uri);
-            mChannelToSampleMap.put(uri, mSamples[index++ % mSamples.length]);
         }
     }
 
