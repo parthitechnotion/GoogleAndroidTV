@@ -18,5 +18,6 @@
     <string name="sample_tv_input">SampleTvInput</string>
     <string name="local_input_label1">Sample Local File Input 1</string>
     <string name="local_input_label2">Sample Local File Input 2</string>
-    <string name="webview_toggle_button">Web View</string>
+    <string name="overlay_view_test">Overlay View Test</string>
+    <string name="webview_toggle_button">Toggle WebView</string>
 </resources>
