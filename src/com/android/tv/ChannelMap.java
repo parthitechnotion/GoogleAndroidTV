@@ -125,8 +125,11 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
                 TvContract.Channels.SERVICE_NAME + " = ? AND " +
                 TvContract.Channels.BROWSABLE + " = 1";
         String[] selectionArgs = { mInputName.getPackageName(), mInputName.getClassName() };
+        String sortOrder = "CAST(" + TvContract.Channels.DISPLAY_NUMBER
+                + " AS INTEGER), CAST(SUBSTR(LTRIM(" + TvContract.Channels.DISPLAY_NUMBER
+                + ",'0123456789'),2) AS INTEGER)";
         return new CursorLoader(mActivity, TvContract.Channels.CONTENT_URI, projection, selection,
-                selectionArgs, null);
+                selectionArgs, sortOrder);
     }
 
     @Override
