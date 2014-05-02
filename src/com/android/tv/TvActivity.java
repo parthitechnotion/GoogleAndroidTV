@@ -45,6 +45,7 @@ import android.view.GestureDetector;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -62,12 +63,14 @@ public class TvActivity extends Activity implements
         InputPickerDialogFragment.InputPickerDialogListener,
         AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "TvActivity";
+    private static final boolean DEBUG = true;
 
     private static final int DURATION_SHOW_CHANNEL_BANNER = 2000;
     private static final int DURATION_SHOW_CONTROL_GUIDE = 1000;
     private static final float AUDIO_MAX_VOLUME = 1.0f;
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
+    private static final int DELAY_FOR_SURFACE_RELEASE = 300;
     // TODO: add more KEYCODEs to the white list.
     private static final int[] KEYCODE_WHITELIST = {
             KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_2, KeyEvent.KEYCODE_3,
@@ -100,11 +103,33 @@ public class TvActivity extends Activity implements
     private TvInputInfo mTvInputInfo;
     private AudioManager mAudioManager;
     private int mAudioFocusStatus;
+    private final Handler mHandler = new Handler();
     private boolean mDefaultSessionRequested;
     private boolean mTunePendding;
     private boolean mPipShowing;
     private boolean mDebugNonFullSizeScreen;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
+
+    private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
+
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) { }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
+            // know when the surface is released at TIS, we don't need this hack.
+            try {
+                if (DEBUG) Log.d(TAG, "Sleep to wait destroying a surface");
+                Thread.sleep(DELAY_FOR_SURFACE_RELEASE);
+                if (DEBUG) Log.d(TAG, "Wake up from sleeping");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     // PIP is used for debug/verification of multiple sessions rather than real PIP feature.
     // When PIP is enabled, the same channel as mTvView is tuned.
@@ -135,8 +160,10 @@ public class TvActivity extends Activity implements
                 return false;
             }
         });
+        mTvView.getHolder().addCallback(mSurfaceHolderCallback);
         mPipView = (TvView) findViewById(R.id.pip_view);
         mPipView.setZOrderMediaOverlay(true);
+        mPipView.getHolder().addCallback(mSurfaceHolderCallback);
 
         mControlGuide = (LinearLayout) findViewById(R.id.control_guide);
         mChannelBanner = (LinearLayout) findViewById(R.id.channel_banner);
@@ -290,7 +317,7 @@ public class TvActivity extends Activity implements
     }
 
     @Override
-    public void onInputPicked(TvInputInfo which) {
+    public void onInputPicked(final TvInputInfo which) {
         if (mTvSession != null && which.equals(mTvInputInfo)) {
             // Nothing has changed thus nothing to do.
             return;
@@ -299,8 +326,15 @@ public class TvActivity extends Activity implements
         // Start a new session with the new input.
         stopSession();
         Channel channel = TvInputUtils.getLastWatchedChannel(this, which.getComponent());
-        long channelId = channel != null ? channel.getId() : Channel.INVALID_ID;
-        startSession(which, channelId);
+        final long channelId = channel != null ? channel.getId() : Channel.INVALID_ID;
+        // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
+        // know when the surface is released at TIS, we don't need this hack.
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startSession(which, channelId);
+            }
+        }, DELAY_FOR_SURFACE_RELEASE);
     }
 
     @Override
@@ -535,6 +569,8 @@ public class TvActivity extends Activity implements
     @Override
     protected void onDestroy() {
         getContentResolver().unregisterContentObserver(mProgramUpdateObserver);
+        mTvView.getHolder().removeCallback(mSurfaceHolderCallback);
+        mPipView.getHolder().removeCallback(mSurfaceHolderCallback);
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
     }
