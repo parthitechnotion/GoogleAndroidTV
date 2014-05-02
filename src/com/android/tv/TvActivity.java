@@ -274,10 +274,7 @@ public class TvActivity extends Activity implements
         }
         if (channelId == Channel.INVALID_ID) {
             // Otherwise, remember the last channel the user watched.
-            Channel channel = TvInputUtils.getLastWatchedChannel(this);
-            if (channel != null) {
-                channelId = channel.getId();
-            }
+            channelId = TvInputUtils.getLastWatchedChannelId(this);
         }
         if (channelId == Channel.INVALID_ID) {
             // If failed to pick a channel, try a different input.
@@ -317,22 +314,22 @@ public class TvActivity extends Activity implements
     }
 
     @Override
-    public void onInputPicked(final TvInputInfo which) {
-        if (mTvSession != null && which.equals(mTvInputInfo)) {
+    public void onInputPicked(final TvInputInfo selectedTvInput) {
+        if (mTvSession != null && selectedTvInput.equals(mTvInputInfo)) {
             // Nothing has changed thus nothing to do.
             return;
         }
 
         // Start a new session with the new input.
         stopSession();
-        Channel channel = TvInputUtils.getLastWatchedChannel(this, which.getComponent());
-        final long channelId = channel != null ? channel.getId() : Channel.INVALID_ID;
         // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
         // know when the surface is released at TIS, we don't need this hack.
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startSession(which, channelId);
+                long channelId = TvInputUtils.getLastWatchedChannelId(TvActivity.this,
+                        selectedTvInput.getId());
+                startSession(selectedTvInput, channelId);
             }
         }, DELAY_FOR_SURFACE_RELEASE);
     }
@@ -500,7 +497,7 @@ public class TvActivity extends Activity implements
         if (currentChannelUri != null) {
             // TODO: implement 'no signal'
             // TODO: add result callback and show a message on failure.
-            TvInputUtils.setLastWatchedChannel(this, currentChannelUri);
+            TvInputUtils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
             mTvSession.tune(currentChannelUri);
             displayChannelBanner();
         }

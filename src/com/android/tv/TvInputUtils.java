@@ -21,7 +21,10 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.TvContract;
+import android.text.TextUtils;
+import android.util.Base64;
 
 /**
  * A class that includes convenience methods for accessing TvProvider database.
@@ -32,6 +35,13 @@ public class TvInputUtils {
     public static final String ACTION_SETTINGS = "android.tv.SettingsActivity";
     public static final String ACTION_SETUP = "android.tv.SetupActivity";
     public static final String EXTRA_SERVICE_NAME = "serviceName";
+
+    // preferences stored in the default preference.
+    private static final String PREF_KEY_LAST_SELECTED_TV_INPUT = "last_selected_tv_input";
+
+    private static final String PREFIX_PREF_NAME = "com.android.tv.";
+    // preferences stored in the preference of a specific tv input.
+    private static final String PREF_KEY_LAST_WATCHED_CHANNEL = "last_watched_channel";
 
     public static ComponentName getInputNameForChannel(Context context, long channelId) {
         if (channelId == Channel.INVALID_ID) {
@@ -62,17 +72,40 @@ public class TvInputUtils {
         return componentName;
     }
 
-    public static Channel getLastWatchedChannel(Context context) {
-        return getLastWatchedChannel(context, null);
+    public static void setLastWatchedChannel(Context context, String inputId, Uri channelUri) {
+        if (TextUtils.isEmpty(inputId)) {
+            throw new IllegalArgumentException("inputId cannot be empty");
+        }
+        context.getSharedPreferences(getPreferenceName(inputId), Context.MODE_PRIVATE).edit()
+                .putString(PREF_KEY_LAST_WATCHED_CHANNEL, channelUri.toString()).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putString(PREF_KEY_LAST_SELECTED_TV_INPUT, inputId).apply();
     }
 
-    public static void setLastWatchedChannel(Context context, Uri channelUri) {
-        // TODO: implement this
+    public static Uri getLastWatchedChannel(Context context) {
+        String inputId = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_KEY_LAST_SELECTED_TV_INPUT, null);
+        if (inputId == null) {
+            return null;
+        }
+        return getLastWatchedChannel(context, inputId);
     }
 
-    public static Channel getLastWatchedChannel(Context context, ComponentName inputName) {
-        // TODO: implement this
-        return null;
+    public static long getLastWatchedChannelId(Context context) {
+        return getChannelId(getLastWatchedChannel(context));
+    }
+
+    public static Uri getLastWatchedChannel(Context context, String inputId) {
+        if (TextUtils.isEmpty(inputId)) {
+            throw new IllegalArgumentException("inputId cannot be empty");
+        }
+        String channel = context.getSharedPreferences(getPreferenceName(inputId),
+                Context.MODE_PRIVATE).getString(PREF_KEY_LAST_WATCHED_CHANNEL, null);
+        return channel == null ? null : Uri.parse(channel);
+    }
+
+    public static long getLastWatchedChannelId(Context context, String inputId) {
+        return getChannelId(getLastWatchedChannel(context, inputId));
     }
 
     public static Program getCurrentProgram(Context context, Uri channelUri) {
@@ -91,5 +124,16 @@ public class TvInputUtils {
 
         // TODO: Consider providing the entire data if needed.
         return new Program.Builder().setTitle(title).build();
+    }
+
+    private static long getChannelId(Uri channelUri) {
+        if (channelUri == null) {
+            return Channel.INVALID_ID;
+        }
+        return ContentUris.parseId(channelUri);
+    }
+
+    private static String getPreferenceName(String inputId) {
+        return PREFIX_PREF_NAME + Base64.encodeToString(inputId.getBytes(), Base64.URL_SAFE);
     }
 }
