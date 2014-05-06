@@ -233,10 +233,11 @@ abstract public class BaseLocalTvInputService extends TvInputService {
 
     // Perform fake channel scan and push the result into the database.
     private void scan() {
+        ContentValues values = new ContentValues();
+        values.put(Channels.SERVICE_NAME, this.getClass().getName());
+
         for (int i = 1; i < mNumberOfChannels + 1; i++) {
             // Generate a dummy channel.
-            ContentValues values = new ContentValues();
-            values.put(Channels.SERVICE_NAME, getServiceName());
             values.put(Channels.DISPLAY_NUMBER, i);
             values.put(Channels.DISPLAY_NAME, "CH" + i);
             Uri uri = getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
@@ -262,9 +263,5 @@ abstract public class BaseLocalTvInputService extends TvInputService {
         public String getProgramTitle() {
             return mProgramTitle;
         }
-    }
-
-    private String getServiceName() {
-        return this.getClass().getName();
     }
 }

@@ -18,6 +18,7 @@
     package="com.example.sampletvinput">
 
     <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="19"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EPG_DATA" />
     <uses-permission android:name="android.permission.WRITE_EPG_DATA" />
@@ -40,6 +41,14 @@
             android:permission="android.permission.BIND_TV_INPUT"
             android:label="@string/local_input_label2"
             android:process=":remoteLocalSampleTvInput2">
+            <intent-filter>
+                <action android:name="android.tv.TvInputService" />
+            </intent-filter>
+        </service>
+        <service android:name="com.example.sampletvinput.HlsTvInputService"
+            android:permission="android.permission.BIND_TV_INPUT"
+            android:label="@string/hls_input_label"
+            android:process=":remoteHlsSampleTvInput">
             <intent-filter>
                 <action android:name="android.tv.TvInputService" />
             </intent-filter>
