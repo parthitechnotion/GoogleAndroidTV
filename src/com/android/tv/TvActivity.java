@@ -583,8 +583,8 @@ public class TvActivity extends Activity implements
         tune();
     }
 
-    private final TvInputManager.SessionCreateCallback mSessionCreated =
-            new TvInputManager.SessionCreateCallback() {
+    private final TvInputManager.SessionCallback mSessionCreated =
+            new TvInputManager.SessionCallback() {
                 @Override
                 public void onSessionCreated(TvInputManager.Session session) {
                     if (session != null) {
@@ -616,8 +616,8 @@ public class TvActivity extends Activity implements
         mPipShowing = true;
     }
 
-    private final TvInputManager.SessionCreateCallback mPipSessionCreated =
-            new TvInputManager.SessionCreateCallback() {
+    private final TvInputManager.SessionCallback mPipSessionCreated =
+            new TvInputManager.SessionCallback() {
                 @Override
                 public void onSessionCreated(final TvInputManager.Session session) {
                     Log.d(TAG, "PIP session is created.");
