@@ -41,7 +41,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="vnd.android.cursor.item/vnd.com.android.tv.channels" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
             <meta-data android:name="supports_leanback" android:value="true" />
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
+
+        <provider android:name="com.android.tv.search.LocalSearchProvider"
+            android:authorities="com.android.tv.search"
+            android:exported="true"
+            android:enabled="true">
+        </provider>
     </application>
 </manifest>
