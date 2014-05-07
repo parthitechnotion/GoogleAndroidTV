@@ -43,7 +43,7 @@ public class LocalTvInputService extends BaseTvInputService {
             R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
 
     private static final float WEBVIEW_ALPHA = 0.7f;
-    private static final String WEBVIEW_SITE = "http://www.yahoo.com";
+    private static final String WEBVIEW_SITE = "http://www.android.com";
 
     @Override
     public TvInputSessionImpl onCreateSession() {

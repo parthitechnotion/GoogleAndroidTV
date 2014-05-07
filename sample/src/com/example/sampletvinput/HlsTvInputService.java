@@ -17,19 +17,15 @@ public class HlsTvInputService extends BaseTvInputService {
     private static final String CHANNEL_1_NUMBER = "2-1";
     private static final String CHANNEL_2_NUMBER = "2-2";
     private static final String CHANNEL_3_NUMBER = "3-1";
-    private static final String CHANNEL_4_NUMBER = "4-1";
     private static final String CHANNEL_1_NAME = "NTSC(SD)";
     private static final String CHANNEL_2_NAME = "NTSC(HD)";
     private static final String CHANNEL_3_NAME = "BUNNY";
-    private static final String CHANNEL_4_NAME = "APPLE";
     private static final String SOURCE_1 =
             "http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8";
     private static final String SOURCE_2 =
             "http://devimages.apple.com/iphone/samples/bipbop/gear4/prog_index.m3u8";
     private static final String SOURCE_3 =
             "http://playertest.longtailvideo.com/adaptive/bbbfull/bbbfull.m3u8";
-    private static final String SOURCE_4 =
-            "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
 
     private NetworkStateReceiver mNetworkStateReceiver;
 
@@ -54,7 +50,6 @@ public class HlsTvInputService extends BaseTvInputService {
         list.add(new ChannelInfo(CHANNEL_1_NUMBER, CHANNEL_1_NAME));
         list.add(new ChannelInfo(CHANNEL_2_NUMBER, CHANNEL_2_NAME));
         list.add(new ChannelInfo(CHANNEL_3_NUMBER, CHANNEL_3_NAME));
-        list.add(new ChannelInfo(CHANNEL_4_NUMBER, CHANNEL_4_NAME));
         return list;
     }
 
@@ -67,8 +62,6 @@ public class HlsTvInputService extends BaseTvInputService {
             dataSource = SOURCE_2;
         } else if (CHANNEL_3_NUMBER.equals(channelNumber)) {
             dataSource = SOURCE_3;
-        } else if (CHANNEL_4_NUMBER.equals(channelNumber)) {
-            dataSource = SOURCE_4;
         } else {
             throw new IllegalArgumentException("Unknown channel number: " + channelNumber);
         }
