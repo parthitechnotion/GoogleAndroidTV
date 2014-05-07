@@ -53,8 +53,6 @@ public class InputPickerDialogFragment extends DialogFragment {
     private static final String TAG = "InputPickerDialogFragment";
     private static final String DIALOG_EDIT_INPUT = "edit_input";
 
-    private static final int REQUEST_START_SETUP_ACTIIVTY = 0;
-
     private final Map<String, TvInputInfo> mInputMap = new HashMap<String, TvInputInfo>();
     private ArrayAdapter<String> mAdapter;
     private InputPickerDialogListener mListener;
@@ -149,11 +147,7 @@ public class InputPickerDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         TvInputInfo name = mInputMap.get(mAdapter.getItem(which));
-                        if (!hasChannel(name)) {
-                            showSetupActivity(name, mAdapter.getItem(which));
-                            return;
-                        }
-                        mListener.onInputPicked(name);
+                        mListener.onInputPicked(name, mAdapter.getItem(which));
                     }
                 })
                 .setNeutralButton(R.string.edit_input_device_name,
@@ -202,61 +196,6 @@ public class InputPickerDialogFragment extends DialogFragment {
     }
 
     public interface InputPickerDialogListener {
-        public void onInputPicked(TvInputInfo which);
-    }
-
-    private boolean hasChannel(TvInputInfo name) {
-        Uri uri = TvContract.buildChannelsUriForInput(name.getComponent());
-        String[] projection = { TvContract.Channels._ID };
-        Cursor cursor = null;
-        try {
-            cursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
-            return cursor != null && cursor.getCount() > 0;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-    private void showSetupActivity(TvInputInfo inputInfo, String displayName) {
-        PackageManager pm = getActivity().getPackageManager();
-        List<ResolveInfo> activityInfos = pm.queryIntentActivities(
-                new Intent(TvInputUtils.ACTION_SETUP), PackageManager.GET_ACTIVITIES);
-        ResolveInfo setupActivity = null;
-        if (activityInfos != null) {
-            for (ResolveInfo info : activityInfos) {
-                if (info.activityInfo.packageName.equals(inputInfo.getPackageName())) {
-                    setupActivity = info;
-                }
-            }
-        }
-
-        if (setupActivity == null) {
-            String message = String.format(getString(R.string.input_setup_activity_not_found),
-                    displayName);
-            new AlertDialog.Builder(getActivity())
-                    .setMessage(message)
-                    .setPositiveButton(R.string.OK, null)
-                    .show();
-            return;
-        }
-
-        Intent intent = new Intent(TvInputUtils.ACTION_SETUP);
-        intent.setClassName(setupActivity.activityInfo.packageName,
-                setupActivity.activityInfo.name);
-        startActivityForResult(intent, REQUEST_START_SETUP_ACTIIVTY);
-        return;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_START_SETUP_ACTIIVTY:
-                if (resultCode == Activity.RESULT_OK) {
-                    mListener.onInputPicked(mSelectedTvInputInfo);
-                }
-                break;
-        }
+        public void onInputPicked(TvInputInfo which, String displayName);
     }
 }
