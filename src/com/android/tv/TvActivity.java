@@ -19,6 +19,7 @@ package com.android.tv;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -29,6 +30,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.ContentObserver;
+import android.database.Cursor;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -87,6 +89,8 @@ public class TvActivity extends Activity implements
     // STOPSHIP: debug keys are used only for testing.
     private static final boolean USE_DEBUG_KEYS = true;
 
+    private static final int REQUEST_START_SETUP_ACTIIVTY = 0;
+
     private TvInputManager mTvInputManager;
     private TvView mTvView;
     private LinearLayout mControlGuide;
@@ -101,6 +105,7 @@ public class TvActivity extends Activity implements
     private ChannelMap mChannelMap;
     private TvInputManager.Session mTvSession;
     private TvInputInfo mTvInputInfo;
+    private TvInputInfo mTvInputInfoForSetup;
     private AudioManager mAudioManager;
     private int mAudioFocusStatus;
     private final Handler mHandler = new Handler();
@@ -314,24 +319,78 @@ public class TvActivity extends Activity implements
     }
 
     @Override
-    public void onInputPicked(final TvInputInfo selectedTvInput) {
+    public void onInputPicked(final TvInputInfo selectedTvInput, final String displayName) {
         if (mTvSession != null && selectedTvInput.equals(mTvInputInfo)) {
             // Nothing has changed thus nothing to do.
             return;
         }
 
+        if (!TvInputUtils.hasChannel(this, selectedTvInput)) {
+            mTvInputInfoForSetup = null;
+            if (showSetupActivity(selectedTvInput, displayName)) {
+                stopSession();
+            }
+            return;
+        }
+
         // Start a new session with the new input.
         stopSession();
+
         // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
         // know when the surface is released at TIS, we don't need this hack.
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                long channelId = TvInputUtils.getLastWatchedChannelId(TvActivity.this,
-                        selectedTvInput.getId());
-                startSession(selectedTvInput, channelId);
+                startSession(selectedTvInput);
             }
         }, DELAY_FOR_SURFACE_RELEASE);
+    }
+
+    private boolean showSetupActivity(TvInputInfo inputInfo, String displayName) {
+        PackageManager pm = getPackageManager();
+        List<ResolveInfo> activityInfos = pm.queryIntentActivities(
+                new Intent(TvInputUtils.ACTION_SETUP), PackageManager.GET_ACTIVITIES);
+        ResolveInfo setupActivity = null;
+        if (activityInfos != null) {
+            for (ResolveInfo info : activityInfos) {
+                if (info.activityInfo.packageName.equals(inputInfo.getPackageName())) {
+                    setupActivity = info;
+                }
+            }
+        }
+
+        if (setupActivity == null) {
+            String message = String.format(getString(R.string.input_setup_activity_not_found),
+                    displayName);
+            new AlertDialog.Builder(this)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.OK, null)
+                    .show();
+            return false;
+        }
+
+        mTvInputInfoForSetup = inputInfo;
+        Intent intent = new Intent(TvInputUtils.ACTION_SETUP);
+        intent.setClassName(setupActivity.activityInfo.packageName,
+                setupActivity.activityInfo.name);
+        startActivityForResult(intent, REQUEST_START_SETUP_ACTIIVTY);
+
+        return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_START_SETUP_ACTIIVTY:
+                if (resultCode == Activity.RESULT_OK && mTvInputInfoForSetup != null) {
+                    startSession(mTvInputInfoForSetup);
+                }
+                break;
+
+            default:
+                //TODO: Handle failure of setup.
+        }
+        mTvInputInfoForSetup = null;
     }
 
     @Override
@@ -375,6 +434,12 @@ public class TvActivity extends Activity implements
                     break;
             }
         }
+    }
+
+    private void startSession(TvInputInfo selectedTvInput) {
+        long channelId = TvInputUtils.getLastWatchedChannelId(TvActivity.this,
+                selectedTvInput.getId());
+        startSession(selectedTvInput, channelId);
     }
 
     private void startSession(TvInputInfo inputInfo, long channelId) {

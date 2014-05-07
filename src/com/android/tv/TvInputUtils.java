@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.TvContract;
 import android.text.TextUtils;
+import android.tv.TvInputInfo;
 import android.util.Base64;
 
 /**
@@ -124,6 +125,20 @@ public class TvInputUtils {
 
         // TODO: Consider providing the entire data if needed.
         return new Program.Builder().setTitle(title).build();
+    }
+
+    public static boolean hasChannel(Context context, TvInputInfo name) {
+        Uri uri = TvContract.buildChannelsUriForInput(name.getComponent());
+        String[] projection = { TvContract.Channels._ID };
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(uri, projection, null, null, null);
+            return cursor != null && cursor.getCount() > 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     private static long getChannelId(Uri channelUri) {
