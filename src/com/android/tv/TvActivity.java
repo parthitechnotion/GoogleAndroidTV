@@ -674,14 +674,14 @@ public class TvActivity extends Activity implements
     }
 
     private void channelUp() {
-        if (mChannelMap != null) {
+        if (mChannelMap != null && mChannelMap.isLoadFinished()) {
             mChannelMap.moveToNextChannel();
             tune();
         }
     }
 
     private void channelDown() {
-        if (mChannelMap != null) {
+        if (mChannelMap != null && mChannelMap.isLoadFinished()) {
             mChannelMap.moveToPreviousChannel();
             tune();
         }
