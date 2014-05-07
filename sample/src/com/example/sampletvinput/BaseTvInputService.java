@@ -19,7 +19,6 @@ package com.example.sampletvinput;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -29,22 +28,102 @@ import android.provider.TvContract.Channels;
 import android.provider.TvContract.Programs;
 import android.tv.TvInputService;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.view.KeyEvent;
 import android.view.Surface;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-abstract public class BaseLocalTvInputService extends TvInputService {
-    private static final String TAG = "SampleTvInputService";
+abstract public class BaseTvInputService extends TvInputService {
+    private static final String TAG = "BaseTvInputService";
+    private static final boolean DEBUG = true;
 
-    class BaseLocalTvInputSessionImpl extends TvInputSessionImpl {
+    private final LongSparseArray<String> mChannelMap = new LongSparseArray<String>();
+    private final Handler mProgramUpdateHandler = new Handler();
+
+    // mNumberOfChannels and mSamples will be set in createSampleChannels().
+    protected int mNumberOfChannels;
+    protected List<ChannelInfo> mChannels;
+
+    private boolean mAvailable = true;
+
+    @Override
+    public void onCreate() {
+        if (DEBUG) Log.d(TAG, "onCreate()");
+        super.onCreate();
+
+        buildChannelMap();
+        setAvailable(mAvailable);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (DEBUG) Log.d(TAG, "onDestroy()");
+        super.onDestroy();
+    }
+
+    @Override
+    public TvInputSessionImpl onCreateSession() {
+        if (DEBUG) Log.d(TAG, "onCreateSession()");
+        return new BaseTvInputSessionImpl();
+    }
+
+    abstract public List<ChannelInfo> createSampleChannels();
+
+    abstract public boolean setDataSource(MediaPlayer player, String channelNumber);
+
+    private void buildChannelMap() {
+        Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()));
+        String[] projection = {
+                TvContract.Channels._ID,
+                TvContract.Channels.DISPLAY_NUMBER
+        };
+        Cursor cursor = null;
+        try {
+            do {
+                cursor = getContentResolver().query(uri, projection, null, null, null);
+                if (cursor != null && cursor.getCount() > 0) {
+                    break;
+                }
+                if (DEBUG) Log.d(TAG, "Couldn't find the channel list. Inserting new channels...");
+                // Insert channels into the database. This needs to be done only for the first time.
+                ContentValues values = new ContentValues();
+                values.put(Channels.SERVICE_NAME, this.getClass().getName());
+                for (ChannelInfo info : createSampleChannels()) {
+                    values.put(Channels.DISPLAY_NUMBER, info.getNumber());
+                    values.put(Channels.DISPLAY_NAME, info.getName());
+                    getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
+                }
+            } while (true);
+
+            while (cursor.moveToNext()) {
+                long channelId = cursor.getLong(0);
+                String channelNumber = cursor.getString(1);
+                if (DEBUG) Log.d(TAG, "Channel mapping: ID(" + channelId + ") -> " + channelNumber);
+                mChannelMap.put(channelId, channelNumber);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    private String getChannelNumber(Uri channelUri) {
+        String channelNumber = mChannelMap.get(ContentUris.parseId(channelUri));
+        if (channelNumber == null) {
+            throw new IllegalArgumentException("Unknown channel: " + channelUri);
+        }
+        return channelNumber;
+    }
+
+    class BaseTvInputSessionImpl extends TvInputSessionImpl {
         private MediaPlayer mPlayer;
         private float mVolume;
         private boolean mMute;
 
-        protected BaseLocalTvInputSessionImpl() {
+        protected BaseTvInputSessionImpl() {
             mPlayer = new MediaPlayer();
             mVolume = 1.0f;
             mMute = false;
@@ -60,47 +139,32 @@ abstract public class BaseLocalTvInputService extends TvInputService {
 
         @Override
         public boolean onSetSurface(Surface surface) {
-            Log.d(TAG, "onSetSurface(" + surface + ")");
+            if (DEBUG) Log.d(TAG, "onSetSurface(" + surface + ")");
             mPlayer.setSurface(surface);
             return true;
         }
 
         @Override
         public void onSetVolume(float volume) {
-            Log.d(TAG, "onSetVolume(" + volume + ")");
+            if (DEBUG) Log.d(TAG, "onSetVolume(" + volume + ")");
             mVolume = volume;
             mPlayer.setVolume(volume, volume);
         }
 
         @Override
         public boolean onTune(Uri channelUri) {
-            Log.d(TAG, "tune(" + channelUri + ")");
-            Sample sample = mChannelToSampleMap.get(channelUri);
-            if (sample == null) {
-                Log.e(TAG, channelUri + " does not exist on the channel map");
-                return false;
-            }
-            AssetFileDescriptor afd = getResources().openRawResourceFd(sample.getResourceId());
-            if (afd == null) {
-                return false;
-            }
+            if (DEBUG) Log.d(TAG, "tune(" + channelUri + ")");
 
             mPlayer.reset();
-            try {
-                mPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
-                        afd.getDeclaredLength());
-                mPlayer.prepare();
-                afd.close();
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (!setDataSource(mPlayer, getChannelNumber(channelUri))) {
+                if (DEBUG) Log.d(TAG, "Failed to set the data source");
+                return false;
             }
-            mPlayer.setLooping(true);
+            try {
+                mPlayer.prepare();
+            } catch (IllegalStateException | IOException e1) {
+                return false;
+            }
             mPlayer.start();
 
             try {
@@ -118,7 +182,7 @@ abstract public class BaseLocalTvInputService extends TvInputService {
             // the actual case where we get parsed program data only after tuning is done.
             final long DELAY_FOR_TESTING_IN_MILLIS = 1000; // 1 second
             mProgramUpdateHandler.postDelayed(
-                    new AddProgramRunnable(channelUri, sample.getProgramTitle()),
+                    new AddProgramRunnable(channelUri, "<Program Information>"),
                     DELAY_FOR_TESTING_IN_MILLIS);
             return true;
         }
@@ -173,95 +237,21 @@ abstract public class BaseLocalTvInputService extends TvInputService {
         }
     }
 
-    private final Map<Uri, Sample> mChannelToSampleMap = new HashMap<Uri, Sample>();
-    private final Handler mProgramUpdateHandler = new Handler();
+    static final class ChannelInfo {
+        private final String mNumber;
+        private final String mName;
 
-    // mNumberOfChannels and mSamples will be set in createSampleChannels().
-    protected int mNumberOfChannels;
-    protected Sample[] mSamples;
-
-    private boolean mAvailable = true;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d(TAG, "onCreate()");
-
-        createSampleChannels();
-        loadChannelMap();
-        setAvailable(mAvailable);
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy()");
-        super.onDestroy();
-    }
-
-    @Override
-    public TvInputSessionImpl onCreateSession() {
-        return new BaseLocalTvInputSessionImpl();
-    }
-
-    protected void loadChannelMap() {
-        Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()));
-        String[] projection = { TvContract.Channels._ID };
-
-        Cursor cursor = null;
-        try {
-            cursor = getContentResolver().query(uri, projection, null, null, null);
-            if (cursor == null || cursor.getCount() < 1) {
-                Log.d(TAG, "Couldn't find the channel list. Perform auto-scan.");
-                scan();
-                return;
-            }
-
-            int index = 0;
-            while (cursor.moveToNext()) {
-                long channelId = cursor.getLong(0);
-                Uri channelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI,
-                        channelId);
-                Log.d(TAG, "Channel mapping " + channelId + " to " + channelUri);
-                mChannelToSampleMap.put(channelUri, mSamples[index++ % mSamples.length]);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-    // Perform fake channel scan and push the result into the database.
-    private void scan() {
-        ContentValues values = new ContentValues();
-        values.put(Channels.SERVICE_NAME, this.getClass().getName());
-
-        for (int i = 1; i < mNumberOfChannels + 1; i++) {
-            // Generate a dummy channel.
-            values.put(Channels.DISPLAY_NUMBER, i);
-            values.put(Channels.DISPLAY_NAME, "CH" + i);
-            Uri uri = getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
-            mChannelToSampleMap.put(uri, mSamples[(i - 1) % mSamples.length]);
-        }
-    }
-
-    abstract void createSampleChannels();
-
-    protected static class Sample {
-        private final int mResourceId;
-        private final String mProgramTitle;
-
-        public Sample(int resourceId, String programTitle) {
-            mResourceId = resourceId;
-            mProgramTitle = programTitle;
+        public ChannelInfo(String number, String name) {
+            mNumber = number;
+            mName = name;
         }
 
-        public int getResourceId() {
-            return mResourceId;
+        public String getNumber() {
+            return mNumber;
         }
 
-        public String getProgramTitle() {
-            return mProgramTitle;
+        public String getName() {
+            return mName;
         }
     }
 }
