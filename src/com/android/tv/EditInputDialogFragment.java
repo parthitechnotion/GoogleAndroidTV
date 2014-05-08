@@ -22,7 +22,6 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
@@ -118,13 +117,9 @@ public class EditInputDialogFragment extends DialogFragment implements OnItemSel
         if (inputs.size() < 1) {
             return;
         }
-        SharedPreferences preferences = getActivity().getSharedPreferences(TvSettings.PREFS_FILE,
-                Context.MODE_PRIVATE);
-        PackageManager pm = getActivity().getPackageManager();
         for (TvInputInfo input : inputs) {
             String id = input.getId();
-            String name = preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + id,
-                    input.loadLabel(pm).toString());
+            String name = TvInputUtils.getDisplayNameForInput(getActivity(), input);
             mInputIdMap.put(name, id);
         }
         mDisplayNames = mInputIdMap.keySet().toArray(new String[0]);

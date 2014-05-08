@@ -19,6 +19,8 @@ package com.android.tv;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -139,6 +141,14 @@ public class TvInputUtils {
                 cursor.close();
             }
         }
+    }
+
+    public static String getDisplayNameForInput(Context context, TvInputInfo info) {
+        SharedPreferences preferences = context.getSharedPreferences(TvSettings.PREFS_FILE,
+                Context.MODE_PRIVATE);
+        PackageManager pm = context.getPackageManager();
+        return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
+                info.loadLabel(pm).toString());
     }
 
     private static long getChannelId(Uri channelUri) {

@@ -20,20 +20,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ComponentName;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ServiceInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.TvContract;
 import android.text.TextUtils;
-import android.util.Log;
+import android.tv.TvInputInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,18 +41,14 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 
 import com.android.tv.R;
-import com.android.tv.TvSettings;
+import com.android.tv.TvInputUtils;
 
 public class EditChannelsDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = EditChannelsDialogFragment.class.getName();
 
-    public static final String ARG_CURRENT_SERVICE_NAME = "current_service_name";
-    public static final String ARG_CURRENT_PACKAGE_NAME = "current_package_name";
+    public static final String ARG_CURRENT_INPUT = "current_input";
 
-    private static final String TAG = EditChannelsDialogFragment.class.getSimpleName();
-
-    private ComponentName mComponentName;
-    private String mServiceName;
+    private TvInputInfo mCurrentInput;
     private SimpleCursorAdapter mAdapter;
 
     private View mView;
@@ -72,29 +63,10 @@ public class EditChannelsDialogFragment extends DialogFragment {
         Bundle arg = getArguments();
         assert(arg != null);
 
-        String packageName = arg.getString(ARG_CURRENT_PACKAGE_NAME);
-        mServiceName = arg.getString(ARG_CURRENT_SERVICE_NAME);
-        assert(packageName != null && mServiceName != null);
-
-        mComponentName = new ComponentName(packageName, mServiceName);
-
-        String displayName = getActivity()
-                .getSharedPreferences(TvSettings.PREFS_FILE, Context.MODE_PRIVATE)
-                .getString(TvSettings.PREF_DISPLAY_INPUT_NAME + packageName + "/" + mServiceName,
-                        null);
-
-        if (TextUtils.isEmpty(displayName)) {
-            try {
-                PackageManager pm = getActivity().getPackageManager();
-                ServiceInfo info = pm.getServiceInfo(mComponentName, 0);
-                displayName = String.valueOf(info.loadLabel(pm));
-            } catch (NameNotFoundException e) {
-                Log.e(TAG, "The service '" + mComponentName + "' is not found.", e);
-                displayName = mServiceName;
-            }
-        }
-
+        mCurrentInput = arg.getParcelable(ARG_CURRENT_INPUT);
+        String displayName = TvInputUtils.getDisplayNameForInput(getActivity(), mCurrentInput);
         String title = String.format(getString(R.string.edit_channels_title), displayName);
+
         mView = LayoutInflater.from(getActivity()).inflate(R.layout.edit_channels, null);
         initButtons();
         initListView();
@@ -127,7 +99,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
         getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                Uri uri = TvContract.buildChannelsUriForInput(mComponentName, false);
+                Uri uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
                 String[] projections = { TvContract.Channels._ID,
                         TvContract.Channels.DISPLAY_NUMBER,
                         TvContract.Channels.DISPLAY_NAME,
@@ -204,7 +176,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
         if (mAdapter == null || mAdapter.getCursor() == null) {
             return;
         }
-        Uri uri = TvContract.buildChannelsUriForInput(mComponentName, false);
+        Uri uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
         ContentValues values = new ContentValues();
         values.put(TvContract.Channels.BROWSABLE, browsable ? 1 : 0);
 

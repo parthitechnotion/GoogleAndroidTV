@@ -25,8 +25,6 @@ import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.tv.TvInputInfo;
@@ -144,15 +142,12 @@ public class InputPickerDialogFragment extends DialogFragment {
             return;
         }
 
-        SharedPreferences preferences = getActivity().getSharedPreferences(TvSettings.PREFS_FILE,
-                Context.MODE_PRIVATE);
-        PackageManager pm = getActivity().getPackageManager();
         for (TvInputInfo input : inputs) {
             ComponentName inputName = input.getComponent();
-            String inputId = input.getId();
             mTvInputManager.registerListener(inputName, mAvailabilityListener, mHandler);
-            String name = preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + inputId,
-                    input.loadLabel(pm).toString());
+
+            String inputId = input.getId();
+            String name = TvInputUtils.getDisplayNameForInput(getActivity(), input);
             if (inputId.equals(mSelectedInputId)) {
                 name += " " + getResources().getString(R.string.selected);
             } else if (inputId.equals(mSelectedPipInputId)) {

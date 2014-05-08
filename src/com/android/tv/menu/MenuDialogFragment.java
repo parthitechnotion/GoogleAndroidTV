@@ -28,6 +28,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.tv.TvInputInfo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -47,8 +48,7 @@ public final class MenuDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = MenuDialogFragment.class.getName();
     public static final boolean PIP_MENU_ENABLED = true;
 
-    public static final String ARG_CURRENT_SERVICE_NAME = "current_service_name";
-    public static final String ARG_CURRENT_PACKAGE_NAME = "current_package_name";
+    public static final String ARG_CURRENT_INPUT = "current_input";
 
     private static final int POSITION_SELECT_INPUT  = 0;
     private static final int POSITION_EDIT_CHANNELS = 1;
@@ -57,15 +57,13 @@ public final class MenuDialogFragment extends DialogFragment {
     private static final int POSITION_PIP           = 4;
     private static final int POSITION_SETTINGS      = 5;
 
-    private String mCurrentPackageName;
-    private String mCurrentServiceName;
+    private TvInputInfo mCurrentInput;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle arg = getArguments();
         if (arg != null) {
-            mCurrentPackageName = arg.getString(ARG_CURRENT_PACKAGE_NAME);
-            mCurrentServiceName = arg.getString(ARG_CURRENT_SERVICE_NAME);
+            mCurrentInput = arg.getParcelable(ARG_CURRENT_INPUT);
         }
 
         String[] items = {
@@ -95,7 +93,7 @@ public final class MenuDialogFragment extends DialogFragment {
                     public boolean isEnabled(int position) {
                         switch (position) {
                             case POSITION_EDIT_CHANNELS:
-                                return mCurrentServiceName != null;
+                                return mCurrentInput != null;
                             case POSITION_SETUP:
                                 return getSetupActivityInfo() != null;
                             case POSITION_PIP:
@@ -120,10 +118,8 @@ public final class MenuDialogFragment extends DialogFragment {
                             case POSITION_EDIT_CHANNELS:
                                 EditChannelsDialogFragment f = new EditChannelsDialogFragment();
                                 Bundle arg = new Bundle();
-                                arg.putString(EditChannelsDialogFragment.ARG_CURRENT_PACKAGE_NAME,
-                                        mCurrentPackageName);
-                                arg.putString(EditChannelsDialogFragment.ARG_CURRENT_SERVICE_NAME,
-                                        mCurrentServiceName);
+                                arg.putParcelable(EditChannelsDialogFragment.ARG_CURRENT_INPUT,
+                                        mCurrentInput);
                                 f.setArguments(arg);
 
                                 showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, f);
@@ -176,7 +172,7 @@ public final class MenuDialogFragment extends DialogFragment {
 
         Intent intent = new Intent(action);
         intent.setClassName(info.packageName, info.name);
-        intent.putExtra(TvInputUtils.EXTRA_SERVICE_NAME, mCurrentServiceName);
+        intent.putExtra(TvInputUtils.EXTRA_SERVICE_NAME, mCurrentInput.getServiceName());
         startActivity(intent);
     }
 
@@ -189,7 +185,7 @@ public final class MenuDialogFragment extends DialogFragment {
     }
 
     private ActivityInfo getActivityInfo(String action) {
-        if (mCurrentPackageName == null) {
+        if (mCurrentInput == null) {
             return null;
         }
 
@@ -200,7 +196,7 @@ public final class MenuDialogFragment extends DialogFragment {
         }
 
         for (ResolveInfo info : infos) {
-            if (info.activityInfo.packageName.equals(mCurrentPackageName)) {
+            if (info.activityInfo.packageName.equals(mCurrentInput.getPackageName())) {
                 return info.activityInfo;
             }
         }

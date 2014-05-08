@@ -789,10 +789,7 @@ public class TvActivity extends Activity implements
         MenuDialogFragment f = new MenuDialogFragment();
         if (mTvSession != null) {
             Bundle arg = new Bundle();
-            arg.putString(MenuDialogFragment.ARG_CURRENT_PACKAGE_NAME,
-                    mTvInputInfo.getPackageName());
-            arg.putString(MenuDialogFragment.ARG_CURRENT_SERVICE_NAME,
-                    mTvInputInfo.getServiceName());
+            arg.putParcelable(MenuDialogFragment.ARG_CURRENT_INPUT, mTvInputInfo);
             f.setArguments(arg);
         }
 
