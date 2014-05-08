@@ -317,6 +317,9 @@ public class TvActivity extends Activity implements
         stopSession();
         stopPipSession();
         mDefaultSessionRequested = false;
+        if (!isShyModeSet()) {
+            setShynessMode(true);
+        }
         super.onStop();
     }
 
