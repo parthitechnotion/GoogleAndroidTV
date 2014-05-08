@@ -321,7 +321,16 @@ public class TvActivity extends Activity implements
     }
 
     public void showInputPickerDialog() {
-        showDialogFragment(InputPickerDialogFragment.DIALOG_TAG, new InputPickerDialogFragment());
+        InputPickerDialogFragment f = new InputPickerDialogFragment();
+        Bundle arg = new Bundle();
+        if (mTvInputInfo != null) {
+            arg.putString(InputPickerDialogFragment.ARG_MAIN_INPUT_ID, mTvInputInfo.getId());
+        }
+        if (mPipInputInfo != null) {
+            arg.putString(InputPickerDialogFragment.ARG_SUB_INPUT_ID, mPipInputInfo.getId());
+        }
+        f.setArguments(arg);
+        showDialogFragment(InputPickerDialogFragment.DIALOG_TAG, f);
     }
 
     @Override

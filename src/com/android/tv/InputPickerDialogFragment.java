@@ -37,6 +37,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +48,17 @@ import java.util.Map;
 public class InputPickerDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = InputPickerDialogFragment.class.getName();
 
+    public static final String ARG_MAIN_INPUT_ID = "main_input_id";
+    public static final String ARG_SUB_INPUT_ID = "sub_input_id";
+
     private static final String TAG = "InputPickerDialogFragment";
     private static final String DIALOG_EDIT_INPUT = "edit_input";
 
     private final Map<String, TvInputInfo> mInputMap = new HashMap<String, TvInputInfo>();
+
+    private String mSelectedInputId;
+    private String mSelectedPipInputId;
+
     private ArrayAdapter<String> mAdapter;
     private InputPickerDialogListener mListener;
 
@@ -90,6 +98,12 @@ public class InputPickerDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Bundle arg = getArguments();
+        if (arg != null) {
+            mSelectedInputId = arg.getString(ARG_MAIN_INPUT_ID);
+            mSelectedPipInputId = arg.getString(ARG_SUB_INPUT_ID);
+        }
+
         mAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
                 new ArrayList<String>()) {
             @Override
@@ -109,6 +123,10 @@ public class InputPickerDialogFragment extends DialogFragment {
             public boolean isEnabled(int position) {
                 if (mTvInputManager != null) {
                     TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(position));
+                    String inputId = inputInfo.getId();
+                    if (inputId.equals(mSelectedInputId) || inputId.equals(mSelectedPipInputId)) {
+                        return false;
+                    }
                     // TODO: Create a cache that is updated from mAvailabilityListener and use the
                     // cached value instead of making an IPC call to get the status.
                     return mTvInputManager.getAvailability(inputInfo.getComponent());
@@ -131,12 +149,20 @@ public class InputPickerDialogFragment extends DialogFragment {
         PackageManager pm = getActivity().getPackageManager();
         for (TvInputInfo input : inputs) {
             ComponentName inputName = input.getComponent();
+            String inputId = input.getId();
             mTvInputManager.registerListener(inputName, mAvailabilityListener, mHandler);
-            String name = preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + input.getId(),
+            String name = preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + inputId,
                     input.loadLabel(pm).toString());
+            if (inputId.equals(mSelectedInputId)) {
+                name += " " + getResources().getString(R.string.selected);
+            } else if (inputId.equals(mSelectedPipInputId)) {
+                name += " " + getResources().getString(R.string.selected_picture_in_picture);
+            }
             mInputMap.put(name, input);
         }
-        mAdapter.addAll(mInputMap.keySet().toArray(new String[0]));
+        String[] inputStrings = mInputMap.keySet().toArray(new String[0]);
+        Arrays.sort(inputStrings);
+        mAdapter.addAll(inputStrings);
         mAdapter.notifyDataSetChanged();
 
         ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_NEUTRAL).setEnabled(true);

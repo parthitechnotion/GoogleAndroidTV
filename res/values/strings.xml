@@ -17,6 +17,13 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="tv_app">TV</string>
     <string name="select_input_device">Select Input Device</string>
+    <!-- Used in the "Select Input Device" dialog to indicate that the user is already watching TV
+        from the current TV input, i.e. this input device is already selected. -->
+    <string name="selected">(Selected)</string>
+    <!-- Used in the "Select Input Device" dialog to indicate that the user is already watching TV
+        in the picture-in-piture mode from the current TV input, i.e. this input device is already
+        selected. -->
+    <string name="selected_picture_in_picture">(Selected/Picture-In-Picture)</string>
     <string name="no_input_device_found">No input device found</string>
     <string name="please_select_input_device">Please select input device</string>
     <string name="no_program_information">No program information</string>
