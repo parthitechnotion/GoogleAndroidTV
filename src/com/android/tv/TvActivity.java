@@ -640,6 +640,13 @@ public class TvActivity extends Activity implements
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Do not save instance state because restoring instance state when TV app died
+        // unexpectedly can cause some problems like initializing fragments duplicately and
+        // accessing resource before it is initialzed.
+    }
+
+    @Override
     protected void onDestroy() {
         getContentResolver().unregisterContentObserver(mProgramUpdateObserver);
         mTvView.getHolder().removeCallback(mSurfaceHolderCallback);
