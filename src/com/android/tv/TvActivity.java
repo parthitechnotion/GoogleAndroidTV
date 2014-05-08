@@ -63,8 +63,9 @@ import java.util.List;
 public class TvActivity extends Activity implements
         InputPickerDialogFragment.InputPickerDialogListener,
         AudioManager.OnAudioFocusChangeListener {
-    private static final String TAG = "TvActivity";
+    // STOPSHIP: Turn debugging off
     private static final boolean DEBUG = true;
+    private static final String TAG = "TvActivity";
 
     private static final int DURATION_SHOW_CHANNEL_BANNER = 2000;
     private static final int DURATION_SHOW_CONTROL_GUIDE = 1000;
@@ -400,6 +401,7 @@ public class TvActivity extends Activity implements
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (DEBUG) Log.d(TAG, "dispatchKeyEvent(" + event + ")");
         int eventKeyCode = event.getKeyCode();
         if (mUseKeycodeBlacklist) {
             for (int keycode : KEYCODE_BLACKLIST) {
@@ -691,8 +693,7 @@ public class TvActivity extends Activity implements
                     displayChannelBanner();
                     return true;
 
-                case KeyEvent.KEYCODE_DPAD_LEFT:
-                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                case KeyEvent.KEYCODE_DPAD_CENTER:
                 case KeyEvent.KEYCODE_MENU:
                     if (event.isCanceled()) {
                         return true;
@@ -744,6 +745,10 @@ public class TvActivity extends Activity implements
     }
 
     private boolean dispatchKeyEventToSession(final KeyEvent event) {
+        if (DEBUG) Log.d(TAG, "dispatchKeyEventToSession(" + event + ")");
+        if (mTvView != null) {
+            return mTvView.dispatchKeyEvent(event);
+        }
         return false;
     }
 
