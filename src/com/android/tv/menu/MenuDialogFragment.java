@@ -28,6 +28,8 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 
@@ -80,6 +82,13 @@ public final class MenuDialogFragment extends DialogFragment {
                     @Override
                     public boolean areAllItemsEnabled() {
                         return false;
+                    }
+
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        View view = super.getView(position, convertView, parent);
+                        view.setEnabled(isEnabled(position));
+                        return view;
                     }
 
                     @Override

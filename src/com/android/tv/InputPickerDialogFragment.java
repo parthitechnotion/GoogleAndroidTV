@@ -25,18 +25,15 @@ import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.TvContract;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
@@ -58,7 +55,6 @@ public class InputPickerDialogFragment extends DialogFragment {
     private InputPickerDialogListener mListener;
 
     private TvInputManager mTvInputManager;
-    private TvInputInfo mSelectedTvInputInfo;
 
     private final TvInputManager.TvInputListener mAvailabilityListener =
             new TvInputManager.TvInputListener() {
@@ -100,6 +96,13 @@ public class InputPickerDialogFragment extends DialogFragment {
             public boolean areAllItemsEnabled() {
                 // Some inputs might not be available at the moment.
                 return false;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                view.setEnabled(isEnabled(position));
+                return view;
             }
 
             @Override
