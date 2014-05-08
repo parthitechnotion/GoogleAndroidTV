@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -91,6 +90,10 @@ public class TvActivity extends Activity implements
 
     private static final int REQUEST_START_SETUP_ACTIIVTY = 0;
 
+    private static final String LEANBACK_SET_SHYNESS_BROADCAST =
+            "com.android.mclauncher.action.SET_APP_SHYNESS";
+    private static final String LEANBACK_SHY_MODE_EXTRA = "shyMode";
+
     private TvInputManager mTvInputManager;
     private TvView mTvView;
     private LinearLayout mControlGuide;
@@ -114,6 +117,7 @@ public class TvActivity extends Activity implements
     private boolean mPipShowing;
     private boolean mDebugNonFullSizeScreen;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
+    private boolean mIsShy = true;
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
@@ -307,11 +311,12 @@ public class TvActivity extends Activity implements
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
+        if (DEBUG) Log.d(TAG, "onStop() -- stop all sessions");
         stopSession();
         stopPipSession();
         mDefaultSessionRequested = false;
-        super.onPause();
+        super.onStop();
     }
 
     public void showInputPickerDialog() {
@@ -564,6 +569,10 @@ public class TvActivity extends Activity implements
             // TODO: add result callback and show a message on failure.
             TvInputUtils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
             mTvSession.tune(currentChannelUri);
+            if (isShyModeSet()) {
+                setShynessMode(false);
+                // TODO: Set the shy mode to true when tune() fails.
+            }
             displayChannelBanner();
         }
         mTunePendding = false;
@@ -814,5 +823,16 @@ public class TvActivity extends Activity implements
         }
         // Schedule the hide animation after a few seconds.
         mHideHandler.postDelayed(hide, duration);
+    }
+
+    private void setShynessMode(boolean shyMode) {
+        mIsShy = shyMode;
+        Intent intent = new Intent(LEANBACK_SET_SHYNESS_BROADCAST);
+        intent.putExtra(LEANBACK_SHY_MODE_EXTRA, shyMode);
+        sendBroadcast(intent);
+    }
+
+    private boolean isShyModeSet() {
+        return mIsShy;
     }
 }
