@@ -42,6 +42,7 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 
 import com.android.tv.R;
 import com.android.tv.TvInputUtils;
+import com.android.tv.TvSettings;
 
 public class EditChannelsDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = EditChannelsDialogFragment.class.getName();
@@ -104,7 +105,8 @@ public class EditChannelsDialogFragment extends DialogFragment {
                         TvContract.Channels.DISPLAY_NUMBER,
                         TvContract.Channels.DISPLAY_NAME,
                         TvContract.Channels.BROWSABLE};
-                return new CursorLoader(getActivity(), uri, projections, null, null, null);
+                return new CursorLoader(getActivity(), uri, projections, null, null,
+                        TvInputUtils.CHANNEL_SORT_ORDER);
             }
 
             @Override
@@ -113,12 +115,14 @@ public class EditChannelsDialogFragment extends DialogFragment {
                 mIndexDisplayName = cursor.getColumnIndex(TvContract.Channels.DISPLAY_NAME);
                 mIndexBrowsable = cursor.getColumnIndex(TvContract.Channels.BROWSABLE);
 
-                mAdapter.changeCursor(cursor);
+                cursor.setNotificationUri(getActivity().getContentResolver(),
+                        TvContract.Channels.CONTENT_URI);
+                mAdapter.swapCursor(cursor);
             }
 
             @Override
             public void onLoaderReset(Loader<Cursor> loader) {
-                mAdapter.changeCursor(null);
+                mAdapter.swapCursor(null);
             }
         });
 
@@ -160,14 +164,12 @@ public class EditChannelsDialogFragment extends DialogFragment {
                 CheckedTextView checkedTextView =
                         (CheckedTextView) view.findViewById(R.id.channel_text_view);
                 boolean checked = checkedTextView.isChecked();
-                int fromTop = view.getTop();
 
                 Uri uri = TvContract.buildChannelUri(id);
                 ContentValues values = new ContentValues();
+                // Toggle the browsable value.
                 values.put(TvContract.Channels.BROWSABLE, checked ? 0 : 1);
                 getActivity().getContentResolver().update(uri, values, null, null);
-
-                mListView.setSelectionFromTop(position, fromTop);
             }
         });
     }
