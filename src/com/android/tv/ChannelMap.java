@@ -36,6 +36,8 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "ChannelMap";
     private static final int CURSOR_LOADER_ID = 0;
 
+    private static final int BROWSABLE = 1;
+
     private final Activity mActivity;
     private final ComponentName mInputName;
     private long mCurrentChannelId;
@@ -50,6 +52,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mIndexPackageName;
     private int mIndexServiceName;
     private int mIndexBrowsable;
+    private int mBrowsableChannelCount;
 
     public ChannelMap(Activity activity, ComponentName inputName, long initChannelId,
             TvInputManagerHelper tvInputManagerHelper, Runnable onLoadFinished) {
@@ -68,7 +71,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public int size() {
         checkCursor();
-        return mCursor.getCount();
+        return mBrowsableChannelCount == 0 ? mCursor.getCount() : mBrowsableChannelCount;
     }
 
     public Uri getCurrentChannelUri() {
@@ -98,63 +101,49 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public boolean moveToNextChannel() {
         checkCursor();
-        if (mCursor.getCount() == 0) {
+        if (mCursor.getCount() <= 0) {
             return false;
         }
-        if (!mIsUnifiedTvInput) {
-            if (!mTvInputManagerHelper.isAvaliable(mInputName)) {
-                return false;
-            }
-            if (!mCursor.moveToNext()) {
-                mCursor.moveToFirst();
-            }
-            mCurrentChannelId = mCursor.getLong(mIndexId);
-            return true;
-        }
-        // For unified TV input.
-        int position = mCursor.getPosition();
-        while (mCursor.moveToNext() || mCursor.moveToFirst()) {
-            if (mTvInputManagerHelper.isAvaliable(getComponentName())
-                    && mCursor.getInt(mIndexBrowsable) == 1) {
+
+        int browsableChannelCount = size();
+        int oldPosition = mCursor.getPosition();
+        boolean ignoreBrowsable = mBrowsableChannelCount == 0;
+
+        while(browsableChannelCount > 0 && (mCursor.moveToNext() || mCursor.moveToFirst())) {
+            if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
+                --browsableChannelCount;
+                if (!mTvInputManagerHelper.isAvaliable(getComponentName())) {
+                    continue;
+                }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
                 return true;
             }
-            if (position == mCursor.getPosition()) {
-                break;
-            }
         }
-        mCurrentChannelId = Channel.INVALID_ID;
+        mCursor.moveToPosition(oldPosition);
         return false;
-    }
+   }
 
     public boolean moveToPreviousChannel() {
         checkCursor();
-        if (mCursor.getCount() == 0) {
+        if (mCursor.getCount() <= 0) {
             return false;
         }
-        if (!mIsUnifiedTvInput) {
-            if (!mTvInputManagerHelper.isAvaliable(mInputName)) {
-                return false;
-            }
-            if (!mCursor.moveToPrevious()) {
-                mCursor.moveToLast();
-            }
-            mCurrentChannelId = mCursor.getLong(mIndexId);
-            return true;
-        }
-        // For unified TV input.
-        int position = mCursor.getPosition();
-        while (mCursor.moveToPrevious() || mCursor.moveToLast()) {
-            if (mTvInputManagerHelper.isAvaliable(getComponentName())
-                    && mCursor.getInt(mIndexBrowsable) == 1) {
+
+        int browsableChannelCount = size();
+        int oldPosition = mCursor.getPosition();
+        boolean ignoreBrowsable = mBrowsableChannelCount == 0;
+
+        while(browsableChannelCount > 0 && (mCursor.moveToPrevious() || mCursor.moveToLast())) {
+            if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
+                --browsableChannelCount;
+                if (!mTvInputManagerHelper.isAvaliable(getComponentName())) {
+                    continue;
+                }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
                 return true;
             }
-            if (position == mCursor.getPosition()) {
-                break;
-            }
         }
-        mCurrentChannelId = Channel.INVALID_ID;
+        mCursor.moveToPosition(oldPosition);
         return false;
     }
 
@@ -180,7 +169,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         if (mIsUnifiedTvInput) {
             uri = TvContract.Channels.CONTENT_URI;
         } else {
-            uri = TvContract.buildChannelsUriForInput(mInputName);
+            uri = TvContract.buildChannelsUriForInput(mInputName, false);
         }
         String[] projection = {
                 TvContract.Channels._ID,
@@ -213,7 +202,15 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mIndexPackageName = mCursor.getColumnIndex(TvContract.Channels.PACKAGE_NAME);
         mIndexServiceName = mCursor.getColumnIndex(TvContract.Channels.SERVICE_NAME);
         mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.BROWSABLE);
+        mBrowsableChannelCount = 0;
         if (mCursor.getCount() > 0) {
+            mCursor.moveToFirst();
+            do {
+                if (mCursor.getInt(mIndexBrowsable) == BROWSABLE) {
+                    ++mBrowsableChannelCount;
+                }
+            } while (mCursor.moveToNext());
+
             mCursor.moveToFirst();
             if (mCurrentChannelId != Channel.INVALID_ID) {
                 moveToChannel(mCurrentChannelId);

@@ -74,7 +74,8 @@ abstract public class BaseTvInputService extends TvInputService {
     abstract public boolean setDataSource(MediaPlayer player, String channelNumber);
 
     private void buildChannelMap() {
-        Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()));
+        Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()),
+                false);
         String[] projection = {
                 TvContract.Channels._ID,
                 TvContract.Channels.DISPLAY_NUMBER
