@@ -38,7 +38,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final Activity mActivity;
     private final ComponentName mInputName;
-    private final long mInitChannelId;
+    private long mCurrentChannelId;
     private Cursor mCursor;
     private final Runnable mOnLoadFinished;
     private boolean mIsLoadFinished;
@@ -50,7 +50,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
             Runnable onLoadFinished) {
         mActivity = activity;
         mInputName = inputName;
-        mInitChannelId = initChannelId;
+        mCurrentChannelId = initChannelId;
         mOnLoadFinished = onLoadFinished;
         mActivity.getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
@@ -94,6 +94,8 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         if (!mCursor.moveToNext()) {
             mCursor.moveToFirst();
         }
+        mCurrentChannelId = (mCursor.getCount() == 0) ? Channel.INVALID_ID :
+                mCursor.getLong(mIndexId);
     }
 
     public void moveToPreviousChannel() {
@@ -101,14 +103,20 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         if (!mCursor.moveToPrevious()) {
             mCursor.moveToLast();
         }
+        mCurrentChannelId = (mCursor.getCount() == 0) ? Channel.INVALID_ID :
+                mCursor.getLong(mIndexId);
     }
 
     public void moveToChannel(long id) {
         checkCursor();
+        if (mCursor.getCount() == 0) {
+            return;
+        }
         int position = mCursor.getPosition();
         mCursor.moveToFirst();
         do {
             if (mCursor.getLong(mIndexId) == id) {
+                mCurrentChannelId = mCursor.getLong(mIndexId);
                 return;
             }
         } while (mCursor.moveToNext());
@@ -122,10 +130,8 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
                 TvContract.Channels._ID,
                 TvContract.Channels.DISPLAY_NUMBER,
                 TvContract.Channels.DISPLAY_NAME};
-        String sortOrder = "CAST(" + TvContract.Channels.DISPLAY_NUMBER
-                + " AS INTEGER), CAST(SUBSTR(LTRIM(" + TvContract.Channels.DISPLAY_NUMBER
-                + ",'0123456789'),2) AS INTEGER)";
-        return new CursorLoader(mActivity, uri, projection, null, null, sortOrder);
+        return new CursorLoader(mActivity, uri, projection, null, null,
+                TvInputUtils.CHANNEL_SORT_ORDER);
     }
 
     @Override
@@ -135,14 +141,18 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         if (mCursor == null || mCursor.isClosed()) {
             return;
         }
+        cursor.setNotificationUri(mActivity.getContentResolver(), TvContract.Channels.CONTENT_URI);
         mIndexId = mCursor.getColumnIndex(TvContract.Channels._ID);
         mIndexDisplayNumber = mCursor.getColumnIndex(TvContract.Channels.DISPLAY_NUMBER);
         mIndexDisplayName = mCursor.getColumnIndex(TvContract.Channels.DISPLAY_NAME);
         if (mCursor.getCount() > 0) {
             mCursor.moveToFirst();
-            if (mInitChannelId != Channel.INVALID_ID) {
-                moveToChannel(mInitChannelId);
+            if (mCurrentChannelId != Channel.INVALID_ID) {
+                moveToChannel(mCurrentChannelId);
             }
+            mCurrentChannelId = mCursor.getLong(mIndexId);
+        } else {
+            mCurrentChannelId = Channel.INVALID_ID;
         }
         mIsLoadFinished = true;
         mOnLoadFinished.run();
