@@ -25,6 +25,8 @@
         selected. -->
     <string name="selected_picture_in_picture">(Selected/Picture-In-Picture)</string>
     <string name="no_input_device_found">No input device found</string>
+    <string name="no_available_input_device">No input device is available</string>
+    <string name="input_is_not_available">The TV input is not available. Please change the TV input.</string>
     <string name="please_select_input_device">Please select input device</string>
     <string name="no_program_information">No program information</string>
     <string name="previously_selected_input_unavailable">Previously selected input unavailable</string>
@@ -50,6 +52,8 @@
     <string name="menu_toggle_pip">Toggle PIP</string>
     <!-- Source specific settings menu option [CHAR LIMIT=30] -->
     <string name="source_specific_setting">More\u2026</string>
+    <!-- Unified TV input label -->
+    <string name="unified_tv_input_label">Unified TV input</string>
 
     <!-- Edit channel list (enable/disable individual channels) -->
     <string name="edit_channels_title">Edit channel list for <xliff:g id="serviceName">%s</xliff:g></string>

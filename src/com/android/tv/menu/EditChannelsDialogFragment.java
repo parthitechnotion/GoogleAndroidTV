@@ -42,14 +42,15 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 
 import com.android.tv.R;
 import com.android.tv.TvInputUtils;
-import com.android.tv.TvSettings;
 
 public class EditChannelsDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = EditChannelsDialogFragment.class.getName();
 
     public static final String ARG_CURRENT_INPUT = "current_input";
+    public static final String ARG_IS_UNIFIED_TV_INPUT = "unified_tv_input";
 
     private TvInputInfo mCurrentInput;
+    private boolean mIsUnifiedTvInput;
     private SimpleCursorAdapter mAdapter;
 
     private View mView;
@@ -65,6 +66,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
         assert(arg != null);
 
         mCurrentInput = arg.getParcelable(ARG_CURRENT_INPUT);
+        mIsUnifiedTvInput = arg.getBoolean(ARG_IS_UNIFIED_TV_INPUT);
         String displayName = TvInputUtils.getDisplayNameForInput(getActivity(), mCurrentInput);
         String title = String.format(getString(R.string.edit_channels_title), displayName);
 
@@ -100,13 +102,24 @@ public class EditChannelsDialogFragment extends DialogFragment {
         getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                Uri uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
+                Uri uri;
+                if (mIsUnifiedTvInput) {
+                    uri = TvContract.Channels.CONTENT_URI;
+                } else {
+                    uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
+                }
                 String[] projections = { TvContract.Channels._ID,
                         TvContract.Channels.DISPLAY_NUMBER,
                         TvContract.Channels.DISPLAY_NAME,
                         TvContract.Channels.BROWSABLE};
-                return new CursorLoader(getActivity(), uri, projections, null, null,
-                        TvInputUtils.CHANNEL_SORT_ORDER);
+                String sortOrder;
+                if (mIsUnifiedTvInput) {
+                    sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
+                            + TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+                } else {
+                    sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+                }
+                return new CursorLoader(getActivity(), uri, projections, null, null, sortOrder);
             }
 
             @Override
