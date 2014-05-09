@@ -40,17 +40,24 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private final ComponentName mInputName;
     private long mCurrentChannelId;
     private Cursor mCursor;
+    private final TvInputManagerHelper mTvInputManagerHelper;
     private final Runnable mOnLoadFinished;
     private boolean mIsLoadFinished;
+    private final boolean mIsUnifiedTvInput;
     private int mIndexId;
     private int mIndexDisplayNumber;
     private int mIndexDisplayName;
+    private int mIndexPackageName;
+    private int mIndexServiceName;
+    private int mIndexBrowsable;
 
     public ChannelMap(Activity activity, ComponentName inputName, long initChannelId,
-            Runnable onLoadFinished) {
+            TvInputManagerHelper tvInputManagerHelper, Runnable onLoadFinished) {
         mActivity = activity;
         mInputName = inputName;
+        mIsUnifiedTvInput = mInputName == null;
         mCurrentChannelId = initChannelId;
+        mTvInputManagerHelper = tvInputManagerHelper;
         mOnLoadFinished = onLoadFinished;
         mActivity.getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
@@ -89,22 +96,66 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return mCursor.getString(mIndexDisplayName);
     }
 
-    public void moveToNextChannel() {
+    public boolean moveToNextChannel() {
         checkCursor();
-        if (!mCursor.moveToNext()) {
-            mCursor.moveToFirst();
+        if (mCursor.getCount() == 0) {
+            return false;
         }
-        mCurrentChannelId = (mCursor.getCount() == 0) ? Channel.INVALID_ID :
-                mCursor.getLong(mIndexId);
+        if (!mIsUnifiedTvInput) {
+            if (!mTvInputManagerHelper.isAvaliable(mInputName)) {
+                return false;
+            }
+            if (!mCursor.moveToNext()) {
+                mCursor.moveToFirst();
+            }
+            mCurrentChannelId = mCursor.getLong(mIndexId);
+            return true;
+        }
+        // For unified TV input.
+        int position = mCursor.getPosition();
+        while (mCursor.moveToNext() || mCursor.moveToFirst()) {
+            if (mTvInputManagerHelper.isAvaliable(getComponentName())
+                    && mCursor.getInt(mIndexBrowsable) == 1) {
+                mCurrentChannelId = mCursor.getLong(mIndexId);
+                return true;
+            }
+            if (position == mCursor.getPosition()) {
+                break;
+            }
+        }
+        mCurrentChannelId = Channel.INVALID_ID;
+        return false;
     }
 
-    public void moveToPreviousChannel() {
+    public boolean moveToPreviousChannel() {
         checkCursor();
-        if (!mCursor.moveToPrevious()) {
-            mCursor.moveToLast();
+        if (mCursor.getCount() == 0) {
+            return false;
         }
-        mCurrentChannelId = (mCursor.getCount() == 0) ? Channel.INVALID_ID :
-                mCursor.getLong(mIndexId);
+        if (!mIsUnifiedTvInput) {
+            if (!mTvInputManagerHelper.isAvaliable(mInputName)) {
+                return false;
+            }
+            if (!mCursor.moveToPrevious()) {
+                mCursor.moveToLast();
+            }
+            mCurrentChannelId = mCursor.getLong(mIndexId);
+            return true;
+        }
+        // For unified TV input.
+        int position = mCursor.getPosition();
+        while (mCursor.moveToPrevious() || mCursor.moveToLast()) {
+            if (mTvInputManagerHelper.isAvaliable(getComponentName())
+                    && mCursor.getInt(mIndexBrowsable) == 1) {
+                mCurrentChannelId = mCursor.getLong(mIndexId);
+                return true;
+            }
+            if (position == mCursor.getPosition()) {
+                break;
+            }
+        }
+        mCurrentChannelId = Channel.INVALID_ID;
+        return false;
     }
 
     public void moveToChannel(long id) {
@@ -125,13 +176,27 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri uri = TvContract.buildChannelsUriForInput(mInputName);
+        Uri uri;
+        if (mIsUnifiedTvInput) {
+            uri = TvContract.Channels.CONTENT_URI;
+        } else {
+            uri = TvContract.buildChannelsUriForInput(mInputName);
+        }
         String[] projection = {
                 TvContract.Channels._ID,
                 TvContract.Channels.DISPLAY_NUMBER,
-                TvContract.Channels.DISPLAY_NAME};
-        return new CursorLoader(mActivity, uri, projection, null, null,
-                TvInputUtils.CHANNEL_SORT_ORDER);
+                TvContract.Channels.DISPLAY_NAME,
+                TvContract.Channels.PACKAGE_NAME,
+                TvContract.Channels.SERVICE_NAME,
+                TvContract.Channels.BROWSABLE};
+        String sortOrder;
+        if (mIsUnifiedTvInput) {
+            sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
+                    + TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+        } else {
+            sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+        }
+        return new CursorLoader(mActivity, uri, projection, null, null, sortOrder);
     }
 
     @Override
@@ -145,6 +210,9 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mIndexId = mCursor.getColumnIndex(TvContract.Channels._ID);
         mIndexDisplayNumber = mCursor.getColumnIndex(TvContract.Channels.DISPLAY_NUMBER);
         mIndexDisplayName = mCursor.getColumnIndex(TvContract.Channels.DISPLAY_NAME);
+        mIndexPackageName = mCursor.getColumnIndex(TvContract.Channels.PACKAGE_NAME);
+        mIndexServiceName = mCursor.getColumnIndex(TvContract.Channels.SERVICE_NAME);
+        mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.BROWSABLE);
         if (mCursor.getCount() > 0) {
             mCursor.moveToFirst();
             if (mCurrentChannelId != Channel.INVALID_ID) {
@@ -178,6 +246,11 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
                     + mCursor.getString(mIndexDisplayName));
         } while (mCursor.moveToNext());
         mCursor.moveToPosition(oldPosition);
+    }
+
+    private ComponentName getComponentName() {
+        return new ComponentName(mCursor.getString(mIndexPackageName),
+                mCursor.getString(mIndexServiceName));
     }
 
     private void checkCursor() {

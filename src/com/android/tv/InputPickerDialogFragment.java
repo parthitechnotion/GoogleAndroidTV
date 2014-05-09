@@ -48,9 +48,11 @@ public class InputPickerDialogFragment extends DialogFragment {
 
     public static final String ARG_MAIN_INPUT_ID = "main_input_id";
     public static final String ARG_SUB_INPUT_ID = "sub_input_id";
+    public static final String ARG_IS_UNIFIED_TV_INPUT = "unified_tv_input";
 
     private static final String TAG = "InputPickerDialogFragment";
     private static final String DIALOG_EDIT_INPUT = "edit_input";
+    private static final int UNIFIED_TV_INPUT_POSITION = 0;
 
     private final Map<String, TvInputInfo> mInputMap = new HashMap<String, TvInputInfo>();
     private final Map<ComponentName, Boolean> mInputAvailabilityMap =
@@ -58,9 +60,12 @@ public class InputPickerDialogFragment extends DialogFragment {
 
     private String mSelectedInputId;
     private String mSelectedPipInputId;
+    private boolean mIsUnifiedTvInput;
 
+    // The first item of the adapter is always 'Unified TV input'.
     private ArrayAdapter<String> mAdapter;
     private InputPickerDialogListener mListener;
+    private String mUnifiedTvInputLabel;
 
     private TvInputManager mTvInputManager;
 
@@ -103,6 +108,7 @@ public class InputPickerDialogFragment extends DialogFragment {
         if (arg != null) {
             mSelectedInputId = arg.getString(ARG_MAIN_INPUT_ID);
             mSelectedPipInputId = arg.getString(ARG_SUB_INPUT_ID);
+            mIsUnifiedTvInput = arg.getBoolean(ARG_IS_UNIFIED_TV_INPUT, false);
         }
 
         mAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
@@ -122,15 +128,35 @@ public class InputPickerDialogFragment extends DialogFragment {
 
             @Override
             public boolean isEnabled(int position) {
+                if (position == UNIFIED_TV_INPUT_POSITION) {
+                    if (mIsUnifiedTvInput) {
+                        return false;
+                    }
+                    for (int i = 0; i < getCount(); ++i) {
+                        if (i == UNIFIED_TV_INPUT_POSITION) {
+                            continue;
+                        }
+                        TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(i));
+                        if (isEnabled(i) && TvInputUtils.hasChannel(getContext(), inputInfo)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
                 TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(position));
                 String inputId = inputInfo.getId();
-                if (inputId.equals(mSelectedInputId) || inputId.equals(mSelectedPipInputId)) {
+                if ((inputId.equals(mSelectedInputId) && !mIsUnifiedTvInput)
+                        || inputId.equals(mSelectedPipInputId)) {
                     return false;
                 }
                 return mInputAvailabilityMap.get(inputInfo.getComponent());
             }
         };
         mTvInputManager = (TvInputManager) getActivity().getSystemService(Context.TV_INPUT_SERVICE);
+        mUnifiedTvInputLabel = getString(R.string.unified_tv_input_label);
+        if (mIsUnifiedTvInput) {
+            mUnifiedTvInputLabel += " " + getResources().getString(R.string.selected);
+        }
     }
 
     private void setupInputAdapter() {
@@ -151,7 +177,7 @@ public class InputPickerDialogFragment extends DialogFragment {
 
             String inputId = input.getId();
             String name = TvInputUtils.getDisplayNameForInput(getActivity(), input);
-            if (inputId.equals(mSelectedInputId)) {
+            if (inputId.equals(mSelectedInputId) && !mIsUnifiedTvInput) {
                 name += " " + getResources().getString(R.string.selected);
             } else if (inputId.equals(mSelectedPipInputId)) {
                 name += " " + getResources().getString(R.string.selected_picture_in_picture);
@@ -160,6 +186,7 @@ public class InputPickerDialogFragment extends DialogFragment {
         }
         String[] inputStrings = mInputMap.keySet().toArray(new String[0]);
         Arrays.sort(inputStrings);
+        mAdapter.add(mUnifiedTvInputLabel);
         mAdapter.addAll(inputStrings);
         mAdapter.notifyDataSetChanged();
 
@@ -173,8 +200,9 @@ public class InputPickerDialogFragment extends DialogFragment {
                 .setAdapter(mAdapter, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        TvInputInfo name = mInputMap.get(mAdapter.getItem(which));
-                        mListener.onInputPicked(name, mAdapter.getItem(which));
+                        TvInputInfo input = mInputMap.get(mAdapter.getItem(which));
+                        // If the unified TV input is selected, input will be null.
+                        mListener.onInputPicked(input, mAdapter.getItem(which));
                     }
                 })
                 .setNeutralButton(R.string.edit_input_device_name,
@@ -219,6 +247,6 @@ public class InputPickerDialogFragment extends DialogFragment {
     }
 
     public interface InputPickerDialogListener {
-        public void onInputPicked(TvInputInfo which, String displayName);
+        public void onInputPicked(TvInputInfo input, String displayName);
     }
 }

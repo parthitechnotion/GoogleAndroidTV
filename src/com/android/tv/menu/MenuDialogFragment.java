@@ -49,6 +49,7 @@ public final class MenuDialogFragment extends DialogFragment {
     public static final boolean PIP_MENU_ENABLED = true;
 
     public static final String ARG_CURRENT_INPUT = "current_input";
+    public static final String ARG_IS_UNIFIED_TV_INPUT = "unified_tv_input";
 
     private static final int POSITION_SELECT_INPUT  = 0;
     private static final int POSITION_EDIT_CHANNELS = 1;
@@ -58,12 +59,16 @@ public final class MenuDialogFragment extends DialogFragment {
     private static final int POSITION_SETTINGS      = 5;
 
     private TvInputInfo mCurrentInput;
+    private boolean mIsUnifiedTvInput;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle arg = getArguments();
         if (arg != null) {
             mCurrentInput = arg.getParcelable(ARG_CURRENT_INPUT);
+            mIsUnifiedTvInput = arg.getBoolean(ARG_IS_UNIFIED_TV_INPUT);
+        } else {
+            mIsUnifiedTvInput = false;
         }
 
         String[] items = {
@@ -120,6 +125,8 @@ public final class MenuDialogFragment extends DialogFragment {
                                 Bundle arg = new Bundle();
                                 arg.putParcelable(EditChannelsDialogFragment.ARG_CURRENT_INPUT,
                                         mCurrentInput);
+                                arg.putBoolean(EditChannelsDialogFragment.ARG_IS_UNIFIED_TV_INPUT,
+                                        mIsUnifiedTvInput);
                                 f.setArguments(arg);
 
                                 showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, f);

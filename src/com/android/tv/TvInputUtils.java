@@ -39,9 +39,12 @@ public class TvInputUtils {
     public static final String ACTION_SETUP = "android.tv.SetupActivity";
     public static final String EXTRA_SERVICE_NAME = "serviceName";
 
-    // channels will be sorted by display number.
-    public static final String CHANNEL_SORT_ORDER = "CAST(" + TvContract.Channels.DISPLAY_NUMBER
-            + " AS INTEGER), CAST(SUBSTR(LTRIM(" + TvContract.Channels.DISPLAY_NUMBER
+    public static final String CHANNEL_SORT_ORDER_BY_INPUT_NAME =
+            TvContract.Channels.PACKAGE_NAME + ", " + TvContract.Channels.SERVICE_NAME;
+
+    public static final String CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER =
+            "CAST(" + TvContract.Channels.DISPLAY_NUMBER + " AS INTEGER), "
+            + "CAST(SUBSTR(LTRIM(" + TvContract.Channels.DISPLAY_NUMBER
             + ",'0123456789'),2) AS INTEGER)";
 
     // preferences stored in the default preference.

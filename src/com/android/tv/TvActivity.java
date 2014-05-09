@@ -35,10 +35,10 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.TvContract;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
-import android.tv.TvInputService;
 import android.tv.TvView;
 import android.util.Log;
 import android.view.Display;
@@ -55,6 +55,7 @@ import android.widget.Toast;
 
 import com.android.tv.menu.MenuDialogFragment;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -73,6 +74,7 @@ public class TvActivity extends Activity implements
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
     private static final int DELAY_FOR_SURFACE_RELEASE = 300;
+    private static final String PREF_KEY_IS_UNIFIED_TV_INPUT = "unified_tv_input";
     // TODO: add more KEYCODEs to the white list.
     private static final int[] KEYCODE_WHITELIST = {
             KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_2, KeyEvent.KEYCODE_3,
@@ -107,13 +109,14 @@ public class TvActivity extends Activity implements
     private int mDisplayWidth;
     private GestureDetector mGestureDetector;
     private ChannelMap mChannelMap;
+    private long mInitChannelId;
     private TvInputManager.Session mTvSession;
     private TvInputInfo mTvInputInfo;
     private TvInputInfo mTvInputInfoForSetup;
+    private boolean mIsUnifiedTvInput;
+    private TvInputManagerHelper mTvInputManagerHelper;
     private AudioManager mAudioManager;
     private int mAudioFocusStatus;
-    private final Handler mHandler = new Handler();
-    private boolean mDefaultSessionRequested;
     private boolean mTunePendding;
     private boolean mPipShowing;
     private boolean mDebugNonFullSizeScreen;
@@ -240,50 +243,60 @@ public class TvActivity extends Activity implements
                 mProgramUpdateObserver);
 
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
+        mTvInputManagerHelper = new TvInputManagerHelper(mTvInputManager);
+        mIsUnifiedTvInput = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean(PREF_KEY_IS_UNIFIED_TV_INPUT, false);
+        onNewIntent(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        setIntent(intent);
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            // In case the channel is given explicitly, use it.
+            mInitChannelId = ContentUris.parseId(intent.getData());
+        } else {
+            mInitChannelId = Channel.INVALID_ID;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mTvInputManagerHelper.start();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        startDefaultSession();
-    }
-
-    private void startDefaultSession() {
-        if (mTvInputManager == null) {
-            return;
-        }
-        // TODO: Remove this check after TvInputManagerService becomes system service.
-        if (mDefaultSessionRequested) {
-            return;
-        }
-        mDefaultSessionRequested = true;
-        if (mTunePendding) {
-            return;
-        }
-
-        // Check whether the system has at least one TvInputService app installed.
-        final List<ResolveInfo> services = getPackageManager().queryIntentServices(
-                new Intent(TvInputService.SERVICE_INTERFACE), PackageManager.GET_SERVICES);
-        if (services == null || services.isEmpty()) {
+        mTvInputManagerHelper.update();
+        if (mTvInputManagerHelper.getTvInputSize() == 0) {
             Toast.makeText(this, R.string.no_input_device_found, Toast.LENGTH_SHORT).show();
             // TODO: Direct the user to a Play Store landing page for TvInputService apps.
             return;
         }
+        startDefaultSession(mInitChannelId);
+        mInitChannelId = Channel.INVALID_ID;
+    }
 
-        // Figure out the initial channel to tune to.
-        long channelId = Channel.INVALID_ID;
-        Intent intent = getIntent();
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            // In case the channel is given explicitly, use it.
-            channelId = ContentUris.parseId(intent.getData());
+    private void startDefaultSession(long channelId) {
+        if (mTvInputInfo != null) {
+            // A session has already started.
+            if (channelId == Channel.INVALID_ID) {
+                // Simply adjust the volume without tune.
+                setVolumeByAudioFocusStatus();
+                return;
+            }
+            Uri channelUri = mChannelMap.getCurrentChannelUri();
+            if (channelUri != null && ContentUris.parseId(channelUri) == channelId) {
+                // The requested channel is already tuned.
+                setVolumeByAudioFocusStatus();
+                return;
+            }
+            stopSession();
         }
+
         if (channelId == Channel.INVALID_ID) {
-            // Otherwise, remember the last channel the user watched.
+            // If any initial channel id is not given, remember the last channel the user watched.
             channelId = TvInputUtils.getLastWatchedChannelId(this);
         }
         if (channelId == Channel.INVALID_ID) {
@@ -292,23 +305,13 @@ public class TvActivity extends Activity implements
             return;
         }
         ComponentName inputName = TvInputUtils.getInputNameForChannel(this, channelId);
-        if (inputName == null) {
+        if (inputName == null || !mTvInputManagerHelper.isAvaliable(inputName)) {
             // If failed to determine the input for that channel, try a different input.
             showInputPickerDialog();
             return;
         }
-        // If the session is already started, simply adjust the volume without tune.
-        if (mTvSession != null) {
-            setVolumeByAudioFocusStatus();
-        } else {
-            List<TvInputInfo> inputList = mTvInputManager.getTvInputList();
-            for (TvInputInfo info : inputList) {
-                if (inputName.equals(info.getComponent())) {
-                    startSession(info, channelId);
-                    break;
-                }
-            }
-        }
+        TvInputInfo input = mTvInputManagerHelper.getTvInputInfo(inputName);
+        startSession(input, channelId);
     }
 
     @Override
@@ -316,10 +319,10 @@ public class TvActivity extends Activity implements
         if (DEBUG) Log.d(TAG, "onStop() -- stop all sessions");
         stopSession();
         stopPipSession();
-        mDefaultSessionRequested = false;
         if (!isShyModeSet()) {
             setShynessMode(true);
         }
+        mTvInputManagerHelper.stop();
         super.onStop();
     }
 
@@ -328,6 +331,7 @@ public class TvActivity extends Activity implements
         Bundle arg = new Bundle();
         if (mTvInputInfo != null) {
             arg.putString(InputPickerDialogFragment.ARG_MAIN_INPUT_ID, mTvInputInfo.getId());
+            arg.putBoolean(InputPickerDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
         }
         if (mPipInputInfo != null) {
             arg.putString(InputPickerDialogFragment.ARG_SUB_INPUT_ID, mPipInputInfo.getId());
@@ -337,18 +341,40 @@ public class TvActivity extends Activity implements
     }
 
     @Override
-    public void onInputPicked(final TvInputInfo selectedTvInput, final String displayName) {
-        if (mTvSession != null && selectedTvInput.equals(mTvInputInfo)) {
-            // Nothing has changed thus nothing to do.
-            return;
-        }
-
-        if (!TvInputUtils.hasChannel(this, selectedTvInput)) {
-            mTvInputInfoForSetup = null;
-            if (showSetupActivity(selectedTvInput, displayName)) {
-                stopSession();
+    public void onInputPicked(TvInputInfo selectedTvInput, final String displayName) {
+        if (selectedTvInput == null) {
+            // For unified TV input.
+            if (mIsUnifiedTvInput) {
+                return;
             }
-            return;
+            mIsUnifiedTvInput = true;
+            if (mTvInputInfo == null) {
+                Collection<TvInputInfo> inputs = mTvInputManagerHelper.getTvInputInfos(true);
+                if (inputs.isEmpty()) {
+                    Toast.makeText(this, R.string.no_available_input_device, Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    TvInputInfo info = inputs.iterator().next();
+                    startSession(info);
+                }
+                return;
+            } else {
+                // Restart session to re-create the channel map.
+                selectedTvInput = mTvInputInfo;
+            }
+        } else {
+            if (mTvSession != null && selectedTvInput.equals(mTvInputInfo) && !mIsUnifiedTvInput) {
+                // Nothing has changed thus nothing to do.
+                return;
+            }
+            mIsUnifiedTvInput = false;
+            if (!TvInputUtils.hasChannel(this, selectedTvInput)) {
+                mTvInputInfoForSetup = null;
+                if (showSetupActivity(selectedTvInput, displayName)) {
+                    stopSession();
+                }
+                return;
+            }
         }
 
         // Start a new session with the new input.
@@ -356,12 +382,12 @@ public class TvActivity extends Activity implements
 
         // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
         // know when the surface is released at TIS, we don't need this hack.
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startSession(selectedTvInput);
-            }
-        }, DELAY_FOR_SURFACE_RELEASE);
+        try {
+            Thread.sleep(DELAY_FOR_SURFACE_RELEASE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        startSession(selectedTvInput);
     }
 
     private boolean showSetupActivity(TvInputInfo inputInfo, String displayName) {
@@ -455,19 +481,33 @@ public class TvActivity extends Activity implements
         }
     }
 
-    private void startSession(TvInputInfo selectedTvInput) {
-        long channelId = TvInputUtils.getLastWatchedChannelId(TvActivity.this,
-                selectedTvInput.getId());
-        startSession(selectedTvInput, channelId);
+    private void startSession(TvInputInfo inputInfo) {
+        long channelId = TvInputUtils.getLastWatchedChannelId(TvActivity.this, inputInfo.getId());
+        startSession(inputInfo, channelId);
     }
 
     private void startSession(TvInputInfo inputInfo, long channelId) {
         // TODO: recreate SurfaceView to prevent abusing from the previous session.
         mTvInputInfo = inputInfo;
         // Prepare a new channel map for the current input.
-        mChannelMap = new ChannelMap(this, inputInfo.getComponent(), channelId,
-                mOnChannelsLoadFinished);
+        mChannelMap = new ChannelMap(this, mIsUnifiedTvInput ? null : inputInfo.getComponent(),
+                channelId, mTvInputManagerHelper, mOnChannelsLoadFinished);
         // Create a new session and start.
+        mTvView.bindTvInput(inputInfo.getComponent(), mSessionCreated);
+        tune();
+    }
+
+    private void changeSession(TvInputInfo inputInfo) {
+        mTvSession = null;
+        mTvView.unbindTvInput();
+        // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
+        // know when the surface is released at TIS, we don't need this hack.
+        try {
+            Thread.sleep(DELAY_FOR_SURFACE_RELEASE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mTvInputInfo = inputInfo;
         mTvView.bindTvInput(inputInfo.getComponent(), mSessionCreated);
         tune();
     }
@@ -570,6 +610,20 @@ public class TvActivity extends Activity implements
             mTunePendding = true;
             return;
         }
+        Uri currentChannelUri = mChannelMap.getCurrentChannelUri();
+        if (currentChannelUri == null) {
+            stopSession();
+            mTunePendding = false;
+            Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ComponentName inputName = TvInputUtils.getInputNameForChannel(this, currentChannelUri);
+        if (!inputName.equals(mTvInputInfo.getComponent())) {
+            Log.d(TAG, "TV input is changed");
+            changeSession(mTvInputManagerHelper.getTvInputInfo(inputName));
+            mTunePendding = true;
+            return;
+        }
         if (mTvSession == null) {
             Log.d(TAG, "Service not connected");
             mTunePendding = true;
@@ -577,7 +631,7 @@ public class TvActivity extends Activity implements
         }
         setVolumeByAudioFocusStatus();
 
-        Uri currentChannelUri = mChannelMap.getCurrentChannelUri();
+
         if (currentChannelUri != null) {
             // TODO: implement 'no signal'
             // TODO: add result callback and show a message on failure.
@@ -631,17 +685,20 @@ public class TvActivity extends Activity implements
     }
 
     private void stopSession() {
-        if (mTvSession != null) {
-            mTvSession.setVolume(AUDIO_MIN_VOLUME);
-            mAudioManager.abandonAudioFocus(this);
+        if (mTvInputInfo != null) {
+            if (mTvSession != null) {
+                mTvSession.setVolume(AUDIO_MIN_VOLUME);
+                mAudioManager.abandonAudioFocus(this);
+                mTvSession = null;
+            }
             mTvView.unbindTvInput();
-            mTvSession = null;
             mTvInputInfo = null;
         }
         if (mChannelMap != null) {
             mChannelMap.close();
             mChannelMap = null;
         }
+        mTunePendding = false;
     }
 
     private void stopPipSession() {
@@ -667,6 +724,8 @@ public class TvActivity extends Activity implements
         getContentResolver().unregisterContentObserver(mProgramUpdateObserver);
         mTvView.getHolder().removeCallback(mSurfaceHolderCallback);
         mPipView.getHolder().removeCallback(mSurfaceHolderCallback);
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putBoolean(PREF_KEY_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput).apply();
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
     }
@@ -777,15 +836,21 @@ public class TvActivity extends Activity implements
 
     private void channelUp() {
         if (mChannelMap != null && mChannelMap.isLoadFinished()) {
-            mChannelMap.moveToNextChannel();
-            tune();
+            if (mChannelMap.moveToNextChannel()) {
+                tune();
+            } else {
+                Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
     private void channelDown() {
         if (mChannelMap != null && mChannelMap.isLoadFinished()) {
-            mChannelMap.moveToPreviousChannel();
-            tune();
+            if (mChannelMap.moveToPreviousChannel()) {
+                tune();
+            } else {
+                Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -794,6 +859,7 @@ public class TvActivity extends Activity implements
         if (mTvSession != null) {
             Bundle arg = new Bundle();
             arg.putParcelable(MenuDialogFragment.ARG_CURRENT_INPUT, mTvInputInfo);
+            arg.putBoolean(MenuDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
             f.setArguments(arg);
         }
 
