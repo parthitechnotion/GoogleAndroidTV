@@ -596,6 +596,10 @@ public class TvActivity extends Activity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
+                    return;
+                }
+
                 // TODO: Show a beautiful channel banner instead.
                 String channelBannerString = "";
                 String displayNumber = mChannelMap.getCurrentDisplayNumber();
