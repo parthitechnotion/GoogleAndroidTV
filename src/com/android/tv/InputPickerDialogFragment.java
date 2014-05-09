@@ -53,6 +53,8 @@ public class InputPickerDialogFragment extends DialogFragment {
     private static final String DIALOG_EDIT_INPUT = "edit_input";
 
     private final Map<String, TvInputInfo> mInputMap = new HashMap<String, TvInputInfo>();
+    private final Map<ComponentName, Boolean> mInputAvailabilityMap =
+            new HashMap<ComponentName, Boolean>();
 
     private String mSelectedInputId;
     private String mSelectedPipInputId;
@@ -66,6 +68,7 @@ public class InputPickerDialogFragment extends DialogFragment {
             new TvInputManager.TvInputListener() {
                 @Override
                 public void onAvailabilityChanged(ComponentName name, boolean isAvailable) {
+                    mInputAvailabilityMap.put(name, Boolean.valueOf(isAvailable));
                     mAdapter.notifyDataSetChanged();
                 }
             };
@@ -119,23 +122,22 @@ public class InputPickerDialogFragment extends DialogFragment {
 
             @Override
             public boolean isEnabled(int position) {
-                if (mTvInputManager != null) {
-                    TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(position));
-                    String inputId = inputInfo.getId();
-                    if (inputId.equals(mSelectedInputId) || inputId.equals(mSelectedPipInputId)) {
-                        return false;
-                    }
-                    // TODO: Create a cache that is updated from mAvailabilityListener and use the
-                    // cached value instead of making an IPC call to get the status.
-                    return mTvInputManager.getAvailability(inputInfo.getComponent());
+                TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(position));
+                String inputId = inputInfo.getId();
+                if (inputId.equals(mSelectedInputId) || inputId.equals(mSelectedPipInputId)) {
+                    return false;
                 }
-                return false;
+                return mInputAvailabilityMap.get(inputInfo.getComponent());
             }
         };
         mTvInputManager = (TvInputManager) getActivity().getSystemService(Context.TV_INPUT_SERVICE);
     }
 
     private void setupInputAdapter() {
+        mInputMap.clear();
+        mInputAvailabilityMap.clear();
+        mAdapter.clear();
+
         List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
         if (inputs.size() < 1) {
             ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_NEUTRAL).setEnabled(false);
@@ -145,6 +147,7 @@ public class InputPickerDialogFragment extends DialogFragment {
         for (TvInputInfo input : inputs) {
             ComponentName inputName = input.getComponent();
             mTvInputManager.registerListener(inputName, mAvailabilityListener, mHandler);
+            mInputAvailabilityMap.put(inputName, mTvInputManager.getAvailability(inputName));
 
             String inputId = input.getId();
             String name = TvInputUtils.getDisplayNameForInput(getActivity(), input);
@@ -207,15 +210,11 @@ public class InputPickerDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause()");
-        if (mTvInputManager == null) {
-            return;
-        }
         List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
-        if (inputs.size() < 1) {
-            return;
-        }
-        for (TvInputInfo input : inputs) {
-            mTvInputManager.unregisterListener(input.getComponent(), mAvailabilityListener);
+        if (inputs.size() > 0) {
+            for (TvInputInfo input : inputs) {
+                mTvInputManager.unregisterListener(input.getComponent(), mAvailabilityListener);
+            }
         }
     }
 
