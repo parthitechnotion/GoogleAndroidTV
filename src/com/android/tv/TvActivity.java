@@ -36,6 +36,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.TvContract;
+import android.text.format.DateFormat;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 import android.tv.TvInputService;
@@ -94,6 +95,7 @@ public class TvActivity extends Activity implements
     private static final String LEANBACK_SET_SHYNESS_BROADCAST =
             "com.android.mclauncher.action.SET_APP_SHYNESS";
     private static final String LEANBACK_SHY_MODE_EXTRA = "shyMode";
+    private static final String TIME_FORMAT = "HH:mm a";
 
     private TvInputManager mTvInputManager;
     private TvView mTvView;
@@ -103,6 +105,7 @@ public class TvActivity extends Activity implements
     private Runnable mHideControlGuide;
     private TextView mChannelTextView;
     private TextView mProgramTextView;
+    private TextView mClockTextView;
     private int mShortAnimationDuration;
     private int mDisplayWidth;
     private GestureDetector mGestureDetector;
@@ -187,6 +190,7 @@ public class TvActivity extends Activity implements
 
         mChannelTextView = (TextView) findViewById(R.id.channel_text);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
+        mClockTextView = (TextView) findViewById(R.id.clock_text);
 
         mShortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -619,6 +623,10 @@ public class TvActivity extends Activity implements
                 // clear the previous program title for now. It will be filled as soon as we get the
                 // updated program information.
                 mProgramTextView.setText(programTitle);
+
+                // Time may changes during the display, but banner is displayed for a short period
+                // so ignoring it might be acceptable.
+                mClockTextView.setText(DateFormat.format(TIME_FORMAT, System.currentTimeMillis()));
 
                 showAndHide(mChannelBanner, mHideChannelBanner, DURATION_SHOW_CHANNEL_BANNER);
             }
