@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.TvContract;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
@@ -97,7 +98,6 @@ public class TvActivity extends Activity implements
     private static final String LEANBACK_SET_SHYNESS_BROADCAST =
             "com.android.mclauncher.action.SET_APP_SHYNESS";
     private static final String LEANBACK_SHY_MODE_EXTRA = "shyMode";
-    private static final String TIME_FORMAT = "HH:mm a";
 
     private TvInputManager mTvInputManager;
     private TvView mTvView;
@@ -107,6 +107,7 @@ public class TvActivity extends Activity implements
     private Runnable mHideControlGuide;
     private TextView mChannelTextView;
     private TextView mProgramTextView;
+    private TextView mProgramTimeTextView;
     private TextView mClockTextView;
     private int mShortAnimationDuration;
     private int mDisplayWidth;
@@ -193,6 +194,7 @@ public class TvActivity extends Activity implements
 
         mChannelTextView = (TextView) findViewById(R.id.channel_text);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
+        mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mClockTextView = (TextView) findViewById(R.id.clock_text);
 
         mShortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
@@ -582,18 +584,7 @@ public class TvActivity extends Activity implements
     private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
-                return;
-            }
-            Uri channelUri = mChannelMap.getCurrentChannelUri();
-            if (channelUri == null) {
-                return;
-            }
-            Program program = TvInputUtils.getCurrentProgram(TvActivity.this, channelUri);
-            if (program == null) {
-                return;
-            }
-            mProgramTextView.setText(program.getTitle());
+            updateProgramInfo();
         }
     };
 
@@ -650,6 +641,11 @@ public class TvActivity extends Activity implements
         mTunePendding = false;
     }
 
+    private String getFormattedTimeString(long time) {
+        return (String) DateFormat.format(
+                (CharSequence) getString(R.string.channel_banner_time_format), time);
+    }
+
     private void displayChannelBanner() {
         runOnUiThread(new Runnable() {
             @Override
@@ -670,21 +666,47 @@ public class TvActivity extends Activity implements
                 }
                 mChannelTextView.setText(channelBannerString);
 
-                Program program = TvInputUtils.getCurrentProgram(TvActivity.this,
-                        mChannelMap.getCurrentChannelUri());
-                String programTitle = program != null ? program.getTitle() : null;
-                // Program title might not be available at this point. Setting the text to null to
-                // clear the previous program title for now. It will be filled as soon as we get the
-                // updated program information.
-                mProgramTextView.setText(programTitle);
+                updateProgramInfo();
 
                 // Time may changes during the display, but banner is displayed for a short period
                 // so ignoring it might be acceptable.
-                mClockTextView.setText(DateFormat.format(TIME_FORMAT, System.currentTimeMillis()));
+                mClockTextView.setText(getFormattedTimeString(System.currentTimeMillis()));
 
                 showAndHide(mChannelBanner, mHideChannelBanner, DURATION_SHOW_CHANNEL_BANNER);
             }
         });
+    }
+
+    private void updateProgramInfo() {
+        if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
+            return;
+        }
+        Uri channelUri = mChannelMap.getCurrentChannelUri();
+        if (channelUri == null) {
+            return;
+        }
+        Program program = TvInputUtils.getCurrentProgram(TvActivity.this, channelUri);
+        if (program == null) {
+            return;
+        }
+        if (!TextUtils.isEmpty(program.getTitle())) {
+            mProgramTextView.setText(program.getTitle());
+
+            if (program.getStartTimeUtcMillis() > 0 && program.getEndTimeUtcMillis() > 0) {
+                String startTime = getFormattedTimeString(program.getStartTimeUtcMillis());
+                String endTime = getFormattedTimeString(program.getEndTimeUtcMillis());
+                mProgramTimeTextView.setText(getString(R.string.channel_banner_program_time_format,
+                                startTime, endTime));
+            } else {
+                mProgramTimeTextView.setText(null);
+            }
+        } else {
+            // Program title might not be available at this point. Setting the text to null to
+            // clear the previous program title for now. It will be filled as soon as we get the
+            // updated program information.
+            mProgramTextView.setText(null);
+            mProgramTimeTextView.setText(null);
+        }
     }
 
     public void showRecentlyWatchedDialog() {
