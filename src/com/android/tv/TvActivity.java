@@ -106,6 +106,7 @@ public class TvActivity extends Activity implements
     private Runnable mHideChannelBanner;
     private Runnable mHideControlGuide;
     private TextView mChannelTextView;
+    private TextView mInputSourceText;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
     private TextView mClockTextView;
@@ -193,6 +194,7 @@ public class TvActivity extends Activity implements
         mHideChannelBanner = new HideRunnable(mChannelBanner);
 
         mChannelTextView = (TextView) findViewById(R.id.channel_text);
+        mInputSourceText = (TextView) findViewById(R.id.input_source_text);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mClockTextView = (TextView) findViewById(R.id.clock_text);
@@ -665,6 +667,8 @@ public class TvActivity extends Activity implements
                     channelBannerString += " " + displayName;
                 }
                 mChannelTextView.setText(channelBannerString);
+                mInputSourceText.setText(
+                        TvInputUtils.getDisplayNameForInput(TvActivity.this, mTvInputInfo));
 
                 updateProgramInfo();
 
