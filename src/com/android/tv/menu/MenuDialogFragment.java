@@ -117,8 +117,8 @@ public final class MenuDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case POSITION_SELECT_INPUT:
-                                showDialogFragment(InputPickerDialogFragment.DIALOG_TAG,
-                                        new InputPickerDialogFragment());
+                                dismiss();
+                                ((TvActivity) getActivity()).showInputPickerDialog();
                                 break;
                             case POSITION_EDIT_CHANNELS:
                                 EditChannelsDialogFragment f = new EditChannelsDialogFragment();
