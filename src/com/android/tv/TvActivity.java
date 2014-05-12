@@ -36,6 +36,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.TvContract;
 import android.text.TextUtils;
@@ -72,12 +73,16 @@ public class TvActivity extends Activity implements
     private static final boolean DEBUG = true;
     private static final String TAG = "TvActivity";
 
+    private static final int MSG_START_DEFAULT_SESSION_RETRY = 1;
+
     private static final int DURATION_SHOW_CHANNEL_BANNER = 2000;
     private static final int DURATION_SHOW_CONTROL_GUIDE = 1000;
     private static final float AUDIO_MAX_VOLUME = 1.0f;
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
     private static final int DELAY_FOR_SURFACE_RELEASE = 300;
+    private static final int START_DEFAULT_SESSION_MAX_RETRY = 4;
+    private static final int START_DEFAULT_SESSION_RETRY_INTERVAL = 250;
     private static final String PREF_KEY_IS_UNIFIED_TV_INPUT = "unified_tv_input";
     // TODO: add more KEYCODEs to the white list.
     private static final int[] KEYCODE_WHITELIST = {
@@ -164,6 +169,19 @@ public class TvActivity extends Activity implements
     private TvView mPipView;
     private TvInputManager.Session mPipSession;
     private TvInputInfo mPipInputInfo;
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == MSG_START_DEFAULT_SESSION_RETRY) {
+                Object[] arg = (Object[]) msg.obj;
+                TvInputInfo input = (TvInputInfo) arg[0];
+                long channelId = (Long) arg[1];
+                int retryCount = msg.arg1;
+                startSessionIfAvailableOrRetry(input, channelId, retryCount);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -323,18 +341,36 @@ public class TvActivity extends Activity implements
             return;
         }
         ComponentName inputName = TvInputUtils.getInputNameForChannel(this, channelId);
-        if (inputName == null || !mTvInputManagerHelper.isAvaliable(inputName)) {
+        if (inputName == null) {
             // If failed to determine the input for that channel, try a different input.
             showInputPickerDialog();
             return;
         }
         TvInputInfo input = mTvInputManagerHelper.getTvInputInfo(inputName);
+        startSessionIfAvailableOrRetry(input, channelId, 0);
+    }
+
+    private void startSessionIfAvailableOrRetry(TvInputInfo input, long channelId, int retryCount) {
+        if (!mTvInputManagerHelper.isAvaliable(input.getComponent())) {
+            if (retryCount >= START_DEFAULT_SESSION_MAX_RETRY) {
+                showInputPickerDialog();
+                return;
+            }
+            if (DEBUG) {
+                Log.d(TAG, "Retry start session (retryCount=" + retryCount + ")");
+            }
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_START_DEFAULT_SESSION_RETRY,
+                    retryCount + 1, 0, new Object[]{input, channelId}),
+                    START_DEFAULT_SESSION_RETRY_INTERVAL);
+            return;
+        }
         startSession(input, channelId);
     }
 
     @Override
     protected void onStop() {
         if (DEBUG) Log.d(TAG, "onStop() -- stop all sessions");
+        mHandler.removeMessages(MSG_START_DEFAULT_SESSION_RETRY);
         stopSession();
         stopPipSession();
         if (!isShyModeSet()) {
@@ -776,6 +812,10 @@ public class TvActivity extends Activity implements
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (mHandler.hasMessages(MSG_START_DEFAULT_SESSION_RETRY)) {
+            // Ignore key events during startDefaultSession retry.
+            return true;
+        }
         if (mChannelMap == null) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_H:
@@ -788,6 +828,7 @@ public class TvActivity extends Activity implements
                 case KeyEvent.KEYCODE_CHANNEL_DOWN:
                 case KeyEvent.KEYCODE_DPAD_DOWN:
                 case KeyEvent.KEYCODE_NUMPAD_ENTER:
+                case KeyEvent.KEYCODE_DPAD_CENTER:
                 case KeyEvent.KEYCODE_E:
                 case KeyEvent.KEYCODE_MENU:
                     showInputPickerDialog();
@@ -915,7 +956,7 @@ public class TvActivity extends Activity implements
         if (!AVAILABLE_DIALOG_TAGS.contains(tag)) {
             return;
         }
-        mHideHandler.post(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
                 FragmentManager fm = getFragmentManager();
@@ -933,8 +974,6 @@ public class TvActivity extends Activity implements
             }
         });
     }
-
-    private final Handler mHideHandler = new Handler();
 
     private class HideRunnable implements Runnable {
         private final View mView;
@@ -961,7 +1000,7 @@ public class TvActivity extends Activity implements
         if (view.getVisibility() == View.VISIBLE) {
             // Skip the show animation if the view is already visible and cancel the scheduled hide
             // animation.
-            mHideHandler.removeCallbacks(hide);
+            mHandler.removeCallbacks(hide);
         } else {
             view.setAlpha(0f);
             view.setVisibility(View.VISIBLE);
@@ -971,7 +1010,7 @@ public class TvActivity extends Activity implements
                     .setListener(null);
         }
         // Schedule the hide animation after a few seconds.
-        mHideHandler.postDelayed(hide, duration);
+        mHandler.postDelayed(hide, duration);
     }
 
     private void setShynessMode(boolean shyMode) {
