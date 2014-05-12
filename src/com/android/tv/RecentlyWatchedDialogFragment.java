@@ -47,7 +47,7 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
         String[] from = {
                 TvContract.WatchedPrograms._ID,
                 TvContract.WatchedPrograms.CHANNEL_ID,
-                TvContract.WatchedPrograms.START_TIME_UTC_MILLIS,
+                TvContract.WatchedPrograms.WATCH_START_TIME_UTC_MILLIS,
                 TvContract.WatchedPrograms.TITLE};
         int[] to = {
                 R.id.watched_program_id,
@@ -64,7 +64,7 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
                     long channleId = cursor.getLong(columnIndex);
                     ((TextView) view).setText(String.valueOf(channleId));
                     return true;
-                } else if (TvContract.WatchedPrograms.START_TIME_UTC_MILLIS.equals(name)) {
+                } else if (TvContract.WatchedPrograms.WATCH_START_TIME_UTC_MILLIS.equals(name)) {
                     long time = cursor.getLong(columnIndex);
                     CharSequence timeString = DateUtils.getRelativeTimeSpanString(time,
                             System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
@@ -96,10 +96,10 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
         String[] projection = {
                 TvContract.WatchedPrograms._ID,
                 TvContract.WatchedPrograms.CHANNEL_ID,
-                TvContract.WatchedPrograms.START_TIME_UTC_MILLIS,
+                TvContract.WatchedPrograms.WATCH_START_TIME_UTC_MILLIS,
                 TvContract.WatchedPrograms.TITLE};
         return new CursorLoader(getActivity(), TvContract.WatchedPrograms.CONTENT_URI, projection,
-                null, null, null);
+                null, null, TvContract.WatchedPrograms._ID + " DESC");
     }
 
     @Override
