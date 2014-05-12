@@ -69,6 +69,11 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return mIsLoadFinished;
     }
 
+    public int getBrowsableChannelCount() {
+        checkCursor();
+        return mBrowsableChannelCount;
+    }
+
     public int size() {
         checkCursor();
         return mBrowsableChannelCount == 0 ? mCursor.getCount() : mBrowsableChannelCount;
