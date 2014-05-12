@@ -73,4 +73,9 @@
 
     <!-- Confirmation of TV watch logging -->
     <string name="privacy_watch_logging">Send TV watch history to Google</string>
+
+    <!-- Time format string at the channel banner [DO NOT TRANSLATE] -->
+    <string name="channel_banner_time_format">HH:mm a</string>
+    <!-- Program time format string at the channel banner [DO NOT TRANSLATE] -->
+    <string name="channel_banner_program_time_format">%1$s - %2$s</string>
 </resources>
