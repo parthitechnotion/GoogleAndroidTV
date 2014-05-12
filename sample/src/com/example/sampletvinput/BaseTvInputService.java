@@ -161,8 +161,16 @@ abstract public class BaseTvInputService extends TvInputService {
                 return false;
             }
             try {
-                mPlayer.prepare();
-            } catch (IllegalStateException | IOException e1) {
+                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer player) {
+                        if (mPlayer != null && !mPlayer.isPlaying()) {
+                            mPlayer.start();
+                        }
+                    }
+                });
+                mPlayer.prepareAsync();
+            } catch (IllegalStateException e1) {
                 return false;
             }
             mPlayer.start();
