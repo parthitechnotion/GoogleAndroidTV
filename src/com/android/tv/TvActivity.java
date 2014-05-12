@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -58,6 +59,7 @@ import android.widget.Toast;
 import com.android.tv.menu.MenuDialogFragment;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -99,6 +101,8 @@ public class TvActivity extends Activity implements
             "com.android.mclauncher.action.SET_APP_SHYNESS";
     private static final String LEANBACK_SHY_MODE_EXTRA = "shyMode";
 
+    private static final HashSet<String> AVAILABLE_DIALOG_TAGS = new HashSet<String>();
+
     private TvInputManager mTvInputManager;
     private TvView mTvView;
     private LinearLayout mControlGuide;
@@ -127,6 +131,12 @@ public class TvActivity extends Activity implements
     private boolean mDebugNonFullSizeScreen;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
     private boolean mIsShy = true;
+
+    static {
+        AVAILABLE_DIALOG_TAGS.add(InputPickerDialogFragment.DIALOG_TAG);
+        AVAILABLE_DIALOG_TAGS.add(MenuDialogFragment.DIALOG_TAG);
+        AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
+    }
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
@@ -900,14 +910,28 @@ public class TvActivity extends Activity implements
         showDialogFragment(MenuDialogFragment.DIALOG_TAG, f);
     }
 
-    private void showDialogFragment(String tag, DialogFragment dialog) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag(tag);
-        if (prev != null) {
-            ft.remove(prev);
+    private void showDialogFragment(final String tag, final DialogFragment dialog) {
+        // A tag for dialog must be added to AVAILABLE_DIALOG_TAGS to make it launchable from TV.
+        if (!AVAILABLE_DIALOG_TAGS.contains(tag)) {
+            return;
         }
-        ft.addToBackStack(null);
-        dialog.show(ft, tag);
+        mHideHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                FragmentManager fm = getFragmentManager();
+                fm.executePendingTransactions();
+
+                for (String availableTag : AVAILABLE_DIALOG_TAGS) {
+                    if (fm.findFragmentByTag(availableTag) != null) {
+                        return;
+                    }
+                }
+
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.addToBackStack(null);
+                dialog.show(ft, tag);
+            }
+        });
     }
 
     private final Handler mHideHandler = new Handler();
