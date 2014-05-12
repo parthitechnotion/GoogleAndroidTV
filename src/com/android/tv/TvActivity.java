@@ -57,6 +57,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.tv.menu.EditChannelsDialogFragment;
 import com.android.tv.menu.MenuDialogFragment;
 
 import java.util.Collection;
@@ -136,11 +137,13 @@ public class TvActivity extends Activity implements
     private boolean mDebugNonFullSizeScreen;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
     private boolean mIsShy = true;
+    private boolean mTuningFromTvInputChange;
 
     static {
         AVAILABLE_DIALOG_TAGS.add(InputPickerDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(MenuDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
+        AVAILABLE_DIALOG_TAGS.add(EditChannelsDialogFragment.DIALOG_TAG);
     }
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
@@ -380,6 +383,18 @@ public class TvActivity extends Activity implements
         super.onStop();
     }
 
+    public void showEditChannelsDialog() {
+        EditChannelsDialogFragment f = new EditChannelsDialogFragment();
+        if (mTvInputInfo != null) {
+            Bundle arg = new Bundle();
+            arg.putParcelable(EditChannelsDialogFragment.ARG_CURRENT_INPUT, mTvInputInfo);
+            arg.putBoolean(EditChannelsDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
+            f.setArguments(arg);
+        }
+
+        showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, f);
+    }
+
     public void showInputPickerDialog() {
         InputPickerDialogFragment f = new InputPickerDialogFragment();
         Bundle arg = new Bundle();
@@ -422,7 +437,7 @@ public class TvActivity extends Activity implements
                 return;
             }
             mIsUnifiedTvInput = false;
-            if (!TvInputUtils.hasChannel(this, selectedTvInput)) {
+            if (!TvInputUtils.hasChannel(this, selectedTvInput, false)) {
                 mTvInputInfoForSetup = null;
                 if (showSetupActivity(selectedTvInput, displayName)) {
                     stopSession();
@@ -543,6 +558,8 @@ public class TvActivity extends Activity implements
     private void startSession(TvInputInfo inputInfo, long channelId) {
         // TODO: recreate SurfaceView to prevent abusing from the previous session.
         mTvInputInfo = inputInfo;
+        mTuningFromTvInputChange = true;
+
         // Prepare a new channel map for the current input.
         mChannelMap = new ChannelMap(this, mIsUnifiedTvInput ? null : inputInfo.getComponent(),
                 channelId, mTvInputManagerHelper, mOnChannelsLoadFinished);
@@ -647,46 +664,57 @@ public class TvActivity extends Activity implements
 
     private void tune() {
         Log.d(TAG, "tune()");
-        // Prerequisites to be able to tune.
-        if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
-            Log.d(TAG, "Channel map not ready");
-            mTunePendding = true;
-            return;
-        }
-        Uri currentChannelUri = mChannelMap.getCurrentChannelUri();
-        if (currentChannelUri == null) {
-            stopSession();
-            mTunePendding = false;
-            Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        ComponentName inputName = TvInputUtils.getInputNameForChannel(this, currentChannelUri);
-        if (!inputName.equals(mTvInputInfo.getComponent())) {
-            Log.d(TAG, "TV input is changed");
-            changeSession(mTvInputManagerHelper.getTvInputInfo(inputName));
-            mTunePendding = true;
-            return;
-        }
-        if (mTvSession == null) {
-            Log.d(TAG, "Service not connected");
-            mTunePendding = true;
-            return;
-        }
-        setVolumeByAudioFocusStatus();
-
-
-        if (currentChannelUri != null) {
-            // TODO: implement 'no signal'
-            // TODO: add result callback and show a message on failure.
-            TvInputUtils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
-            mTvSession.tune(currentChannelUri);
-            if (isShyModeSet()) {
-                setShynessMode(false);
-                // TODO: Set the shy mode to true when tune() fails.
+        try {
+            // Prerequisites to be able to tune.
+            if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
+                Log.d(TAG, "Channel map not ready");
+                mTunePendding = true;
+                return;
             }
-            displayChannelBanner();
+            Uri currentChannelUri = mChannelMap.getCurrentChannelUri();
+            if (currentChannelUri == null) {
+                stopSession();
+                mTunePendding = false;
+                Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            ComponentName inputName = TvInputUtils.getInputNameForChannel(this, currentChannelUri);
+            if (!inputName.equals(mTvInputInfo.getComponent())) {
+                Log.d(TAG, "TV input is changed");
+                changeSession(mTvInputManagerHelper.getTvInputInfo(inputName));
+                mTunePendding = true;
+                return;
+            }
+            if (mTvSession == null) {
+                Log.d(TAG, "Service not connected");
+                mTunePendding = true;
+                return;
+            }
+            setVolumeByAudioFocusStatus();
+
+            if (currentChannelUri != null) {
+                // TODO: implement 'no signal'
+                // TODO: add result callback and show a message on failure.
+                TvInputUtils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
+                mTvSession.tune(currentChannelUri);
+                if (isShyModeSet()) {
+                    setShynessMode(false);
+                    // TODO: Set the shy mode to true when tune() fails.
+                }
+                displayChannelBanner();
+            }
+            mTunePendding = false;
+
+            if (mTuningFromTvInputChange && mChannelMap.getBrowsableChannelCount() == 0) {
+                showEditChannelsDialog();
+                Toast.makeText(TvActivity.this, R.string.all_channels_disabled,
+                        Toast.LENGTH_SHORT).show();
+            }
+        } finally {
+            if (!mTunePendding) {
+                mTuningFromTvInputChange = false;
+            }
         }
-        mTunePendding = false;
     }
 
     private String getFormattedTimeString(long time) {

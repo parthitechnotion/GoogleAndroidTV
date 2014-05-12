@@ -137,7 +137,8 @@ public class InputPickerDialogFragment extends DialogFragment {
                             continue;
                         }
                         TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(i));
-                        if (isEnabled(i) && TvInputUtils.hasChannel(getContext(), inputInfo)) {
+                        if (isEnabled(i)
+                                && TvInputUtils.hasChannel(getContext(), inputInfo, false)) {
                             return true;
                         }
                     }

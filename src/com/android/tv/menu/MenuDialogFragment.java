@@ -121,15 +121,8 @@ public final class MenuDialogFragment extends DialogFragment {
                                 ((TvActivity) getActivity()).showInputPickerDialog();
                                 break;
                             case POSITION_EDIT_CHANNELS:
-                                EditChannelsDialogFragment f = new EditChannelsDialogFragment();
-                                Bundle arg = new Bundle();
-                                arg.putParcelable(EditChannelsDialogFragment.ARG_CURRENT_INPUT,
-                                        mCurrentInput);
-                                arg.putBoolean(EditChannelsDialogFragment.ARG_IS_UNIFIED_TV_INPUT,
-                                        mIsUnifiedTvInput);
-                                f.setArguments(arg);
-
-                                showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, f);
+                                dismiss();
+                                ((TvActivity) getActivity()).showEditChannelsDialog();
                                 break;
                             case POSITION_SETUP:
                                 startSetupActivity();

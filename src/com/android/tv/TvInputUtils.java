@@ -148,7 +148,11 @@ public class TvInputUtils {
     }
 
     public static boolean hasChannel(Context context, TvInputInfo name) {
-        Uri uri = TvContract.buildChannelsUriForInput(name.getComponent());
+        return hasChannel(context, name, true);
+    }
+
+    public static boolean hasChannel(Context context, TvInputInfo name, boolean browsableOnly) {
+        Uri uri = TvContract.buildChannelsUriForInput(name.getComponent(), browsableOnly);
         String[] projection = { TvContract.Channels._ID };
         Cursor cursor = null;
         try {
