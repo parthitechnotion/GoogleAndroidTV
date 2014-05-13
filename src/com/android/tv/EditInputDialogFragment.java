@@ -98,6 +98,18 @@ public class EditInputDialogFragment extends DialogFragment implements OnItemSel
                         mPreferences.edit().putString(key, newDisplayName).commit();
                     }
                 })
+                .setNeutralButton(R.string.reset, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (mSelected < 0 || mSelected >= mDisplayNames.length) {
+                            return;
+                        }
+                        String oldDisplayName = mDisplayNames[mSelected];
+                        String inputId = mInputIdMap.get(oldDisplayName);
+                        mPreferences.edit().remove(
+                                TvSettings.PREF_DISPLAY_INPUT_NAME + inputId).commit();
+                    }
+                })
                 .setNegativeButton(android.R.string.cancel, null);
         return builder.create();
     }
