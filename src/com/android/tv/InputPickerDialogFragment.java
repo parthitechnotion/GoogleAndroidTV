@@ -22,7 +22,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -138,7 +137,7 @@ public class InputPickerDialogFragment extends DialogFragment {
                         }
                         TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(i));
                         if (isEnabled(i)
-                                && TvInputUtils.hasChannel(getContext(), inputInfo, false)) {
+                                && Utils.hasChannel(getContext(), inputInfo, false)) {
                             return true;
                         }
                     }
@@ -175,7 +174,7 @@ public class InputPickerDialogFragment extends DialogFragment {
             String inputId = input.getId();
             mTvInputManager.registerListener(inputId, mAvailabilityListener, mHandler);
             mInputAvailabilityMap.put(inputId, mTvInputManager.getAvailability(inputId));
-            String name = TvInputUtils.getDisplayNameForInput(getActivity(), input);
+            String name = Utils.getDisplayNameForInput(getActivity(), input);
             if (inputId.equals(mSelectedInputId) && !mIsUnifiedTvInput) {
                 name += " " + getResources().getString(R.string.selected);
             } else if (inputId.equals(mSelectedPipInputId)) {

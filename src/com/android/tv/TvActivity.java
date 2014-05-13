@@ -21,10 +21,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -336,14 +334,14 @@ public class TvActivity extends Activity implements
 
         if (channelId == Channel.INVALID_ID) {
             // If any initial channel id is not given, remember the last channel the user watched.
-            channelId = TvInputUtils.getLastWatchedChannelId(this);
+            channelId = Utils.getLastWatchedChannelId(this);
         }
         if (channelId == Channel.INVALID_ID) {
             // If failed to pick a channel, try a different input.
             showInputPickerDialog();
             return;
         }
-        String inputId = TvInputUtils.getInputIdForChannel(this, channelId);
+        String inputId = Utils.getInputIdForChannel(this, channelId);
         if (TextUtils.isEmpty(inputId)) {
             // If failed to determine the input for that channel, try a different input.
             showInputPickerDialog();
@@ -437,7 +435,7 @@ public class TvActivity extends Activity implements
                 return;
             }
             mIsUnifiedTvInput = false;
-            if (!TvInputUtils.hasChannel(this, selectedTvInput, false)) {
+            if (!Utils.hasChannel(this, selectedTvInput, false)) {
                 mTvInputInfoForSetup = null;
                 if (showSetupActivity(selectedTvInput, displayName)) {
                     stopSession();
@@ -462,7 +460,7 @@ public class TvActivity extends Activity implements
     private boolean showSetupActivity(TvInputInfo inputInfo, String displayName) {
         PackageManager pm = getPackageManager();
         List<ResolveInfo> activityInfos = pm.queryIntentActivities(
-                new Intent(TvInputUtils.ACTION_SETUP), PackageManager.GET_ACTIVITIES);
+                new Intent(Utils.ACTION_SETUP), PackageManager.GET_ACTIVITIES);
         ResolveInfo setupActivity = null;
         if (activityInfos != null) {
             for (ResolveInfo info : activityInfos) {
@@ -483,7 +481,7 @@ public class TvActivity extends Activity implements
         }
 
         mTvInputInfoForSetup = inputInfo;
-        Intent intent = new Intent(TvInputUtils.ACTION_SETUP);
+        Intent intent = new Intent(Utils.ACTION_SETUP);
         intent.setClassName(setupActivity.activityInfo.packageName,
                 setupActivity.activityInfo.name);
         startActivityForResult(intent, REQUEST_START_SETUP_ACTIIVTY);
@@ -551,7 +549,7 @@ public class TvActivity extends Activity implements
     }
 
     private void startSession(TvInputInfo inputInfo) {
-        long channelId = TvInputUtils.getLastWatchedChannelId(TvActivity.this, inputInfo.getId());
+        long channelId = Utils.getLastWatchedChannelId(TvActivity.this, inputInfo.getId());
         startSession(inputInfo, channelId);
     }
 
@@ -678,7 +676,7 @@ public class TvActivity extends Activity implements
                 Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
                 return;
             }
-            String inputId = TvInputUtils.getInputIdForChannel(this, currentChannelUri);
+            String inputId = Utils.getInputIdForChannel(this, currentChannelUri);
             if (!mTvInputInfo.getId().equals(inputId)) {
                 Log.d(TAG, "TV input is changed");
                 changeSession(mTvInputManagerHelper.getTvInputInfo(inputId));
@@ -695,7 +693,7 @@ public class TvActivity extends Activity implements
             if (currentChannelUri != null) {
                 // TODO: implement 'no signal'
                 // TODO: add result callback and show a message on failure.
-                TvInputUtils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
+                Utils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
                 mTvSession.tune(currentChannelUri);
                 if (isShyModeSet()) {
                     setShynessMode(false);
@@ -742,7 +740,7 @@ public class TvActivity extends Activity implements
                 }
                 mChannelTextView.setText(channelBannerString);
                 mInputSourceText.setText(
-                        TvInputUtils.getDisplayNameForInput(TvActivity.this, mTvInputInfo));
+                        Utils.getDisplayNameForInput(TvActivity.this, mTvInputInfo));
 
                 updateProgramInfo();
 
@@ -763,7 +761,7 @@ public class TvActivity extends Activity implements
         if (channelUri == null) {
             return;
         }
-        Program program = TvInputUtils.getCurrentProgram(TvActivity.this, channelUri);
+        Program program = Utils.getCurrentProgram(TvActivity.this, channelUri);
         if (program == null) {
             return;
         }

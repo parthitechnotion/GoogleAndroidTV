@@ -16,7 +16,6 @@
 
 package com.android.tv;
 
-import android.content.ComponentName;
 import android.os.Handler;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;

@@ -26,7 +26,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.TvContract;
-import android.text.TextUtils;
 import android.tv.TvInputInfo;
 import android.util.Log;
 
@@ -189,10 +188,10 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
                 TvContract.Channels.BROWSABLE};
         String sortOrder;
         if (mIsUnifiedTvInput) {
-            sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
-                    + TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+            sortOrder = Utils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
+                    + Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
         } else {
-            sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+            sortOrder = Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
         }
         return new CursorLoader(mActivity, uri, projection, null, null, sortOrder);
     }

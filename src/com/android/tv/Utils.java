@@ -32,7 +32,7 @@ import android.util.Base64;
 /**
  * A class that includes convenience methods for accessing TvProvider database.
  */
-public class TvInputUtils {
+public class Utils {
 
     public static final String SERVICE_INTERFACE = "android.tv.TvInputService";
     public static final String ACTION_SETTINGS = "android.tv.SettingsActivity";
