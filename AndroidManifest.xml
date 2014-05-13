@@ -54,5 +54,12 @@
             android:exported="true"
             android:enabled="true">
         </provider>
+
+        <receiver android:name=".PackageIntentsReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
