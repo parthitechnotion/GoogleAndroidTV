@@ -136,7 +136,7 @@ public class InputPickerDialogFragment extends DialogFragment {
                             continue;
                         }
                         TvInputInfo inputInfo = mInputMap.get(mAdapter.getItem(i));
-                        if (isEnabled(i)
+                        if (mInputAvailabilityMap.get(inputInfo.getId())
                                 && Utils.hasChannel(getContext(), inputInfo, false)) {
                             return true;
                         }
@@ -149,7 +149,7 @@ public class InputPickerDialogFragment extends DialogFragment {
                         || inputId.equals(mSelectedPipInputId)) {
                     return false;
                 }
-                return mInputAvailabilityMap.get(inputInfo.getId());
+                return mInputAvailabilityMap.get(inputId);
             }
         };
         mTvInputManager = (TvInputManager) getActivity().getSystemService(Context.TV_INPUT_SERVICE);
