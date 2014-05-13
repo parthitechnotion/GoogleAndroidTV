@@ -382,13 +382,15 @@ public class TvActivity extends Activity implements
     }
 
     public void showEditChannelsDialog() {
-        EditChannelsDialogFragment f = new EditChannelsDialogFragment();
-        if (mTvInputInfo != null) {
-            Bundle arg = new Bundle();
-            arg.putParcelable(EditChannelsDialogFragment.ARG_CURRENT_INPUT, mTvInputInfo);
-            arg.putBoolean(EditChannelsDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
-            f.setArguments(arg);
+        if (mTvInputInfo == null) {
+            return;
         }
+
+        EditChannelsDialogFragment f = new EditChannelsDialogFragment();
+        Bundle arg = new Bundle();
+        arg.putParcelable(EditChannelsDialogFragment.ARG_CURRENT_INPUT, mTvInputInfo);
+        arg.putBoolean(EditChannelsDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
+        f.setArguments(arg);
 
         showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, f);
     }
