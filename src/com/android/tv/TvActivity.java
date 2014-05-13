@@ -135,7 +135,6 @@ public class TvActivity extends Activity implements
     private boolean mDebugNonFullSizeScreen;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
     private boolean mIsShy = true;
-    private boolean mTuningFromTvInputChange;
 
     static {
         AVAILABLE_DIALOG_TAGS.add(InputPickerDialogFragment.DIALOG_TAG);
@@ -556,7 +555,6 @@ public class TvActivity extends Activity implements
     private void startSession(TvInputInfo inputInfo, long channelId) {
         // TODO: recreate SurfaceView to prevent abusing from the previous session.
         mTvInputInfo = inputInfo;
-        mTuningFromTvInputChange = true;
 
         // Prepare a new channel map for the current input.
         mChannelMap = new ChannelMap(this, mIsUnifiedTvInput ? null : inputInfo,
@@ -662,57 +660,45 @@ public class TvActivity extends Activity implements
 
     private void tune() {
         Log.d(TAG, "tune()");
-        try {
-            // Prerequisites to be able to tune.
-            if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
-                Log.d(TAG, "Channel map not ready");
-                mTunePendding = true;
-                return;
-            }
-            Uri currentChannelUri = mChannelMap.getCurrentChannelUri();
-            if (currentChannelUri == null) {
-                stopSession();
-                mTunePendding = false;
-                Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String inputId = Utils.getInputIdForChannel(this, currentChannelUri);
-            if (!mTvInputInfo.getId().equals(inputId)) {
-                Log.d(TAG, "TV input is changed");
-                changeSession(mTvInputManagerHelper.getTvInputInfo(inputId));
-                mTunePendding = true;
-                return;
-            }
-            if (mTvSession == null) {
-                Log.d(TAG, "Service not connected");
-                mTunePendding = true;
-                return;
-            }
-            setVolumeByAudioFocusStatus();
-
-            if (currentChannelUri != null) {
-                // TODO: implement 'no signal'
-                // TODO: add result callback and show a message on failure.
-                Utils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
-                mTvSession.tune(currentChannelUri);
-                if (isShyModeSet()) {
-                    setShynessMode(false);
-                    // TODO: Set the shy mode to true when tune() fails.
-                }
-                displayChannelBanner();
-            }
-            mTunePendding = false;
-
-            if (mTuningFromTvInputChange && mChannelMap.getBrowsableChannelCount() == 0) {
-                showEditChannelsDialog();
-                Toast.makeText(TvActivity.this, R.string.all_channels_disabled,
-                        Toast.LENGTH_SHORT).show();
-            }
-        } finally {
-            if (!mTunePendding) {
-                mTuningFromTvInputChange = false;
-            }
+        // Prerequisites to be able to tune.
+        if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
+            Log.d(TAG, "Channel map not ready");
+            mTunePendding = true;
+            return;
         }
+        Uri currentChannelUri = mChannelMap.getCurrentChannelUri();
+        if (currentChannelUri == null) {
+            stopSession();
+            mTunePendding = false;
+            Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String inputId = Utils.getInputIdForChannel(this, currentChannelUri);
+        if (!mTvInputInfo.getId().equals(inputId)) {
+            Log.d(TAG, "TV input is changed");
+            changeSession(mTvInputManagerHelper.getTvInputInfo(inputId));
+            mTunePendding = true;
+            return;
+        }
+        if (mTvSession == null) {
+            Log.d(TAG, "Service not connected");
+            mTunePendding = true;
+            return;
+        }
+        setVolumeByAudioFocusStatus();
+
+        if (currentChannelUri != null) {
+            // TODO: implement 'no signal'
+            // TODO: add result callback and show a message on failure.
+            Utils.setLastWatchedChannel(this, mTvInputInfo.getId(), currentChannelUri);
+            mTvSession.tune(currentChannelUri);
+            if (isShyModeSet()) {
+                setShynessMode(false);
+                // TODO: Set the shy mode to true when tune() fails.
+            }
+            displayChannelBanner();
+        }
+        mTunePendding = false;
     }
 
     private String getFormattedTimeString(long time) {

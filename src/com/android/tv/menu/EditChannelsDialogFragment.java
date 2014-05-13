@@ -39,6 +39,7 @@ import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
+import android.widget.Toast;
 
 import com.android.tv.R;
 import com.android.tv.Utils;
@@ -48,6 +49,8 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
     public static final String ARG_CURRENT_INPUT = "current_input";
     public static final String ARG_IS_UNIFIED_TV_INPUT = "unified_tv_input";
+
+    private static final int BROWSABLE = 1;
 
     private TvInputInfo mCurrentInput;
     private boolean mIsUnifiedTvInput;
@@ -59,6 +62,10 @@ public class EditChannelsDialogFragment extends DialogFragment {
     private int mIndexDisplayNumber;
     private int mIndexDisplayName;
     private int mIndexBrowsable;
+
+    private int mBrowsableChannelCount;
+
+    private boolean isInitialLoading;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -119,6 +126,8 @@ public class EditChannelsDialogFragment extends DialogFragment {
                 } else {
                     sortOrder = Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
                 }
+
+                isInitialLoading = true;
                 return new CursorLoader(getActivity(), uri, projections, null, null, sortOrder);
             }
 
@@ -131,6 +140,20 @@ public class EditChannelsDialogFragment extends DialogFragment {
                 cursor.setNotificationUri(getActivity().getContentResolver(),
                         TvContract.Channels.CONTENT_URI);
                 mAdapter.swapCursor(cursor);
+
+                if (isInitialLoading) {
+                    isInitialLoading = false;
+                    mBrowsableChannelCount = 0;
+                    while(cursor.moveToNext()) {
+                        if (cursor.getInt(mIndexBrowsable) == BROWSABLE) {
+                            ++mBrowsableChannelCount;
+                        }
+                    }
+                    if (mBrowsableChannelCount <= 0) {
+                        Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
 
             @Override
@@ -180,9 +203,14 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
                 Uri uri = TvContract.buildChannelUri(id);
                 ContentValues values = new ContentValues();
-                // Toggle the browsable value.
                 values.put(TvContract.Channels.BROWSABLE, checked ? 0 : 1);
                 getActivity().getContentResolver().update(uri, values, null, null);
+
+                mBrowsableChannelCount += checked ? 1 : -1;
+                if (mBrowsableChannelCount <= 0) {
+                    Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -201,5 +229,13 @@ public class EditChannelsDialogFragment extends DialogFragment {
         values.put(TvContract.Channels.BROWSABLE, browsable ? 1 : 0);
 
         getActivity().getContentResolver().update(uri, values, null, null);
+
+        if (browsable) {
+            mBrowsableChannelCount = mAdapter.getCount();
+        } else  {
+            mBrowsableChannelCount = 0;
+            Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }
