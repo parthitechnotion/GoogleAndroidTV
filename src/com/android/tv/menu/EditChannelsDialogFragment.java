@@ -191,7 +191,12 @@ public class EditChannelsDialogFragment extends DialogFragment {
         if (mAdapter == null || mAdapter.getCursor() == null) {
             return;
         }
-        Uri uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
+        Uri uri;
+        if (mIsUnifiedTvInput) {
+            uri = TvContract.Channels.CONTENT_URI;
+        } else {
+            uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
+        }
         ContentValues values = new ContentValues();
         values.put(TvContract.Channels.BROWSABLE, browsable ? 1 : 0);
 
