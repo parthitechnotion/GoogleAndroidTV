@@ -41,7 +41,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 
 import com.android.tv.R;
-import com.android.tv.TvInputUtils;
+import com.android.tv.Utils;
 
 public class EditChannelsDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = EditChannelsDialogFragment.class.getName();
@@ -67,7 +67,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
         mCurrentInput = arg.getParcelable(ARG_CURRENT_INPUT);
         mIsUnifiedTvInput = arg.getBoolean(ARG_IS_UNIFIED_TV_INPUT);
-        String displayName = TvInputUtils.getDisplayNameForInput(getActivity(), mCurrentInput);
+        String displayName = Utils.getDisplayNameForInput(getActivity(), mCurrentInput);
         String title = String.format(getString(R.string.edit_channels_title), displayName);
 
         mView = LayoutInflater.from(getActivity()).inflate(R.layout.edit_channels, null);
@@ -114,10 +114,10 @@ public class EditChannelsDialogFragment extends DialogFragment {
                         TvContract.Channels.BROWSABLE};
                 String sortOrder;
                 if (mIsUnifiedTvInput) {
-                    sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
-                            + TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+                    sortOrder = Utils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
+                            + Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
                 } else {
-                    sortOrder = TvInputUtils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
+                    sortOrder = Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
                 }
                 return new CursorLoader(getActivity(), uri, projections, null, null, sortOrder);
             }

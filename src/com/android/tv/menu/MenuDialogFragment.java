@@ -37,7 +37,7 @@ import android.widget.ListAdapter;
 import com.android.tv.InputPickerDialogFragment;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
-import com.android.tv.TvInputUtils;
+import com.android.tv.Utils;
 
 import java.util.List;
 
@@ -157,11 +157,11 @@ public final class MenuDialogFragment extends DialogFragment {
     }
 
     private void startSetupActivity() {
-        startActivity(TvInputUtils.ACTION_SETUP);
+        startActivity(Utils.ACTION_SETUP);
     }
 
     private void startSettingsActivity() {
-        startActivity(TvInputUtils.ACTION_SETTINGS);
+        startActivity(Utils.ACTION_SETTINGS);
     }
 
     private void startActivity(String action) {
@@ -172,16 +172,16 @@ public final class MenuDialogFragment extends DialogFragment {
 
         Intent intent = new Intent(action);
         intent.setClassName(info.packageName, info.name);
-        intent.putExtra(TvInputUtils.EXTRA_SERVICE_NAME, mCurrentInput.getServiceName());
+        intent.putExtra(Utils.EXTRA_SERVICE_NAME, mCurrentInput.getServiceName());
         startActivity(intent);
     }
 
     private ActivityInfo getSetupActivityInfo() {
-        return getActivityInfo(TvInputUtils.ACTION_SETUP);
+        return getActivityInfo(Utils.ACTION_SETUP);
     }
 
     private ActivityInfo getSettingsActivityInfo() {
-        return getActivityInfo(TvInputUtils.ACTION_SETTINGS);
+        return getActivityInfo(Utils.ACTION_SETTINGS);
     }
 
     private ActivityInfo getActivityInfo(String action) {
