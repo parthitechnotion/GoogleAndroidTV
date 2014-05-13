@@ -167,7 +167,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
         });
 
         mListView = (ListView) mView.findViewById(android.R.id.list);
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         mListView.setAdapter(mAdapter);
         mListView.setEmptyView(mView.findViewById(R.id.empty));
 
