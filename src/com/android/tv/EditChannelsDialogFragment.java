@@ -207,7 +207,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
                 values.put(TvContract.Channels.COLUMN_BROWSABLE, checked ? 0 : 1);
                 getActivity().getContentResolver().update(uri, values, null, null);
 
-                mBrowsableChannelCount += checked ? 1 : -1;
+                mBrowsableChannelCount += checked ? -1 : 1;
                 if (mBrowsableChannelCount <= 0) {
                     Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
                             Toast.LENGTH_SHORT).show();
