@@ -84,12 +84,12 @@ public final class Program {
 
     public ContentValues toContentValues() {
         ContentValues values = new ContentValues();
-        values.put(TvContract.Programs.CHANNEL_ID, mChannelId);
-        values.put(TvContract.Programs.TITLE, mTitle);
-        values.put(TvContract.Programs.START_TIME_UTC_MILLIS, mStartTimeUtcMillis);
-        values.put(TvContract.Programs.END_TIME_UTC_MILLIS, mEndTimeUtcMillis);
-        values.put(TvContract.Programs.DESCRIPTION, mDescription);
-        values.put(TvContract.Programs.LONG_DESCRIPTION, mLongDescription);
+        values.put(TvContract.Programs.COLUMN_CHANNEL_ID, mChannelId);
+        values.put(TvContract.Programs.COLUMN_TITLE, mTitle);
+        values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, mStartTimeUtcMillis);
+        values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, mEndTimeUtcMillis);
+        values.put(TvContract.Programs.COLUMN_DESCRIPTION, mDescription);
+        values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, mLongDescription);
         return values;
     }
 

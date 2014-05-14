@@ -116,9 +116,9 @@ public class EditChannelsDialogFragment extends DialogFragment {
                     uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
                 }
                 String[] projections = { TvContract.Channels._ID,
-                        TvContract.Channels.DISPLAY_NUMBER,
-                        TvContract.Channels.DISPLAY_NAME,
-                        TvContract.Channels.BROWSABLE};
+                        TvContract.Channels.COLUMN_DISPLAY_NUMBER,
+                        TvContract.Channels.COLUMN_DISPLAY_NAME,
+                        TvContract.Channels.COLUMN_BROWSABLE };
                 String sortOrder;
                 if (mIsUnifiedTvInput) {
                     sortOrder = Utils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
@@ -133,9 +133,10 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
             @Override
             public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-                mIndexDisplayNumber = cursor.getColumnIndex(TvContract.Channels.DISPLAY_NUMBER);
-                mIndexDisplayName = cursor.getColumnIndex(TvContract.Channels.DISPLAY_NAME);
-                mIndexBrowsable = cursor.getColumnIndex(TvContract.Channels.BROWSABLE);
+                mIndexDisplayNumber = cursor.getColumnIndex(
+                        TvContract.Channels.COLUMN_DISPLAY_NUMBER);
+                mIndexDisplayName = cursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NAME);
+                mIndexBrowsable = cursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
 
                 cursor.setNotificationUri(getActivity().getContentResolver(),
                         TvContract.Channels.CONTENT_URI);
@@ -163,7 +164,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
         });
 
         // TODO: need to show logo when TvProvider supports logo-related field.
-        String[] from = {TvContract.Channels.DISPLAY_NAME};
+        String[] from = { TvContract.Channels.COLUMN_DISPLAY_NAME };
         int[] to = {R.id.channel_text_view};
 
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.edit_channels_item, null, from,
@@ -203,7 +204,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
                 Uri uri = TvContract.buildChannelUri(id);
                 ContentValues values = new ContentValues();
-                values.put(TvContract.Channels.BROWSABLE, checked ? 0 : 1);
+                values.put(TvContract.Channels.COLUMN_BROWSABLE, checked ? 0 : 1);
                 getActivity().getContentResolver().update(uri, values, null, null);
 
                 mBrowsableChannelCount += checked ? 1 : -1;
@@ -226,7 +227,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
             uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
         }
         ContentValues values = new ContentValues();
-        values.put(TvContract.Channels.BROWSABLE, browsable ? 1 : 0);
+        values.put(TvContract.Channels.COLUMN_BROWSABLE, browsable ? 1 : 0);
 
         getActivity().getContentResolver().update(uri, values, null, null);
 

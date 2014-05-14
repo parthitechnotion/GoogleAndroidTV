@@ -181,11 +181,11 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         }
         String[] projection = {
                 TvContract.Channels._ID,
-                TvContract.Channels.DISPLAY_NUMBER,
-                TvContract.Channels.DISPLAY_NAME,
-                TvContract.Channels.PACKAGE_NAME,
-                TvContract.Channels.SERVICE_NAME,
-                TvContract.Channels.BROWSABLE};
+                TvContract.Channels.COLUMN_DISPLAY_NUMBER,
+                TvContract.Channels.COLUMN_DISPLAY_NAME,
+                TvContract.Channels.COLUMN_PACKAGE_NAME,
+                TvContract.Channels.COLUMN_SERVICE_NAME,
+                TvContract.Channels.COLUMN_BROWSABLE };
         String sortOrder;
         if (mIsUnifiedTvInput) {
             sortOrder = Utils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
@@ -205,11 +205,11 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         }
         cursor.setNotificationUri(mActivity.getContentResolver(), TvContract.Channels.CONTENT_URI);
         mIndexId = mCursor.getColumnIndex(TvContract.Channels._ID);
-        mIndexDisplayNumber = mCursor.getColumnIndex(TvContract.Channels.DISPLAY_NUMBER);
-        mIndexDisplayName = mCursor.getColumnIndex(TvContract.Channels.DISPLAY_NAME);
-        mIndexPackageName = mCursor.getColumnIndex(TvContract.Channels.PACKAGE_NAME);
-        mIndexServiceName = mCursor.getColumnIndex(TvContract.Channels.SERVICE_NAME);
-        mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.BROWSABLE);
+        mIndexDisplayNumber = mCursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NUMBER);
+        mIndexDisplayName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NAME);
+        mIndexPackageName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_PACKAGE_NAME);
+        mIndexServiceName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_SERVICE_NAME);
+        mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
         mBrowsableChannelCount = 0;
         if (mCursor.getCount() > 0) {
             mCursor.moveToFirst();

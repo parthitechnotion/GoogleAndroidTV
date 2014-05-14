@@ -32,7 +32,6 @@ import android.util.LongSparseArray;
 import android.view.KeyEvent;
 import android.view.Surface;
 
-import java.io.IOException;
 import java.util.List;
 
 abstract public class BaseTvInputService extends TvInputService {
@@ -78,7 +77,7 @@ abstract public class BaseTvInputService extends TvInputService {
                 false);
         String[] projection = {
                 TvContract.Channels._ID,
-                TvContract.Channels.DISPLAY_NUMBER
+                TvContract.Channels.COLUMN_DISPLAY_NUMBER
         };
         Cursor cursor = null;
         try {
@@ -90,10 +89,10 @@ abstract public class BaseTvInputService extends TvInputService {
                 if (DEBUG) Log.d(TAG, "Couldn't find the channel list. Inserting new channels...");
                 // Insert channels into the database. This needs to be done only for the first time.
                 ContentValues values = new ContentValues();
-                values.put(Channels.SERVICE_NAME, this.getClass().getName());
+                values.put(Channels.COLUMN_SERVICE_NAME, this.getClass().getName());
                 for (ChannelInfo info : createSampleChannels()) {
-                    values.put(Channels.DISPLAY_NUMBER, info.getNumber());
-                    values.put(Channels.DISPLAY_NAME, info.getName());
+                    values.put(Channels.COLUMN_DISPLAY_NUMBER, info.getNumber());
+                    values.put(Channels.COLUMN_DISPLAY_NAME, info.getName());
                     getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
                 }
             } while (true);
@@ -237,10 +236,10 @@ abstract public class BaseTvInputService extends TvInputService {
                 }
                 long time = System.currentTimeMillis();
                 ContentValues values = new ContentValues();
-                values.put(Programs.CHANNEL_ID, ContentUris.parseId(mChannelUri));
-                values.put(Programs.TITLE, mTitle);
-                values.put(Programs.START_TIME_UTC_MILLIS, time);
-                values.put(Programs.END_TIME_UTC_MILLIS, time + duration);
+                values.put(Programs.COLUMN_CHANNEL_ID, ContentUris.parseId(mChannelUri));
+                values.put(Programs.COLUMN_TITLE, mTitle);
+                values.put(Programs.COLUMN_START_TIME_UTC_MILLIS, time);
+                values.put(Programs.COLUMN_END_TIME_UTC_MILLIS, time + duration);
                 getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);
             }
         }

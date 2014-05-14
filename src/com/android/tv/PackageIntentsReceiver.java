@@ -33,11 +33,11 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)
                 && !intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
             Uri uri = intent.getData();
-            onPackageFullyRemoved(context, uri != null ? uri.getSchemeSpecificPart() : null);
+            onPackageFullyRemoved(uri != null ? uri.getSchemeSpecificPart() : null);
         }
     }
 
-    private void onPackageFullyRemoved(Context context, String packageName) {
+    private void onPackageFullyRemoved(String packageName) {
         if (packageName == null || packageName.isEmpty()) {
             return;
         }

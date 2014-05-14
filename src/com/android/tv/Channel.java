@@ -88,14 +88,14 @@ public final class Channel {
 
     public ContentValues toContentValues() {
         ContentValues values = new ContentValues();
-        values.put(TvContract.Channels.SERVICE_NAME, mServiceName);
-        values.put(TvContract.Channels.TYPE, mType);
-        values.put(TvContract.Channels.TRANSPORT_STREAM_ID, mTransportStreamId);
-        values.put(TvContract.Channels.DISPLAY_NUMBER, mDisplayNumber);
-        values.put(TvContract.Channels.DISPLAY_NAME, mDisplayName);
-        values.put(TvContract.Channels.DESCRIPTION, mDescription);
-        values.put(TvContract.Channels.BROWSABLE, mIsBrowsable ? 1 : 0);
-        values.put(TvContract.Channels.DATA, mData);
+        values.put(TvContract.Channels.COLUMN_SERVICE_NAME, mServiceName);
+        values.put(TvContract.Channels.COLUMN_TYPE, mType);
+        values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, mTransportStreamId);
+        values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, mDisplayNumber);
+        values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, mDisplayName);
+        values.put(TvContract.Channels.COLUMN_DESCRIPTION, mDescription);
+        values.put(TvContract.Channels.COLUMN_BROWSABLE, mIsBrowsable ? 1 : 0);
+        values.put(TvContract.Channels.COLUMN_DATA, mData);
         return values;
     }
 

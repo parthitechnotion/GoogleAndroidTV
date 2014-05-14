@@ -46,11 +46,12 @@ public class Utils {
     public static final String EXTRA_SERVICE_NAME = "serviceName";
 
     public static final String CHANNEL_SORT_ORDER_BY_INPUT_NAME =
-            TvContract.Channels.PACKAGE_NAME + ", " + TvContract.Channels.SERVICE_NAME;
+            TvContract.Channels.COLUMN_PACKAGE_NAME + ", "
+            + TvContract.Channels.COLUMN_SERVICE_NAME;
 
     public static final String CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER =
-            "CAST(" + TvContract.Channels.DISPLAY_NUMBER + " AS INTEGER), "
-            + "CAST(SUBSTR(LTRIM(" + TvContract.Channels.DISPLAY_NUMBER
+            "CAST(" + TvContract.Channels.COLUMN_DISPLAY_NUMBER + " AS INTEGER), "
+            + "CAST(SUBSTR(LTRIM(" + TvContract.Channels.COLUMN_DISPLAY_NUMBER
             + ",'0123456789'),2) AS INTEGER)";
 
     // preferences stored in the default preference.
@@ -74,8 +75,8 @@ public class Utils {
     }
 
     public static String getInputIdForChannel(Context context, Uri channelUri) {
-        String[] projection = { TvContract.Channels.PACKAGE_NAME,
-                TvContract.Channels.SERVICE_NAME };
+        String[] projection = { TvContract.Channels.COLUMN_PACKAGE_NAME,
+                TvContract.Channels.COLUMN_SERVICE_NAME };
         if (channelUri == null) {
             return null;
         }
@@ -137,9 +138,9 @@ public class Utils {
         long time = System.currentTimeMillis();
         Uri uri = TvContract.buildProgramsUriForChannel(channelUri, time, time);
         String[] projection = {
-                TvContract.Programs.TITLE,
-                TvContract.Programs.START_TIME_UTC_MILLIS,
-                TvContract.Programs.END_TIME_UTC_MILLIS};
+                TvContract.Programs.COLUMN_TITLE,
+                TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
+                TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS };
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         String title = null;
         long startTime = -1;

@@ -31,12 +31,12 @@ public class TvProviderSearch {
     public static List<SearchResult> search(Context context, String query) {
         List<SearchResult> results = new ArrayList<SearchResult>();
         results.addAll(searchChannels(context, query, new String[] {
-                Channels.DISPLAY_NAME,
-                Channels.DESCRIPTION
+                Channels.COLUMN_DISPLAY_NAME,
+                Channels.COLUMN_DESCRIPTION
         }));
         results.addAll(searchPrograms(context, query, new String[] {
-                Programs.TITLE,
-                Programs.DESCRIPTION
+                Programs.COLUMN_TITLE,
+                Programs.COLUMN_DESCRIPTION
         }));
         return results;
     }
@@ -45,8 +45,8 @@ public class TvProviderSearch {
             String[] columnNames) {
         String[] projection = {
                 Channels._ID,
-                Channels.DISPLAY_NAME,
-                Channels.DESCRIPTION,
+                Channels.COLUMN_DISPLAY_NAME,
+                Channels.COLUMN_DESCRIPTION,
         };
         return search(context, Channels.CONTENT_URI, projection, query, columnNames);
     }
@@ -56,9 +56,9 @@ public class TvProviderSearch {
     private static List<SearchResult> searchPrograms(Context context, String query,
             String[] columnNames) {
         String[] projection = {
-                Programs.CHANNEL_ID,
-                Programs.TITLE,
-                Programs.DESCRIPTION,
+                Programs.COLUMN_CHANNEL_ID,
+                Programs.COLUMN_TITLE,
+                Programs.COLUMN_DESCRIPTION,
         };
         return search(context, Programs.CONTENT_URI, projection, query, columnNames);
     }

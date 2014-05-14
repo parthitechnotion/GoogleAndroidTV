@@ -46,9 +46,9 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
 
         String[] from = {
                 TvContract.WatchedPrograms._ID,
-                TvContract.WatchedPrograms.CHANNEL_ID,
-                TvContract.WatchedPrograms.WATCH_START_TIME_UTC_MILLIS,
-                TvContract.WatchedPrograms.TITLE};
+                TvContract.WatchedPrograms.COLUMN_CHANNEL_ID,
+                TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS,
+                TvContract.WatchedPrograms.COLUMN_TITLE };
         int[] to = {
                 R.id.watched_program_id,
                 R.id.watched_program_channel_id,
@@ -60,11 +60,12 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
             @Override
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 String name = cursor.getColumnName(columnIndex);
-                if (TvContract.WatchedPrograms.CHANNEL_ID.equals(name)) {
+                if (TvContract.WatchedPrograms.COLUMN_CHANNEL_ID.equals(name)) {
                     long channleId = cursor.getLong(columnIndex);
                     ((TextView) view).setText(String.valueOf(channleId));
                     return true;
-                } else if (TvContract.WatchedPrograms.WATCH_START_TIME_UTC_MILLIS.equals(name)) {
+                } else if (TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS.equals(
+                        name)) {
                     long time = cursor.getLong(columnIndex);
                     CharSequence timeString = DateUtils.getRelativeTimeSpanString(time,
                             System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
@@ -95,9 +96,9 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {
                 TvContract.WatchedPrograms._ID,
-                TvContract.WatchedPrograms.CHANNEL_ID,
-                TvContract.WatchedPrograms.WATCH_START_TIME_UTC_MILLIS,
-                TvContract.WatchedPrograms.TITLE};
+                TvContract.WatchedPrograms.COLUMN_CHANNEL_ID,
+                TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS,
+                TvContract.WatchedPrograms.COLUMN_TITLE };
         return new CursorLoader(getActivity(), TvContract.WatchedPrograms.CONTENT_URI, projection,
                 null, null, TvContract.WatchedPrograms._ID + " DESC");
     }
