@@ -200,7 +200,7 @@ public class InputPickerDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         TvInputInfo input = mInputMap.get(mAdapter.getItem(which));
                         // If the unified TV input is selected, input will be null.
-                        mListener.onInputPicked(input, mAdapter.getItem(which));
+                        mListener.onInputPicked(input);
                     }
                 })
                 .setNeutralButton(R.string.edit_input_device_name,
@@ -245,6 +245,6 @@ public class InputPickerDialogFragment extends DialogFragment {
     }
 
     public interface InputPickerDialogListener {
-        public void onInputPicked(TvInputInfo input, String displayName);
+        public void onInputPicked(TvInputInfo input);
     }
 }

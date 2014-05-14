@@ -1,15 +1,12 @@
 package com.android.tv;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.provider.TvContract;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
-import android.util.Log;
 
 import java.util.HashSet;
 import java.util.List;

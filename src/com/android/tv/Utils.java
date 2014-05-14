@@ -16,11 +16,15 @@
 
 package com.android.tv;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -28,6 +32,8 @@ import android.provider.TvContract;
 import android.text.TextUtils;
 import android.tv.TvInputInfo;
 import android.util.Base64;
+
+import java.util.List;
 
 /**
  * A class that includes convenience methods for accessing TvProvider database.
@@ -176,6 +182,55 @@ public class Utils {
         PackageManager pm = context.getPackageManager();
         return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
                 info.loadLabel(pm).toString());
+    }
+
+    public static boolean hasActivity(Context context, TvInputInfo input, String action) {
+        return getActivityInfo(context, input, action) != null;
+    }
+
+    public static boolean startActivity(Context context, TvInputInfo input, String action) {
+        ActivityInfo activityInfo = getActivityInfo(context, input, action);
+        if (activityInfo == null) {
+            return false;
+        }
+
+        Intent intent = new Intent(action);
+        intent.setClassName(activityInfo.packageName, activityInfo.name);
+        intent.putExtra(Utils.EXTRA_SERVICE_NAME, input.getServiceName());
+        context.startActivity(intent);
+        return true;
+    }
+
+    public static boolean startActivityForResult(Activity activity, TvInputInfo input,
+            String action, int requestCode) {
+        ActivityInfo activityInfo = getActivityInfo(activity, input, action);
+        if (activityInfo == null) {
+            return false;
+        }
+
+        Intent intent = new Intent(Utils.ACTION_SETUP);
+        intent.setClassName(activityInfo.packageName, activityInfo.name);
+        activity.startActivityForResult(intent, requestCode);
+        return true;
+    }
+
+    private static ActivityInfo getActivityInfo(Context context, TvInputInfo input, String action) {
+        if (input == null) {
+            return null;
+        }
+
+        List<ResolveInfo> infos = context.getPackageManager().queryIntentActivities(
+                new Intent(action), PackageManager.GET_ACTIVITIES);
+        if (infos == null) {
+            return null;
+        }
+
+        for (ResolveInfo info : infos) {
+            if (info.activityInfo.packageName.equals(input.getPackageName())) {
+                return info.activityInfo;
+            }
+        }
+        return null;
     }
 
     private static long getChannelId(Uri channelUri) {

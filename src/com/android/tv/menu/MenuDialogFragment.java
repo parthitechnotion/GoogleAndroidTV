@@ -23,10 +23,6 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.tv.TvInputInfo;
 import android.view.View;
@@ -34,12 +30,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 
-import com.android.tv.InputPickerDialogFragment;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
 import com.android.tv.Utils;
-
-import java.util.List;
 
 /**
  * The TV app's menu dialog.
@@ -100,11 +93,15 @@ public final class MenuDialogFragment extends DialogFragment {
                             case POSITION_EDIT_CHANNELS:
                                 return mCurrentInput != null;
                             case POSITION_SETUP:
-                                return getSetupActivityInfo() != null;
+                                return !mIsUnifiedTvInput && mCurrentInput != null
+                                        && Utils.hasActivity(getContext(),
+                                                mCurrentInput, Utils.ACTION_SETUP);
                             case POSITION_PIP:
                                 return PIP_MENU_ENABLED;
                             case POSITION_SETTINGS:
-                                return getSettingsActivityInfo() != null;
+                                return !mIsUnifiedTvInput && mCurrentInput != null
+                                        && Utils.hasActivity(getContext(),
+                                                mCurrentInput, Utils.ACTION_SETTINGS);
                         }
                         return true;
                     }
@@ -125,7 +122,8 @@ public final class MenuDialogFragment extends DialogFragment {
                                 ((TvActivity) getActivity()).showEditChannelsDialog();
                                 break;
                             case POSITION_SETUP:
-                                startSetupActivity();
+                                dismiss();
+                                ((TvActivity) getActivity()).startSetupActivity(mCurrentInput);
                                 break;
                             case POSITION_PRIVACY:
                                 showDialogFragment(PrivacySettingDialogFragment.DIALOG_TAG,
@@ -136,7 +134,8 @@ public final class MenuDialogFragment extends DialogFragment {
                                 activity.togglePipView();
                                 break;
                             case POSITION_SETTINGS:
-                                startSettingsActivity();
+                                dismiss();
+                                ((TvActivity) getActivity()).startSettingsActivity();
                                 break;
                         }
                     }
@@ -154,52 +153,5 @@ public final class MenuDialogFragment extends DialogFragment {
         }
         ft.addToBackStack(null);
         dialog.show(ft, tag);
-    }
-
-    private void startSetupActivity() {
-        startActivity(Utils.ACTION_SETUP);
-    }
-
-    private void startSettingsActivity() {
-        startActivity(Utils.ACTION_SETTINGS);
-    }
-
-    private void startActivity(String action) {
-        ActivityInfo info = getActivityInfo(action);
-        if (info == null) {
-            return;
-        }
-
-        Intent intent = new Intent(action);
-        intent.setClassName(info.packageName, info.name);
-        intent.putExtra(Utils.EXTRA_SERVICE_NAME, mCurrentInput.getServiceName());
-        startActivity(intent);
-    }
-
-    private ActivityInfo getSetupActivityInfo() {
-        return getActivityInfo(Utils.ACTION_SETUP);
-    }
-
-    private ActivityInfo getSettingsActivityInfo() {
-        return getActivityInfo(Utils.ACTION_SETTINGS);
-    }
-
-    private ActivityInfo getActivityInfo(String action) {
-        if (mCurrentInput == null) {
-            return null;
-        }
-
-        List<ResolveInfo> infos = getActivity().getPackageManager().queryIntentActivities(
-                new Intent(action), PackageManager.GET_ACTIVITIES);
-        if (infos == null) {
-            return null;
-        }
-
-        for (ResolveInfo info : infos) {
-            if (info.activityInfo.packageName.equals(mCurrentInput.getPackageName())) {
-                return info.activityInfo;
-            }
-        }
-        return null;
     }
 }

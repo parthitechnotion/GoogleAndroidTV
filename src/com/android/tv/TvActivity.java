@@ -26,8 +26,6 @@ import android.app.FragmentTransaction;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.ContentObserver;
 import android.graphics.Point;
 import android.media.AudioManager;
@@ -60,7 +58,6 @@ import com.android.tv.menu.MenuDialogFragment;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * The main activity for demonstrating TV app.
@@ -380,6 +377,54 @@ public class TvActivity extends Activity implements
         super.onStop();
     }
 
+    @Override
+    public void onInputPicked(TvInputInfo input) {
+        if (input == null) {
+            // For unified TV input.
+            if (mIsUnifiedTvInput) {
+                return;
+            }
+            mIsUnifiedTvInput = true;
+            if (mTvInputInfo == null) {
+                Collection<TvInputInfo> inputs = mTvInputManagerHelper.getTvInputInfos(true);
+                if (inputs.isEmpty()) {
+                    Toast.makeText(this, R.string.no_available_input_device, Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    TvInputInfo info = inputs.iterator().next();
+                    startSession(info);
+                }
+                return;
+            } else {
+                // Restart session to re-create the channel map.
+                input = mTvInputInfo;
+            }
+        } else {
+            if (mTvSession != null && input.equals(mTvInputInfo) && !mIsUnifiedTvInput) {
+                // Nothing has changed thus nothing to do.
+                return;
+            }
+            mIsUnifiedTvInput = false;
+            if (!Utils.hasChannel(this, input, false)) {
+                mTvInputInfoForSetup = null;
+                startSetupActivity(input);
+                return;
+            }
+        }
+
+        // Start a new session with the new input.
+        stopSession();
+
+        // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
+        // know when the surface is released at TIS, we don't need this hack.
+        try {
+            Thread.sleep(DELAY_FOR_SURFACE_RELEASE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        startSession(input);
+    }
+
     public void showEditChannelsDialog() {
         if (mTvInputInfo == null) {
             return;
@@ -408,86 +453,27 @@ public class TvActivity extends Activity implements
         showDialogFragment(InputPickerDialogFragment.DIALOG_TAG, f);
     }
 
-    @Override
-    public void onInputPicked(TvInputInfo selectedTvInput, final String displayName) {
-        if (selectedTvInput == null) {
-            // For unified TV input.
-            if (mIsUnifiedTvInput) {
-                return;
-            }
-            mIsUnifiedTvInput = true;
-            if (mTvInputInfo == null) {
-                Collection<TvInputInfo> inputs = mTvInputManagerHelper.getTvInputInfos(true);
-                if (inputs.isEmpty()) {
-                    Toast.makeText(this, R.string.no_available_input_device, Toast.LENGTH_SHORT)
-                            .show();
-                } else {
-                    TvInputInfo info = inputs.iterator().next();
-                    startSession(info);
-                }
-                return;
-            } else {
-                // Restart session to re-create the channel map.
-                selectedTvInput = mTvInputInfo;
-            }
-        } else {
-            if (mTvSession != null && selectedTvInput.equals(mTvInputInfo) && !mIsUnifiedTvInput) {
-                // Nothing has changed thus nothing to do.
-                return;
-            }
-            mIsUnifiedTvInput = false;
-            if (!Utils.hasChannel(this, selectedTvInput, false)) {
-                mTvInputInfoForSetup = null;
-                if (showSetupActivity(selectedTvInput, displayName)) {
-                    stopSession();
-                }
-                return;
-            }
+    public void startSettingsActivity() {
+        if (mTvInputInfo == null) {
+            Log.w(TAG, "mTvInputInfo is null in showSettingsActivity");
         }
-
-        // Start a new session with the new input.
-        stopSession();
-
-        // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
-        // know when the surface is released at TIS, we don't need this hack.
-        try {
-            Thread.sleep(DELAY_FOR_SURFACE_RELEASE);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        startSession(selectedTvInput);
+        Utils.startActivity(this, mTvInputInfo, Utils.ACTION_SETTINGS);
     }
 
-    private boolean showSetupActivity(TvInputInfo inputInfo, String displayName) {
-        PackageManager pm = getPackageManager();
-        List<ResolveInfo> activityInfos = pm.queryIntentActivities(
-                new Intent(Utils.ACTION_SETUP), PackageManager.GET_ACTIVITIES);
-        ResolveInfo setupActivity = null;
-        if (activityInfos != null) {
-            for (ResolveInfo info : activityInfos) {
-                if (info.activityInfo.packageName.equals(inputInfo.getPackageName())) {
-                    setupActivity = info;
-                }
-            }
-        }
-
-        if (setupActivity == null) {
-            String message = String.format(getString(R.string.input_setup_activity_not_found),
-                    displayName);
+    public void startSetupActivity(TvInputInfo input) {
+        if (Utils.startActivityForResult(this, input, Utils.ACTION_SETUP,
+                REQUEST_START_SETUP_ACTIIVTY)) {
+            mTvInputInfoForSetup = input;
+            stopSession();
+        } else {
+            String displayName = Utils.getDisplayNameForInput(this, input);
+            String message = String.format(getString(
+                    R.string.input_setup_activity_not_found), displayName);
             new AlertDialog.Builder(this)
                     .setMessage(message)
                     .setPositiveButton(R.string.OK, null)
                     .show();
-            return false;
         }
-
-        mTvInputInfoForSetup = inputInfo;
-        Intent intent = new Intent(Utils.ACTION_SETUP);
-        intent.setClassName(setupActivity.activityInfo.packageName,
-                setupActivity.activityInfo.name);
-        startActivityForResult(intent, REQUEST_START_SETUP_ACTIIVTY);
-
-        return true;
     }
 
     @Override
@@ -704,8 +690,7 @@ public class TvActivity extends Activity implements
     }
 
     private String getFormattedTimeString(long time) {
-        return (String) DateFormat.format(
-                (CharSequence) getString(R.string.channel_banner_time_format), time);
+        return DateFormat.format(getString(R.string.channel_banner_time_format), time).toString();
     }
 
     private void displayChannelBanner() {
