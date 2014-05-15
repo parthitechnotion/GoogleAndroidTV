@@ -464,7 +464,7 @@ public class TvActivity extends Activity implements
             mTvInputInfoForSetup = input;
             stopSession();
         } else {
-            String displayName = Utils.getDisplayNameForInput(this, input);
+            String displayName = Utils.getDisplayNameForInput(this, input, false);
             String message = String.format(getString(
                     R.string.input_setup_activity_not_found), displayName);
             new AlertDialog.Builder(this)
@@ -710,8 +710,8 @@ public class TvActivity extends Activity implements
                     channelBannerString += " " + displayName;
                 }
                 mChannelTextView.setText(channelBannerString);
-                mInputSourceText.setText(
-                        Utils.getDisplayNameForInput(TvActivity.this, mTvInputInfo));
+                mInputSourceText.setText(Utils.getDisplayNameForInput(TvActivity.this,
+                        mTvInputInfo, mIsUnifiedTvInput));
 
                 updateProgramInfo();
 

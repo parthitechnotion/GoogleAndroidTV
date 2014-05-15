@@ -74,7 +74,8 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
         mCurrentInput = arg.getParcelable(ARG_CURRENT_INPUT);
         mIsUnifiedTvInput = arg.getBoolean(ARG_IS_UNIFIED_TV_INPUT);
-        String displayName = Utils.getDisplayNameForInput(getActivity(), mCurrentInput);
+        String displayName = Utils.getDisplayNameForInput(getActivity(), mCurrentInput,
+                mIsUnifiedTvInput);
         String title = String.format(getString(R.string.edit_channels_title), displayName);
 
         mView = LayoutInflater.from(getActivity()).inflate(R.layout.edit_channels, null);

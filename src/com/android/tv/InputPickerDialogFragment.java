@@ -174,7 +174,7 @@ public class InputPickerDialogFragment extends DialogFragment {
             String inputId = input.getId();
             mTvInputManager.registerListener(inputId, mAvailabilityListener, mHandler);
             mInputAvailabilityMap.put(inputId, mTvInputManager.getAvailability(inputId));
-            String name = Utils.getDisplayNameForInput(getActivity(), input);
+            String name = Utils.getDisplayNameForInput(getActivity(), input, false);
             if (inputId.equals(mSelectedInputId) && !mIsUnifiedTvInput) {
                 name += " " + getResources().getString(R.string.selected);
             } else if (inputId.equals(mSelectedPipInputId)) {

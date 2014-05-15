@@ -177,12 +177,17 @@ public class Utils {
         }
     }
 
-    public static String getDisplayNameForInput(Context context, TvInputInfo info) {
-        SharedPreferences preferences = context.getSharedPreferences(TvSettings.PREFS_FILE,
-                Context.MODE_PRIVATE);
-        PackageManager pm = context.getPackageManager();
-        return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
-                info.loadLabel(pm).toString());
+    public static String getDisplayNameForInput(Context context, TvInputInfo info,
+            boolean isUnifiedTvInput) {
+        if (isUnifiedTvInput) {
+            return context.getString(R.string.unified_tv_input_label);
+        } else {
+            SharedPreferences preferences = context.getSharedPreferences(TvSettings.PREFS_FILE,
+                    Context.MODE_PRIVATE);
+            PackageManager pm = context.getPackageManager();
+            return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
+                    info.loadLabel(pm).toString());
+        }
     }
 
     public static boolean hasActivity(Context context, TvInputInfo input, String action) {
