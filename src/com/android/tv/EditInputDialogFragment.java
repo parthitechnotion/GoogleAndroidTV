@@ -131,7 +131,7 @@ public class EditInputDialogFragment extends DialogFragment implements OnItemSel
         }
         for (TvInputInfo input : inputs) {
             String id = input.getId();
-            String name = Utils.getDisplayNameForInput(getActivity(), input);
+            String name = Utils.getDisplayNameForInput(getActivity(), input, false);
             mInputIdMap.put(name, id);
         }
         mDisplayNames = mInputIdMap.keySet().toArray(new String[0]);
