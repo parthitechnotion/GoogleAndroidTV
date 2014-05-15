@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EditInputDialogFragment extends DialogFragment implements OnItemSelectedListener {
+    public static final String DIALOG_TAG = EditInputDialogFragment.class.getName();
+
     private TvInputManager mTvInputManager;
     private SharedPreferences mPreferences;
 
