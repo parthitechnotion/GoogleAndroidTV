@@ -240,7 +240,7 @@ public class TvActivity extends Activity implements
 
             @Override
             public boolean onDown(MotionEvent event) {
-                Log.d(TAG, "onDown: " + event.toString());
+                if (DEBUG) Log.d(TAG, "onDown: " + event.toString());
                 if (mChannelMap == null) {
                     return false;
                 }
@@ -353,9 +353,7 @@ public class TvActivity extends Activity implements
                 showInputPickerDialog();
                 return;
             }
-            if (DEBUG) {
-                Log.d(TAG, "Retry start session (retryCount=" + retryCount + ")");
-            }
+            if (DEBUG) Log.d(TAG, "Retry start session (retryCount=" + retryCount + ")");
             mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_START_DEFAULT_SESSION_RETRY,
                     retryCount + 1, 0, new Object[]{input, channelId}),
                     START_DEFAULT_SESSION_RETRY_INTERVAL);
@@ -591,10 +589,10 @@ public class TvActivity extends Activity implements
 
     private void startPipSession() {
         if (mTvSession == null) {
-            Log.w(TAG, "TV content should be playing.");
+            Log.w(TAG, "TV content should be playing");
             return;
         }
-        Log.d(TAG, "startPipSession");
+        if (DEBUG) Log.d(TAG, "startPipSession()");
         mPipInputInfo = mTvInputInfo;
         mPipView.bindTvInput(mPipInputInfo.getId(), mPipSessionCreated);
         mPipShowing = true;
@@ -604,9 +602,9 @@ public class TvActivity extends Activity implements
             new TvInputManager.SessionCallback() {
                 @Override
                 public void onSessionCreated(final TvInputManager.Session session) {
-                    Log.d(TAG, "PIP session is created.");
+                    if (DEBUG) Log.d(TAG, "PIP session is created");
                     if (mTvSession == null) {
-                        Log.w(TAG, "TV content should be playing.");
+                        Log.w(TAG, "TV content should be playing");
                         if (session != null) {
                             mPipView.unbindTvInput();
                         }
@@ -614,7 +612,7 @@ public class TvActivity extends Activity implements
                         return;
                     }
                     if (session == null) {
-                        Log.w(TAG, "Fail to create another session.");
+                        Log.w(TAG, "Fail to create another session");
                         mPipShowing = false;
                         return;
                     }
@@ -647,10 +645,10 @@ public class TvActivity extends Activity implements
     };
 
     private void tune() {
-        Log.d(TAG, "tune()");
+        if (DEBUG) Log.d(TAG, "tune()");
         // Prerequisites to be able to tune.
         if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
-            Log.d(TAG, "Channel map not ready");
+            if (DEBUG) Log.d(TAG, "Channel map not ready");
             mTunePendding = true;
             return;
         }
@@ -663,13 +661,13 @@ public class TvActivity extends Activity implements
         }
         String inputId = Utils.getInputIdForChannel(this, currentChannelUri);
         if (!mTvInputInfo.getId().equals(inputId)) {
-            Log.d(TAG, "TV input is changed");
+            if (DEBUG) Log.d(TAG, "TV input is changed");
             changeSession(mTvInputManagerHelper.getTvInputInfo(inputId));
             mTunePendding = true;
             return;
         }
         if (mTvSession == null) {
-            Log.d(TAG, "Service not connected");
+            if (DEBUG) Log.d(TAG, "Session is not created yet");
             mTunePendding = true;
             return;
         }
@@ -781,7 +779,7 @@ public class TvActivity extends Activity implements
     }
 
     private void stopPipSession() {
-        Log.d(TAG, "stopPipSession");
+        if (DEBUG) Log.d(TAG, "stopPipSession");
         if (mPipSession != null) {
             mPipView.setVisibility(View.INVISIBLE);
             mPipView.unbindTvInput();
@@ -805,7 +803,7 @@ public class TvActivity extends Activity implements
         mPipView.getHolder().removeCallback(mSurfaceHolderCallback);
         PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putBoolean(PREF_KEY_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput).apply();
-        Log.d(TAG, "onDestroy()");
+        if (DEBUG) Log.d(TAG, "onDestroy()");
         super.onDestroy();
     }
 
