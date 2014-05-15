@@ -571,23 +571,18 @@ public class TvActivity extends Activity implements
                 public void onSessionCreated(TvInputManager.Session session) {
                     if (session != null) {
                         mTvSession = session;
-                        mAudioManager.requestAudioFocus(TvActivity.this,
+                        int result = mAudioManager.requestAudioFocus(TvActivity.this,
                                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                        mAudioFocusStatus =
+                                (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) ?
+                                        AudioManager.AUDIOFOCUS_GAIN
+                                        : AudioManager.AUDIOFOCUS_LOSS;
                         if (mTunePendding) {
                             tune();
                         }
                     } else {
                         Log.w(TAG, "Failed to create a session");
                         // TODO: show something to user about this error.
-                    }
-                }
-
-                @Override
-                public void onSessionReleased(TvInputManager.Session session) {
-                    Log.w(TAG, "Session is released by crash");
-                    if (mTvSession == session) {
-                        stopSession();
-                        startDefaultSession(Channel.INVALID_ID);
                     }
                 }
             };
@@ -630,14 +625,6 @@ public class TvActivity extends Activity implements
                             mPipView.setVisibility(View.VISIBLE);
                         }
                     });
-                }
-
-                @Override
-                public void onSessionReleased(final TvInputManager.Session session) {
-                    Log.w(TAG, "PIP session is released by crash");
-                    if (mPipSession == session) {
-                        stopPipSession();
-                    }
                 }
             };
 
@@ -777,6 +764,7 @@ public class TvActivity extends Activity implements
     private void stopSession() {
         if (mTvInputInfo != null) {
             if (mTvSession != null) {
+                mTvSession.setVolume(AUDIO_MIN_VOLUME);
                 mAudioManager.abandonAudioFocus(this);
                 mTvSession = null;
             }
