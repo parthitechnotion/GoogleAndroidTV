@@ -539,6 +539,12 @@ public class TvActivity extends Activity implements
     }
 
     private void startSession(TvInputInfo inputInfo, long channelId) {
+        if (mTvInputInfo != null || mChannelMap != null) {
+            // TODO: when this case occurs, we should remove the case.
+            Log.w(TAG, "The previous variables are not released in startSession");
+            stopSession();
+        }
+
         // TODO: recreate SurfaceView to prevent abusing from the previous session.
         mTvInputInfo = inputInfo;
 
