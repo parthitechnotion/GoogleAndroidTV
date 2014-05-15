@@ -138,6 +138,7 @@ public class TvActivity extends Activity implements
         AVAILABLE_DIALOG_TAGS.add(MenuDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditChannelsDialogFragment.DIALOG_TAG);
+        AVAILABLE_DIALOG_TAGS.add(EditInputDialogFragment.DIALOG_TAG);
     }
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
