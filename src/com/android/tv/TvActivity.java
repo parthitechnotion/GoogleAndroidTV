@@ -345,11 +345,18 @@ public class TvActivity extends Activity implements
             return;
         }
         TvInputInfo input = mTvInputManagerHelper.getTvInputInfo(inputId);
+        if (input == null) {
+            // TODO: if the last selected TV input is uninstalled, getLastWatchedChannelId
+            // should return Channel.INVALID_ID.
+            Log.w(TAG, "Input (id=" + inputId + ") doesn't exist");
+            showInputPickerDialog();
+            return;
+        }
         startSessionIfAvailableOrRetry(input, channelId, 0);
     }
 
     private void startSessionIfAvailableOrRetry(TvInputInfo input, long channelId, int retryCount) {
-        if (!mTvInputManagerHelper.isAvaliable(input.getId())) {
+        if (!mTvInputManagerHelper.isAvailable(input.getId())) {
             if (retryCount >= START_DEFAULT_SESSION_MAX_RETRY) {
                 showInputPickerDialog();
                 return;
