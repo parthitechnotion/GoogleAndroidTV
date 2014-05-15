@@ -43,6 +43,7 @@ import android.tv.TvView;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -55,6 +56,9 @@ import android.widget.Toast;
 
 import com.android.tv.menu.EditChannelsDialogFragment;
 import com.android.tv.menu.MenuDialogFragment;
+import com.android.tv.menu.PrivacySettingDialogFragment;
+import com.android.tv.ui.ChannelBannerView;
+import com.android.tv.ui.MainMenuView;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -73,6 +77,7 @@ public class TvActivity extends Activity implements
 
     private static final int DURATION_SHOW_CHANNEL_BANNER = 2000;
     private static final int DURATION_SHOW_CONTROL_GUIDE = 1000;
+    private static final int DURATION_SHOW_MAIN_MENU = 3000;
     private static final float AUDIO_MAX_VOLUME = 1.0f;
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
@@ -107,14 +112,11 @@ public class TvActivity extends Activity implements
     private TvInputManager mTvInputManager;
     private TvView mTvView;
     private LinearLayout mControlGuide;
-    private LinearLayout mChannelBanner;
-    private Runnable mHideChannelBanner;
-    private Runnable mHideControlGuide;
-    private TextView mChannelTextView;
-    private TextView mInputSourceText;
-    private TextView mProgramTextView;
-    private TextView mProgramTimeTextView;
-    private TextView mClockTextView;
+    private MainMenuView mMainMenuView;
+    private ChannelBannerView mChannelBanner;
+    private HideRunnable mHideChannelBanner;
+    private HideRunnable mHideControlGuide;
+    private HideRunnable mHideMainMenu;
     private int mShortAnimationDuration;
     private int mDisplayWidth;
     private GestureDetector mGestureDetector;
@@ -139,6 +141,7 @@ public class TvActivity extends Activity implements
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditChannelsDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditInputDialogFragment.DIALOG_TAG);
+        AVAILABLE_DIALOG_TAGS.add(PrivacySettingDialogFragment.DIALOG_TAG);
     }
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
@@ -210,22 +213,21 @@ public class TvActivity extends Activity implements
         mPipView.getHolder().addCallback(mSurfaceHolderCallback);
 
         mControlGuide = (LinearLayout) findViewById(R.id.control_guide);
-        mChannelBanner = (LinearLayout) findViewById(R.id.channel_banner);
+        mChannelBanner = (ChannelBannerView) findViewById(R.id.channel_banner);
+        mMainMenuView = (MainMenuView) findViewById(R.id.main_menu);
+        mMainMenuView.setTvActivity(this);
 
         // Initially hide the channel banner and the control guide.
         mChannelBanner.setVisibility(View.GONE);
+        mMainMenuView.setVisibility(View.GONE);
         mControlGuide.setVisibility(View.GONE);
 
-        mHideControlGuide = new HideRunnable(mControlGuide);
-        mHideChannelBanner = new HideRunnable(mChannelBanner);
+        mHideControlGuide = new HideRunnable(mControlGuide, DURATION_SHOW_CONTROL_GUIDE);
+        mHideChannelBanner = new HideRunnable(mChannelBanner, DURATION_SHOW_CHANNEL_BANNER);
+        mHideMainMenu = new HideRunnable(mMainMenuView, DURATION_SHOW_MAIN_MENU);
 
-        mChannelTextView = (TextView) findViewById(R.id.channel_text);
-        mInputSourceText = (TextView) findViewById(R.id.input_source_text);
-        mProgramTextView = (TextView) findViewById(R.id.program_text);
-        mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
-        mClockTextView = (TextView) findViewById(R.id.clock_text);
-
-        mShortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        mShortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mAudioFocusStatus = AudioManager.AUDIOFOCUS_LOSS;
@@ -234,7 +236,7 @@ public class TvActivity extends Activity implements
         display.getSize(size);
         mDisplayWidth = size.x;
 
-        mGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+        mGestureDetector = new GestureDetector(this, new SimpleOnGestureListener() {
             static final float CONTROL_MARGIN = 0.2f;
             final float mLeftMargin = mDisplayWidth * CONTROL_MARGIN;
             final float mRightMargin = mDisplayWidth * (1 - CONTROL_MARGIN);
@@ -246,7 +248,7 @@ public class TvActivity extends Activity implements
                     return false;
                 }
 
-                showAndHide(mControlGuide, mHideControlGuide, DURATION_SHOW_CONTROL_GUIDE);
+                mHideControlGuide.showAndHide();
 
                 if (event.getX() <= mLeftMargin) {
                     channelDown();
@@ -266,15 +268,12 @@ public class TvActivity extends Activity implements
                 }
 
                 if (event.getX() > mLeftMargin && event.getX() < mRightMargin) {
-                    showMenu();
+                    displayMainMenu();
                     return true;
                 }
                 return false;
             }
         });
-
-        getContentResolver().registerContentObserver(TvContract.Programs.CONTENT_URI, true,
-                mProgramUpdateObserver);
 
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
         mTvInputManagerHelper = new TvInputManagerHelper(mTvInputManager);
@@ -466,6 +465,12 @@ public class TvActivity extends Activity implements
         Utils.startActivity(this, mTvInputInfo, Utils.ACTION_SETTINGS);
     }
 
+    public void startSetupActivity() {
+        if (mTvInputInfo != null) {
+            startSetupActivity(mTvInputInfo);
+        }
+    }
+
     public void startSetupActivity(TvInputInfo input) {
         if (Utils.startActivityForResult(this, input, Utils.ACTION_SETUP,
                 REQUEST_START_SETUP_ACTIIVTY)) {
@@ -556,6 +561,8 @@ public class TvActivity extends Activity implements
         // TODO: recreate SurfaceView to prevent abusing from the previous session.
         mTvInputInfo = inputInfo;
 
+        mMainMenuView.setChannelMap(null);
+
         // Prepare a new channel map for the current input.
         mChannelMap = new ChannelMap(this, mIsUnifiedTvInput ? null : inputInfo,
                 channelId, mTvInputManagerHelper, mOnChannelsLoadFinished);
@@ -642,19 +649,13 @@ public class TvActivity extends Activity implements
                 }
             };
 
-    private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            updateProgramInfo();
-        }
-    };
-
     private final Runnable mOnChannelsLoadFinished = new Runnable() {
         @Override
         public void run() {
             if (mTunePendding) {
                 tune();
             }
+            mMainMenuView.setChannelMap(mChannelMap);
         }
     };
 
@@ -701,10 +702,6 @@ public class TvActivity extends Activity implements
         mTunePendding = false;
     }
 
-    private String getFormattedTimeString(long time) {
-        return DateFormat.format(getString(R.string.channel_banner_time_format), time).toString();
-    }
-
     private void displayChannelBanner() {
         runOnUiThread(new Runnable() {
             @Override
@@ -713,61 +710,23 @@ public class TvActivity extends Activity implements
                     return;
                 }
 
-                // TODO: Show a beautiful channel banner instead.
-                String channelBannerString = "";
-                String displayNumber = mChannelMap.getCurrentDisplayNumber();
-                if (displayNumber != null) {
-                    channelBannerString += displayNumber;
-                }
-                String displayName = mChannelMap.getCurrentDisplayName();
-                if (displayName != null) {
-                    channelBannerString += " " + displayName;
-                }
-                mChannelTextView.setText(channelBannerString);
-                mInputSourceText.setText(Utils.getDisplayNameForInput(TvActivity.this,
-                        mTvInputInfo, mIsUnifiedTvInput));
-
-                updateProgramInfo();
-
-                // Time may changes during the display, but banner is displayed for a short period
-                // so ignoring it might be acceptable.
-                mClockTextView.setText(getFormattedTimeString(System.currentTimeMillis()));
-
-                showAndHide(mChannelBanner, mHideChannelBanner, DURATION_SHOW_CHANNEL_BANNER);
+                mChannelBanner.updateViews(mChannelMap);
+                mHideChannelBanner.showAndHide();
             }
         });
     }
 
-    private void updateProgramInfo() {
-        if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
-            return;
-        }
-        Uri channelUri = mChannelMap.getCurrentChannelUri();
-        if (channelUri == null) {
-            return;
-        }
-        Program program = Utils.getCurrentProgram(TvActivity.this, channelUri);
-        if (program == null) {
-            return;
-        }
-        if (!TextUtils.isEmpty(program.getTitle())) {
-            mProgramTextView.setText(program.getTitle());
+    private void displayMainMenu() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mChannelMap == null || !mChannelMap.isLoadFinished()) {
+                    return;
+                }
 
-            if (program.getStartTimeUtcMillis() > 0 && program.getEndTimeUtcMillis() > 0) {
-                String startTime = getFormattedTimeString(program.getStartTimeUtcMillis());
-                String endTime = getFormattedTimeString(program.getEndTimeUtcMillis());
-                mProgramTimeTextView.setText(getString(R.string.channel_banner_program_time_format,
-                                startTime, endTime));
-            } else {
-                mProgramTimeTextView.setText(null);
+                mHideMainMenu.showAndHide();
             }
-        } else {
-            // Program title might not be available at this point. Setting the text to null to
-            // clear the previous program title for now. It will be filled as soon as we get the
-            // updated program information.
-            mProgramTextView.setText(null);
-            mProgramTimeTextView.setText(null);
-        }
+        });
     }
 
     public void showRecentlyWatchedDialog() {
@@ -786,6 +745,7 @@ public class TvActivity extends Activity implements
             mTvInputInfo = null;
         }
         if (mChannelMap != null) {
+            mMainMenuView.setChannelMap(null);
             mChannelMap.close();
             mChannelMap = null;
         }
@@ -812,7 +772,6 @@ public class TvActivity extends Activity implements
 
     @Override
     protected void onDestroy() {
-        getContentResolver().unregisterContentObserver(mProgramUpdateObserver);
         mTvView.getHolder().removeCallback(mSurfaceHolderCallback);
         mPipView.getHolder().removeCallback(mSurfaceHolderCallback);
         PreferenceManager.getDefaultSharedPreferences(this).edit()
@@ -823,6 +782,14 @@ public class TvActivity extends Activity implements
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (mMainMenuView.getVisibility() == View.VISIBLE) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                mMainMenuView.setVisibility(View.GONE);
+                return true;
+            }
+            return super.onKeyUp(keyCode, event);
+        }
+
         if (mHandler.hasMessages(MSG_START_DEFAULT_SESSION_RETRY)) {
             // Ignore key events during startDefaultSession retry.
             return true;
@@ -866,17 +833,25 @@ public class TvActivity extends Activity implements
                     channelDown();
                     return true;
 
-                case KeyEvent.KEYCODE_NUMPAD_ENTER:
-                case KeyEvent.KEYCODE_E:
-                    displayChannelBanner();
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    displayMainMenu();
                     return true;
 
+                case KeyEvent.KEYCODE_ENTER:
+                case KeyEvent.KEYCODE_NUMPAD_ENTER:
+                case KeyEvent.KEYCODE_E:
                 case KeyEvent.KEYCODE_DPAD_CENTER:
                 case KeyEvent.KEYCODE_MENU:
                     if (event.isCanceled()) {
                         return true;
                     }
-                    showMenu();
+                    if (keyCode != KeyEvent.KEYCODE_MENU) {
+                        displayChannelBanner();
+                    }
+                    if (keyCode != KeyEvent.KEYCODE_E) {
+                        displayMainMenu();
+                    }
                     return true;
             }
         }
@@ -909,8 +884,18 @@ public class TvActivity extends Activity implements
     }
 
     @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        if (mMainMenuView.getVisibility() == View.VISIBLE) {
+            mHideMainMenu.showAndHide();
+        }
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
+        if (mMainMenuView.getVisibility() != View.VISIBLE) {
+            mGestureDetector.onTouchEvent(event);
+        }
         return super.onTouchEvent(event);
     }
 
@@ -928,6 +913,17 @@ public class TvActivity extends Activity implements
             return mTvView.dispatchKeyEvent(event);
         }
         return false;
+    }
+
+    public void moveToChannel(long id) {
+        if (mChannelMap != null && mChannelMap.isLoadFinished()
+                && id != mChannelMap.getCurrentChannelId()) {
+            if (mChannelMap.moveToChannel(id)) {
+                tune();
+            } else {
+                Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void channelUp() {
@@ -962,7 +958,7 @@ public class TvActivity extends Activity implements
         showDialogFragment(MenuDialogFragment.DIALOG_TAG, f);
     }
 
-    private void showDialogFragment(final String tag, final DialogFragment dialog) {
+    public void showDialogFragment(final String tag, final DialogFragment dialog) {
         // A tag for dialog must be added to AVAILABLE_DIALOG_TAGS to make it launchable from TV.
         if (!AVAILABLE_DIALOG_TAGS.contains(tag)) {
             return;
@@ -988,40 +984,46 @@ public class TvActivity extends Activity implements
 
     private class HideRunnable implements Runnable {
         private final View mView;
+        private final long mWaitingTime;
+        private boolean mOnHideAnimation;
 
-        public HideRunnable(View view) {
+        public HideRunnable(View view, long waitingTime) {
             mView = view;
+            mWaitingTime = waitingTime;
         }
 
         @Override
         public void run() {
+            mOnHideAnimation = true;
             mView.animate()
                     .alpha(0f)
                     .setDuration(mShortAnimationDuration)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
+                            mOnHideAnimation = false;
                             mView.setVisibility(View.GONE);
                         }
                     });
         }
-    }
 
-    private void showAndHide(View view, Runnable hide, long duration) {
-        if (view.getVisibility() == View.VISIBLE) {
-            // Skip the show animation if the view is already visible and cancel the scheduled hide
-            // animation.
-            mHandler.removeCallbacks(hide);
-        } else {
-            view.setAlpha(0f);
-            view.setVisibility(View.VISIBLE);
-            view.animate()
-                    .alpha(1f)
-                    .setDuration(mShortAnimationDuration)
-                    .setListener(null);
+        private void showAndHide() {
+            if (mView.getVisibility() != View.VISIBLE) {
+                mView.setAlpha(0f);
+                mView.setVisibility(View.VISIBLE);
+                mView.animate()
+                        .alpha(1f)
+                        .setDuration(mShortAnimationDuration)
+                        .setListener(null);
+            }
+            // Schedule the hide animation after a few seconds.
+            mHandler.removeCallbacks(this);
+            if (mOnHideAnimation) {
+                mView.clearAnimation();
+                mOnHideAnimation = false;
+            }
+            mHandler.postDelayed(this, mWaitingTime);
         }
-        // Schedule the hide animation after a few seconds.
-        mHandler.postDelayed(hide, duration);
     }
 
     private void setShynessMode(boolean shyMode) {

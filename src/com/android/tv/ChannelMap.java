@@ -29,6 +29,8 @@ import android.provider.TvContract;
 import android.tv.TvInputInfo;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 /**
  * The class that abstracts the channel information for each input service and provides convenient
  * methods to access it.
@@ -54,6 +56,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mIndexServiceName;
     private int mIndexBrowsable;
     private int mBrowsableChannelCount;
+    private ArrayList<Channel> mChannelList = new ArrayList<Channel>();
 
     public ChannelMap(Activity activity, TvInputInfo tvInputInfo, long initChannelId,
             TvInputManagerHelper tvInputManagerHelper, Runnable onLoadFinished) {
@@ -75,9 +78,29 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return mBrowsableChannelCount;
     }
 
+    public TvInputInfo getTvInputInfo() {
+        return mInputInfo;
+    }
+
+    public Channel[] getAllChannelList() {
+        return mChannelList.toArray(new Channel[0]);
+    }
+
+    public boolean isUnifiedTvInput() {
+        return mIsUnifiedTvInput;
+    }
+
     public int size() {
         checkCursor();
         return mBrowsableChannelCount == 0 ? mCursor.getCount() : mBrowsableChannelCount;
+    }
+
+    public long getCurrentChannelId() {
+        checkCursor();
+        if (mCursor.getCount() < 1) {
+            return Channel.INVALID_ID;
+        }
+        return mCursor.getLong(mIndexId);
     }
 
     public Uri getCurrentChannelUri() {
@@ -153,20 +176,21 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return false;
     }
 
-    public void moveToChannel(long id) {
+    public boolean moveToChannel(long id) {
         checkCursor();
         if (mCursor.getCount() == 0) {
-            return;
+            return false;
         }
         int position = mCursor.getPosition();
         mCursor.moveToFirst();
         do {
             if (mCursor.getLong(mIndexId) == id) {
                 mCurrentChannelId = mCursor.getLong(mIndexId);
-                return;
+                return true;
             }
         } while (mCursor.moveToNext());
         mCursor.moveToPosition(position);
+        return false;
     }
 
     @Override
@@ -209,9 +233,17 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mIndexServiceName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_SERVICE_NAME);
         mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
         mBrowsableChannelCount = 0;
+        mChannelList.clear();
         if (mCursor.getCount() > 0) {
             mCursor.moveToFirst();
             do {
+                mChannelList.add(new Channel.Builder()
+                        .setId(mCursor.getLong(mIndexId))
+                        .setServiceName(mCursor.getString(mIndexServiceName))
+                        .setDisplayNumber(mCursor.getString(mIndexDisplayNumber))
+                        .setDisplayName(mCursor.getString(mIndexDisplayName))
+                        .setBrowsable(mCursor.getInt(mIndexBrowsable) == BROWSABLE)
+                        .build());
                 if (mCursor.getInt(mIndexBrowsable) == BROWSABLE) {
                     ++mBrowsableChannelCount;
                 }
