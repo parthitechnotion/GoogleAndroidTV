@@ -19,6 +19,7 @@ package com.android.tv;
 import android.os.Handler;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
+import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -33,6 +34,8 @@ import java.util.Set;
 
 
 public class TvInputManagerHelper {
+    private static final String TAG = "TvInputManagerHelper";
+
     private final TvInputManager mTvInputManager;
     private final Map<String, Boolean> mInputAvailabilityMap =
             new HashMap<String, Boolean>();
@@ -145,7 +148,7 @@ public class TvInputManagerHelper {
         return mInputAvailabilityMap.size();
     }
 
-    public boolean isAvaliable(String inputId) {
+    public boolean isAvailable(String inputId) {
         if (!mStarted) {
             throw new IllegalStateException("AvailabilityManager doesn't started");
         }
@@ -154,7 +157,8 @@ public class TvInputManagerHelper {
             update();
             available = mInputAvailabilityMap.get(inputId);
             if (available == null) {
-                throw new IllegalArgumentException("inputName (" + inputId + ") doesn't exist");
+                Log.w(TAG, "isAvailable: no such input (id=" + inputId + ")");
+                return false;
             }
         }
         return available;

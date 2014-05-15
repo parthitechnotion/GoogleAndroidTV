@@ -118,8 +118,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         while(browsableChannelCount > 0 && (mCursor.moveToNext() || mCursor.moveToFirst())) {
             if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
                 --browsableChannelCount;
-                if (!mTvInputManagerHelper.isAvaliable(
-                        TvInputInfo.generateInputIdForComponenetName(getComponentName()))) {
+                if (!mTvInputManagerHelper.isAvailable(getInputId())) {
                     continue;
                 }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
@@ -143,8 +142,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         while(browsableChannelCount > 0 && (mCursor.moveToPrevious() || mCursor.moveToLast())) {
             if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
                 --browsableChannelCount;
-                if (!mTvInputManagerHelper.isAvaliable(
-                        TvInputInfo.generateInputIdForComponenetName(getComponentName()))) {
+                if (!mTvInputManagerHelper.isAvailable(getInputId())) {
                     continue;
                 }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
@@ -253,9 +251,10 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mCursor.moveToPosition(oldPosition);
     }
 
-    private ComponentName getComponentName() {
-        return new ComponentName(mCursor.getString(mIndexPackageName),
+    private String getInputId() {
+        ComponentName componentName = new ComponentName(mCursor.getString(mIndexPackageName),
                 mCursor.getString(mIndexServiceName));
+        return TvInputInfo.generateInputIdForComponenetName(componentName);
     }
 
     private void checkCursor() {
