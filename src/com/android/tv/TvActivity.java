@@ -54,9 +54,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.tv.menu.EditChannelsDialogFragment;
-import com.android.tv.menu.MenuDialogFragment;
-import com.android.tv.menu.PrivacySettingDialogFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.MainMenuView;
 
@@ -137,7 +134,6 @@ public class TvActivity extends Activity implements
 
     static {
         AVAILABLE_DIALOG_TAGS.add(InputPickerDialogFragment.DIALOG_TAG);
-        AVAILABLE_DIALOG_TAGS.add(MenuDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditChannelsDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditInputDialogFragment.DIALOG_TAG);
@@ -960,18 +956,6 @@ public class TvActivity extends Activity implements
                 Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void showMenu() {
-        MenuDialogFragment f = new MenuDialogFragment();
-        if (mTvSession != null) {
-            Bundle arg = new Bundle();
-            arg.putParcelable(MenuDialogFragment.ARG_CURRENT_INPUT, mTvInputInfo);
-            arg.putBoolean(MenuDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
-            f.setArguments(arg);
-        }
-
-        showDialogFragment(MenuDialogFragment.DIALOG_TAG, f);
     }
 
     public void showDialogFragment(final String tag, final DialogFragment dialog) {

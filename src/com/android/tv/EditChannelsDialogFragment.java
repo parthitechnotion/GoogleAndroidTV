@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv.menu;
+package com.android.tv;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -42,7 +42,6 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.Toast;
 
 import com.android.tv.R;
-import com.android.tv.Utils;
 
 public class EditChannelsDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = EditChannelsDialogFragment.class.getName();

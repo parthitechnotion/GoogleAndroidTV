@@ -4,10 +4,10 @@ package com.android.tv.ui;
 
 import com.android.tv.Channel;
 import com.android.tv.ChannelMap;
+import com.android.tv.PrivacySettingDialogFragment;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
 import com.android.tv.Utils;
-import com.android.tv.menu.PrivacySettingDialogFragment;
 
 import android.content.Context;
 import android.net.Uri;

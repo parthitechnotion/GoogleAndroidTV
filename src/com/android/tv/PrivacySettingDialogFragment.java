@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv.menu;
+package com.android.tv;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import com.android.tv.R;
-import com.android.tv.TvSettings;
 
 /**
  * Privacy setting dialog.

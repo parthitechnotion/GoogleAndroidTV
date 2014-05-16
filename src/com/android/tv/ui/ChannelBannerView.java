@@ -9,15 +9,12 @@ import com.android.tv.Utils;
 
 import android.content.Context;
 import android.database.ContentObserver;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.TvContract;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.tv.TvInputInfo;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,7 +29,6 @@ public class ChannelBannerView extends LinearLayout {
     private TextView mInputSourceText;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
-    private Context mContext;
     private Uri mCurrentChannelUri;
 
     private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
@@ -96,7 +92,6 @@ public class ChannelBannerView extends LinearLayout {
             channelBannerString += " " + displayName;
         }
         mChannelTextView.setText(channelBannerString);
-        TvInputInfo info = channelMap.getTvInputInfo();
         mInputSourceText.setText(Utils.getDisplayNameForInput(mContext,
                 channelMap.getTvInputInfo(), channelMap.isUnifiedTvInput()));
 
