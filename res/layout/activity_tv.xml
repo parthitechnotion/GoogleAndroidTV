@@ -15,6 +15,7 @@
 -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:lb="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -61,23 +62,21 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="96dp"
-        android:layout_margin="8dp">
+        android:layout_height="wrap_content">
         <include layout="@layout/channel_banner" />
     </FrameLayout>
 
     <com.android.tv.ui.MainMenuView
         android:id="@+id/main_menu"
         android:layout_width="match_parent"
-        android:layout_height="270dp"
+        android:layout_height="200dp"
         android:layout_gravity="bottom"
-        android:paddingLeft="22dp"
-        android:paddingRight="22dp"
-        android:paddingBottom="22dp"
+        android:padding="22dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:focusable="true"
         android:visibility="invisible"
-        android:background="#AA000000" />
+        android:background="#AA000000"
+        lb:verticalMargin="20dp" />
 
 </FrameLayout>

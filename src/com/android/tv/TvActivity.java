@@ -74,7 +74,7 @@ public class TvActivity extends Activity implements
 
     private static final int DURATION_SHOW_CHANNEL_BANNER = 2000;
     private static final int DURATION_SHOW_CONTROL_GUIDE = 1000;
-    private static final int DURATION_SHOW_MAIN_MENU = 3000;
+    private static final int DURATION_SHOW_MAIN_MENU = DURATION_SHOW_CHANNEL_BANNER;
     private static final float AUDIO_MAX_VOLUME = 1.0f;
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;

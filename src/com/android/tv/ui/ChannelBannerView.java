@@ -12,10 +12,14 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.TvContract;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.tv.TvInputInfo;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
@@ -25,8 +29,12 @@ public class ChannelBannerView extends LinearLayout {
 
     private static final String TAG = "ChannelBannerView";
 
+    private TextView mResolutionTextView;
+    private TextView mAspectRatioTextView;
+    private ProgressBar mRemainingTimeView;
+    private LinearLayout mProgramInfoContainer;
+    private TextView mProgrameDescriptionTextView;
     private TextView mChannelTextView;
-    private TextView mInputSourceText;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
     private Uri mCurrentChannelUri;
@@ -70,30 +78,36 @@ public class ChannelBannerView extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
+        mResolutionTextView = (TextView) findViewById(R.id.resolution);
+        mAspectRatioTextView = (TextView) findViewById(R.id.aspect_ratio);
+        mRemainingTimeView = (ProgressBar) findViewById(R.id.remaining_time);
         mChannelTextView = (TextView) findViewById(R.id.channel_text);
-        mInputSourceText = (TextView) findViewById(R.id.input_source_text);
-        mProgramTextView = (TextView) findViewById(R.id.program_text);
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
+        mProgramInfoContainer = (LinearLayout) findViewById(R.id.program_info);
+        mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
+        mProgramTextView = (TextView) findViewById(R.id.program_text);
     }
 
     public void updateViews(ChannelMap channelMap) {
-        mProgramTextView.setText(mContext.getText(R.string.no_program_information));
         if (channelMap == null || !channelMap.isLoadFinished()) {
             return;
         }
 
-        String channelBannerString = "";
+        mResolutionTextView.setVisibility(View.GONE);
+        mAspectRatioTextView.setVisibility(View.GONE);
+        mProgrameDescriptionTextView.setVisibility(View.GONE);
+
         String displayNumber = channelMap.getCurrentDisplayNumber();
-        if (displayNumber != null) {
-            channelBannerString += displayNumber;
-        }
         String displayName = channelMap.getCurrentDisplayName();
-        if (displayName != null) {
-            channelBannerString += " " + displayName;
+        if (displayNumber == null) {
+            displayNumber = "";
         }
-        mChannelTextView.setText(channelBannerString);
-        mInputSourceText.setText(Utils.getDisplayNameForInput(mContext,
-                channelMap.getTvInputInfo(), channelMap.isUnifiedTvInput()));
+        if (displayName == null) {
+            displayName = "";
+        }
+        mChannelTextView.setText(Html.fromHtml(mContext.getString(
+                R.string.channel_banner_channel_title, displayNumber, displayName)));
+        TvInputInfo info = channelMap.getTvInputInfo();
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
         updateProgramInfo();
@@ -106,29 +120,52 @@ public class ChannelBannerView extends LinearLayout {
 
     public void updateProgramInfo() {
         if (mCurrentChannelUri == null) {
+            hideProgramInformation();
             return;
         }
 
         Program program = Utils.getCurrentProgram(mContext, mCurrentChannelUri);
         if (program == null) {
+            hideProgramInformation();
             return;
         }
         if (!TextUtils.isEmpty(program.getTitle())) {
+            mProgramInfoContainer.setVisibility(View.VISIBLE);
             mProgramTextView.setText(program.getTitle());
 
-            if (program.getStartTimeUtcMillis() > 0 && program.getEndTimeUtcMillis() > 0) {
-                String startTime = getFormattedTimeString(program.getStartTimeUtcMillis());
-                String endTime = getFormattedTimeString(program.getEndTimeUtcMillis());
+            long startTime = program.getStartTimeUtcMillis();
+            long endTime = program.getEndTimeUtcMillis();
+            if (startTime > 0 && endTime > 0) {
+                mProgramTimeTextView.setVisibility(View.VISIBLE);
+                mRemainingTimeView.setVisibility(View.VISIBLE);
+
+                String startTimeText = getFormattedTimeString(startTime);
+                String endTimeText = getFormattedTimeString(endTime);
+
                 mProgramTimeTextView.setText(mContext.getString(
-                        R.string.channel_banner_program_time_format, startTime, endTime));
+                        R.string.channel_banner_program_time_format, startTimeText, endTimeText));
+
+                long currTime = System.currentTimeMillis();
+                if (currTime <= startTime) {
+                    mRemainingTimeView.setProgress(0);
+                } else if (currTime >= endTime) {
+                    mRemainingTimeView.setProgress(100);
+                } else {
+                    mRemainingTimeView.setProgress(
+                            (int) (100 *(currTime - startTime) / (endTime - startTime)));
+                }
             } else {
-                mProgramTimeTextView.setText(null);
+                mProgramTimeTextView.setVisibility(View.INVISIBLE);
+                mRemainingTimeView.setVisibility(View.INVISIBLE);
             }
         } else {
-            // Program title might not be available at this point. Setting the text to null to
-            // clear the previous program title for now. It will be filled as soon as we get the
-            // updated program information.
-            mProgramTimeTextView.setText(null);
+            hideProgramInformation();
         }
+    }
+
+    private void hideProgramInformation() {
+        mProgramInfoContainer.setVisibility(View.INVISIBLE);
+        mProgramTimeTextView.setVisibility(View.INVISIBLE);
+        mRemainingTimeView.setVisibility(View.GONE);
     }
 }
