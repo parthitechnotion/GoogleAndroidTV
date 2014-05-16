@@ -599,6 +599,15 @@ public class TvActivity extends Activity implements
                         // TODO: show something to user about this error.
                     }
                 }
+
+                @Override
+                public void onSessionReleased(TvInputManager.Session session) {
+                    Log.w(TAG, "Session is released by crash");
+                    if (mTvSession == session) {
+                        stopSession();
+                        startDefaultSession(Channel.INVALID_ID);
+                    }
+                }
             };
 
     private void startPipSession() {
@@ -639,6 +648,14 @@ public class TvActivity extends Activity implements
                             mPipView.setVisibility(View.VISIBLE);
                         }
                     });
+                }
+
+                @Override
+                public void onSessionReleased(final TvInputManager.Session session) {
+                    Log.w(TAG, "PIP session is released by crash");
+                    if (mPipSession == session) {
+                        stopPipSession();
+                    }
                 }
             };
 
@@ -778,7 +795,6 @@ public class TvActivity extends Activity implements
     private void stopSession() {
         if (mTvInputInfo != null) {
             if (mTvSession != null) {
-                mTvSession.setVolume(AUDIO_MIN_VOLUME);
                 mAudioManager.abandonAudioFocus(this);
                 mTvSession = null;
             }
