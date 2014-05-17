@@ -1,26 +1,36 @@
-// Copyright 2014 Google Inc. All Rights Reserved.
+/*
+ * Copyright (C) 2014 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.android.tv.ui;
+
+import android.content.Context;
+import android.os.Handler;
+import android.support.v17.leanback.widget.VerticalGridView;
+import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.android.tv.Channel;
 import com.android.tv.ChannelMap;
 import com.android.tv.PrivacySettingDialogFragment;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
-import com.android.tv.Utils;
-
-import android.content.Context;
-import android.net.Uri;
-import android.os.Handler;
-import android.provider.TvContract;
-import android.support.v17.leanback.widget.VerticalGridView;
-import android.support.v7.widget.RecyclerView;
-import android.tv.TvInputInfo;
-import android.util.AttributeSet;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 /*
  * A subclass of VerticalGridView that shows tv main menu.
@@ -32,14 +42,14 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
     private static final int ALL_CHANNEL_LIST_MENU_TYPE = 0;
     private static final int SETTINGS_MENU_TYPE = 1;
 
-    private LayoutInflater mLayoutInflater;
-    private MainMenuAdapter mAapter = new MainMenuAdapter();
+    private final LayoutInflater mLayoutInflater;
+    private final MainMenuAdapter mAapter = new MainMenuAdapter();
     private ChannelMap mChannelMap;
     private TvActivity mTvActivity;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
-    private ChannelListAdapter mAllChannelListAdapter;
-    private OptionsAdapter mOptionsAdapter;
+    private final ChannelListAdapter mAllChannelListAdapter;
+    private final OptionsAdapter mOptionsAdapter;
 
     public MainMenuView(Context context) {
         this(context, null, 0);
@@ -100,8 +110,8 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         static final int CHANNEL_TAG_TYPE = 0;
         static final int MENU_ACTION_TAG_TYPE = 1;
 
-        private int mType;
-        private Object mObj;
+        private final int mType;
+        private final Object mObj;
 
         private MenuTag(int type, Object obj) {
             mType = type;

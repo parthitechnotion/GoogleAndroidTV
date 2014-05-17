@@ -1,9 +1,20 @@
-// Copyright 2014 Google Inc. All Rights Reserved.
+/*
+ * Copyright (C) 2014 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.android.tv.ui;
-
-import com.android.tv.ChannelMap;
-import com.android.tv.R;
 
 import android.content.Context;
 import android.support.v17.leanback.widget.HorizontalGridView;
@@ -14,6 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.android.tv.R;
 
 /*
  * A subclass of LinearLayout that shows a title and list view.
@@ -63,9 +76,9 @@ public class ItemListView extends LinearLayout {
     }
 
     public static class ItemListAdapter extends RecyclerView.Adapter {
-        private LayoutInflater mLayoutInflater;
-        private View.OnClickListener mOnClickListener;
-        private int mLayoutResId;
+        private final LayoutInflater mLayoutInflater;
+        private final View.OnClickListener mOnClickListener;
+        private final int mLayoutResId;
         private Object[] mItemList;
 
         public ItemListAdapter(Context context, int layoutResId,
@@ -95,7 +108,7 @@ public class ItemListView extends LinearLayout {
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = mLayoutInflater.inflate(mLayoutResId, parent, false);
             ((TileView) view).loadViews();
-            return new MyViewHolder((View) view);
+            return new MyViewHolder(view);
         }
 
         @Override
