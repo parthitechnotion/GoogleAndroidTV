@@ -59,11 +59,15 @@ public class Utils {
 
     private static final String PREFIX_PREF_NAME = "com.android.tv.";
     // preferences stored in the preference of a specific tv input.
-    private static final String PREF_KEY_LAST_WATCHED_CHANNEL = "last_watched_channel";
+    private static final String PREF_KEY_LAST_WATCHED_CHANNEL_ID = "last_watched_channel_id";
 
     // TODO: Remove this and add inputId into TvProvider.
     public static String getInputIdForComponentName(ComponentName name) {
         return name.flattenToShortString();
+    }
+
+    public static Uri getChannelUri(long channelId) {
+        return ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channelId);
     }
 
     public static String getInputIdForChannel(Context context, long channelId) {
@@ -95,40 +99,31 @@ public class Utils {
         return getInputIdForComponentName(componentName);
     }
 
-    public static void setLastWatchedChannel(Context context, String inputId, Uri channelUri) {
+    public static void setLastWatchedChannelId(Context context, String inputId, long channelId) {
         if (TextUtils.isEmpty(inputId)) {
             throw new IllegalArgumentException("inputId cannot be empty");
         }
         context.getSharedPreferences(getPreferenceName(inputId), Context.MODE_PRIVATE).edit()
-                .putString(PREF_KEY_LAST_WATCHED_CHANNEL, channelUri.toString()).apply();
+                .putLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, channelId).apply();
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putString(PREF_KEY_LAST_SELECTED_TV_INPUT, inputId).apply();
     }
 
-    public static Uri getLastWatchedChannel(Context context) {
+    public static long getLastWatchedChannelId(Context context) {
         String inputId = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(PREF_KEY_LAST_SELECTED_TV_INPUT, null);
         if (inputId == null) {
-            return null;
+            return Channel.INVALID_ID;
         }
-        return getLastWatchedChannel(context, inputId);
-    }
-
-    public static long getLastWatchedChannelId(Context context) {
-        return getChannelId(getLastWatchedChannel(context));
-    }
-
-    public static Uri getLastWatchedChannel(Context context, String inputId) {
-        if (TextUtils.isEmpty(inputId)) {
-            throw new IllegalArgumentException("inputId cannot be empty");
-        }
-        String channel = context.getSharedPreferences(getPreferenceName(inputId),
-                Context.MODE_PRIVATE).getString(PREF_KEY_LAST_WATCHED_CHANNEL, null);
-        return channel == null ? null : Uri.parse(channel);
+        return getLastWatchedChannelId(context, inputId);
     }
 
     public static long getLastWatchedChannelId(Context context, String inputId) {
-        return getChannelId(getLastWatchedChannel(context, inputId));
+        if (TextUtils.isEmpty(inputId)) {
+            throw new IllegalArgumentException("inputId cannot be empty");
+        }
+        return context.getSharedPreferences(getPreferenceName(inputId),
+                Context.MODE_PRIVATE).getLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, Channel.INVALID_ID);
     }
 
     public static Program getCurrentProgram(Context context, Uri channelUri) {

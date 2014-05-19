@@ -21,12 +21,12 @@
     android:orientation="vertical"
     android:keepScreenOn="true" >
 
-    <android.tv.TvView android:id="@+id/tv_view"
+    <com.android.tv.TunableTvView android:id="@+id/tv_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center" />
 
-    <android.tv.TvView android:id="@+id/pip_view"
+    <com.android.tv.TunableTvView android:id="@+id/pip_view"
         android:visibility="invisible"
         android:layout_margin="30dp"
         android:layout_width="240dp"
