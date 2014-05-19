@@ -42,13 +42,12 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int BROWSABLE = 1;
 
     private final Activity mActivity;
-    private final TvInputInfo mInputInfo;
+    private final TvInput mInput;
     private long mCurrentChannelId;
     private Cursor mCursor;
     private final TvInputManagerHelper mTvInputManagerHelper;
     private final Runnable mOnLoadFinished;
     private boolean mIsLoadFinished;
-    private final boolean mIsUnifiedTvInput;
     private int mIndexId;
     private int mIndexDisplayNumber;
     private int mIndexDisplayName;
@@ -58,11 +57,10 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mBrowsableChannelCount;
     private ArrayList<Channel> mChannelList = new ArrayList<Channel>();
 
-    public ChannelMap(Activity activity, TvInputInfo tvInputInfo, long initChannelId,
+    public ChannelMap(Activity activity, TvInput tvInput, long initChannelId,
             TvInputManagerHelper tvInputManagerHelper, Runnable onLoadFinished) {
         mActivity = activity;
-        mInputInfo = tvInputInfo;
-        mIsUnifiedTvInput = mInputInfo == null;
+        mInput = tvInput;
         mCurrentChannelId = initChannelId;
         mTvInputManagerHelper = tvInputManagerHelper;
         mOnLoadFinished = onLoadFinished;
@@ -78,16 +76,12 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return mBrowsableChannelCount;
     }
 
-    public TvInputInfo getTvInputInfo() {
-        return mInputInfo;
+    public TvInput getTvInput() {
+        return mInput;
     }
 
     public Channel[] getAllChannelList() {
         return mChannelList.toArray(new Channel[0]);
-    }
-
-    public boolean isUnifiedTvInput() {
-        return mIsUnifiedTvInput;
     }
 
     public int size() {
@@ -195,12 +189,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri uri;
-        if (mIsUnifiedTvInput) {
-            uri = TvContract.Channels.CONTENT_URI;
-        } else {
-            uri = TvContract.buildChannelsUriForInput(mInputInfo.getComponent(), false);
-        }
+        Uri uri = mInput.buildChannelsUri();
         String[] projection = {
                 TvContract.Channels._ID,
                 TvContract.Channels.COLUMN_DISPLAY_NUMBER,
@@ -208,13 +197,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
                 TvContract.Channels.COLUMN_PACKAGE_NAME,
                 TvContract.Channels.COLUMN_SERVICE_NAME,
                 TvContract.Channels.COLUMN_BROWSABLE };
-        String sortOrder;
-        if (mIsUnifiedTvInput) {
-            sortOrder = Utils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
-                    + Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
-        } else {
-            sortOrder = Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
-        }
+        String sortOrder = mInput.buildChannelsSortOrder();
         return new CursorLoader(mActivity, uri, projection, null, null, sortOrder);
     }
 

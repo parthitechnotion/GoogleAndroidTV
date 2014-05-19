@@ -53,8 +53,7 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
         mListView = listView;
         if (channelMap != null) {
             setCurrentChannelId(channelMap.getCurrentChannelId());
-            title = Utils.getDisplayNameForInput(mContext, channelMap.getTvInputInfo(),
-                    channelMap.isUnifiedTvInput());
+            title = channelMap.getTvInput().getDisplayName();
         }
 
         if (mListView != null) {

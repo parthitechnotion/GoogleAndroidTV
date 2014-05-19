@@ -52,8 +52,10 @@ import com.android.tv.TunableTvView.OnTuneListener;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.MainMenuView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * The main activity for demonstrating TV app.
@@ -75,7 +77,6 @@ public class TvActivity extends Activity implements
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
     private static final int START_TV_MAX_RETRY = 4;
     private static final int START_TV_RETRY_INTERVAL = 250;
-    private static final String PREF_KEY_IS_UNIFIED_TV_INPUT = "unified_tv_input";
 
     // TODO: add more KEYCODEs to the white list.
     private static final int[] KEYCODE_WHITELIST = {
@@ -114,9 +115,9 @@ public class TvActivity extends Activity implements
     private GestureDetector mGestureDetector;
     private ChannelMap mChannelMap;
     private long mInitChannelId;
-    private TvInputInfo mTvInputInfo;
-    private TvInputInfo mTvInputInfoForSetup;
-    private boolean mIsUnifiedTvInput;
+
+    private TvInput mSelectedTvInput;
+    private TvInput mTvInputForSetup;
     private TvInputManagerHelper mTvInputManagerHelper;
     private AudioManager mAudioManager;
     private int mAudioFocusStatus;
@@ -143,7 +144,7 @@ public class TvActivity extends Activity implements
         public void handleMessage(Message msg) {
             if (msg.what == MSG_START_TV_RETRY) {
                 Object[] arg = (Object[]) msg.obj;
-                TvInputInfo input = (TvInputInfo) arg[0];
+                TvInput input = (TvInput) arg[0];
                 long channelId = (Long) arg[1];
                 int retryCount = msg.arg1;
                 startTvIfAvailableOrRetry(input, channelId, retryCount);
@@ -242,8 +243,6 @@ public class TvActivity extends Activity implements
 
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
         mTvInputManagerHelper = new TvInputManagerHelper(mTvInputManager);
-        mIsUnifiedTvInput = PreferenceManager.getDefaultSharedPreferences(this)
-                .getBoolean(PREF_KEY_IS_UNIFIED_TV_INPUT, false);
         onNewIntent(getIntent());
     }
 
@@ -320,19 +319,25 @@ public class TvActivity extends Activity implements
             showInputPickerDialog();
             return;
         }
-        TvInputInfo input = mTvInputManagerHelper.getTvInputInfo(inputId);
-        if (input == null) {
+        TvInputInfo inputInfo = mTvInputManagerHelper.getTvInputInfo(inputId);
+        if (inputInfo == null) {
             // TODO: if the last selected TV input is uninstalled, getLastWatchedChannelId
             // should return Channel.INVALID_ID.
             Log.w(TAG, "Input (id=" + inputId + ") doesn't exist");
             showInputPickerDialog();
             return;
         }
-        startTvIfAvailableOrRetry(input, channelId, 0);
+        String lastSelectedInputId = Utils.getLastSelectedInputId(this);
+        if (UnifiedTvInput.ID.equals(lastSelectedInputId)) {
+            mSelectedTvInput = new UnifiedTvInput(mTvInputManagerHelper, this);
+        } else {
+            mSelectedTvInput = new TisTvInput(mTvInputManagerHelper, inputInfo, this);
+        }
+        startTvIfAvailableOrRetry(mSelectedTvInput, channelId, 0);
     }
 
-    private void startTvIfAvailableOrRetry(TvInputInfo input, long channelId, int retryCount) {
-        if (!mTvInputManagerHelper.isAvailable(input.getId())) {
+    private void startTvIfAvailableOrRetry(TvInput input, long channelId, int retryCount) {
+        if (!input.isAvailable()) {
             if (retryCount >= START_TV_MAX_RETRY) {
                 showInputPickerDialog();
                 return;
@@ -360,93 +365,66 @@ public class TvActivity extends Activity implements
     }
 
     @Override
-    public void onInputPicked(TvInputInfo input) {
-        if (input == null) {
-            // For unified TV input.
-            if (mIsUnifiedTvInput) {
-                return;
-            }
-            mIsUnifiedTvInput = true;
-            if (mTvView.isPlaying()) {
-                TvInputInfo inputInfo = mTvView.getCurrentTvInputInfo();
-                long channelId = mTvView.getCurrentChannelId();
-                stopTv();
-                if (channelId != Channel.INVALID_ID) {
-                    startTv(inputInfo, channelId);
-                    return;
-                }
-            }
-            Collection<TvInputInfo> inputs = mTvInputManagerHelper.getTvInputInfos(true);
-            if (inputs.isEmpty()) {
-                Toast.makeText(this, R.string.no_available_input_device, Toast.LENGTH_SHORT)
-                        .show();
-            } else {
-                TvInputInfo info = inputs.iterator().next();
-                startTvWithLastWatchedChannel(info);
-            }
-            return;
-        }
-        if (input.equals(mTvInputInfo) && !mIsUnifiedTvInput) {
+    public void onInputPicked(TvInput input) {
+        if (input.equals(mSelectedTvInput)) {
             // Nothing has changed thus nothing to do.
             return;
         }
-        mIsUnifiedTvInput = false;
-        if (!Utils.hasChannel(this, input, false)) {
-            mTvInputInfoForSetup = null;
-            startSetupActivity(input);
+        if (!input.hasChannel(false)) {
+            mTvInputForSetup = null;
+            if (input.hasActivity(Utils.ACTION_SETUP)) {
+                startSetupActivity(input);
+            } else {
+                Toast.makeText(this, R.string.empty_channel_tvinput, Toast.LENGTH_SHORT).show();
+                showInputPickerDialog();
+            }
             return;
         }
-        mTvInputInfo = input;
+        mSelectedTvInput = input;
 
         stopTv();
         startTvWithLastWatchedChannel(input);
     }
 
+    public TvInputManagerHelper getTvInputManagerHelper() {
+        return mTvInputManagerHelper;
+    }
+
+    public TvInput getSelectedTvInput() {
+        return mSelectedTvInput;
+    }
+
     public void showEditChannelsDialog() {
-        if (mTvInputInfo == null) {
+        if (mSelectedTvInput == null) {
             return;
         }
 
-        EditChannelsDialogFragment f = new EditChannelsDialogFragment();
-        Bundle arg = new Bundle();
-        arg.putParcelable(EditChannelsDialogFragment.ARG_CURRENT_INPUT, mTvInputInfo);
-        arg.putBoolean(EditChannelsDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
-        f.setArguments(arg);
-
-        showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, f);
+        showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, new EditChannelsDialogFragment());
     }
 
     public void showInputPickerDialog() {
-        InputPickerDialogFragment f = new InputPickerDialogFragment();
-        Bundle arg = new Bundle();
-        if (mTvInputInfo != null) {
-            arg.putString(InputPickerDialogFragment.ARG_MAIN_INPUT_ID, mTvInputInfo.getId());
-            arg.putBoolean(InputPickerDialogFragment.ARG_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput);
-        }
-        f.setArguments(arg);
-        showDialogFragment(InputPickerDialogFragment.DIALOG_TAG, f);
+        showDialogFragment(InputPickerDialogFragment.DIALOG_TAG, new InputPickerDialogFragment());
     }
 
     public void startSettingsActivity() {
-        if (mTvInputInfo == null) {
+        if (mSelectedTvInput == null) {
             Log.w(TAG, "mTvInputInfo is null in showSettingsActivity");
         }
-        Utils.startActivity(this, mTvInputInfo, Utils.ACTION_SETTINGS);
+        mSelectedTvInput.startActivity(Utils.ACTION_SETTINGS);
     }
 
     public void startSetupActivity() {
-        if (mTvInputInfo != null) {
-            startSetupActivity(mTvInputInfo);
+        if (mSelectedTvInput != null) {
+            startSetupActivity(mSelectedTvInput);
         }
     }
 
-    public void startSetupActivity(TvInputInfo input) {
-        if (Utils.startActivityForResult(this, input, Utils.ACTION_SETUP,
-                REQUEST_START_SETUP_ACTIIVTY)) {
-            mTvInputInfoForSetup = input;
+    public void startSetupActivity(TvInput input) {
+        if (input.startActivityForResult(this, Utils.ACTION_SETUP, REQUEST_START_SETUP_ACTIIVTY)) {
+            mTvInputForSetup = input;
             stopTv();
         } else {
-            String displayName = Utils.getDisplayNameForInput(this, input, false);
+            String displayName = input.getDisplayName();
             String message = String.format(getString(
                     R.string.input_setup_activity_not_found), displayName);
             new AlertDialog.Builder(this)
@@ -460,15 +438,15 @@ public class TvActivity extends Activity implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_START_SETUP_ACTIIVTY:
-                if (resultCode == Activity.RESULT_OK && mTvInputInfoForSetup != null) {
-                    startTvWithLastWatchedChannel(mTvInputInfoForSetup);
+                if (resultCode == Activity.RESULT_OK && mTvInputForSetup != null) {
+                    startTvWithLastWatchedChannel(mTvInputForSetup);
                 }
                 break;
 
             default:
                 //TODO: Handle failure of setup.
         }
-        mTvInputInfoForSetup = null;
+        mTvInputForSetup = null;
     }
 
     @Override
@@ -515,12 +493,12 @@ public class TvActivity extends Activity implements
         }
     }
 
-    private void startTvWithLastWatchedChannel(TvInputInfo inputInfo) {
-        long channelId = Utils.getLastWatchedChannelId(TvActivity.this, inputInfo.getId());
-        startTv(inputInfo, channelId);
+    private void startTvWithLastWatchedChannel(TvInput input) {
+        long channelId = Utils.getLastWatchedChannelId(TvActivity.this, input.getId());
+        startTv(input, channelId);
     }
 
-    private void startTv(TvInputInfo inputInfo, long channelId) {
+    private void startTv(TvInput input, long channelId) {
         if (mChannelMap != null) {
             // TODO: when this case occurs, we should remove the case.
             Log.w(TAG, "The previous variables are not released in startTv");
@@ -534,8 +512,7 @@ public class TvActivity extends Activity implements
                         AudioManager.AUDIOFOCUS_GAIN : AudioManager.AUDIOFOCUS_LOSS;
 
         // Prepare a new channel map for the current input.
-        mChannelMap = new ChannelMap(this, mIsUnifiedTvInput ? null : inputInfo,
-                channelId, mTvInputManagerHelper, mOnChannelsLoadFinished);
+        mChannelMap = input.buildChannelMap(this, channelId, mOnChannelsLoadFinished);
         mTvView.start(mTvInputManagerHelper);
         setVolumeByAudioFocusStatus();
         tune();
@@ -634,8 +611,8 @@ public class TvActivity extends Activity implements
                     Log.w(TAG, "Failed to tune to channel " + channelId);
                     // TODO: show something to user about this error.
                 } else {
-                    Utils.setLastWatchedChannelId(TvActivity.this,
-                            mTvView.getCurrentTvInputInfo().getId(), channelId);
+                    Utils.setLastWatchedChannelId(TvActivity.this, mSelectedTvInput.getId(),
+                            channelId);
                 }
             }
         });
@@ -687,8 +664,6 @@ public class TvActivity extends Activity implements
 
     @Override
     protected void onDestroy() {
-        PreferenceManager.getDefaultSharedPreferences(this).edit()
-                .putBoolean(PREF_KEY_IS_UNIFIED_TV_INPUT, mIsUnifiedTvInput).apply();
         if (DEBUG) Log.d(TAG, "onDestroy()");
         super.onDestroy();
     }

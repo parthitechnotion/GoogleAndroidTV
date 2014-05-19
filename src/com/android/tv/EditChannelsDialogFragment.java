@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.TvContract;
 import android.text.TextUtils;
-import android.tv.TvInputInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,18 +40,15 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.Toast;
 
+import com.android.internal.util.Preconditions;
 import com.android.tv.R;
 
 public class EditChannelsDialogFragment extends DialogFragment {
     public static final String DIALOG_TAG = EditChannelsDialogFragment.class.getName();
 
-    public static final String ARG_CURRENT_INPUT = "current_input";
-    public static final String ARG_IS_UNIFIED_TV_INPUT = "unified_tv_input";
-
     private static final int BROWSABLE = 1;
 
-    private TvInputInfo mCurrentInput;
-    private boolean mIsUnifiedTvInput;
+    private TvInput mSelectedInput;
     private SimpleCursorAdapter mAdapter;
 
     private View mView;
@@ -68,13 +64,10 @@ public class EditChannelsDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Bundle arg = getArguments();
-        assert(arg != null);
+        mSelectedInput = ((TvActivity) getActivity()).getSelectedTvInput();
+        Preconditions.checkNotNull(mSelectedInput);
 
-        mCurrentInput = arg.getParcelable(ARG_CURRENT_INPUT);
-        mIsUnifiedTvInput = arg.getBoolean(ARG_IS_UNIFIED_TV_INPUT);
-        String displayName = Utils.getDisplayNameForInput(getActivity(), mCurrentInput,
-                mIsUnifiedTvInput);
+        String displayName = mSelectedInput.getDisplayName();
         String title = String.format(getString(R.string.edit_channels_title), displayName);
 
         mView = LayoutInflater.from(getActivity()).inflate(R.layout.edit_channels, null);
@@ -109,23 +102,12 @@ public class EditChannelsDialogFragment extends DialogFragment {
         getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                Uri uri;
-                if (mIsUnifiedTvInput) {
-                    uri = TvContract.Channels.CONTENT_URI;
-                } else {
-                    uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
-                }
+                Uri uri = mSelectedInput.buildChannelsUri();
                 String[] projections = { TvContract.Channels._ID,
                         TvContract.Channels.COLUMN_DISPLAY_NUMBER,
                         TvContract.Channels.COLUMN_DISPLAY_NAME,
                         TvContract.Channels.COLUMN_BROWSABLE };
-                String sortOrder;
-                if (mIsUnifiedTvInput) {
-                    sortOrder = Utils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
-                            + Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
-                } else {
-                    sortOrder = Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
-                }
+                String sortOrder = mSelectedInput.buildChannelsSortOrder();
 
                 isInitialLoading = true;
                 return new CursorLoader(getActivity(), uri, projections, null, null, sortOrder);
@@ -220,12 +202,7 @@ public class EditChannelsDialogFragment extends DialogFragment {
         if (mAdapter == null || mAdapter.getCursor() == null) {
             return;
         }
-        Uri uri;
-        if (mIsUnifiedTvInput) {
-            uri = TvContract.Channels.CONTENT_URI;
-        } else {
-            uri = TvContract.buildChannelsUriForInput(mCurrentInput.getComponent(), false);
-        }
+        Uri uri = mSelectedInput.buildChannelsUri();
         ContentValues values = new ContentValues();
         values.put(TvContract.Channels.COLUMN_BROWSABLE, browsable ? 1 : 0);
 

@@ -121,7 +121,6 @@ public class ChannelBannerView extends LinearLayout {
         }
         mChannelTextView.setText(Html.fromHtml(mContext.getString(
                 R.string.channel_banner_channel_title, displayNumber, displayName)));
-        TvInputInfo info = channelMap.getTvInputInfo();
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
         updateProgramInfo();

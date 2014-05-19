@@ -23,6 +23,7 @@ import android.view.View;
 
 import com.android.tv.ChannelMap;
 import com.android.tv.R;
+import com.android.tv.TvInput;
 import com.android.tv.Utils;
 
 import java.util.ArrayList;
@@ -32,30 +33,25 @@ import java.util.ArrayList;
  */
 public class OptionsAdapter extends ItemListView.ItemListAdapter {
     private static final String TAG = "OptionsAdapter";
-    private Context mContext;
 
     public OptionsAdapter(Context context, Handler handler, View.OnClickListener onClickListener) {
         super(context, handler, R.layout.action_tile, onClickListener);
-        mContext = context;
     }
 
     public void update(ChannelMap channelMap) {
-        boolean isUnifiedTvInput = channelMap == null ? false : channelMap.isUnifiedTvInput();
-        TvInputInfo tvInputInfo = channelMap == null ? null : channelMap.getTvInputInfo();
+        TvInput tvInput = channelMap == null ? null : channelMap.getTvInput();
 
         ArrayList<MenuAction> actionList = new ArrayList<MenuAction>();
         actionList.add(MenuAction.SELECT_TV_INPUT_ACTION);
         if (channelMap != null) {
             actionList.add(MenuAction.EDIT_CHANNEL_LIST_ACTION);
         }
-        if (channelMap != null && !isUnifiedTvInput && tvInputInfo != null
-                    && Utils.hasActivity(mContext, tvInputInfo, Utils.ACTION_SETUP)) {
+        if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETUP)) {
             actionList.add(MenuAction.AUTO_SCAN_CHANNELS_ACTION);
         }
         actionList.add(MenuAction.PRIVACY_SETTING_ACTION);
         actionList.add(MenuAction.TOGGLE_PIP_ACTION);
-        if (channelMap != null && !isUnifiedTvInput && tvInputInfo != null
-                && Utils.hasActivity(mContext, tvInputInfo, Utils.ACTION_SETTINGS)) {
+        if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETTINGS)) {
             actionList.add(MenuAction.MORE_ACTION);
         }
 

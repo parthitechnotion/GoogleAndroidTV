@@ -166,7 +166,11 @@ public class TunableTvView extends TvView {
             bindTvInput(mInputInfo.getId(), mSessionCallback);
             // mChannelId will be tuned after onSessionCreated.
         } else {
-            mHandler.sendEmptyMessage(MSG_TUNE);
+            if (mSession == null) {
+                // onSessionCreated is not called yet. MSG_TUNE will be sent in onSessionCreated.
+            } else {
+                mHandler.sendEmptyMessage(MSG_TUNE);
+            }
         }
         return true;
     }

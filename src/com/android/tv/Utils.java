@@ -111,8 +111,7 @@ public class Utils {
     }
 
     public static long getLastWatchedChannelId(Context context) {
-        String inputId = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(PREF_KEY_LAST_SELECTED_TV_INPUT, null);
+        String inputId = getLastSelectedInputId(context);
         if (inputId == null) {
             return Channel.INVALID_ID;
         }
@@ -125,6 +124,11 @@ public class Utils {
         }
         return context.getSharedPreferences(getPreferenceName(inputId),
                 Context.MODE_PRIVATE).getLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, Channel.INVALID_ID);
+    }
+
+    public static String getLastSelectedInputId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_KEY_LAST_SELECTED_TV_INPUT, null);
     }
 
     public static Program getCurrentProgram(Context context, Uri channelUri) {
@@ -173,17 +177,12 @@ public class Utils {
         }
     }
 
-    public static String getDisplayNameForInput(Context context, TvInputInfo info,
-            boolean isUnifiedTvInput) {
-        if (isUnifiedTvInput) {
-            return context.getString(R.string.unified_tv_input_label);
-        } else {
-            SharedPreferences preferences = context.getSharedPreferences(TvSettings.PREFS_FILE,
-                    Context.MODE_PRIVATE);
-            PackageManager pm = context.getPackageManager();
-            return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
-                    info.loadLabel(pm).toString());
-        }
+    public static String getDisplayNameForInput(Context context, TvInputInfo info) {
+        SharedPreferences preferences = context.getSharedPreferences(TvSettings.PREFS_FILE,
+                Context.MODE_PRIVATE);
+        PackageManager pm = context.getPackageManager();
+        return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
+                info.loadLabel(pm).toString());
     }
 
     public static boolean hasActivity(Context context, TvInputInfo input, String action) {
