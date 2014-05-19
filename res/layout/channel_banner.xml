@@ -99,8 +99,6 @@
             android:layout_gravity="right|top"
             android:layout_marginTop="25dp"
             android:gravity="center"
-            android:shadowColor="@android:color/white"
-            android:shadowRadius="10"
             android:textColor="@android:color/black"
             android:textSize="24sp"
             android:format12Hour="@string/channel_banner_time_format" />
