@@ -77,7 +77,7 @@
 
     <string name="channel_banner_channel_title">&lt;font color="black"&gt;<xliff:g id="channel_number">%s</xliff:g>&lt;/font&gt; &lt;font color="#FF969495"&gt;<xliff:g id="channel_name">%s</xliff:g>&lt;/font&gt;</string>
     <!-- Time format string at the channel banner [DO NOT TRANSLATE] -->
-    <string name="channel_banner_time_format">HH:mm a</string>
+    <string name="channel_banner_time_format">h:mm a</string>
     <!-- Program time format string at the channel banner [DO NOT TRANSLATE] -->
     <string name="channel_banner_program_time_format">%1$s - %2$s</string>
 
