@@ -26,7 +26,6 @@ import android.app.FragmentTransaction;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.database.ContentObserver;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -34,9 +33,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.provider.TvContract;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 import android.util.Log;
@@ -46,11 +43,9 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tv.TunableTvView.OnTuneListener;
@@ -85,7 +80,7 @@ public class TvActivity extends Activity implements
     // TODO: add more KEYCODEs to the white list.
     private static final int[] KEYCODE_WHITELIST = {
             KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_2, KeyEvent.KEYCODE_3,
-            KeyEvent.KEYCODE_4, KeyEvent.KEYCODE_5, KeyEvent.KEYCODE_5, KeyEvent.KEYCODE_7,
+            KeyEvent.KEYCODE_4, KeyEvent.KEYCODE_5, KeyEvent.KEYCODE_6, KeyEvent.KEYCODE_7,
             KeyEvent.KEYCODE_8, KeyEvent.KEYCODE_9, KeyEvent.KEYCODE_STAR, KeyEvent.KEYCODE_POUND,
             KeyEvent.KEYCODE_M,
     };
@@ -254,6 +249,18 @@ public class TvActivity extends Activity implements
 
     @Override
     protected void onNewIntent(Intent intent) {
+        // Handle the passed key press, if any. Note that only the key codes that are currently
+        // handled in the TV app will be handled via Intent.
+        // TODO: Consider defining a separate intent filter as passing data of mime type
+        // vnd.android.cursor.item/vnd.com.android.tv.channels isn't really necessary here.
+        int keyCode = intent.getIntExtra(Utils.EXTRA_KEYCODE, KeyEvent.KEYCODE_UNKNOWN);
+        if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
+            if (DEBUG) Log.d(TAG, "Got an intent with keycode: " + keyCode);
+            KeyEvent event = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
+            onKeyUp(keyCode, event);
+            return;
+        }
+
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             // In case the channel is given explicitly, use it.
             mInitChannelId = ContentUris.parseId(intent.getData());

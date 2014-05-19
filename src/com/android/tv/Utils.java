@@ -44,6 +44,7 @@ public class Utils {
     public static final String ACTION_SETTINGS = "android.tv.SettingsActivity";
     public static final String ACTION_SETUP = "android.tv.SetupActivity";
     public static final String EXTRA_SERVICE_NAME = "serviceName";
+    public static final String EXTRA_KEYCODE = "keycode";
 
     public static final String CHANNEL_SORT_ORDER_BY_INPUT_NAME =
             TvContract.Channels.COLUMN_PACKAGE_NAME + ", "
