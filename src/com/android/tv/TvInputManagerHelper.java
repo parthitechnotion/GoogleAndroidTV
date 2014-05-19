@@ -136,6 +136,9 @@ public class TvInputManagerHelper {
         if (!mStarted) {
             throw new IllegalStateException("AvailabilityManager doesn't started");
         }
+        if (inputId == null) {
+            return null;
+        }
         TvInputInfo input = mInputMap.get(inputId);
         if (input == null) {
             update();
@@ -146,6 +149,10 @@ public class TvInputManagerHelper {
 
     public int getTvInputSize() {
         return mInputAvailabilityMap.size();
+    }
+
+    public boolean isAvailable(TvInputInfo inputInfo) {
+        return isAvailable(inputInfo.getId());
     }
 
     public boolean isAvailable(String inputId) {
