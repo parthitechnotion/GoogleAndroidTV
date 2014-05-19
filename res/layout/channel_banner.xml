@@ -93,11 +93,59 @@
 
         </LinearLayout>
 
+        <!-- clock_text_bg_* is to give outline effect to clock of channel banner.
+             TODO: Remove clock_text_bg_*, and implement the functionality inside an inheritor of
+             TextClock -->
+        <TextClock android:id="@+id/clock_text_bg_up"
+            android:layout_width="120dp"
+            android:layout_height="36dp"
+            android:layout_gravity="right|top"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="1dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:format12Hour="@string/channel_banner_time_format" />
+
+        <TextClock android:id="@+id/clock_text_bg_down"
+            android:layout_width="120dp"
+            android:layout_height="36dp"
+            android:layout_gravity="right|top"
+            android:layout_marginTop="26dp"
+            android:layout_marginRight="1dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:format12Hour="@string/channel_banner_time_format" />
+
+        <TextClock android:id="@+id/clock_text_bg_left"
+            android:layout_width="120dp"
+            android:layout_height="36dp"
+            android:layout_gravity="right|top"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="2dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:format12Hour="@string/channel_banner_time_format" />
+
+        <TextClock android:id="@+id/clock_text_bg_right"
+            android:layout_width="120dp"
+            android:layout_height="36dp"
+            android:layout_gravity="right|top"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="0dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:format12Hour="@string/channel_banner_time_format" />
+
         <TextClock android:id="@+id/clock_text"
             android:layout_width="120dp"
             android:layout_height="36dp"
             android:layout_gravity="right|top"
             android:layout_marginTop="25dp"
+            android:layout_marginRight="1dp"
             android:gravity="center"
             android:textColor="@android:color/black"
             android:textSize="24sp"
