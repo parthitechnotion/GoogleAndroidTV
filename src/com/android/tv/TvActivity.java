@@ -540,8 +540,12 @@ public class TvActivity extends Activity implements
         mTunePendding = false;
     }
 
+    private boolean isPlaying() {
+        return mTvView.isPlaying() && mTvView.getCurrentChannelId() != Channel.INVALID_ID;
+    }
+
     private void startPip() {
-        if (!mTvView.isPlaying() || mTvView.getCurrentChannelId() == Channel.INVALID_ID) {
+        if (!isPlaying()) {
             Log.w(TAG, "TV content should be playing");
             return;
         }
@@ -778,6 +782,20 @@ public class TvActivity extends Activity implements
             }
         }
         return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getFragmentManager().getBackStackEntryCount() <= 0 && isPlaying()) {
+            // If back key would exit TV app,
+            // show McLauncher instead so we can get benefit of McLauncher's shyMode.
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startMain);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
