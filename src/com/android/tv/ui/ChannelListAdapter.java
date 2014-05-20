@@ -17,6 +17,7 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.os.Handler;
 import android.view.View;
 
 import com.android.tv.Channel;
@@ -34,8 +35,9 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
     private ItemListView mListView;
     private Context mContext;
 
-    public ChannelListAdapter(Context context, View.OnClickListener onClickListener) {
-        super(context, R.layout.channel_tile, onClickListener);
+    public ChannelListAdapter(Context context, Handler handler,
+            View.OnClickListener onClickListener) {
+        super(context, handler, R.layout.channel_tile, onClickListener);
         mContext = context;
     }
 

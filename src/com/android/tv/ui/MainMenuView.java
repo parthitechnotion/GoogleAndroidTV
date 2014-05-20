@@ -65,8 +65,8 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         mLayoutInflater = LayoutInflater.from(context);
         setAdapter(mAapter);
 
-        mAllChannelListAdapter = new ChannelListAdapter(context, this);
-        mOptionsAdapter = new OptionsAdapter(context, this);
+        mAllChannelListAdapter = new ChannelListAdapter(context, mHandler, this);
+        mOptionsAdapter = new OptionsAdapter(context, mHandler, this);
     }
 
     public void setTvActivity(TvActivity activity) {
