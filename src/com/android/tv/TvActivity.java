@@ -532,13 +532,13 @@ public class TvActivity extends Activity implements
     }
 
     private void startPip() {
-        if (!mTvView.isPlaying()) {
+        if (!mTvView.isPlaying() || mTvView.getCurrentChannelId() == Channel.INVALID_ID) {
             Log.w(TAG, "TV content should be playing");
             return;
         }
         if (DEBUG) Log.d(TAG, "startPip()");
         mPipView.start(mTvInputManagerHelper);
-        boolean success = mPipView.tuneTo(mChannelMap.getCurrentChannelId(), new OnTuneListener() {
+        boolean success = mPipView.tuneTo(mTvView.getCurrentChannelId(), new OnTuneListener() {
             @Override
             public void onUnexpectedStop(long channelId) {
                 Log.w(TAG, "The PIP is Unexpectedly stopped");
