@@ -33,8 +33,6 @@ import com.android.tv.R;
  * A subclass of LinearLayout that shows a title and list view.
  */
 public class ItemListView extends LinearLayout {
-    private static final String TAG = "ItemListView";
-
     public interface TileView {
         void loadViews();
         void populateViews(View.OnClickListener onClickListener, Object item);

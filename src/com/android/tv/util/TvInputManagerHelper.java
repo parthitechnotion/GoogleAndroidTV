@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.util;
 
 import android.os.Handler;
 import android.tv.TvInputInfo;
@@ -51,7 +51,7 @@ public class TvInputManagerHelper {
     private final Handler mHandler = new Handler();
     private boolean mStarted;
 
-    TvInputManagerHelper(TvInputManager tvInputManager) {
+    public TvInputManagerHelper(TvInputManager tvInputManager) {
         mTvInputManager = tvInputManager;
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.input;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,10 +22,11 @@ import android.net.Uri;
 import android.provider.TvContract;
 import android.tv.TvInputInfo;
 
-public class TisTvInput extends TvInput {
-    private static final boolean DEBUG = true;
-    private static final String TAG = "TisTvInput";
+import com.android.tv.data.ChannelMap;
+import com.android.tv.util.TvInputManagerHelper;
+import com.android.tv.util.Utils;
 
+public class TisTvInput extends TvInput {
     private final TvInputManagerHelper mInputManagerHelper;
     private final TvInputInfo mInputInfo;
     private final Context mContext;

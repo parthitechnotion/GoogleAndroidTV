@@ -24,25 +24,21 @@ import android.provider.TvContract;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.tv.TvInputInfo;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.tv.ChannelMap;
-import com.android.tv.Program;
 import com.android.tv.R;
-import com.android.tv.Utils;
+import com.android.tv.data.ChannelMap;
+import com.android.tv.data.Program;
+import com.android.tv.util.Utils;
 
 /**
  * A view to render channel banner.
  */
 public class ChannelBannerView extends LinearLayout {
-
-    private static final String TAG = "ChannelBannerView";
-
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
     private ProgressBar mRemainingTimeView;

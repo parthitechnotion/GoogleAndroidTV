@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.dialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,6 +32,13 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+
+import com.android.tv.R;
+import com.android.tv.TvActivity;
+import com.android.tv.input.TisTvInput;
+import com.android.tv.input.TvInput;
+import com.android.tv.input.UnifiedTvInput;
+import com.android.tv.util.TvInputManagerHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;

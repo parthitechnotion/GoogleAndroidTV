@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.data;
 
 import android.content.ContentValues;
 import android.provider.TvContract;

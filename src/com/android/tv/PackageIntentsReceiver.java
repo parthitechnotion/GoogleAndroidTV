@@ -24,6 +24,8 @@ import android.net.Uri;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 
+import com.android.tv.util.TvSettings;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

@@ -25,16 +25,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.internal.util.Preconditions;
-import com.android.tv.Channel;
 import com.android.tv.R;
+import com.android.tv.data.Channel;
 
 /**
  * A view to render channel tile.
  */
 public class ChannelTileView extends LinearLayout implements ItemListView.TileView {
-
-    private static final String TAG = "ChannelTileView";
-
     private TextView mChannelNameView;
     private TextView mChannelNumberView;
 

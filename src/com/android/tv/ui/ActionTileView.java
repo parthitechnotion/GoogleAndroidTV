@@ -31,9 +31,6 @@ import com.android.tv.R;
  * A view to render channel banner.
  */
 public class ActionTileView extends LinearLayout implements ItemListView.TileView {
-
-    private static final String TAG = "ChannelTileView";
-
     private TextView mActionNameView;
 
     public ActionTileView(Context context) {

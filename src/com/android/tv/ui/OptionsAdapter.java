@@ -18,13 +18,12 @@ package com.android.tv.ui;
 
 import android.content.Context;
 import android.os.Handler;
-import android.tv.TvInputInfo;
 import android.view.View;
 
-import com.android.tv.ChannelMap;
 import com.android.tv.R;
-import com.android.tv.TvInput;
-import com.android.tv.Utils;
+import com.android.tv.data.ChannelMap;
+import com.android.tv.input.TvInput;
+import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
 
@@ -32,8 +31,6 @@ import java.util.ArrayList;
  * An adapter of options.
  */
 public class OptionsAdapter extends ItemListView.ItemListAdapter {
-    private static final String TAG = "OptionsAdapter";
-
     public OptionsAdapter(Context context, Handler handler, View.OnClickListener onClickListener) {
         super(context, handler, R.layout.action_tile, onClickListener);
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,6 +33,10 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.android.tv.R;
+import com.android.tv.util.TvSettings;
+import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

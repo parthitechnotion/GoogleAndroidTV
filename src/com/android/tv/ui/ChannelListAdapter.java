@@ -20,25 +20,20 @@ import android.content.Context;
 import android.os.Handler;
 import android.view.View;
 
-import com.android.tv.Channel;
-import com.android.tv.ChannelMap;
 import com.android.tv.R;
-import com.android.tv.Utils;
+import com.android.tv.data.Channel;
+import com.android.tv.data.ChannelMap;
 
 /*
  * An adapter of channel list.
  */
 public class ChannelListAdapter extends ItemListView.ItemListAdapter {
-    private static final String TAG = "ChannelListAdapter";
-
     private Channel[] mChannelList;
     private ItemListView mListView;
-    private Context mContext;
 
     public ChannelListAdapter(Context context, Handler handler,
             View.OnClickListener onClickListener) {
         super(context, handler, R.layout.channel_tile, onClickListener);
-        mContext = context;
     }
 
     public void update(ChannelMap channelMap) {

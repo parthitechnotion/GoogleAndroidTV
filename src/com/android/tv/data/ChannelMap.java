@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.data;
 
 import android.app.Activity;
 import android.app.LoaderManager;
@@ -28,6 +28,9 @@ import android.os.Bundle;
 import android.provider.TvContract;
 import android.tv.TvInputInfo;
 import android.util.Log;
+
+import com.android.tv.input.TvInput;
+import com.android.tv.util.TvInputManagerHelper;
 
 import java.util.ArrayList;
 

@@ -32,7 +32,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
@@ -48,14 +47,24 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.tv.TunableTvView.OnTuneListener;
+import com.android.tv.data.Channel;
+import com.android.tv.data.ChannelMap;
+import com.android.tv.dialog.EditChannelsDialogFragment;
+import com.android.tv.dialog.EditInputDialogFragment;
+import com.android.tv.dialog.InputPickerDialogFragment;
+import com.android.tv.dialog.PrivacySettingDialogFragment;
+import com.android.tv.dialog.RecentlyWatchedDialogFragment;
+import com.android.tv.input.TisTvInput;
+import com.android.tv.input.TvInput;
+import com.android.tv.input.UnifiedTvInput;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.MainMenuView;
+import com.android.tv.ui.TunableTvView;
+import com.android.tv.ui.TunableTvView.OnTuneListener;
+import com.android.tv.util.TvInputManagerHelper;
+import com.android.tv.util.Utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * The main activity for demonstrating TV app.

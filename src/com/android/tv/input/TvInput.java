@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.input;
 
 import android.app.Activity;
 import android.net.Uri;
+
+import com.android.tv.data.ChannelMap;
 
 public abstract class TvInput {
     abstract public String getId();
@@ -28,7 +30,7 @@ public abstract class TvInput {
             int requestCode);
     abstract public boolean isAvailable();
     abstract public boolean hasChannel(boolean browsableOnly);
-    abstract ChannelMap buildChannelMap(Activity activity, long initialChannelId,
+    abstract public ChannelMap buildChannelMap(Activity activity, long initialChannelId,
             Runnable onChannelsLoadFinished);
 
     // TvContract related method

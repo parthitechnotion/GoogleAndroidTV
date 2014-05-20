@@ -1,4 +1,4 @@
-package com.android.tv;
+package com.android.tv.ui;
 
 import android.content.Context;
 import android.os.Handler;
@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.android.internal.util.Preconditions;
+import com.android.tv.data.Channel;
+import com.android.tv.util.TvInputManagerHelper;
+import com.android.tv.util.Utils;
 
 public class TunableTvView extends TvView {
     private static final boolean DEBUG = true;

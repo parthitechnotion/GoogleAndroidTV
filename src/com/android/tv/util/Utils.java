@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.util;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -33,13 +33,15 @@ import android.text.TextUtils;
 import android.tv.TvInputInfo;
 import android.util.Base64;
 
+import com.android.tv.data.Channel;
+import com.android.tv.data.Program;
+
 import java.util.List;
 
 /**
  * A class that includes convenience methods for accessing TvProvider database.
  */
 public class Utils {
-
     public static final String SERVICE_INTERFACE = "android.tv.TvInputService";
     public static final String ACTION_SETTINGS = "android.tv.SettingsActivity";
     public static final String ACTION_SETUP = "android.tv.SetupActivity";
@@ -232,13 +234,6 @@ public class Utils {
             }
         }
         return null;
-    }
-
-    private static long getChannelId(Uri channelUri) {
-        if (channelUri == null) {
-            return Channel.INVALID_ID;
-        }
-        return ContentUris.parseId(channelUri);
     }
 
     private static String getPreferenceName(String inputId) {

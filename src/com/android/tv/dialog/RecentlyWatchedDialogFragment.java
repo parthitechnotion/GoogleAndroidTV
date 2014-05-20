@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv;
+package com.android.tv.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -30,6 +30,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.android.tv.R;
 
 /**
  * Displays the watch history

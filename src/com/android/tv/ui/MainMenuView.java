@@ -26,18 +26,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.tv.Channel;
-import com.android.tv.ChannelMap;
-import com.android.tv.PrivacySettingDialogFragment;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
+import com.android.tv.data.Channel;
+import com.android.tv.data.ChannelMap;
+import com.android.tv.dialog.PrivacySettingDialogFragment;
 
 /*
  * A subclass of VerticalGridView that shows tv main menu.
  */
 public class MainMenuView extends VerticalGridView implements View.OnClickListener {
-    private static final String TAG = "MainMenuView";
-
     private static final int MENU_COUNT = 2;
     private static final int ALL_CHANNEL_LIST_MENU_TYPE = 0;
     private static final int SETTINGS_MENU_TYPE = 1;
