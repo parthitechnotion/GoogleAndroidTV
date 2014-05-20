@@ -184,7 +184,7 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         setVisibility(View.GONE);
     }
 
-    class MainMenuAdapter extends RecyclerView.Adapter {
+    class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.MyViewHolder> {
         @Override
         public int getItemViewType(int position) {
             return position;
@@ -197,7 +197,7 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = null;
             view = mLayoutInflater.inflate(R.layout.item_list, parent, false);
 
@@ -221,7 +221,7 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder baseHolder, int position) {
+        public void onBindViewHolder(MyViewHolder baseHolder, int position) {
             int viewType = position;
             ItemListView listView = null;
             switch (viewType) {

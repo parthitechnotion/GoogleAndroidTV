@@ -74,7 +74,7 @@ public class ItemListView extends LinearLayout {
         mListView.setSelectedPosition(position);
     }
 
-    public static class ItemListAdapter extends RecyclerView.Adapter {
+    public static class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyViewHolder> {
         private final LayoutInflater mLayoutInflater;
         private final View.OnClickListener mOnClickListener;
         private final int mLayoutResId;
@@ -106,14 +106,14 @@ public class ItemListView extends LinearLayout {
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = mLayoutInflater.inflate(mLayoutResId, parent, false);
             ((TileView) view).loadViews();
             return new MyViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder baseHolder, int position) {
+        public void onBindViewHolder(MyViewHolder baseHolder, int position) {
             TileView view = (TileView) baseHolder.itemView;
             if (mItemList != null && position >= 0 && mItemList.length > position) {
                 view.populateViews(mOnClickListener, mItemList[position]);
