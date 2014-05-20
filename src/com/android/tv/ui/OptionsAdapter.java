@@ -17,6 +17,7 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.os.Handler;
 import android.tv.TvInputInfo;
 import android.view.View;
 
@@ -33,8 +34,8 @@ public class OptionsAdapter extends ItemListView.ItemListAdapter {
     private static final String TAG = "OptionsAdapter";
     private Context mContext;
 
-    public OptionsAdapter(Context context, View.OnClickListener onClickListener) {
-        super(context, R.layout.action_tile, onClickListener);
+    public OptionsAdapter(Context context, Handler handler, View.OnClickListener onClickListener) {
+        super(context, handler, R.layout.action_tile, onClickListener);
         mContext = context;
     }
 

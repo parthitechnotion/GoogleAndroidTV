@@ -17,6 +17,7 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -80,9 +81,11 @@ public class ItemListView extends LinearLayout {
         private final View.OnClickListener mOnClickListener;
         private final int mLayoutResId;
         private Object[] mItemList;
+        private Handler mHandler;
 
-        public ItemListAdapter(Context context, int layoutResId,
+        public ItemListAdapter(Context context, Handler handler, int layoutResId,
                 View.OnClickListener onClickListener) {
+            mHandler = handler;
             mLayoutResId = layoutResId;
             mLayoutInflater = LayoutInflater.from(context);
             mOnClickListener = onClickListener;
@@ -116,6 +119,17 @@ public class ItemListView extends LinearLayout {
             TileView view = (TileView) baseHolder.itemView;
             if (mItemList != null && position >= 0 && mItemList.length > position) {
                 view.populateViews(mOnClickListener, mItemList[position]);
+                if (view instanceof ViewGroup) {
+                    final ViewGroup viewGroup = (ViewGroup) view;
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                                viewGroup.getChildAt(i).requestLayout();
+                            }
+                        }
+                    });
+                }
             }
         }
 
