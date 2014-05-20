@@ -83,4 +83,8 @@
 
     <!-- Label of reset button. [CHAR LIMIT=20] -->
     <string name="reset">Reset</string>
+
+    <!-- Text displayed in a toast to tell the user to long-press BACK key to exit the application
+         instead of the normal press. -->
+    <string name="long_press_back">Long-press BACK key instead to exit.</string>
 </resources>

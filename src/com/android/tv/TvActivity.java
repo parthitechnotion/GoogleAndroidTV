@@ -786,8 +786,23 @@ public class TvActivity extends Activity implements
     }
 
     @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (DEBUG) Log.d(TAG, "onKeyLongPress(" + event);
+        // Treat the BACK key long press as the normal press since we changed the behavior in
+        // onBackPressed().
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            super.onBackPressed();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void onBackPressed() {
         if (getFragmentManager().getBackStackEntryCount() <= 0 && isPlaying()) {
+            Toast.makeText(getApplicationContext(),
+                    getResources().getString(R.string.long_press_back), Toast.LENGTH_SHORT).show();
+
             // If back key would exit TV app,
             // show McLauncher instead so we can get benefit of McLauncher's shyMode.
             Intent startMain = new Intent(Intent.ACTION_MAIN);
