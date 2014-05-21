@@ -74,6 +74,10 @@ public final class Channel {
         return mDescription;
     }
 
+    public boolean isBrowsable() {
+        return mIsBrowsable;
+    }
+
     public void setDescription(String description) {
         mDescription = description;
     }

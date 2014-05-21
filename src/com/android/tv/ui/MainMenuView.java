@@ -32,22 +32,24 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.dialog.PrivacySettingDialogFragment;
 
+import java.util.ArrayList;
+
 /*
  * A subclass of VerticalGridView that shows tv main menu.
  */
 public class MainMenuView extends VerticalGridView implements View.OnClickListener {
-    private static final int MENU_COUNT = 2;
-    private static final int ALL_CHANNEL_LIST_MENU_TYPE = 0;
-    private static final int SETTINGS_MENU_TYPE = 1;
+    private static final int DUMMY_TYPE = 0;
+    private static final int CHANNEL_LIST_TYPE = 1;
+    private static final int OPTIONS_TYPE = 2;
 
     private final LayoutInflater mLayoutInflater;
-    private final MainMenuAdapter mAapter = new MainMenuAdapter();
+    private final MainMenuAdapter mAdapter = new MainMenuAdapter();
     private ChannelMap mChannelMap;
     private TvActivity mTvActivity;
     private final Handler mHandler = new Handler();
 
-    private final ChannelListAdapter mAllChannelListAdapter;
-    private final OptionsAdapter mOptionsAdapter;
+    private final ArrayList<ItemListView.ItemListAdapter> mAllAdapterList =
+            new ArrayList<ItemListView.ItemListAdapter>();
 
     public MainMenuView(Context context) {
         this(context, null, 0);
@@ -61,10 +63,21 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         super(context, attrs, defStyle);
 
         mLayoutInflater = LayoutInflater.from(context);
-        setAdapter(mAapter);
+        setWindowAlignmentOffset(context.getResources().getDimensionPixelOffset(
+                R.dimen.selected_row_alignment));
+        setWindowAlignmentOffsetPercent(VerticalGridView.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED);
 
-        mAllChannelListAdapter = new ChannelListAdapter(context, mHandler, this);
-        mOptionsAdapter = new OptionsAdapter(context, mHandler, this);
+        setAdapter(mAdapter);
+
+        // List for enabled channels
+        mAllAdapterList.add(new ChannelListAdapter(context, mHandler, this, true, null,
+                context.getResources().getDimensionPixelOffset(R.dimen.channel_list_view_height)));
+
+        // List for options
+        mAllAdapterList.add(new OptionsAdapter(context, mHandler, this));
+
+        // Keep all items for the main menu
+        setItemViewCacheSize(mAllAdapterList.size());
     }
 
     public void setTvActivity(TvActivity activity) {
@@ -73,14 +86,29 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
 
     public void setChannelMap(ChannelMap channelMap) {
         mChannelMap = channelMap;
-        mAllChannelListAdapter.update(channelMap);
-        mOptionsAdapter.update(channelMap);
+
+        ArrayList<ItemListView.ItemListAdapter> availableAdapterList =
+                new ArrayList<ItemListView.ItemListAdapter>();
+        for (ItemListView.ItemListAdapter adapter : mAllAdapterList) {
+            adapter.update(channelMap);
+            if (adapter.getItemCount() > 0) {
+                availableAdapterList.add(adapter);
+            }
+        }
+
+        mAdapter.setItemListAdapters(
+                availableAdapterList.toArray(new ItemListView.ItemListAdapter[0]));
     }
 
     private void show() {
         if (mChannelMap != null) {
             long id = mChannelMap.getCurrentChannelId();
-            mAllChannelListAdapter.setCurrentChannelId(id);
+
+            for (ItemListView.ItemListAdapter adapter : mAllAdapterList) {
+                if (adapter instanceof ChannelListAdapter) {
+                    ((ChannelListAdapter) adapter).setCurrentChannelId(id);
+                }
+            }
         }
 
         setSelectedPosition(0);
@@ -185,9 +213,26 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
     }
 
     class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.MyViewHolder> {
+        private ItemListView.ItemListAdapter[] mAdapters;
+
+        public void setItemListAdapters(ItemListView.ItemListAdapter[] adapters) {
+            mAdapters = adapters;
+            notifyDataSetChanged();
+        }
+
         @Override
         public int getItemViewType(int position) {
-            return position;
+            ItemListView.ItemListAdapter[] adapters = mAdapters;
+            if (adapters != null && position < adapters.length) {
+                if (adapters[position] instanceof ChannelListAdapter) {
+                    return CHANNEL_LIST_TYPE;
+                }
+                if (adapters[position] instanceof OptionsAdapter) {
+                    return OPTIONS_TYPE;
+                }
+            }
+
+            return DUMMY_TYPE;
         }
 
         private class MyViewHolder extends RecyclerView.ViewHolder {
@@ -198,55 +243,27 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
 
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = null;
-            view = mLayoutInflater.inflate(R.layout.item_list, parent, false);
-
-            int listViewHeight = 0;
-            switch (viewType) {
-                case ALL_CHANNEL_LIST_MENU_TYPE:
-                    listViewHeight = mContext.getResources().getDimensionPixelOffset(
-                            R.dimen.channel_list_view_height);
-                    break;
-                case SETTINGS_MENU_TYPE:
-                    listViewHeight = mContext.getResources().getDimensionPixelOffset(
-                            R.dimen.action_list_view_height);
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("unexpected view type: " + viewType);
-            }
-            ((ItemListView) view).loadViews(listViewHeight);
+            View view = mLayoutInflater.inflate(R.layout.item_list, parent, false);
+            ((ItemListView) view).loadViews();
 
             return new MyViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(MyViewHolder baseHolder, int position) {
-            int viewType = position;
-            ItemListView listView = null;
-            switch (viewType) {
-                case ALL_CHANNEL_LIST_MENU_TYPE:
-                    listView = (ItemListView) baseHolder.itemView;
-
-                    listView.populateViews(null, mAllChannelListAdapter);
-                    mAllChannelListAdapter.update(mChannelMap, listView);
-                    break;
-
-                case SETTINGS_MENU_TYPE:
-                    listView = (ItemListView) baseHolder.itemView;
-                    listView.populateViews(mContext.getString(R.string.menu_title),
-                            mOptionsAdapter);
-                    mOptionsAdapter.update(mChannelMap);
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("unexpected view type: " + viewType);
+            ItemListView.ItemListAdapter[] adapters = mAdapters;
+            if (adapters != null && position < adapters.length) {
+                ItemListView listView = (ItemListView) baseHolder.itemView;
+                ItemListView.ItemListAdapter adapter = mAdapters[position];
+                listView.populateViews(adapter.getTitle(), adapter);
+                adapter.update(mChannelMap, listView);
             }
         }
 
         @Override
         public int getItemCount() {
-            return MENU_COUNT;
+            ItemListView.ItemListAdapter[] adapters = mAdapters;
+            return adapters == null ? 0 : adapters.length;
         }
     }
 }

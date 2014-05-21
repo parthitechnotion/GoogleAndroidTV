@@ -31,10 +31,28 @@ import java.util.ArrayList;
  * An adapter of options.
  */
 public class OptionsAdapter extends ItemListView.ItemListAdapter {
+    private final String mTitle;
+    private final int mTileHeight;
+
     public OptionsAdapter(Context context, Handler handler, View.OnClickListener onClickListener) {
         super(context, handler, R.layout.action_tile, onClickListener);
+
+        mTitle = context.getString(R.string.menu_title);
+        mTileHeight = context.getResources().getDimensionPixelOffset(
+                R.dimen.action_list_view_height);
     }
 
+    @Override
+    public int getTileHeight() {
+        return mTileHeight;
+    }
+
+    @Override
+    public String getTitle() {
+        return mTitle;
+    }
+
+    @Override
     public void update(ChannelMap channelMap) {
         TvInput tvInput = channelMap == null ? null : channelMap.getTvInput();
 
@@ -53,5 +71,10 @@ public class OptionsAdapter extends ItemListView.ItemListAdapter {
         }
 
         setItemList(actionList.toArray(new MenuAction[0]));
+    }
+
+    @Override
+    public void update(ChannelMap channelMap, ItemListView list) {
+        update(channelMap);
     }
 }

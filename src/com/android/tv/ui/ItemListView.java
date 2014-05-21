@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.tv.R;
+import com.android.tv.data.ChannelMap;
 
 /*
  * A subclass of LinearLayout that shows a title and list view.
@@ -53,17 +54,17 @@ public class ItemListView extends LinearLayout {
         super(context, attrs, defStyle);
     }
 
-    public void loadViews(int listViewHeight) {
+    public void loadViews() {
         mTitleView = (TextView) findViewById(R.id.title);
-
         mListView = (HorizontalGridView) findViewById(R.id.list_view);
-        ViewGroup.LayoutParams lp = mListView.getLayoutParams();
-        lp.height = listViewHeight;
     }
 
     public void populateViews(String title, ItemListAdapter adapter) {
         mTitleView.setText(title);
         mListView.setAdapter(adapter);
+
+        ViewGroup.LayoutParams lp = mListView.getLayoutParams();
+        lp.height = adapter.getTileHeight();
     }
 
     public void setTitle(String title) {
@@ -74,12 +75,18 @@ public class ItemListView extends LinearLayout {
         mListView.setSelectedPosition(position);
     }
 
-    public static class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyViewHolder> {
+    public static abstract class ItemListAdapter extends
+            RecyclerView.Adapter<ItemListAdapter.MyViewHolder> {
         private final LayoutInflater mLayoutInflater;
         private final View.OnClickListener mOnClickListener;
         private final int mLayoutResId;
         private Object[] mItemList;
         private Handler mHandler;
+
+        public abstract int getTileHeight();
+        public abstract String getTitle();
+        public abstract void update(ChannelMap channelMap);
+        public abstract void update(ChannelMap channelMap, ItemListView list);
 
         public ItemListAdapter(Context context, Handler handler, int layoutResId,
                 View.OnClickListener onClickListener) {
@@ -115,8 +122,9 @@ public class ItemListView extends LinearLayout {
         @Override
         public void onBindViewHolder(MyViewHolder baseHolder, int position) {
             TileView view = (TileView) baseHolder.itemView;
-            if (mItemList != null && position >= 0 && mItemList.length > position) {
-                view.populateViews(mOnClickListener, mItemList[position]);
+            Object[] itemList = mItemList;
+            if (itemList != null && position >= 0 && itemList.length > position) {
+                view.populateViews(mOnClickListener, itemList[position]);
                 if (view instanceof ViewGroup) {
                     final ViewGroup viewGroup = (ViewGroup) view;
                     mHandler.post(new Runnable() {
@@ -133,7 +141,8 @@ public class ItemListView extends LinearLayout {
 
         @Override
         public int getItemCount() {
-            return mItemList == null ? 0 : mItemList.length;
+            Object[] itemList = mItemList;
+            return itemList == null ? 0 : itemList.length;
         }
     }
 }
