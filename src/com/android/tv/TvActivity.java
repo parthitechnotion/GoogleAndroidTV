@@ -899,12 +899,20 @@ public class TvActivity extends Activity implements
                 mView.animate()
                         .alpha(1f)
                         .setDuration(mShortAnimationDuration)
-                        .setListener(null);
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                // Currently the target alpha isn't kept, but it was before.
+                                // TODO: Remove this if frameworks keeps the target value again.
+                                mView.setAlpha(1f);
+                            }
+                        });
             }
             // Schedule the hide animation after a few seconds.
             mHandler.removeCallbacks(this);
             if (mOnHideAnimation) {
                 mView.clearAnimation();
+                mView.setAlpha(1f);
                 mOnHideAnimation = false;
             }
             mHandler.postDelayed(this, mWaitingTime);
