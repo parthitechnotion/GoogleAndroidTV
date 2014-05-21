@@ -56,10 +56,15 @@
             android:enabled="true">
         </provider>
 
-        <receiver android:name=".PackageIntentsReceiver">
+        <receiver android:name="com.android.tv.receiver.PackageIntentsReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <data android:scheme="package"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.android.tv.receiver.GlobalKeyReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.GLOBAL_BUTTON" />
             </intent-filter>
         </receiver>
     </application>
