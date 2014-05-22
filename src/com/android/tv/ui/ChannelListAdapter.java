@@ -24,35 +24,59 @@ import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 
+import java.util.ArrayList;
+
 /*
  * An adapter of channel list.
  */
 public class ChannelListAdapter extends ItemListView.ItemListAdapter {
     private Channel[] mChannelList;
     private ItemListView mListView;
+    private boolean mBrowsableOnly;
+    private final String mFixedTitle;
+    private String mTitle;
+    private final int mTileHeight;
 
     public ChannelListAdapter(Context context, Handler handler,
-            View.OnClickListener onClickListener) {
+            View.OnClickListener onClickListener, boolean browsableOnly, String title,
+            int tileHeight) {
         super(context, handler, R.layout.channel_tile, onClickListener);
+        mBrowsableOnly = browsableOnly;
+        mFixedTitle = title;
+        mTileHeight = tileHeight;
     }
 
+    @Override
+    public int getTileHeight() {
+        return mTileHeight;
+    }
+
+    @Override
+    public String getTitle() {
+        return mFixedTitle != null ? mFixedTitle : mTitle;
+    }
+
+    @Override
     public void update(ChannelMap channelMap) {
         update(channelMap, mListView);
     }
 
+    @Override
     public void update(ChannelMap channelMap, ItemListView listView) {
-        mChannelList = channelMap == null ? null : channelMap.getAllChannelList();
+        mChannelList = channelMap == null ? null : channelMap.getChannelList(mBrowsableOnly);
         setItemList(mChannelList);
 
-        String title = null;
-        mListView = listView;
-        if (channelMap != null) {
-            setCurrentChannelId(channelMap.getCurrentChannelId());
-            title = channelMap.getTvInput().getDisplayName();
-        }
+        if (mFixedTitle == null) {
+            mTitle = null;
+            mListView = listView;
+            if (channelMap != null) {
+                setCurrentChannelId(channelMap.getCurrentChannelId());
+                mTitle = channelMap.getTvInput().getDisplayName();
+            }
 
-        if (mListView != null) {
-            mListView.setTitle(title);
+            if (mListView != null) {
+                mListView.setTitle(mTitle);
+            }
         }
     }
 

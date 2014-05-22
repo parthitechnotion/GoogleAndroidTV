@@ -83,8 +83,18 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return mInput;
     }
 
-    public Channel[] getAllChannelList() {
-        return mChannelList.toArray(new Channel[0]);
+    public Channel[] getChannelList(boolean browsableOnly) {
+        if (mBrowsableChannelCount == 0 || !browsableOnly) {
+            return mChannelList.toArray(new Channel[0]);
+        }
+
+        ArrayList<Channel> list = new ArrayList<Channel>();
+        for (Channel channel : mChannelList) {
+            if (channel.isBrowsable()) {
+                list.add(channel);
+            }
+        }
+        return list.toArray(new Channel[0]);
     }
 
     public int size() {
