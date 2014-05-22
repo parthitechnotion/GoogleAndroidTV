@@ -62,8 +62,7 @@ public class EditInputDialogFragment extends DialogFragment implements OnItemSel
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPreferences = getActivity().getSharedPreferences(TvSettings.PREFS_FILE,
-                Context.MODE_PRIVATE);
+        mPreferences = Utils.getSharedPreferencesOfDisplayNameForInput(getActivity());
         mAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
                 new ArrayList<String>());
 

@@ -179,9 +179,12 @@ public class Utils {
         }
     }
 
+    public static SharedPreferences getSharedPreferencesOfDisplayNameForInput(Context context) {
+        return context.getSharedPreferences(TvSettings.PREFS_FILE, Context.MODE_PRIVATE);
+    }
+
     public static String getDisplayNameForInput(Context context, TvInputInfo info) {
-        SharedPreferences preferences = context.getSharedPreferences(TvSettings.PREFS_FILE,
-                Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferencesOfDisplayNameForInput(context);
         PackageManager pm = context.getPackageManager();
         return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
                 info.loadLabel(pm).toString());

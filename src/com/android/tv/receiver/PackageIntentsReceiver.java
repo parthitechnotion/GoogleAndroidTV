@@ -25,6 +25,7 @@ import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 
 import com.android.tv.util.TvSettings;
+import com.android.tv.util.Utils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -40,8 +41,7 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (mPreferences == null) {
-            mPreferences = context.getSharedPreferences(TvSettings.PREFS_FILE,
-                    Context.MODE_PRIVATE);
+            mPreferences = Utils.getSharedPreferencesOfDisplayNameForInput(context);
         }
         if (mTvInputManager == null) {
             mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);

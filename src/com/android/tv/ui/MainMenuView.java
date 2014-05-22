@@ -17,6 +17,7 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +32,7 @@ import com.android.tv.TvActivity;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.dialog.PrivacySettingDialogFragment;
+import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
 
@@ -50,6 +52,15 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
 
     private final ArrayList<ItemListView.ItemListAdapter> mAllAdapterList =
             new ArrayList<ItemListView.ItemListAdapter>();
+
+    private SharedPreferences.OnSharedPreferenceChangeListener mPrefChangeListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                    if (mChannelMap != null) {
+                        updateAdapters();
+                    }
+                }
+            };
 
     public MainMenuView(Context context) {
         this(context, null, 0);
@@ -80,17 +91,32 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         setItemViewCacheSize(mAllAdapterList.size());
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        Utils.getSharedPreferencesOfDisplayNameForInput(getContext())
+                .registerOnSharedPreferenceChangeListener(mPrefChangeListener);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        Utils.getSharedPreferencesOfDisplayNameForInput(getContext())
+                .unregisterOnSharedPreferenceChangeListener(mPrefChangeListener);
+    }
+
     public void setTvActivity(TvActivity activity) {
         mTvActivity = activity;
     }
 
     public void setChannelMap(ChannelMap channelMap) {
         mChannelMap = channelMap;
+        updateAdapters();
+    }
 
+    private void updateAdapters() {
         ArrayList<ItemListView.ItemListAdapter> availableAdapterList =
                 new ArrayList<ItemListView.ItemListAdapter>();
         for (ItemListView.ItemListAdapter adapter : mAllAdapterList) {
-            adapter.update(channelMap);
+            adapter.update(mChannelMap);
             if (adapter.getItemCount() > 0) {
                 availableAdapterList.add(adapter);
             }
