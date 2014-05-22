@@ -800,8 +800,9 @@ public class TvActivity extends Activity implements
     @Override
     public void onBackPressed() {
         if (getFragmentManager().getBackStackEntryCount() <= 0 && isPlaying()) {
-            Toast.makeText(getApplicationContext(),
-                    getResources().getString(R.string.long_press_back), Toast.LENGTH_SHORT).show();
+            // TODO: show the following toast message in the future.
+//            Toast.makeText(getApplicationContext(), getResources().getString(
+//                    R.string.long_press_back), Toast.LENGTH_SHORT).show();
 
             // If back key would exit TV app,
             // show McLauncher instead so we can get benefit of McLauncher's shyMode.
