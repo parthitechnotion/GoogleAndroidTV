@@ -17,6 +17,7 @@
 package com.android.tv.data;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.provider.TvContract;
 
 /**
@@ -29,14 +30,88 @@ public final class Channel {
     private long mId;
 
     private String mServiceName;
-    private String mType;
+    private int mType;
     private int mOriginalNetworkId;
     private int mTransportStreamId;
     private String mDisplayNumber;
     private String mDisplayName;
     private String mDescription;
     private boolean mIsBrowsable;
-    private String mData;
+    private byte[] mData;
+
+    public static Channel fromCursor(Cursor cursor) {
+        Channel channel = new Channel();
+        int index = cursor.getColumnIndex(TvContract.Channels._ID);
+        if (index >= 0) {
+            channel.mId = cursor.getLong(index);
+        } else {
+            channel.mId = INVALID_ID;
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_SERVICE_NAME);
+        if (index >= 0) {
+            channel.mServiceName = cursor.getString(index);
+        } else {
+            channel.mServiceName = "serviceName";
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_TYPE);
+        if (index >= 0) {
+            channel.mType = cursor.getInt(index);
+        } else {
+            channel.mType = 0;
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID);
+        if (index >= 0) {
+            channel.mTransportStreamId = cursor.getInt(index);
+        } else {
+            channel.mTransportStreamId = 0;
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID);
+        if (index >= 0) {
+            channel.mOriginalNetworkId = cursor.getInt(index);
+        } else {
+            channel.mOriginalNetworkId = 0;
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NUMBER);
+        if (index >= 0) {
+            channel.mDisplayNumber = cursor.getString(index);
+        } else {
+            channel.mDisplayNumber = "0";
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NAME);
+        if (index >= 0) {
+            channel.mDisplayName = cursor.getString(index);
+        } else {
+            channel.mDisplayName = "name";
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DESCRIPTION);
+        if (index >= 0) {
+            channel.mDescription = cursor.getString(index);
+        } else {
+            channel.mDescription = "description";
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
+        if (index >= 0) {
+            channel.mIsBrowsable = cursor.getInt(index) == 1;
+        } else {
+            channel.mIsBrowsable = true;
+        }
+
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DATA);
+        if (index >= 0) {
+            channel.mData = cursor.getBlob(index);
+        } else {
+            channel.mData = null;
+        }
+        return channel;
+    }
 
     private Channel() {
         // Do nothing.
@@ -50,7 +125,7 @@ public final class Channel {
         return mServiceName;
     }
 
-    public String getType() {
+    public int getType() {
         return mType;
     }
 
@@ -86,7 +161,7 @@ public final class Channel {
         mIsBrowsable = browsable;
     }
 
-    public String getData() {
+    public byte[] getData() {
         return mData;
     }
 
@@ -145,14 +220,14 @@ public final class Channel {
             // Fill initial data.
             mChannel.mId = INVALID_ID;
             mChannel.mServiceName = "serviceName";
-            mChannel.mType = "type";
+            mChannel.mType = 0;
             mChannel.mTransportStreamId = 0;
             mChannel.mOriginalNetworkId = 0;
             mChannel.mDisplayNumber = "0";
             mChannel.mDisplayName = "name";
             mChannel.mDescription = "description";
             mChannel.mIsBrowsable = true;
-            mChannel.mData = "";
+            mChannel.mData = null;
         }
 
         public Builder(Channel other) {
@@ -170,7 +245,7 @@ public final class Channel {
             return this;
         }
 
-        public Builder setType(String type) {
+        public Builder setType(int type) {
             mChannel.mType = type;
             return this;
         }
@@ -205,7 +280,7 @@ public final class Channel {
             return this;
         }
 
-        public Builder setData(String data) {
+        public Builder setData(byte[] data) {
             mChannel.mData = data;
             return this;
         }
