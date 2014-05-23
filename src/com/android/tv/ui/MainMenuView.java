@@ -143,8 +143,8 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
     }
 
     @Override
-    protected void onVisibilityChanged (View changedView, int visibility) {
-        if (visibility == View.VISIBLE) {
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        if (changedView == this && visibility == View.VISIBLE) {
             show();
         }
     }
