@@ -74,9 +74,6 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         super(context, attrs, defStyle);
 
         mLayoutInflater = LayoutInflater.from(context);
-        setWindowAlignmentOffset(context.getResources().getDimensionPixelOffset(
-                R.dimen.selected_row_alignment));
-        setWindowAlignmentOffsetPercent(VerticalGridView.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED);
 
         setAdapter(mAdapter);
 
