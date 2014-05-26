@@ -23,6 +23,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 import android.view.LayoutInflater;
@@ -78,6 +81,24 @@ public class EditInputDialogFragment extends DialogFragment implements OnItemSel
         dropdown.setAdapter(mAdapter);
         dropdown.setOnItemSelectedListener(this);
         mEditText = (EditText) view.findViewById(R.id.input_edit_text);
+        mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                AlertDialog dialog = (AlertDialog) getDialog();
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                        .setEnabled(!TextUtils.isEmpty(s.toString()));
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                /* do nothing */
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                /* do nothing */
+            }
+        });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.new_input_device_name)
@@ -116,7 +137,16 @@ public class EditInputDialogFragment extends DialogFragment implements OnItemSel
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null);
-        return builder.create();
+
+        final AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dlg) {
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
+            }
+        });
+
+        return dialog;
     }
 
     @Override
