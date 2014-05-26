@@ -384,10 +384,11 @@ public class TvActivity extends Activity implements
         }
         if (!input.hasChannel(false)) {
             mTvInputForSetup = null;
-            if (input.hasActivity(Utils.ACTION_SETUP)) {
-                startSetupActivity(input);
-            } else {
-                Toast.makeText(this, R.string.empty_channel_tvinput, Toast.LENGTH_SHORT).show();
+            if (!startSetupActivity(input)) {
+                String message = String.format(
+                        getString(R.string.empty_channel_tvinput_and_no_setup_activity),
+                        input.getDisplayName());
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                 showInputPickerDialog();
             }
             return;
@@ -417,33 +418,36 @@ public class TvActivity extends Activity implements
         showDialogFragment(InputPickerDialogFragment.DIALOG_TAG, new InputPickerDialogFragment());
     }
 
-    public void startSettingsActivity() {
+    public boolean startSetupActivity() {
         if (getSelectedTvInput() == null) {
+            return false;
+        }
+        return startSetupActivity(getSelectedTvInput());
+    }
+
+    public boolean startSetupActivity(TvInput input) {
+        Intent intent = input.getIntentForSetupActivity();
+        if (intent == null) {
+            return false;
+        }
+        startActivityForResult(intent, REQUEST_START_SETUP_ACTIIVTY);
+        mTvInputForSetup = input;
+        stopTv();
+        return true;
+    }
+
+    public boolean startSettingsActivity() {
+        TvInput input = getSelectedTvInput();
+        if (input == null) {
             Log.w(TAG, "There is no selected TV input during startSettingsActivity");
-            return;
+            return false;
         }
-        getSelectedTvInput().startActivity(Utils.ACTION_SETTINGS);
-    }
-
-    public void startSetupActivity() {
-        if (getSelectedTvInput() != null) {
-            startSetupActivity(getSelectedTvInput());
+        Intent intent = input.getIntentForSetupActivity();
+        if (intent == null) {
+            return false;
         }
-    }
-
-    public void startSetupActivity(TvInput input) {
-        if (input.startActivityForResult(this, Utils.ACTION_SETUP, REQUEST_START_SETUP_ACTIIVTY)) {
-            mTvInputForSetup = input;
-            stopTv();
-        } else {
-            String displayName = input.getDisplayName();
-            String message = String.format(getString(
-                    R.string.input_setup_activity_not_found), displayName);
-            new AlertDialog.Builder(this)
-                    .setMessage(message)
-                    .setPositiveButton(R.string.OK, null)
-                    .show();
-        }
+        startActivity(intent);
+        return true;
     }
 
     public void showAspectRatioOption() {
