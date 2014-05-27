@@ -26,6 +26,12 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Receives input events from TV app. -->
+    <permission android:name="android.permission.RECEIVE_INPUT_EVENT"
+        android:protectionLevel="signatureOrSystem"
+        android:label="@string/permlab_receiveInputEvent"
+        android:description="@string/permdesc_receiveInputEvent" />
+
     <application android:label="@string/tv_app"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"

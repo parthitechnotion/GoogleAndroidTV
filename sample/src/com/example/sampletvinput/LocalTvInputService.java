@@ -18,6 +18,7 @@ package com.example.sampletvinput;
 
 import android.media.tv.TvInputService;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
@@ -49,7 +50,7 @@ public class LocalTvInputService extends BaseTvInputService {
 
     @Override
     public TvInputService.Session onCreateSession() {
-        TvInputService.Session impl = new BaseLocalTvInput1SessionImpl();
+        TvInputService.Session impl = new LocalTvInputSessionImpl();
         impl.setOverlayViewEnabled(true);
         return impl;
     }
@@ -64,13 +65,54 @@ public class LocalTvInputService extends BaseTvInputService {
         return list;
     }
 
-    class BaseLocalTvInput1SessionImpl extends BaseTvInputSessionImpl {
+    class LocalTvInputSessionImpl extends BaseTvInputSessionImpl {
         private WebView mWebView;
+        private View mUiLayout;
+        private boolean mUiVisible;
+
+        public void setUiVisibility(boolean visible) {
+            if (mUiVisible == visible) {
+                return;
+            }
+            mUiVisible = visible;
+            mUiLayout.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        }
+
+        @Override
+        public boolean onKeyUp(int keyCode, KeyEvent event) {
+            if (keyCode == KeyEvent.KEYCODE_U) {
+                if (mUiVisible) {
+                    Log.d(TAG, "Abandon UI interactivity");
+                    setUiVisibility(false);
+                } else {
+                    Log.d(TAG, "Request UI interactivity");
+                    setUiVisibility(true);
+                }
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                if (mUiVisible) {
+                    Log.d(TAG, "Abandon UI interactivity");
+                    setUiVisibility(false);
+                    return true;
+                }
+            }
+            return false;
+        }
 
         @Override
         public View onCreateOverlayView() {
             LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.overlay, null);
+            Button closeButton = (Button) view.findViewById(R.id.close_overlay_view);
+            closeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (DEBUG) Log.d(TAG, "Click the close button");
+                    setUiVisibility(false);
+                }
+            });
+            mUiLayout = view.findViewById(R.id.ui_layout);
             mWebView = (WebView) view.findViewById(R.id.webview);
             mWebView.getSettings().setJavaScriptEnabled(true);
             mWebView.setAlpha(WEBVIEW_ALPHA);

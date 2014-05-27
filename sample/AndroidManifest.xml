@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.READ_EPG_DATA" />
     <uses-permission android:name="android.permission.WRITE_EPG_DATA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_INPUT_EVENT" />
 
     <application android:label="@string/sample_tv_input"
             android:icon="@drawable/icon">

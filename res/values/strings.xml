@@ -20,6 +20,14 @@
     <string name="condensed_font" translatable="false">sans-serif-condensed</string>
 
     <string name="tv_app">TV</string>
+
+    <!-- Title of an application permission, listed so the user can choose
+        whether they want to allow the application to do this. -->
+    <string name="permlab_receiveInputEvent">receive input events from TV app</string>
+    <!-- Description of an application permission, listed so the user can choose
+        whether they want to allow the application to do this. -->
+    <string name="permdesc_receiveInputEvent">Allows the app to receive input events from TV app.</string>
+
     <string name="select_input_device">Select TV Input</string>
     <!-- Used in the "Select Input Device" dialog to indicate that the user is already watching TV
         from the current TV input, i.e. this input device is already selected. -->
