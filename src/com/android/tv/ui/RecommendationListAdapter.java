@@ -23,27 +23,27 @@ import android.view.View;
 import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
-
-import java.util.ArrayList;
+import com.android.tv.recommendation.TvRecommendation;
 
 /*
- * An adapter of channel list.
+ * An adapter of recommended channel list.
  */
-public class ChannelListAdapter extends ItemListView.ItemListAdapter {
+public class RecommendationListAdapter extends ItemListView.ItemListAdapter {
     private ChannelMap mChannelMap;
     private Channel[] mChannelList;
     private ItemListView mListView;
-    private boolean mBrowsableOnly;
-    private final String mFixedTitle;
-    private String mTitle;
+    private final String mTitle;
     private final int mTileHeight;
+    private final int mMaxCount;
+    private final TvRecommendation mRecommendationEngine;
 
-    public ChannelListAdapter(Context context, Handler handler,
-            View.OnClickListener onClickListener, boolean browsableOnly, String title,
-            int tileHeight) {
-        super(context, handler, R.layout.channel_tile, onClickListener);
-        mBrowsableOnly = browsableOnly;
-        mFixedTitle = title;
+    public RecommendationListAdapter(Context context, Handler handler,
+            View.OnClickListener onClickListener, TvRecommendation recommendationEngine,
+            int maxCount, int tileResId, String title, int tileHeight) {
+        super(context, handler, tileResId, onClickListener);
+        mRecommendationEngine = recommendationEngine;
+        mMaxCount = maxCount;
+        mTitle = title;
         mTileHeight = tileHeight;
     }
 
@@ -54,7 +54,7 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
 
     @Override
     public String getTitle() {
-        return mFixedTitle != null ? mFixedTitle : mTitle;
+        return mTitle;
     }
 
     @Override
@@ -67,30 +67,27 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
         mChannelMap = channelMap;
         mListView = listView;
 
-        mChannelList = mChannelMap == null ? null : mChannelMap.getChannelList(mBrowsableOnly);
-        setItemList(mChannelList);
-
-        updateTitle();
+        updateChannelList();
         selectCurrentChannel();
     }
 
     @Override
     public void onBeforeShowing() {
-        updateTitle();
+        updateChannelList();
         selectCurrentChannel();
     }
 
-    private void updateTitle() {
-        if (mFixedTitle == null) {
-            mTitle = null;
-            if (mChannelMap != null) {
-                mTitle = mChannelMap.getTvInput().getDisplayName();
-            }
-
-            if (mListView != null) {
-                mListView.setTitle(mTitle);
+    private void updateChannelList() {
+        TvRecommendation.ChannelRecord[] records =
+                mRecommendationEngine.getRecommendedChannelList(mMaxCount);
+        mChannelList = null;
+        if (records != null && records.length > 0) {
+            mChannelList = new Channel[records.length];
+            for (int i = 0; i < records.length; i++) {
+                mChannelList[i] = records[i].getChannel();
             }
         }
+        setItemList(mChannelList);
     }
 
     private void selectCurrentChannel() {

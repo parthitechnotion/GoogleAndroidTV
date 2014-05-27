@@ -87,6 +87,7 @@ public class ItemListView extends LinearLayout {
         public abstract String getTitle();
         public abstract void update(ChannelMap channelMap);
         public abstract void update(ChannelMap channelMap, ItemListView list);
+        public void onBeforeShowing() {}
 
         public ItemListAdapter(Context context, Handler handler, int layoutResId,
                 View.OnClickListener onClickListener) {
