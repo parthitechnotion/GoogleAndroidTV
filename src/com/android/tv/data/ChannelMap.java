@@ -231,6 +231,8 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mBrowsableChannelCount = 0;
         mChannelList.clear();
         if (mCursor.getCount() > 0) {
+            long firstBrowsableChannelId = Channel.INVALID_ID;
+
             mCursor.moveToFirst();
             do {
                 mChannelList.add(new Channel.Builder()
@@ -242,12 +244,20 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
                         .build());
                 if (mCursor.getInt(mIndexBrowsable) == BROWSABLE) {
                     ++mBrowsableChannelCount;
+                    if (firstBrowsableChannelId == Channel.INVALID_ID) {
+                        firstBrowsableChannelId = mCursor.getLong(mIndexId);
+                    }
                 }
             } while (mCursor.moveToNext());
 
-            mCursor.moveToFirst();
-            if (mCurrentChannelId != Channel.INVALID_ID) {
-                moveToChannel(mCurrentChannelId);
+            if (mCurrentChannelId == Channel.INVALID_ID || !moveToChannel(mCurrentChannelId)) {
+                if (firstBrowsableChannelId == Channel.INVALID_ID) {
+                    // If there's no browsable channel, we assume that all the channels are
+                    // browsable.
+                    mCursor.moveToFirst();
+                } else {
+                    moveToChannel(firstBrowsableChannelId);
+                }
             }
             mCurrentChannelId = mCursor.getLong(mIndexId);
         } else {
