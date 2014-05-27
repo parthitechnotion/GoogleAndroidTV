@@ -32,9 +32,11 @@ import com.android.tv.TvActivity;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.dialog.PrivacySettingDialogFragment;
+import com.android.tv.recommendation.TvRecommendation;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
  * A subclass of VerticalGridView that shows tv main menu.
@@ -44,23 +46,18 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
     private static final int CHANNEL_LIST_TYPE = 1;
     private static final int OPTIONS_TYPE = 2;
 
+    private static final int MAX_COUNT_FOR_RECOMMENDATION = 10;
+
     private final LayoutInflater mLayoutInflater;
     private final MainMenuAdapter mAdapter = new MainMenuAdapter();
     private ChannelMap mChannelMap;
     private TvActivity mTvActivity;
+    private TvRecommendation mTvRecommendation;
+
     private final Handler mHandler = new Handler();
 
     private final ArrayList<ItemListView.ItemListAdapter> mAllAdapterList =
             new ArrayList<ItemListView.ItemListAdapter>();
-
-    private SharedPreferences.OnSharedPreferenceChangeListener mPrefChangeListener =
-            new SharedPreferences.OnSharedPreferenceChangeListener() {
-                public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                    if (mChannelMap != null) {
-                        updateAdapters();
-                    }
-                }
-            };
 
     public MainMenuView(Context context) {
         this(context, null, 0);
@@ -74,11 +71,22 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         super(context, attrs, defStyle);
 
         mLayoutInflater = LayoutInflater.from(context);
-
         setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        Context context = getContext();
 
         // List for enabled channels
         mAllAdapterList.add(new ChannelListAdapter(context, mHandler, this, true, null,
+                context.getResources().getDimensionPixelOffset(R.dimen.channel_list_view_height)));
+
+        // List for recommended channels
+        mTvRecommendation = new TvRecommendation(context, mHandler);
+        mAllAdapterList.add(new RecommendationListAdapter(context, mHandler, this,
+                mTvRecommendation, MAX_COUNT_FOR_RECOMMENDATION, R.layout.channel_tile,
+                context.getString(R.string.recommended_channel_list_title),
                 context.getResources().getDimensionPixelOffset(R.dimen.channel_list_view_height)));
 
         // List for options
@@ -86,18 +94,16 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
 
         // Keep all items for the main menu
         setItemViewCacheSize(mAllAdapterList.size());
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        Utils.getSharedPreferencesOfDisplayNameForInput(getContext())
-                .registerOnSharedPreferenceChangeListener(mPrefChangeListener);
+        updateAdapters(true);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        Utils.getSharedPreferencesOfDisplayNameForInput(getContext())
-                .unregisterOnSharedPreferenceChangeListener(mPrefChangeListener);
+        mAllAdapterList.clear();
+        updateAdapters(false);
+
+        mTvRecommendation.release();
+        mTvRecommendation = null;
     }
 
     public void setTvActivity(TvActivity activity) {
@@ -106,14 +112,16 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
 
     public void setChannelMap(ChannelMap channelMap) {
         mChannelMap = channelMap;
-        updateAdapters();
+        updateAdapters(true);
     }
 
-    private void updateAdapters() {
+    private void updateAdapters(boolean channelMapUpdateRequired) {
         ArrayList<ItemListView.ItemListAdapter> availableAdapterList =
                 new ArrayList<ItemListView.ItemListAdapter>();
         for (ItemListView.ItemListAdapter adapter : mAllAdapterList) {
-            adapter.update(mChannelMap);
+            if (channelMapUpdateRequired) {
+                adapter.update(mChannelMap);
+            }
             if (adapter.getItemCount() > 0) {
                 availableAdapterList.add(adapter);
             }
@@ -125,12 +133,19 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
 
     private void show() {
         if (mChannelMap != null) {
-            long id = mChannelMap.getCurrentChannelId();
+            boolean adapterVisibilityChanged = false;
 
             for (ItemListView.ItemListAdapter adapter : mAllAdapterList) {
-                if (adapter instanceof ChannelListAdapter) {
-                    ((ChannelListAdapter) adapter).setCurrentChannelId(id);
+                int prevCount = adapter.getItemCount();
+                adapter.onBeforeShowing();
+                int currCount = adapter.getItemCount();
+                if ((prevCount == 0 && currCount != 0) || (prevCount != 0 && currCount == 0)) {
+                    adapterVisibilityChanged = true;
                 }
+            }
+
+            if (adapterVisibilityChanged) {
+                updateAdapters(false);
             }
         }
 
@@ -239,8 +254,10 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         private ItemListView.ItemListAdapter[] mAdapters;
 
         public void setItemListAdapters(ItemListView.ItemListAdapter[] adapters) {
-            mAdapters = adapters;
-            notifyDataSetChanged();
+            if (!Arrays.equals(mAdapters, adapters)) {
+                mAdapters = adapters;
+                notifyDataSetChanged();
+            }
         }
 
         @Override

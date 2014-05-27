@@ -852,6 +852,8 @@ public class TvActivity extends Activity implements
                 && id != mChannelMap.getCurrentChannelId()) {
             if (mChannelMap.moveToChannel(id)) {
                 tune();
+            } else if (!TextUtils.isEmpty(Utils.getInputIdForChannel(this, id))) {
+                startTv(id);
             } else {
                 Toast.makeText(this, R.string.input_is_not_available, Toast.LENGTH_SHORT).show();
             }
