@@ -81,7 +81,7 @@ public class ItemListView extends LinearLayout {
         private final View.OnClickListener mOnClickListener;
         private final int mLayoutResId;
         private Object[] mItemList;
-        private Handler mHandler;
+        private final Handler mHandler;
 
         public abstract int getTileHeight();
         public abstract String getTitle();
