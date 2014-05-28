@@ -282,7 +282,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private String getInputId() {
         ComponentName componentName = new ComponentName(mCursor.getString(mIndexPackageName),
                 mCursor.getString(mIndexServiceName));
-        return TvInputInfo.generateInputIdForComponenetName(componentName);
+        return TvInputInfo.generateInputIdForComponentName(componentName);
     }
 
     private void checkCursor() {
