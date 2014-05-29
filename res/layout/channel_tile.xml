@@ -16,30 +16,47 @@
 
 <com.android.tv.ui.ChannelTileView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/channel_tile"
-    android:layout_width="270dp"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_width="185dp"
+    android:layout_height="match_parent"
+    android:layoutMode="opticalBounds"
+    android:clipChildren="false"
     android:focusable="true"
     android:clickable="true">
 
-    <TextView android:id="@+id/channel_number"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="22dp"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:background="#FFE1E1E1" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="8dip"
+        android:background="#FFE1E1E1" >
 
-    <TextView android:id="@+id/channel_name"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:textColor="#000000"
-        android:textSize="23sp"
-        android:background="#FFEEEEEE" />
+        <TextView android:id="@+id/channel_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:gravity="left|center_vertical"
+            android:padding="2dip"
+            android:fontFamily="@string/font"
+            android:textColor="#000000"
+            android:textSize="30sp" />
 
+        <ImageView android:id="@+id/channel_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@id/channel_number"
+            android:gravity="right|top"
+            android:src="@drawable/app_icon" />
+
+        <TextView android:id="@+id/channel_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/channel_number"
+            android:gravity="left|center_vertical"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:fontFamily="@string/font"
+            android:textColor="#555555"
+            android:textSize="16sp" />
+    </RelativeLayout>
 </com.android.tv.ui.ChannelTileView>

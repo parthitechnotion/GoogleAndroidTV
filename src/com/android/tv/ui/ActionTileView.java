@@ -30,7 +30,7 @@ import com.android.tv.R;
 /**
  * A view to render channel banner.
  */
-public class ActionTileView extends LinearLayout implements ItemListView.TileView {
+public class ActionTileView extends ShadowContainer implements ItemListView.TileView {
     private TextView mActionNameView;
 
     public ActionTileView(Context context) {
@@ -59,12 +59,5 @@ public class ActionTileView extends LinearLayout implements ItemListView.TileVie
         setTag(MainMenuView.MenuTag.buildTag(action));
 
         mActionNameView.setText(action.getActionName(getContext()));
-    }
-
-    @Override
-    protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
-        mActionNameView.setBackgroundColor(gainFocus
-                ? getContext().getResources().getColor(R.color.selected_item_background)
-                : Color.WHITE);
     }
 }

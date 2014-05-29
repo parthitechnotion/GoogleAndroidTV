@@ -17,11 +17,8 @@
 package com.android.tv.ui;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.internal.util.Preconditions;
@@ -31,7 +28,7 @@ import com.android.tv.data.Channel;
 /**
  * A view to render channel tile.
  */
-public class ChannelTileView extends LinearLayout implements ItemListView.TileView {
+public class ChannelTileView extends ShadowContainer implements ItemListView.TileView {
     private TextView mChannelNameView;
     private TextView mChannelNumberView;
 
@@ -63,12 +60,5 @@ public class ChannelTileView extends LinearLayout implements ItemListView.TileVi
 
         mChannelNameView.setText(channel.getDisplayName());
         mChannelNumberView.setText(channel.getDisplayNumber());
-    }
-
-    @Override
-    protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
-        mChannelNameView.setBackgroundColor(gainFocus
-                ? getContext().getResources().getColor(R.color.selected_item_background)
-                : Color.WHITE);
     }
 }
