@@ -24,27 +24,34 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.TvContract;
+import android.util.Log;
 
 import com.android.tv.data.Channel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TvRecommendation {
+    private static final String TAG = "TvRecommendation";
+
     private static final long MIN_WATCH_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
     private static final UriMatcher sUriMatcher;
     private static final int MATCH_CHANNEL_ID = 1;
     private static final int MATCH_WATCHED_PROGRAM_ID = 2;
 
+    private static final List<TvRecommenderWrapper> sTvRecommenders =
+            new ArrayList<TvRecommenderWrapper>();
+
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(TvContract.AUTHORITY, "channel/#", MATCH_CHANNEL_ID);
         sUriMatcher.addURI(TvContract.AUTHORITY, "watched_program/#", MATCH_WATCHED_PROGRAM_ID);
+
+        sTvRecommenders.add(new TvRecommenderWrapper(new RecentChannelRecommender()));
     }
 
     private final Map<Long, ChannelRecord> mChannelRecordMap;
@@ -79,24 +86,29 @@ public class TvRecommendation {
     /**
      * Get the channel list of recommendation up to {@code n} or the number of channels.
      *
-     * @param n The number of channels will be recommended.
-     * @return Top {@code n} channels recommended. If {@code n} is bigger than the number of
-     * channels, the number of results could be less than {@code n}.
+     * @param size The number of channels that might be recommended.
+     * @return Top {@code size} channels recommended. If {@code size} is bigger than the number of
+     * channels, the number of results could be less than {@code size}.
      */
-    public ChannelRecord[] getRecommendedChannelList(int n) {
-        if (n > mChannelRecordMap.size()) {
-            n = mChannelRecordMap.size();
+    // TODO: consider to change the return type from ChannelRecord[] to Channel[]
+    public ChannelRecord[] getRecommendedChannelList(int size) {
+        if (size > mChannelRecordMap.size()) {
+            size = mChannelRecordMap.size();
+        }
+        for (ChannelRecord cr : mChannelRecordMap.values()) {
+            double maxScore = 0.0;
+            for (TvRecommenderWrapper recommender : sTvRecommenders) {
+                double score = recommender.calculateScaledScore(cr);
+                if (score > maxScore) {
+                    maxScore = score;;
+                }
+            }
+            cr.mScore = maxScore;
         }
         ChannelRecord[] allChannelRecords =
                 mChannelRecordMap.values().toArray(new ChannelRecord[0]);
-        Arrays.sort(allChannelRecords, new Comparator<ChannelRecord>() {
-            @Override
-            public int compare(ChannelRecord c1, ChannelRecord c2) {
-                long diff = c1.getLastWatchedTimeMs() - c2.getLastWatchedTimeMs();
-                return (diff == 0l) ? 0 : (diff < 0) ? 1 : -1;
-            }
-        });
-        return Arrays.copyOfRange(allChannelRecords, 0, n);
+        Arrays.sort(allChannelRecords);
+        return Arrays.copyOfRange(allChannelRecords, 0, size);
     }
 
     private void registerContentObservers() {
@@ -114,7 +126,11 @@ public class TvRecommendation {
                         cursor = mContext.getContentResolver().query(
                                 uri, projection, null, null, null);
                         if (cursor != null && cursor.moveToFirst()) {
-                            updateLastWatchedTimeFromWatchedProgramCursor(cursor);
+                            ChannelRecord channelRecord =
+                                    updateChannelRecordFromWatchedProgramCursor(cursor);
+                            for (TvRecommenderWrapper recommender : sTvRecommenders) {
+                                recommender.onNewWatchLog(channelRecord);
+                            }
                         }
                     } finally {
                         if (cursor != null) {
@@ -141,8 +157,8 @@ public class TvRecommendation {
                             ChannelRecord oldChannelRecord = mChannelRecordMap.get(channelId);
                             ChannelRecord newChannelRecord =
                                     new ChannelRecord(Channel.fromCursor(cursor));
-                            newChannelRecord.setLastWatchedTime(oldChannelRecord == null
-                                    ? 0 : oldChannelRecord.getLastWatchedTimeMs());
+                            newChannelRecord.mLastWatchedTimeMs = (oldChannelRecord == null)
+                                    ? 0 : oldChannelRecord.mLastWatchedTimeMs;
                             mChannelRecordMap.put(channelId, newChannelRecord);
                         } else {
                             mChannelRecordMap.remove(channelId);
@@ -198,7 +214,7 @@ public class TvRecommendation {
                     TvContract.WatchedPrograms.CONTENT_URI, projection, null, null, null);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    updateLastWatchedTimeFromWatchedProgramCursor(cursor);
+                    updateChannelRecordFromWatchedProgramCursor(cursor);
                 }
             }
         } finally {
@@ -208,7 +224,7 @@ public class TvRecommendation {
         }
     }
 
-    private void updateLastWatchedTimeFromWatchedProgramCursor(Cursor cursor) {
+    private final ChannelRecord updateChannelRecordFromWatchedProgramCursor(Cursor cursor) {
         final int indexWatchStartTime = cursor.getColumnIndex(
                 TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS);
         final int indexWatchEndTime = cursor.getColumnIndex(
@@ -218,18 +234,21 @@ public class TvRecommendation {
 
         long watchEndTimeMs = cursor.getLong(indexWatchEndTime);
         long watchDurationMs = watchEndTimeMs - cursor.getLong(indexWatchStartTime);
+        ChannelRecord channelRecord = null;
         if (watchEndTimeMs != 0l && watchDurationMs > MIN_WATCH_DURATION_MS) {
-            ChannelRecord channelRecord = mChannelRecordMap.get(
+            channelRecord = mChannelRecordMap.get(
                     cursor.getLong(indexWatchChannelId));
-            if (channelRecord != null && channelRecord.getLastWatchedTimeMs() < watchEndTimeMs) {
-                channelRecord.setLastWatchedTime(watchEndTimeMs);
+            if (channelRecord != null && channelRecord.mLastWatchedTimeMs < watchEndTimeMs) {
+                channelRecord.mLastWatchedTimeMs = watchEndTimeMs;
             }
         }
+        return channelRecord;
     }
 
-    public static class ChannelRecord {
+    public static class ChannelRecord implements Comparable<ChannelRecord> {
         private final Channel mChannel;
         private long mLastWatchedTimeMs;
+        private double mScore;
 
         public ChannelRecord(Channel channel) {
             mChannel = channel;
@@ -244,8 +263,87 @@ public class TvRecommendation {
             return mLastWatchedTimeMs;
         }
 
-        public void setLastWatchedTime(long timeMs) {
-            mLastWatchedTimeMs = timeMs;
+        public double getRecommendationScore() {
+            return mScore;
+        }
+
+        @Override
+        public int compareTo(ChannelRecord another) {
+            // Make Array.sort work in descending order.
+            return (mScore == another.mScore) ? 0 : (mScore > another.mScore) ? -1 : 1;
+        }
+    }
+
+    public static abstract class TvRecommender {
+        public static final double NOT_RECOMMENDED = -1.0;
+
+        /**
+         * This will be called when a new watch log comes into WatchedPrograms table.
+         */
+        protected void onNewWatchLog(ChannelRecord channelRecord) {
+        }
+
+        /**
+         * The implementation should return the calculated score for the given channel record.
+         * The return value should be in the range of [0.0, 1.0] or NOT_RECOMMENDED for denoting
+         * that it gives up to calculate the score for the channel.
+         *
+         * @param channelRecord The channel record which will be evaluated by this recommender.
+         * @return The recommendation score
+         */
+        protected abstract double calculateScore(final ChannelRecord cr);
+    }
+
+    private static class TvRecommenderWrapper {
+        private static final double DEFAULT_BASE_SCORE = 0.0;
+        private static final double DEFAULT_WEIGHT = 1.0;
+
+        private final TvRecommender mRecommender;
+        // The minimum score of the TvRecommender unless it gives up to provide the score.
+        private final double mBaseScore;
+        // The weight of the recommender. The return-value of getScore() will be multiplied by
+        // this value.
+        private final double mWeight;
+
+        public TvRecommenderWrapper(TvRecommender recommender) {
+            this(recommender, DEFAULT_BASE_SCORE, DEFAULT_WEIGHT);
+        }
+
+        public TvRecommenderWrapper(TvRecommender recommender, double baseScore, double weight) {
+            mRecommender = recommender;
+            mBaseScore = baseScore;
+            mWeight = weight;
+        }
+
+        /**
+         * This returns the scaled score for the given channel record based on the returned value
+         * of calculateScore().
+         *
+         * @param channelRecord The channel record which will be evaluated by the recommender.
+         * @return Returns the scaled score (mBaseScore + score * mWeight) when calculateScore() is
+         * in the range of [0.0, 1.0]. If calculateScore() returns NOT_RECOMMENDED or any negative
+         * numbers, it returns NOT_RECOMMENDED. If calculateScore() returns more than 1.0, it
+         * returns (mBaseScore + mWeight).
+         */
+        public double calculateScaledScore(final ChannelRecord channelRecord) {
+            double score = mRecommender.calculateScore(channelRecord);
+            if (score < 0.0) {
+                if (score != TvRecommender.NOT_RECOMMENDED) {
+                    Log.w(TAG, "Unexpected scroe (" + score + ") from the recommender"
+                            + mRecommender);
+                }
+                // If the recommender gives up to calculate the score, return 0.0
+                return TvRecommender.NOT_RECOMMENDED;
+            } else if (score > 1.0) {
+                Log.w(TAG, "Unexpected scroe (" + score + ") from the recommender"
+                        + mRecommender);
+                score = 1.0;
+            }
+            return mBaseScore + score * mWeight;
+        }
+
+        public void onNewWatchLog(ChannelRecord channelRecord) {
+            mRecommender.onNewWatchLog(channelRecord);
         }
     }
 }
