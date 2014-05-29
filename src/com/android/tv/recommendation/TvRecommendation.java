@@ -28,16 +28,20 @@ import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
 import android.net.Uri;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.tv.data.Channel;
+import com.android.tv.data.Program;
 
 import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TvRecommendation {
@@ -61,12 +65,12 @@ public class TvRecommendation {
     }
 
     private final List<TvRecommenderWrapper> mTvRecommenders;
-    private Map<Long, ChannelRecord> mChannelRecordMap;
     // TODO: Consider to define each observer rather than the list or observers.
     private final Handler mHandler;
     private final ContentObserver mContentObserver;
     private final Context mContext;
     private final boolean mIncludeRecommendedOnly;
+    private Map<Long, ChannelRecord> mChannelRecordMap;
 
     /**
      * Create a TV recommendation object.
@@ -181,15 +185,10 @@ public class TvRecommendation {
                         mChannelRecordMap.remove(channelId);
                     }
                 } else if (match == MATCH_WATCHED_PROGRAM_ID) {
-                    String[] projection = {
-                            TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS,
-                            TvContract.WatchedPrograms.COLUMN_WATCH_END_TIME_UTC_MILLIS,
-                            TvContract.WatchedPrograms.COLUMN_CHANNEL_ID };
-
                     Cursor cursor = null;
                     try {
                         cursor = mContext.getContentResolver().query(
-                                uri, projection, null, null, null);
+                                uri, null, null, null, null);
                         if (cursor != null && cursor.moveToFirst()) {
                             ChannelRecord channelRecord =
                                     updateChannelRecordFromWatchedProgramCursor(cursor);
@@ -292,14 +291,9 @@ public class TvRecommendation {
         }
 
         // update last watched time for channels.
-        String[] projection = {
-                TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS,
-                TvContract.WatchedPrograms.COLUMN_WATCH_END_TIME_UTC_MILLIS,
-                TvContract.WatchedPrograms.COLUMN_CHANNEL_ID };
-
         try {
             cursor = mContext.getContentResolver().query(
-                    TvContract.WatchedPrograms.CONTENT_URI, projection, null, null, null);
+                    TvContract.WatchedPrograms.CONTENT_URI, null, null, null, null);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     updateChannelRecordFromWatchedProgramCursor(cursor);
@@ -312,7 +306,25 @@ public class TvRecommendation {
         }
     }
 
-    private final ChannelRecord updateChannelRecordFromWatchedProgramCursor(Cursor cursor) {
+    private Program createProgramFromWatchedProgramCursor(Cursor cursor) {
+        final int indexWatchChannelId = cursor.getColumnIndex(
+                TvContract.WatchedPrograms.COLUMN_CHANNEL_ID);
+        final int indexProgramTitle = cursor.getColumnIndex(
+                TvContract.WatchedPrograms.COLUMN_TITLE);
+        final int indexProgramStartTime = cursor.getColumnIndex(
+                TvContract.WatchedPrograms.COLUMN_START_TIME_UTC_MILLIS);
+        final int indexProgramEndTime = cursor.getColumnIndex(
+                TvContract.WatchedPrograms.COLUMN_END_TIME_UTC_MILLIS);
+        String title = cursor.getString(indexProgramTitle);
+        return TextUtils.isEmpty(title) ? null : new Program.Builder()
+                .setChannelId(cursor.getLong(indexWatchChannelId))
+                .setTitle(title)
+                .setStartTimeUtcMillis(cursor.getLong(indexProgramStartTime))
+                .setStartTimeUtcMillis(cursor.getLong(indexProgramEndTime))
+                .build();
+    }
+
+    private ChannelRecord updateChannelRecordFromWatchedProgramCursor(Cursor cursor) {
         final int indexWatchStartTime = cursor.getColumnIndex(
                 TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS);
         final int indexWatchEndTime = cursor.getColumnIndex(
@@ -329,6 +341,10 @@ public class TvRecommendation {
             if (channelRecord != null && channelRecord.mLastWatchedTimeMs < watchEndTimeMs) {
                 channelRecord.mLastWatchedTimeMs = watchEndTimeMs;
                 channelRecord.mLastWatchDurationMs = watchDurationMs;
+                Program program = createProgramFromWatchedProgramCursor(cursor);
+                if (program != null) {
+                    channelRecord.logWatchHistory(program);
+                }
             }
         }
         return channelRecord;
@@ -336,8 +352,11 @@ public class TvRecommendation {
 
     public static class ChannelRecord
             implements Comparable<ChannelRecord>, Channel.LoadLogoCallback {
+        // TODO: decide the value for max history size.
+        private static final int MAX_HISTORY_SIZE = 100;
         private final Channel mChannel;
         private final Uri mChannelUri;
+        private final Queue<Program> mWatchHistory;
         private long mLastWatchedTimeMs;
         private long mLastWatchDurationMs;
         private double mScore;
@@ -346,6 +365,7 @@ public class TvRecommendation {
             mChannel = channel;
             mChannelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI,
                     channel.getId());
+            mWatchHistory = new ArrayDeque<Program>();
             mLastWatchedTimeMs = 0l;
             mLastWatchDurationMs = 0;
             mChannel.loadLogo(context, this);
@@ -369,6 +389,17 @@ public class TvRecommendation {
 
         public double getRecommendationScore() {
             return mScore;
+        }
+
+        public final Program[] getWatchHistory() {
+            return mWatchHistory.toArray(new Program[0]);
+        }
+
+        public void logWatchHistory(Program p) {
+            mWatchHistory.offer(p);
+            if (mWatchHistory.size() > MAX_HISTORY_SIZE) {
+                mWatchHistory.poll();
+            }
         }
 
         @Override
