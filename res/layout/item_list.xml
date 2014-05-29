@@ -39,10 +39,10 @@
     <android.support.v17.leanback.widget.HorizontalGridView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="105dp"
+        android:layout_height="115dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:focusable="true"
-        lb:horizontalMargin="15dp" />
+        lb:horizontalMargin="@dimen/inter_card_spacing" />
 
 </com.android.tv.ui.ItemListView>
