@@ -35,6 +35,7 @@ import android.util.Base64;
 
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
+import com.android.tv.data.StreamInfo;
 
 import java.util.List;
 
@@ -63,6 +64,15 @@ public class Utils {
     private static final String PREFIX_PREF_NAME = "com.android.tv.";
     // preferences stored in the preference of a specific tv input.
     private static final String PREF_KEY_LAST_WATCHED_CHANNEL_ID = "last_watched_channel_id";
+
+    private static int VIDEO_SD_WIDTH = 704;
+    private static int VIDEO_SD_HEIGHT = 480;
+    private static int VIDEO_HD_WIDTH = 1280;
+    private static int VIDEO_HD_HEIGHT = 720;
+    private static int VIDEO_FULL_HD_WIDTH = 1920;
+    private static int VIDEO_FULL_HD_HEIGHT = 1080;
+    private static int VIDEO_ULTRA_HD_WIDTH = 2048;
+    private static int VIDEO_ULTRA_HD_HEIGHT = 1536;
 
     // TODO: Remove this and add inputId into TvProvider.
     public static String getInputIdForComponentName(ComponentName name) {
@@ -218,6 +228,34 @@ public class Utils {
         intent.setClassName(activityInfo.packageName, activityInfo.name);
         activity.startActivityForResult(intent, requestCode);
         return true;
+    }
+
+    public static int getVideoDefinitionLevelFromSize(int width, int height) {
+        if (width >= VIDEO_ULTRA_HD_WIDTH && height >= VIDEO_ULTRA_HD_HEIGHT) {
+            return StreamInfo.VIDEO_DEFINITION_LEVEL_ULTRA_HD;
+        } else if (width >= VIDEO_FULL_HD_WIDTH && height >= VIDEO_FULL_HD_HEIGHT) {
+            return StreamInfo.VIDEO_DEFINITION_LEVEL_FULL_HD;
+        } else if (width >= VIDEO_HD_WIDTH && height >= VIDEO_HD_HEIGHT) {
+            return StreamInfo.VIDEO_DEFINITION_LEVEL_HD;
+        } else if (width >= VIDEO_SD_WIDTH && height >= VIDEO_SD_HEIGHT) {
+            return StreamInfo.VIDEO_DEFINITION_LEVEL_SD;
+        }
+        return StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
+    }
+
+    /* TODO: remove this method once we have assets for video formats */
+    public static String getVideoDefinitionLevelString(int videoFormat) {
+        switch (videoFormat) {
+            case StreamInfo.VIDEO_DEFINITION_LEVEL_ULTRA_HD:
+                return "UltraHD";
+            case StreamInfo.VIDEO_DEFINITION_LEVEL_FULL_HD:
+                return "FullHD";
+            case StreamInfo.VIDEO_DEFINITION_LEVEL_HD:
+                return "HD";
+            case StreamInfo.VIDEO_DEFINITION_LEVEL_SD:
+                return "SD";
+        }
+        return "";
     }
 
     private static ActivityInfo getActivityInfo(Context context, TvInputInfo input, String action) {

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
+import android.tv.TvInputManager.Session;
 import android.tv.TvView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -12,10 +13,12 @@ import android.view.SurfaceHolder;
 
 import com.android.internal.util.Preconditions;
 import com.android.tv.data.Channel;
+import com.android.tv.data.StreamInfo;
+import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
-public class TunableTvView extends TvView {
+public class TunableTvView extends TvView implements StreamInfo {
     private static final boolean DEBUG = true;
     private static final String TAG = "TunableTvView";
 
@@ -29,6 +32,7 @@ public class TunableTvView extends TvView {
     private TvInputInfo mInputInfo;
     private TvInputManager.Session mSession;
     private OnTuneListener mOnTuneListener;
+    private int mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -100,6 +104,14 @@ public class TunableTvView extends TvView {
                         mOnTuneListener = null;
                     }
                 }
+
+                @Override
+                public void onVideoSizeChanged(Session session, int width, int height) {
+                    mVideoFormat = Utils.getVideoDefinitionLevelFromSize(width, height);
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
+                    }
+                }
             };
 
     public TunableTvView(Context context) {
@@ -146,6 +158,7 @@ public class TunableTvView extends TvView {
         }
         if (DEBUG) Log.d(TAG, "tuneTo " + channelId);
         mHandler.removeMessages(MSG_TUNE);
+        mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
         String inputId = Utils.getInputIdForChannel(getContext(), channelId);
         TvInputInfo inputInfo = mInputManagerHelper.getTvInputInfo(inputId);
         if (inputInfo == null || !mInputManagerHelper.isAvailable(inputInfo)) {
@@ -200,5 +213,11 @@ public class TunableTvView extends TvView {
     public interface OnTuneListener {
         void onTuned(boolean success, long channelId);
         void onUnexpectedStop(long channelId);
+        void onStreamInfoChanged(StreamInfo info);
+    }
+
+    @Override
+    public int getVideoDefinitionLevel() {
+        return mVideoFormat;
     }
 }
