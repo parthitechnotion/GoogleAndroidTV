@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (C) 2014 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,11 @@
      limitations under the License.
 -->
 
-<resources>
-
-    <color name="selected_item_background">#FF6DCFF6</color>
-    <color name="option_item_background">#455A64</color>
-    <color name="option_item_focused_background">#5C6467</color>
-    <color name="channel_tile_top">#03A9F4</color>
-    <color name="channel_tile_bottom">#0288D1</color>
-
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/channel_tile_bottom"/>
+    <corners android:radius="2dp"
+        android:topLeftRadius="2dp"
+        android:topRightRadius="2dp"
+        android:bottomLeftRadius="2dp"
+        android:bottomRightRadius="2dp"/>
+</shape>
