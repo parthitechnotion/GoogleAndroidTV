@@ -129,11 +129,18 @@ public class ItemListView extends LinearLayout {
                 if (view instanceof ViewGroup) {
                     final ViewGroup viewGroup = (ViewGroup) view;
                     mHandler.post(new Runnable() {
+                        void requestLayout(ViewGroup v) {
+                            for (int i = 0; i < v.getChildCount(); i++) {
+                                v.getChildAt(i).requestLayout();
+                                if (v.getChildAt(i) instanceof ViewGroup) {
+                                    requestLayout((ViewGroup) v.getChildAt(i));
+                                }
+                            }
+                        }
+
                         @Override
                         public void run() {
-                            for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                                viewGroup.getChildAt(i).requestLayout();
-                            }
+                            requestLayout(viewGroup);
                         }
                     });
                 }
