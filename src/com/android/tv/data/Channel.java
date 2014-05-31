@@ -18,7 +18,7 @@ package com.android.tv.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.provider.TvContract;
+import android.media.tv.TvContract;
 
 /**
  * A convenience class to create and insert channel entries into the database.

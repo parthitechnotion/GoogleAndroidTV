@@ -18,9 +18,9 @@ package com.android.tv.ui;
 
 import android.content.Context;
 import android.database.ContentObserver;
+import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Handler;
-import android.provider.TvContract;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateFormat;

@@ -26,11 +26,11 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.media.tv.TvContract;
+import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.provider.TvContract;
 import android.text.TextUtils;
-import android.tv.TvInputInfo;
 import android.util.Base64;
 
 import com.android.tv.data.Channel;
@@ -43,9 +43,9 @@ import java.util.List;
  * A class that includes convenience methods for accessing TvProvider database.
  */
 public class Utils {
-    public static final String SERVICE_INTERFACE = "android.tv.TvInputService";
-    public static final String ACTION_SETTINGS = "android.tv.SettingsActivity";
-    public static final String ACTION_SETUP = "android.tv.SetupActivity";
+    public static final String SERVICE_INTERFACE = "android.media.tv.TvInputService";
+    public static final String ACTION_SETTINGS = "android.media.tv.SettingsActivity";
+    public static final String ACTION_SETUP = "android.media.tv.SetupActivity";
     public static final String EXTRA_SERVICE_NAME = "serviceName";
     public static final String EXTRA_KEYCODE = "keycode";
 

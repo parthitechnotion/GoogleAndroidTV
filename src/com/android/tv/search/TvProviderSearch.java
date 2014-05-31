@@ -20,9 +20,9 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.tv.TvContract.Channels;
+import android.media.tv.TvContract.Programs;
 import android.net.Uri;
-import android.provider.TvContract.Channels;
-import android.provider.TvContract.Programs;
 
 import java.util.ArrayList;
 import java.util.List;

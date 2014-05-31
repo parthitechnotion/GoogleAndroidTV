@@ -17,7 +17,7 @@
 package com.android.tv.data;
 
 import android.content.ContentValues;
-import android.provider.TvContract;
+import android.media.tv.TvContract;
 
 /**
  * A convenience class to create and insert program information entries into the database.

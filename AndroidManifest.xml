@@ -29,7 +29,7 @@
         android:allowBackup="true"
         android:icon="@drawable/app_icon"
         android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
-        <activity android:name=".TvActivity"
+        <activity android:name="com.android.tv.TvActivity"
             android:configChanges="keyboard|keyboardHidden"
             android:screenOrientation="landscape"
             android:launchMode="singleTask" >

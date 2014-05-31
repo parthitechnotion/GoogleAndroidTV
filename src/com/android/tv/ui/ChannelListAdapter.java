@@ -24,8 +24,6 @@ import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 
-import java.util.ArrayList;
-
 /*
  * An adapter of channel list.
  */

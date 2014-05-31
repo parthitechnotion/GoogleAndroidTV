@@ -1,12 +1,12 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
+import android.media.tv.TvInputManager.Session;
+import android.media.tv.TvView;
 import android.os.Handler;
 import android.os.Message;
-import android.tv.TvInputInfo;
-import android.tv.TvInputManager;
-import android.tv.TvInputManager.Session;
-import android.tv.TvView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;

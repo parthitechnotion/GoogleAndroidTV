@@ -23,10 +23,10 @@ import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.media.tv.TvContract;
+import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.TvContract;
-import android.tv.TvInputInfo;
 import android.util.Log;
 
 import com.android.tv.input.TvInput;
@@ -58,7 +58,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mIndexServiceName;
     private int mIndexBrowsable;
     private int mBrowsableChannelCount;
-    private ArrayList<Channel> mChannelList = new ArrayList<Channel>();
+    private final ArrayList<Channel> mChannelList = new ArrayList<Channel>();
 
     public ChannelMap(Activity activity, TvInput tvInput, long initChannelId,
             TvInputManagerHelper tvInputManagerHelper, Runnable onLoadFinished) {
