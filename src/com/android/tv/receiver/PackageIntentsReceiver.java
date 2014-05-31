@@ -78,10 +78,6 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
             init(context);
         }
 
-        if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
-            return;
-        }
-
         String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
             Uri uri = intent.getData();
