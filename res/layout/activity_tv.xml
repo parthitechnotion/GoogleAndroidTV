@@ -79,4 +79,8 @@
         android:background="#AA000000"
         lb:verticalMargin="20dp" />
 
+    <FrameLayout
+        android:id="@+id/right_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </FrameLayout>
