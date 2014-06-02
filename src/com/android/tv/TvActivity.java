@@ -262,7 +262,7 @@ public class TvActivity extends Activity implements
         // Handle the passed key press, if any. Note that only the key codes that are currently
         // handled in the TV app will be handled via Intent.
         // TODO: Consider defining a separate intent filter as passing data of mime type
-        // vnd.android.cursor.item/vnd.com.android.tv.channels isn't really necessary here.
+        // vnd.android.cursor.item/channel isn't really necessary here.
         int keyCode = intent.getIntExtra(Utils.EXTRA_KEYCODE, KeyEvent.KEYCODE_UNKNOWN);
         if (keyCode != KeyEvent.KEYCODE_UNKNOWN) {
             if (DEBUG) Log.d(TAG, "Got an intent with keycode: " + keyCode);

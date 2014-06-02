@@ -88,7 +88,7 @@ public final class Program {
         values.put(TvContract.Programs.COLUMN_TITLE, mTitle);
         values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, mStartTimeUtcMillis);
         values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, mEndTimeUtcMillis);
-        values.put(TvContract.Programs.COLUMN_DESCRIPTION, mDescription);
+        values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, mDescription);
         values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, mLongDescription);
         return values;
     }
