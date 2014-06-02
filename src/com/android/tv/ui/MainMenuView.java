@@ -243,13 +243,11 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                             MenuAction action = (MenuAction) tag.mObj;
                             switch (action.getType()) {
                                 case MenuAction.SELECT_CLOSED_CAPTION:
-                                    Toast.makeText(getContext(), R.string.not_implemented_yet,
-                                            Toast.LENGTH_SHORT).show();
+                                    mTvActivity.showClosedCaptionOption();
                                     break;
 
                                 case MenuAction.SELECT_ASPECT_RATIO:
-                                    Toast.makeText(getContext(), R.string.not_implemented_yet,
-                                            Toast.LENGTH_SHORT).show();
+                                    mTvActivity.showAspectRatioOption();
                                     break;
 
                                 case MenuAction.SELECT_TV_INPUT_TYPE:

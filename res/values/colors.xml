@@ -25,5 +25,8 @@
     <color name="unfocused_list_title">#7FEEEEEE</color>
     <color name="options_selection_indicator">#4CEEEEEE</color>
 
-    <color name="action_tile_label">#FFEEEEEE</color>
+    <color name="menu_default_text_color">#FFEEEEEE</color>
+
+    <color name="option_fragment_background">#455A64</color>
+    <color name="option_fragment_header_background">#03A0F4</color>
 </resources>

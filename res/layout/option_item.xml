@@ -17,7 +17,7 @@
 <view
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="@dimen/option_item_height"
     android:focusable="true"
     android:orientation="horizontal"
     class="com.android.tv.ui.BaseSideFragment$ShadedItemContainer" >
@@ -27,8 +27,8 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:gravity="left|center_vertical"
-        android:paddingLeft="32dp"
-        android:textSize="18sp"
-        android:textColor="#EEEEEE"
+        android:paddingLeft="@dimen/option_item_padding_left"
+        android:textSize="@dimen/option_item_text_size"
+        android:textColor="@color/menu_default_text_color"
         android:fontFamily="@string/font" />
 </view>
