@@ -33,7 +33,7 @@
         android:maxWidth="600dp"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
-        android:textColor="@color/unfocused_list_title_color"
+        android:textColor="@color/unfocused_list_title"
         android:textSize="@dimen/unfocused_list_title_text_size" />
 
     <android.support.v17.leanback.widget.HorizontalGridView

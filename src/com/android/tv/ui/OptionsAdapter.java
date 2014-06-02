@@ -33,6 +33,8 @@ import java.util.ArrayList;
 public class OptionsAdapter extends ItemListView.ItemListAdapter {
     private final String mTitle;
     private final int mTileHeight;
+    private boolean mMoreOptionsShown;
+    private ChannelMap mChannelMap;
 
     public OptionsAdapter(Context context, Handler handler, View.OnClickListener onClickListener) {
         super(context, handler, R.layout.action_tile, onClickListener);
@@ -54,20 +56,27 @@ public class OptionsAdapter extends ItemListView.ItemListAdapter {
 
     @Override
     public void update(ChannelMap channelMap) {
+        mChannelMap = channelMap;
         TvInput tvInput = channelMap == null ? null : channelMap.getTvInput();
 
         ArrayList<MenuAction> actionList = new ArrayList<MenuAction>();
+        actionList.add(MenuAction.SELECT_CLOSED_CAPTION_ACTION);
+        actionList.add(MenuAction.SELECT_ASPECT_RATIO_ACTION);
         actionList.add(MenuAction.SELECT_TV_INPUT_ACTION);
-        if (channelMap != null) {
-            actionList.add(MenuAction.EDIT_CHANNEL_LIST_ACTION);
-        }
-        if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETUP)) {
-            actionList.add(MenuAction.AUTO_SCAN_CHANNELS_ACTION);
-        }
-        actionList.add(MenuAction.PRIVACY_SETTING_ACTION);
         actionList.add(MenuAction.TOGGLE_PIP_ACTION);
-        if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETTINGS)) {
+        if (!mMoreOptionsShown) {
             actionList.add(MenuAction.MORE_ACTION);
+        } else {
+            if (channelMap != null) {
+                actionList.add(MenuAction.EDIT_CHANNEL_LIST_ACTION);
+            }
+            if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETUP)) {
+                actionList.add(MenuAction.AUTO_SCAN_CHANNELS_ACTION);
+            }
+            actionList.add(MenuAction.PRIVACY_SETTING_ACTION);
+            if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETTINGS)) {
+                actionList.add(MenuAction.INPUT_SETTING_ACTION);
+            }
         }
 
         setItemList(actionList.toArray(new MenuAction[0]));
@@ -76,5 +85,10 @@ public class OptionsAdapter extends ItemListView.ItemListAdapter {
     @Override
     public void update(ChannelMap channelMap, ItemListView list) {
         update(channelMap);
+    }
+
+    public void setMoreOptionsShown(boolean shown) {
+        mMoreOptionsShown = shown;
+        update(mChannelMap);
     }
 }

@@ -17,8 +17,8 @@
 package com.android.tv.ui;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Handler;
+import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v17.leanback.widget.OnChildSelectedListener;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.android.tv.R;
 import com.android.tv.TvActivity;
@@ -35,7 +36,6 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.dialog.PrivacySettingDialogFragment;
 import com.android.tv.recommendation.TvRecommendation;
-import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +58,7 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     private TvActivity mTvActivity;
     private TvRecommendation mTvRecommendation;
     private ItemListView mSelectedList;
+    private OptionsAdapter mOptionsAdapter;
 
     private final Handler mHandler = new Handler();
 
@@ -110,7 +111,8 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                 context.getResources().getDimensionPixelOffset(R.dimen.channel_list_view_height)));
 
         // List for options
-        mAllAdapterList.add(new OptionsAdapter(context, mHandler, this));
+        mOptionsAdapter = new OptionsAdapter(context, mHandler, this);
+        mAllAdapterList.add(mOptionsAdapter);
 
         // Keep all items for the main menu
         mMenuList.setItemViewCacheSize(mAllAdapterList.size());
@@ -119,6 +121,8 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
 
     @Override
     protected void onDetachedFromWindow() {
+        mOptionsAdapter = null;
+
         mAllAdapterList.clear();
         updateAdapters(false);
 
@@ -152,6 +156,9 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     }
 
     private void show() {
+        if (mOptionsAdapter != null) {
+            mOptionsAdapter.setMoreOptionsShown(false);
+        }
         if (mChannelMap != null) {
             boolean adapterVisibilityChanged = false;
 
@@ -235,8 +242,26 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                         case MenuTag.MENU_ACTION_TAG_TYPE:
                             MenuAction action = (MenuAction) tag.mObj;
                             switch (action.getType()) {
+                                case MenuAction.SELECT_CLOSED_CAPTION:
+                                    Toast.makeText(getContext(), R.string.not_implemented_yet,
+                                            Toast.LENGTH_SHORT).show();
+                                    break;
+
+                                case MenuAction.SELECT_ASPECT_RATIO:
+                                    Toast.makeText(getContext(), R.string.not_implemented_yet,
+                                            Toast.LENGTH_SHORT).show();
+                                    break;
+
                                 case MenuAction.SELECT_TV_INPUT_TYPE:
                                     mTvActivity.showInputPickerDialog();
+                                    break;
+
+                                case MenuAction.TOGGLE_PIP_TYPE:
+                                    mTvActivity.togglePipView();
+                                    break;
+
+                                case MenuAction.MORE_TYPE:
+                                    mOptionsAdapter.setMoreOptionsShown(true);
                                     break;
 
                                 case MenuAction.EDIT_CHANNEL_LIST_TYPE:
@@ -253,11 +278,7 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                                             new PrivacySettingDialogFragment());
                                     break;
 
-                                case MenuAction.TOGGLE_PIP_TYPE:
-                                    mTvActivity.togglePipView();
-                                    break;
-
-                                case MenuAction.MORE_TYPE:
+                                case MenuAction.INPUT_SETTING_TYPE:
                                     mTvActivity.startSettingsActivity();
                                     break;
                             }
@@ -265,6 +286,11 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                     }
                 }
             });
+            if (tag.mType == MenuTag.MENU_ACTION_TAG_TYPE
+                    && ((MenuAction) tag.mObj).getType() == MenuAction.MORE_TYPE) {
+                // Don't hide menu in the case of More.
+                return;
+            }
         }
 
         setVisibility(View.GONE);
@@ -321,6 +347,12 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = mLayoutInflater.inflate(R.layout.item_list, parent, false);
+            if (viewType == OPTIONS_TYPE) {
+                int interCardSpacing = getContext().getResources().getDimensionPixelSize(
+                        R.dimen.action_tile_inter_card_spacing);
+                ((HorizontalGridView) view.findViewById(R.id.list_view)).setHorizontalMargin(
+                        interCardSpacing);
+            }
             ((ItemListView) view).loadViews();
 
             return new MyViewHolder(view);

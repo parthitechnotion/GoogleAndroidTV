@@ -21,7 +21,9 @@
     <color name="channel_tile_top">#03A9F4</color>
     <color name="channel_tile_bottom">#0288D1</color>
 
-    <color name="focused_list_title_color">#FFEEEEEE</color>
-    <color name="unfocused_list_title_color">#7FEEEEEE</color>
+    <color name="focused_list_title">#FFEEEEEE</color>
+    <color name="unfocused_list_title">#7FEEEEEE</color>
+    <color name="options_selection_indicator">#4CEEEEEE</color>
 
+    <color name="action_tile_label">#FFEEEEEE</color>
 </resources>

@@ -14,21 +14,10 @@
      limitations under the License.
 -->
 
-<view
+<shape
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:focusable="true"
-    android:orientation="horizontal"
-    class="com.android.tv.ui.BaseSideFragment$ShadedItemContainer" >
+    android:shape="oval">
 
-    <TextView
-        android:id="@+id/option_item"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="32dp"
-        android:textSize="18sp"
-        android:textColor="#EEEEEE"
-        android:fontFamily="@string/font" />
-</view>
+   <solid
+       android:color="@color/options_selection_indicator"/>
+</shape>
