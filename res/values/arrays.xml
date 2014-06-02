@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (C) 2014 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,13 @@
      limitations under the License.
 -->
 
-<resources>
-
-    <color name="selected_item_background">#FF6DCFF6</color>
-    <color name="option_item_background">#455A64</color>
-    <color name="option_item_focused_background">#5C6467</color>
-
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- The aspect_ratio_label should be synced with src/com/android/tv/data/AspectRatio.java -->
+    <string-array name="aspect_ratio_label">
+        <item>16 : 9</item>
+        <item>4 : 3</item>
+        <item>Full</item>
+        <item>Zoom</item>
+        <item>Set by program</item>
+    </string-array>
 </resources>

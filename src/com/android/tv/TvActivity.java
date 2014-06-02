@@ -58,6 +58,7 @@ import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
+import com.android.tv.ui.AspectRatioOptionFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.TunableTvView;
@@ -697,6 +698,13 @@ public class TvActivity extends Activity implements
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                getFragmentManager().popBackStack();
+                return true;
+            }
+            return super.onKeyUp(keyCode, event);
+        }
         if (mMainMenuView.getVisibility() == View.VISIBLE) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 mMainMenuView.setVisibility(View.GONE);
@@ -791,6 +799,15 @@ public class TvActivity extends Activity implements
                 case KeyEvent.KEYCODE_CTRL_LEFT:
                 case KeyEvent.KEYCODE_CTRL_RIGHT: {
                     mUseKeycodeBlacklist = !mUseKeycodeBlacklist;
+                    return true;
+                }
+                case KeyEvent.KEYCODE_O: {
+                    AspectRatioOptionFragment f = new AspectRatioOptionFragment();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.add(R.id.right_panel, f);
+                    ft.addToBackStack(null);
+                    // TODO: add an animation.
+                    ft.commit();
                     return true;
                 }
             }
