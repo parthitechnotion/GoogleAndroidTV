@@ -169,6 +169,14 @@ abstract public class BaseTvInputService extends TvInputService {
                         }
                     }
                 });
+                mPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(MediaPlayer player, int width, int height) {
+                        if (mPlayer != null) {
+                            dispatchVideoSizeChanged(width, height);
+                        }
+                    }
+                });
                 mPlayer.prepareAsync();
             } catch (IllegalStateException e1) {
                 return false;

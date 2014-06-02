@@ -49,6 +49,7 @@ import android.widget.Toast;
 
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
+import com.android.tv.data.StreamInfo;
 import com.android.tv.dialog.EditChannelsDialogFragment;
 import com.android.tv.dialog.EditInputDialogFragment;
 import com.android.tv.dialog.InputPickerDialogFragment;
@@ -567,6 +568,11 @@ public class TvActivity extends Activity implements
                     mPipView.setVisibility(View.VISIBLE);
                 }
             }
+
+            @Override
+            public void onStreamInfoChanged(StreamInfo info) {
+                // Do nothing.
+            }
         });
         if (!success) {
             Log.w(TAG, "Fail to start the PIP");
@@ -629,15 +635,20 @@ public class TvActivity extends Activity implements
                             channelId);
                 }
             }
+
+            @Override
+            public void onStreamInfoChanged(StreamInfo info) {
+                updateChannelBanner(false);
+            }
         });
-        displayChannelBanner();
+        updateChannelBanner(true);
         if (isShyModeSet()) {
             setShynessMode(false);
             // TODO: Set the shy mode to true when tune() fails.
         }
     }
 
-    private void displayChannelBanner() {
+    private void updateChannelBanner(final boolean showBanner) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -645,8 +656,10 @@ public class TvActivity extends Activity implements
                     return;
                 }
 
-                mChannelBanner.updateViews(mChannelMap);
-                mHideChannelBanner.showAndHide();
+                mChannelBanner.updateViews(mChannelMap, mTvView);
+                if (showBanner) {
+                    mHideChannelBanner.showAndHide();
+                }
             }
         });
     }
@@ -749,7 +762,7 @@ public class TvActivity extends Activity implements
                         return true;
                     }
                     if (keyCode != KeyEvent.KEYCODE_MENU) {
-                        displayChannelBanner();
+                        updateChannelBanner(true);
                     }
                     if (keyCode != KeyEvent.KEYCODE_E) {
                         displayMainMenu();

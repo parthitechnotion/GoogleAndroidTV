@@ -33,6 +33,7 @@ import android.widget.TextView;
 import com.android.tv.R;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.Program;
+import com.android.tv.data.StreamInfo;
 import com.android.tv.util.Utils;
 
 /**
@@ -98,12 +99,13 @@ public class ChannelBannerView extends LinearLayout {
         mProgramTextView = (TextView) findViewById(R.id.program_text);
     }
 
-    public void updateViews(ChannelMap channelMap) {
+    public void updateViews(ChannelMap channelMap, StreamInfo info) {
         if (channelMap == null || !channelMap.isLoadFinished()) {
             return;
         }
 
-        mResolutionTextView.setVisibility(View.GONE);
+        mResolutionTextView.setText(Utils.getVideoDefinitionLevelString(
+                info.getVideoDefinitionLevel()));
         mAspectRatioTextView.setVisibility(View.GONE);
         mProgrameDescriptionTextView.setVisibility(View.GONE);
 
