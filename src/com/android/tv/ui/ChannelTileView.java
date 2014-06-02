@@ -64,23 +64,32 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
         setOnClickListener(listener);
         setTag(MainMenuView.MenuTag.buildTag(channel));
 
-        mChannelNameView.setText(channel.getDisplayName());
-        // TODO: setVisibility of mChannelNameView and mChannelLogoView properly.
-        if (mChannelNameView.getVisibility() == INVISIBLE) {
-            mChannelLogoView.setVisibility(INVISIBLE);
-            mChannelNameView.setVisibility(VISIBLE);
-        } else {
+        if (channel.getType() == R.integer.channel_type_guide) {
             mChannelNameView.setVisibility(INVISIBLE);
+            mChannelLogoView.setImageResource(R.drawable.ic_channel_guide);
             mChannelLogoView.setVisibility(VISIBLE);
-        }
-
-        mChannelNumberView.setText(channel.getDisplayNumber());
-        // TODO: mProgramNameView should be shown with a program title.
-        if (Math.random() < 0.5) {
+            mProgramNameView.setText(R.string.menu_program_guide);
             mProgramNameView.setVisibility(VISIBLE);
-            mProgramNameView.setText(channel.getDisplayName());
         } else {
-            mProgramNameView.setVisibility(GONE);
+            mChannelNumberView.setText(channel.getDisplayNumber());
+            // TODO: setVisibility of mChannelNameView and mChannelLogoView properly.
+            if (Math.random() < 0.5) {
+                mChannelNameView.setText(channel.getDisplayName());
+                mChannelNameView.setVisibility(VISIBLE);
+                mChannelLogoView.setVisibility(INVISIBLE);
+            } else {
+                mChannelNameView.setVisibility(INVISIBLE);
+                // TODO: use channel logo instead of app_icon.
+                mChannelLogoView.setImageResource(R.drawable.app_icon);
+                mChannelLogoView.setVisibility(VISIBLE);
+            }
+            // TODO: mProgramNameView should be shown with a program title.
+            if (Math.random() < 0.5) {
+                mProgramNameView.setVisibility(VISIBLE);
+                mProgramNameView.setText(channel.getDisplayName());
+            } else {
+                mProgramNameView.setVisibility(GONE);
+            }
         }
     }
 }

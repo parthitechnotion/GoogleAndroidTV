@@ -33,7 +33,7 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
     private ChannelMap mChannelMap;
     private Channel[] mChannelList;
     private ItemListView mListView;
-    private boolean mBrowsableOnly;
+    private final boolean mBrowsableOnly;
     private final String mFixedTitle;
     private String mTitle;
     private final int mTileHeight;
@@ -67,7 +67,19 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
         mChannelMap = channelMap;
         mListView = listView;
 
-        mChannelList = mChannelMap == null ? null : mChannelMap.getChannelList(mBrowsableOnly);
+        if (mChannelMap == null) {
+            mChannelList = null;
+        } else {
+            Channel[] channels = mChannelMap.getChannelList(mBrowsableOnly);
+            Channel guideChannel = new Channel.Builder()
+                    .setType(R.integer.channel_type_guide)
+                    .build();
+            mChannelList = new Channel[channels.length + 1];
+            mChannelList[0] = guideChannel;
+            for (int i = 0; i < channels.length; ++i) {
+                mChannelList[i + 1] = channels[i];
+            }
+        }
         setItemList(mChannelList);
 
         updateTitle();
