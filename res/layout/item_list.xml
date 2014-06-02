@@ -16,7 +16,7 @@
 
 <com.android.tv.ui.ItemListView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:lb="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/channel_banner"
+    android:id="@+id/item_list"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -26,15 +26,15 @@
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_gravity="left"
+        android:layout_height="32dp"
+        android:layout_gravity="left|bottom"
         android:gravity="left|top"
         android:singleLine="true"
-        android:maxWidth="300dp"
+        android:maxWidth="600dp"
         android:ellipsize="end"
-        android:textColor="#FFFFFFFF"
-        android:textSize="18sp"
-        android:textAllCaps="true" />
+        android:fontFamily="sans-serif"
+        android:textColor="@color/unfocused_list_title_color"
+        android:textSize="@dimen/unfocused_list_title_text_size" />
 
     <android.support.v17.leanback.widget.HorizontalGridView
         android:id="@+id/list_view"

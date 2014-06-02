@@ -19,6 +19,7 @@ package com.android.tv.ui;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.support.v17.leanback.widget.OnChildSelectedListener;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -26,6 +27,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.android.tv.R;
 import com.android.tv.TvActivity;
@@ -41,7 +43,8 @@ import java.util.Arrays;
 /*
  * A subclass of VerticalGridView that shows tv main menu.
  */
-public class MainMenuView extends VerticalGridView implements View.OnClickListener {
+public class MainMenuView extends FrameLayout implements View.OnClickListener,
+        OnChildSelectedListener {
     private static final int DUMMY_TYPE = 0;
     private static final int CHANNEL_LIST_TYPE = 1;
     private static final int OPTIONS_TYPE = 2;
@@ -49,10 +52,12 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
     private static final int MAX_COUNT_FOR_RECOMMENDATION = 10;
 
     private final LayoutInflater mLayoutInflater;
+    private VerticalGridView mMenuList;
     private final MainMenuAdapter mAdapter = new MainMenuAdapter();
     private ChannelMap mChannelMap;
     private TvActivity mTvActivity;
     private TvRecommendation mTvRecommendation;
+    private ItemListView mSelectedList;
 
     private final Handler mHandler = new Handler();
 
@@ -71,7 +76,22 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         super(context, attrs, defStyle);
 
         mLayoutInflater = LayoutInflater.from(context);
-        setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onFinishInflate(){
+        mMenuList = (VerticalGridView) findViewById(R.id.menu_list);
+        mMenuList.setOnChildSelectedListener(this);
+        mMenuList.setAnimateChildLayout(false);
+        mMenuList.setAdapter(mAdapter);
+        mMenuList.setWindowAlignment(VerticalGridView.WINDOW_ALIGN_NO_EDGE);
+        mMenuList.setWindowAlignmentOffset(getContext().getResources().getDimensionPixelOffset(
+                R.dimen.selected_row_alignment));
+        mMenuList.setWindowAlignmentOffsetPercent(
+                VerticalGridView.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED);
+        mMenuList.setItemAlignmentOffset(0);
+        mMenuList.setItemAlignmentOffsetPercent(
+                VerticalGridView.ITEM_ALIGN_OFFSET_PERCENT_DISABLED);
     }
 
     @Override
@@ -93,7 +113,7 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         mAllAdapterList.add(new OptionsAdapter(context, mHandler, this));
 
         // Keep all items for the main menu
-        setItemViewCacheSize(mAllAdapterList.size());
+        mMenuList.setItemViewCacheSize(mAllAdapterList.size());
         updateAdapters(true);
     }
 
@@ -149,7 +169,7 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
             }
         }
 
-        setSelectedPosition(0);
+        mMenuList.setSelectedPosition(0);
         requestFocus();
         bringToFront();
     }
@@ -248,6 +268,23 @@ public class MainMenuView extends VerticalGridView implements View.OnClickListen
         }
 
         setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onChildSelected(ViewGroup parent, View child, int position, long id) {
+        if (mSelectedList == child) {
+            return;
+        }
+        for (int i = 0; i < mMenuList.getChildCount(); i++) {
+            ItemListView v = (ItemListView) mMenuList.getChildAt(i);
+            if (v != child) {
+                v.onDeselected();
+            }
+        }
+        mSelectedList = (ItemListView) child;
+        if (mSelectedList != null) {
+            mSelectedList.onSelected();
+        }
     }
 
     class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.MyViewHolder> {
