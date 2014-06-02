@@ -236,7 +236,12 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                     switch (tag.mType) {
                         case MenuTag.CHANNEL_TAG_TYPE:
                             Channel channel = (Channel) tag.mObj;
-                            mTvActivity.moveToChannel(channel.getId());
+                            if (channel.getType() == R.integer.channel_type_guide) {
+                                Toast.makeText(getContext(), R.string.not_implemented_yet,
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                mTvActivity.moveToChannel(channel.getId());
+                            }
                             break;
 
                         case MenuTag.MENU_ACTION_TAG_TYPE:

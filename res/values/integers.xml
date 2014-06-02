@@ -16,4 +16,5 @@
 
 <resources>
     <integer name="action_item_anim_duration">100</integer>
+    <integer name="channel_type_guide">0x10000000</integer>
 </resources>
