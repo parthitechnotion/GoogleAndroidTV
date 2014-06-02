@@ -108,8 +108,26 @@ public class TunableTvView extends TvView implements StreamInfo {
                 }
 
                 @Override
-                public void onVideoSizeChanged(Session session, int width, int height) {
+                public void onVideoStreamChanged(Session session, int width, int height,
+                        boolean interlaced) {
                     mVideoFormat = Utils.getVideoDefinitionLevelFromSize(width, height);
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
+                    }
+                }
+
+                @Override
+                public void onAudioStreamChanged(Session session, int channelCount) {
+                    mAudioChannelCount = channelCount;
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
+                    }
+                }
+
+                @Override
+                public void onClosedCaptionStreamChanged(Session session,
+                        boolean hasClosedCaption) {
+                    mHasClosedCaption = hasClosedCaption;
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
                     }
