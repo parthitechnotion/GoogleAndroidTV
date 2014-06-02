@@ -17,10 +17,12 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Handler;
 import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +36,8 @@ import com.android.tv.data.ChannelMap;
  * A subclass of LinearLayout that shows a title and list view.
  */
 public class ItemListView extends LinearLayout {
+    private static final long DURATION_OF_SELECTION_CHANGE_ANIMATION_MS = 200;
+
     public interface TileView {
         void loadViews();
         void populateViews(View.OnClickListener onClickListener, Object item);
@@ -65,6 +69,8 @@ public class ItemListView extends LinearLayout {
 
         ViewGroup.LayoutParams lp = mListView.getLayoutParams();
         lp.height = adapter.getTileHeight();
+
+        onDeselected();
     }
 
     public void setTitle(String title) {
@@ -73,6 +79,35 @@ public class ItemListView extends LinearLayout {
 
     public void setSelectedPosition(int position) {
         mListView.setSelectedPosition(position);
+    }
+
+    public void onDeselected() {
+        mListView.setVisibility(View.GONE);
+        updateTitle(false);
+    }
+
+    public void onSelected() {
+        mListView.setVisibility(View.VISIBLE);
+        mListView.requestFocus();
+
+        mListView.setAlpha(0f);
+        mListView.animate()
+                .alpha(1f)
+                .setDuration(DURATION_OF_SELECTION_CHANGE_ANIMATION_MS);
+
+        updateTitle(true);
+    }
+
+    private void updateTitle(boolean focused) {
+        int colorResId = focused ? R.color.focused_list_title_color :
+                R.color.unfocused_list_title_color;
+        int textSizeResId = focused ? R.dimen.focused_list_title_text_size :
+                R.dimen.unfocused_list_title_text_size;
+
+        Resources res = getContext().getResources();
+        mTitleView.setTextColor(res.getColor(colorResId));
+        mTitleView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                res.getDimensionPixelOffset(textSizeResId));
     }
 
     public static abstract class ItemListAdapter extends
