@@ -258,6 +258,19 @@ public class Utils {
         return "";
     }
 
+    /* TODO: remove this method once we have assets for audio channels */
+    public static String getAudioChannelString(int channelCount) {
+        switch (channelCount) {
+            case 1:
+                return "MONO";
+            case 2:
+                return "STEREO";
+            case 6:
+                return "5.1";
+        }
+        return "";
+    }
+
     private static ActivityInfo getActivityInfo(Context context, TvInputInfo input, String action) {
         if (input == null) {
             return null;

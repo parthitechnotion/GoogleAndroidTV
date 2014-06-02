@@ -40,12 +40,14 @@ import com.android.tv.util.Utils;
  * A view to render channel banner.
  */
 public class ChannelBannerView extends LinearLayout {
+    private TextView mClosedCaptionTextView;
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
+    private TextView mAudioChannelTextView;
     private ProgressBar mRemainingTimeView;
-    private LinearLayout mProgramInfoContainer;
     private TextView mProgrameDescriptionTextView;
     private TextView mChannelTextView;
+    private TextView mChannelNameTextView;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
     private Uri mCurrentChannelUri;
@@ -89,12 +91,14 @@ public class ChannelBannerView extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
+        mClosedCaptionTextView = (TextView) findViewById(R.id.closed_caption);
         mResolutionTextView = (TextView) findViewById(R.id.resolution);
         mAspectRatioTextView = (TextView) findViewById(R.id.aspect_ratio);
+        mAudioChannelTextView = (TextView) findViewById(R.id.audio_channel);
         mRemainingTimeView = (ProgressBar) findViewById(R.id.remaining_time);
         mChannelTextView = (TextView) findViewById(R.id.channel_text);
+        mChannelNameTextView = (TextView) findViewById(R.id.channel_name);
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
-        mProgramInfoContainer = (LinearLayout) findViewById(R.id.program_info);
         mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
     }
@@ -104,10 +108,24 @@ public class ChannelBannerView extends LinearLayout {
             return;
         }
 
-        mResolutionTextView.setText(Utils.getVideoDefinitionLevelString(
-                info.getVideoDefinitionLevel()));
+        if (info.hasClosedCaption()) {
+            mClosedCaptionTextView.setText("CC");
+        } else {
+            mResolutionTextView.setVisibility(View.GONE);
+        }
+        if (info.getVideoDefinitionLevel() != StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN) {
+            mResolutionTextView.setText(Utils.getVideoDefinitionLevelString(
+                    info.getVideoDefinitionLevel()));
+        } else {
+            mResolutionTextView.setVisibility(View.GONE);
+        }
+        // TODO: implement aspect ratio.
         mAspectRatioTextView.setVisibility(View.GONE);
-        mProgrameDescriptionTextView.setVisibility(View.GONE);
+        if (!TextUtils.isEmpty(Utils.getAudioChannelString(info.getAudioChannelCount()))) {
+            mAudioChannelTextView.setText(Utils.getAudioChannelString(info.getAudioChannelCount()));
+        } else {
+            mAudioChannelTextView.setVisibility(View.GONE);
+        }
 
         String displayNumber = channelMap.getCurrentDisplayNumber();
         String displayName = channelMap.getCurrentDisplayName();
@@ -117,8 +135,8 @@ public class ChannelBannerView extends LinearLayout {
         if (displayName == null) {
             displayName = "";
         }
-        mChannelTextView.setText(Html.fromHtml(mContext.getString(
-                R.string.channel_banner_channel_title, displayNumber, displayName)));
+        mChannelTextView.setText(displayNumber);
+        mChannelNameTextView.setText(displayName);
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
         updateProgramInfo();
@@ -131,23 +149,21 @@ public class ChannelBannerView extends LinearLayout {
 
     public void updateProgramInfo() {
         if (mCurrentChannelUri == null) {
-            hideProgramInformation();
+            handleNoProgramInformation();
             return;
         }
 
         Program program = Utils.getCurrentProgram(mContext, mCurrentChannelUri);
         if (program == null) {
-            hideProgramInformation();
+            handleNoProgramInformation();
             return;
         }
         if (!TextUtils.isEmpty(program.getTitle())) {
-            mProgramInfoContainer.setVisibility(View.VISIBLE);
             mProgramTextView.setText(program.getTitle());
 
             long startTime = program.getStartTimeUtcMillis();
             long endTime = program.getEndTimeUtcMillis();
             if (startTime > 0 && endTime > 0) {
-                mProgramTimeTextView.setVisibility(View.VISIBLE);
                 mRemainingTimeView.setVisibility(View.VISIBLE);
 
                 String startTimeText = getFormattedTimeString(startTime);
@@ -166,17 +182,19 @@ public class ChannelBannerView extends LinearLayout {
                             (int) (100 *(currTime - startTime) / (endTime - startTime)));
                 }
             } else {
-                mProgramTimeTextView.setVisibility(View.INVISIBLE);
-                mRemainingTimeView.setVisibility(View.INVISIBLE);
+                mProgramTimeTextView.setVisibility(View.GONE);
+                mRemainingTimeView.setVisibility(View.GONE);
             }
-        } else {
-            hideProgramInformation();
+        }
+        if (!TextUtils.isEmpty(program.getDescription())) {
+            mProgrameDescriptionTextView.setText(program.getDescription());
         }
     }
 
-    private void hideProgramInformation() {
-        mProgramInfoContainer.setVisibility(View.INVISIBLE);
-        mProgramTimeTextView.setVisibility(View.INVISIBLE);
+    private void handleNoProgramInformation() {
+        mProgramTextView.setText(mContext.getString(R.string.channel_banner_no_title));
+        mProgramTimeTextView.setVisibility(View.GONE);
         mRemainingTimeView.setVisibility(View.GONE);
+        mProgrameDescriptionTextView.setVisibility(View.GONE);
     }
 }

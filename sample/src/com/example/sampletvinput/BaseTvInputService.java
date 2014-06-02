@@ -198,7 +198,7 @@ abstract public class BaseTvInputService extends TvInputService {
             // the actual case where we get parsed program data only after tuning is done.
             final long DELAY_FOR_TESTING_IN_MILLIS = 1000; // 1 second
             mProgramUpdateHandler.postDelayed(
-                    new AddProgramRunnable(channelUri, "<Program Information>"),
+                    new AddProgramRunnable(channelUri, "Program Title", "Program Description"),
                     DELAY_FOR_TESTING_IN_MILLIS);
             return true;
         }
@@ -227,10 +227,12 @@ abstract public class BaseTvInputService extends TvInputService {
             private static final int DEFAULT_PROGRAM_DURATION_IN_MILLIS = 30000; // 5 minutes
             private final Uri mChannelUri;
             private final String mTitle;
+            private final String mDescription;
 
-            public AddProgramRunnable(Uri channelUri, String title) {
+            public AddProgramRunnable(Uri channelUri, String title, String description) {
                 mChannelUri = channelUri;
                 mTitle = title;
+                mDescription = description;
             }
 
             @Override
@@ -246,6 +248,7 @@ abstract public class BaseTvInputService extends TvInputService {
                 ContentValues values = new ContentValues();
                 values.put(Programs.COLUMN_CHANNEL_ID, ContentUris.parseId(mChannelUri));
                 values.put(Programs.COLUMN_TITLE, mTitle);
+                values.put(Programs.COLUMN_DESCRIPTION, mDescription);
                 values.put(Programs.COLUMN_START_TIME_UTC_MILLIS, time);
                 values.put(Programs.COLUMN_END_TIME_UTC_MILLIS, time + duration);
                 getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);

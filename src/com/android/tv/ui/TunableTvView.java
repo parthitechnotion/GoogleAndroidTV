@@ -33,6 +33,8 @@ public class TunableTvView extends TvView implements StreamInfo {
     private TvInputManager.Session mSession;
     private OnTuneListener mOnTuneListener;
     private int mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
+    private int mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
+    private boolean mHasClosedCaption = false;
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -159,6 +161,8 @@ public class TunableTvView extends TvView implements StreamInfo {
         if (DEBUG) Log.d(TAG, "tuneTo " + channelId);
         mHandler.removeMessages(MSG_TUNE);
         mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
+        mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
+        mHasClosedCaption = false;
         String inputId = Utils.getInputIdForChannel(getContext(), channelId);
         TvInputInfo inputInfo = mInputManagerHelper.getTvInputInfo(inputId);
         if (inputInfo == null || !mInputManagerHelper.isAvailable(inputInfo)) {
@@ -219,5 +223,15 @@ public class TunableTvView extends TvView implements StreamInfo {
     @Override
     public int getVideoDefinitionLevel() {
         return mVideoFormat;
+    }
+
+    @Override
+    public int getAudioChannelCount() {
+        return mAudioChannelCount;
+    }
+
+    @Override
+    public boolean hasClosedCaption() {
+        return mHasClosedCaption;
     }
 }

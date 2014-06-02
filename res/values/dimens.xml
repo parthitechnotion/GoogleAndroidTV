@@ -42,4 +42,9 @@
     <dimen name="option_item_height">48dp</dimen>
     <dimen name="option_item_padding_left">32dp</dimen>
     <dimen name="option_item_text_size">18sp</dimen>
+
+    <dimen name="channel_banner_large_text_size">54sp</dimen>
+    <dimen name="channel_banner_medium_text_size">28sp</dimen>
+    <dimen name="channel_banner_small_text_size">14sp</dimen>
+    <dimen name="channel_banner_track_meta_text_size">9sp</dimen>
 </resources>
