@@ -27,7 +27,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="center_vertical"
         android:background="@drawable/channel_tile_top" >
 
         <FrameLayout android:id="@+id/channel"
