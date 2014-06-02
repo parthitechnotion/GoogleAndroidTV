@@ -16,7 +16,7 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!--  DO NOT TRANSLATE -->
-    <string name="font" translatable="false">sans-serif-condensed</string>
+    <string name="font" translatable="false">Roboto</string>
 
     <string name="tv_app">TV</string>
     <string name="select_input_device">Select Input Device</string>
@@ -39,22 +39,31 @@
     <string name="name_already_exists">Name already exists</string>
     <string name="input_setup_activity_not_found">Setup activity for \'<xliff:g id="majorNumber">%s</xliff:g>\' is not found.\r\nMaybe you need to setup the input manually.</string>
     <string name="OK">OK</string>
+    <string name="not_implemented_yet">The feature will be implemented soon</string>
 
     <!-- menu option title. [CHAR LIMIT=30] -->
-    <string name="menu_title">Options</string>
+    <string name="menu_title">TV Options</string>
 
-    <!-- "Select TV Input" menu option [CHAR LIMIT=30] -->
-    <string name="menu_select_input">Select TV input</string>
-    <!-- "Edit Channels" menu option [CHAR LIMIT=30] -->
-    <string name="menu_edit_channels">Edit channel list</string>
-    <!-- "Auto-Scan Channels" menu option [CHAR LIMIT=30] -->
-    <string name="menu_auto_scan">Auto-scan channels</string>
-    <!-- "Privacy settings" menu option [CHAR LIMIT=30] -->
-    <string name="menu_privacy_setting">Privacy setting</string>
-    <!-- Toggle PIP [CHAR LIMIT=30] -->
-    <string name="menu_toggle_pip">Toggle PIP</string>
-    <!-- Source specific settings menu option [CHAR LIMIT=30] -->
-    <string name="source_specific_setting">More\u2026</string>
+    <!-- "Closed Caption" menu option [CHAR LIMIT=15] -->
+    <string name="menu_closed_caption">Closed Caption</string>
+    <!-- "Aspect Ration" menu option [CHAR LIMIT=15] -->
+    <string name="menu_aspect_ratio">Aspect Ratio</string>
+    <!-- "Select TV Input" menu option [CHAR LIMIT=15] -->
+    <string name="menu_select_input">TV Input</string>
+    <!-- Toggle PIP [CHAR LIMIT=15] -->
+    <string name="menu_toggle_pip">PIP</string>
+    <!-- Source specific settings menu option [CHAR LIMIT=15] -->
+    <string name="source_specific_setting">More</string>
+
+    <!-- "Edit Channels" menu option [CHAR LIMIT=15] -->
+    <string name="menu_edit_channels">Edit Channel List</string>
+    <!-- "Auto-Scan Channels" menu option [CHAR LIMIT=15] -->
+    <string name="menu_auto_scan">Auto-scan Channels</string>
+    <!-- "Privacy settings" menu option [CHAR LIMIT=15] -->
+    <string name="menu_privacy_setting">Privacy Setting</string>
+    <!-- "Input Setting" menu option [CHAR LIMIT=15] -->
+    <string name="menu_input_setting">Input Setting</string>
+
     <!-- Unified TV input label -->
     <string name="unified_tv_input_label">Unified TV input</string>
 

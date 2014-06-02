@@ -16,14 +16,20 @@
 
 <resources>
     <dimen name="channel_list_view_height">160dp</dimen>
-    <dimen name="action_list_view_height">115dp</dimen>
+    <dimen name="action_list_view_height">144dp</dimen>
     <dimen name="selected_row_alignment">64dp</dimen>
 
     <dimen name="item_size_medium_threshold">128sp</dimen>
     <dimen name="item_size_large_threshold">256sp</dimen>
 
-    <dimen name="inter_card_spacing">-25dip</dimen>
+    <dimen name="inter_card_spacing">-25dp</dimen>
 
     <dimen name="focused_list_title_text_size">20sp</dimen>
     <dimen name="unfocused_list_title_text_size">16sp</dimen>
+
+    <!-- Action tile dimensions -->
+    <dimen name="action_tile_inter_card_spacing">8dp</dimen>
+    <dimen name="action_tile_outer_length">116dp</dimen>
+    <dimen name="action_tile_inner_length">92dp</dimen>
+    <dimen name="action_tile_label_font_size">14sp</dimen>
 </resources>

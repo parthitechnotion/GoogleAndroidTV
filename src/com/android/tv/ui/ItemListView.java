@@ -99,8 +99,8 @@ public class ItemListView extends LinearLayout {
     }
 
     private void updateTitle(boolean focused) {
-        int colorResId = focused ? R.color.focused_list_title_color :
-                R.color.unfocused_list_title_color;
+        int colorResId = focused ? R.color.focused_list_title :
+                R.color.unfocused_list_title;
         int textSizeResId = focused ? R.dimen.focused_list_title_text_size :
                 R.dimen.unfocused_list_title_text_size;
 

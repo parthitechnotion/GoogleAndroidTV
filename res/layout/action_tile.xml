@@ -14,35 +14,45 @@
      limitations under the License.
 -->
 
-<com.android.tv.ui.ActionTileView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/action_tile"
-    android:layout_width="185dp"
-    android:layout_height="match_parent"
-    android:layoutMode="opticalBounds"
-    android:focusable="true"
-    android:clickable="true">
-
+<com.android.tv.ui.ActionTileView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:focusable="true" >
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="#FFE1E1E1" >
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <FrameLayout
+            android:layout_width="@dimen/action_tile_outer_length"
+            android:layout_height="@dimen/action_tile_outer_length" >
+            <ImageView
+                android:id="@+id/action_tile_selection_circle"
+                android:layout_width="@dimen/action_tile_inner_length"
+                android:layout_height="@dimen/action_tile_inner_length"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:alpha="0.0"
+                android:src="@drawable/options_selection_circle" />
+            <ImageView
+                android:id="@+id/action_tile_icon"
+                android:layout_width="@dimen/action_tile_inner_length"
+                android:layout_height="@dimen/action_tile_inner_length"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_tvoption_aspect" />
+        </FrameLayout>
 
-        <ImageView
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/action_tile_label"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:src="@drawable/app_icon" />
-
-        <TextView android:id="@+id/action_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:singleLine="true"
-            android:ellipsize="end"
             android:fontFamily="@string/font"
-            android:textColor="#555555"
-            android:textSize="16sp" />
+            android:layout_gravity="center_horizontal"
+            android:singleLine="true"
+            android:textColor="@color/action_tile_label"
+            android:textSize="@dimen/action_tile_label_font_size" />
     </LinearLayout>
-
 </com.android.tv.ui.ActionTileView>
