@@ -39,8 +39,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="34dp"
-                android:layout_marginRight="34dp"
-                android:src="@drawable/app_icon" />
+                android:layout_marginRight="34dp" />
 
             <TextView android:id="@+id/channel_name"
                 android:layout_width="match_parent"

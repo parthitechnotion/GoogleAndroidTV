@@ -44,6 +44,8 @@
     <!-- menu option title. [CHAR LIMIT=30] -->
     <string name="menu_title">TV Options</string>
 
+    <!-- Program guide label -->
+    <string name="menu_program_guide">Program Guide</string>
     <!-- "Closed Caption" menu option [CHAR LIMIT=15] -->
     <string name="menu_closed_caption">Closed Caption</string>
     <!-- "Aspect Ration" menu option [CHAR LIMIT=15] -->
