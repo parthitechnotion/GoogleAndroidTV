@@ -15,7 +15,7 @@
 -->
 
 <resources>
-    <dimen name="channel_list_view_height">115dp</dimen>
+    <dimen name="channel_list_view_height">160dp</dimen>
     <dimen name="action_list_view_height">115dp</dimen>
     <dimen name="selected_row_alignment">22dp</dimen>
 

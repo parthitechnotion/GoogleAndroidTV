@@ -16,47 +16,67 @@
 
 <com.android.tv.ui.ChannelTileView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/channel_tile"
-    android:layout_width="185dp"
+    android:layout_width="192dp"
     android:layout_height="match_parent"
     android:layoutMode="opticalBounds"
     android:clipChildren="false"
     android:focusable="true"
     android:clickable="true">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:padding="8dip"
-        android:background="#FFE1E1E1" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/channel_tile_top" >
 
-        <TextView android:id="@+id/channel_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:gravity="left|center_vertical"
-            android:padding="2dip"
-            android:fontFamily="@string/font"
-            android:textColor="#000000"
-            android:textSize="30sp" />
-
-        <ImageView android:id="@+id/channel_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@id/channel_number"
-            android:gravity="right|top"
-            android:src="@drawable/app_icon" />
-
-        <TextView android:id="@+id/channel_name"
+        <FrameLayout android:id="@+id/channel"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/channel_number"
-            android:gravity="left|center_vertical"
+            android:layout_height="90dp">
+
+            <ImageView android:id="@+id/channel_logo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="34dp"
+                android:layout_marginRight="34dp"
+                android:src="@drawable/app_icon" />
+
+            <TextView android:id="@+id/channel_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:gravity="center"
+                android:singleLine="false"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:fontFamily="@string/font"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <TextView android:id="@+id/channel_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|bottom"
+                android:layout_marginLeft="12dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@string/font"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp" />
+        </FrameLayout>
+
+        <TextView android:id="@+id/program_name"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:gravity="center_vertical"
+            android:padding="12dp"
             android:singleLine="true"
             android:ellipsize="end"
             android:fontFamily="@string/font"
-            android:textColor="#555555"
-            android:textSize="16sp" />
-    </RelativeLayout>
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:background="@drawable/channel_tile_bottom" />
+    </LinearLayout>
 </com.android.tv.ui.ChannelTileView>

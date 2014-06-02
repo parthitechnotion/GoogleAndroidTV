@@ -19,6 +19,7 @@ package com.android.tv.ui;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.internal.util.Preconditions;
@@ -29,8 +30,10 @@ import com.android.tv.data.Channel;
  * A view to render channel tile.
  */
 public class ChannelTileView extends ShadowContainer implements ItemListView.TileView {
+    private ImageView mChannelLogoView;
     private TextView mChannelNameView;
     private TextView mChannelNumberView;
+    private TextView mProgramNameView;
 
     public ChannelTileView(Context context) {
         super(context);
@@ -46,8 +49,11 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
 
     @Override
     public void loadViews() {
+        mChannelLogoView = (ImageView) findViewById(R.id.channel_logo);
         mChannelNameView = (TextView) findViewById(R.id.channel_name);
         mChannelNumberView = (TextView) findViewById(R.id.channel_number);
+        mProgramNameView = (TextView) findViewById(R.id.program_name);
+        mChannelNameView.setVisibility(INVISIBLE);
     }
 
     @Override
@@ -59,6 +65,22 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
         setTag(MainMenuView.MenuTag.buildTag(channel));
 
         mChannelNameView.setText(channel.getDisplayName());
+        // TODO: setVisibility of mChannelNameView and mChannelLogoView properly.
+        if (mChannelNameView.getVisibility() == INVISIBLE) {
+            mChannelLogoView.setVisibility(INVISIBLE);
+            mChannelNameView.setVisibility(VISIBLE);
+        } else {
+            mChannelNameView.setVisibility(INVISIBLE);
+            mChannelLogoView.setVisibility(VISIBLE);
+        }
+
         mChannelNumberView.setText(channel.getDisplayNumber());
+        // TODO: mProgramNameView should be shown with a program title.
+        if (Math.random() < 0.5) {
+            mProgramNameView.setVisibility(VISIBLE);
+            mProgramNameView.setText(channel.getDisplayName());
+        } else {
+            mProgramNameView.setVisibility(GONE);
+        }
     }
 }
