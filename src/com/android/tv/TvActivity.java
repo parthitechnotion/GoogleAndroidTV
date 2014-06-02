@@ -60,6 +60,7 @@ import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
 import com.android.tv.ui.AspectRatioOptionFragment;
 import com.android.tv.ui.ChannelBannerView;
+import com.android.tv.ui.ClosedCaptionOptionFragment;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
@@ -445,6 +446,24 @@ public class TvActivity extends Activity implements
         }
     }
 
+    public void showAspectRatioOption() {
+        AspectRatioOptionFragment f = new AspectRatioOptionFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(R.id.right_panel, f);
+        ft.addToBackStack(null);
+        // TODO: add an animation.
+        ft.commit();
+    }
+
+    public void showClosedCaptionOption() {
+        ClosedCaptionOptionFragment f = new ClosedCaptionOptionFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(R.id.right_panel, f);
+        ft.addToBackStack(null);
+        // TODO: add an animation.
+        ft.commit();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -802,12 +821,7 @@ public class TvActivity extends Activity implements
                     return true;
                 }
                 case KeyEvent.KEYCODE_O: {
-                    AspectRatioOptionFragment f = new AspectRatioOptionFragment();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.add(R.id.right_panel, f);
-                    ft.addToBackStack(null);
-                    // TODO: add an animation.
-                    ft.commit();
+                    showAspectRatioOption();
                     return true;
                 }
             }

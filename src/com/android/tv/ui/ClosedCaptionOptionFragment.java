@@ -25,22 +25,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tv.R;
-import com.android.tv.data.AspectRatio;
 
-public class AspectRatioOptionFragment extends BaseSideFragment {
-    private static final String TAG = "AspectRatioOptionFragment";
+public class ClosedCaptionOptionFragment extends BaseSideFragment {
+    private static final String TAG = "ClosedCaptionOptionFragment";
     private static final boolean DEBUG = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        Object[] items = new Object[AspectRatio.SIZE_OF_RATIO_TYPES];
-        for (int i = 0; i < AspectRatio.SIZE_OF_RATIO_TYPES; ++i) {
-            items[i] = AspectRatio.getLabel(i, getActivity());
-        }
-        initialize(getString(R.string.aspect_ratio_option_title), items, R.layout.option_item);
+        Object[] items = new Object[2];
+        items[0] = getString(R.string.option_item_on);
+        items[1] = getString(R.string.option_item_off);
+
+        initialize(getString(R.string.closed_caption_option_title), items, R.layout.option_item);
         View fragView = super.onCreateView(inflater, container, savedInstanceState);
-        // TODO: implement to get the current aspect ratio.
+        // TODO: implement to get the current closed caption.
         setPrevSelectedItem(0);
         return fragView;
     }

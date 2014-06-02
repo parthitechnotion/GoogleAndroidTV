@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import android.support.v17.leanback.widget.BaseCardView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,13 +39,14 @@ public class ActionTileView extends BaseCardView implements ItemListView.TileVie
     private int mAnimDuration;
     private TextView mLabelView;
     private ImageView mIconView;
+    private ViewPropertyAnimator mAnimator;
 
     public ActionTileView(Context context) {
-        super(context);
+        this(context, null, 0);
     }
 
     public ActionTileView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public ActionTileView(Context context, AttributeSet attrs, int defStyle) {
@@ -56,6 +58,7 @@ public class ActionTileView extends BaseCardView implements ItemListView.TileVie
     protected void onFinishInflate() {
         super.onFinishInflate();
         mCircle = findViewById(R.id.action_tile_selection_circle);
+        mAnimator = mCircle.animate();
     }
 
     @Override
@@ -88,9 +91,21 @@ public class ActionTileView extends BaseCardView implements ItemListView.TileVie
         super.setSelected(selected);
 
         if (mCircle != null) {
-            mCircle.animate()
-                    .alpha(selected ? 1.0f : 0.0f)
-                    .setDuration(mAnimDuration);
+            if (selected) {
+                mAnimator.alpha(1.0f)
+                        .setDuration(mAnimDuration)
+                        .setStartDelay(0)
+                        .start();
+            } else {
+                // When D-pad is long pressed, key down events are triggered too fast. So focus
+                // movement is not shown without the animation cancel and setting alpha to 1.0.
+                mAnimator.cancel();
+                mCircle.setAlpha(1.0f);
+                mAnimator.alpha(0.f)
+                        .setDuration(mAnimDuration)
+                        .setStartDelay(0)
+                        .start();
+            }
         }
     }
 }

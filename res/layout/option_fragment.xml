@@ -24,20 +24,20 @@
 
     <LinearLayout
         android:layout_gravity="right"
-        android:layout_width="360dp"
+        android:layout_width="@dimen/option_fragment_width"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#455a64">
+        android:background="@color/option_fragment_background">
         <TextView
             android:id="@+id/option_title"
-            android:paddingTop="27dp"
-            android:paddingLeft="32dp"
+            android:paddingTop="@dimen/option_fragment_header_padding_top"
+            android:paddingLeft="@dimen/option_fragment_header_padding_left"
             android:layout_width="match_parent"
-            android:textSize="34sp"
-            android:textColor="#EEEEEE"
+            android:textSize="@dimen/option_fragment_header_text_size"
+            android:textColor="@color/menu_default_text_color"
             android:fontFamily="@string/font"
-            android:layout_height="87dp"
-            android:background="#03A0F4" />
+            android:layout_height="@dimen/option_fragment_header_text_height"
+            android:background="@color/option_fragment_header_background" />
 
         <android.support.v17.leanback.widget.VerticalGridView
             android:id="@+id/option_list"

@@ -52,7 +52,7 @@
             android:fontFamily="@string/font"
             android:layout_gravity="center_horizontal"
             android:singleLine="true"
-            android:textColor="@color/action_tile_label"
+            android:textColor="@color/menu_default_text_color"
             android:textSize="@dimen/action_tile_label_font_size" />
     </LinearLayout>
 </com.android.tv.ui.ActionTileView>
