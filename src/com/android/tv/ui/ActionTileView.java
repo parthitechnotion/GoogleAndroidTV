@@ -36,7 +36,8 @@ public class ActionTileView extends BaseCardView implements ItemListView.TileVie
     private static final boolean DEBUG = false;
 
     private View mCircle;
-    private int mAnimDuration;
+    private final int mAnimDuration;
+    private final float mZoomFactor;
     private TextView mLabelView;
     private ImageView mIconView;
     private ViewPropertyAnimator mAnimator;
@@ -52,6 +53,8 @@ public class ActionTileView extends BaseCardView implements ItemListView.TileVie
     public ActionTileView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mAnimDuration = context.getResources().getInteger(R.integer.action_item_anim_duration);
+        mZoomFactor = context.getResources().getFraction(
+                R.fraction.lb_focus_zoom_factor_large, 1, 1);
     }
 
     @Override
@@ -92,11 +95,21 @@ public class ActionTileView extends BaseCardView implements ItemListView.TileVie
 
         if (mCircle != null) {
             if (selected) {
+                animate().scaleX(mZoomFactor)
+                        .scaleY(mZoomFactor)
+                        .setDuration(mAnimDuration);
+
                 mAnimator.alpha(1.0f)
                         .setDuration(mAnimDuration)
                         .setStartDelay(0)
                         .start();
             } else {
+                setScaleX(mZoomFactor);
+                setScaleY(mZoomFactor);
+                animate().scaleX(1.f)
+                        .scaleY(1.f)
+                        .setDuration(mAnimDuration);
+
                 // When D-pad is long pressed, key down events are triggered too fast. So focus
                 // movement is not shown without the animation cancel and setting alpha to 1.0.
                 mAnimator.cancel();
