@@ -104,7 +104,7 @@ public final class Channel {
             channel.mIsBrowsable = true;
         }
 
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DATA);
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA);
         if (index >= 0) {
             channel.mData = cursor.getBlob(index);
         } else {
@@ -174,7 +174,7 @@ public final class Channel {
         values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, mDisplayName);
         values.put(TvContract.Channels.COLUMN_DESCRIPTION, mDescription);
         values.put(TvContract.Channels.COLUMN_BROWSABLE, mIsBrowsable ? 1 : 0);
-        values.put(TvContract.Channels.COLUMN_DATA, mData);
+        values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, mData);
         return values;
     }
 

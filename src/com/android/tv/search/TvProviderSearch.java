@@ -36,7 +36,7 @@ public class TvProviderSearch {
         }));
         results.addAll(searchPrograms(context, query, new String[] {
                 Programs.COLUMN_TITLE,
-                Programs.COLUMN_DESCRIPTION
+                Programs.COLUMN_SHORT_DESCRIPTION
         }));
         return results;
     }
@@ -58,7 +58,7 @@ public class TvProviderSearch {
         String[] projection = {
                 Programs.COLUMN_CHANNEL_ID,
                 Programs.COLUMN_TITLE,
-                Programs.COLUMN_DESCRIPTION,
+                Programs.COLUMN_SHORT_DESCRIPTION,
         };
         return search(context, Programs.CONTENT_URI, projection, query, columnNames);
     }

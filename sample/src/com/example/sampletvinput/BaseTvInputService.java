@@ -248,7 +248,7 @@ abstract public class BaseTvInputService extends TvInputService {
                 ContentValues values = new ContentValues();
                 values.put(Programs.COLUMN_CHANNEL_ID, ContentUris.parseId(mChannelUri));
                 values.put(Programs.COLUMN_TITLE, mTitle);
-                values.put(Programs.COLUMN_DESCRIPTION, mDescription);
+                values.put(Programs.COLUMN_SHORT_DESCRIPTION, mDescription);
                 values.put(Programs.COLUMN_START_TIME_UTC_MILLIS, time);
                 values.put(Programs.COLUMN_END_TIME_UTC_MILLIS, time + duration);
                 getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);
