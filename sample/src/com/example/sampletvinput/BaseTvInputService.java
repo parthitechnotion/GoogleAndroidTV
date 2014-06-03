@@ -173,7 +173,9 @@ abstract public class BaseTvInputService extends TvInputService {
                     @Override
                     public void onVideoSizeChanged(MediaPlayer player, int width, int height) {
                         if (mPlayer != null) {
-                            dispatchVideoSizeChanged(width, height);
+                            dispatchVideoStreamChanged(width, height, false);
+                            dispatchAudioStreamChanged(2);
+                            dispatchClosedCaptionStreamChanged(false);
                         }
                     }
                 });
