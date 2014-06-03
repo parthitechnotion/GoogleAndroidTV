@@ -42,7 +42,8 @@ public class HlsTvInputService extends BaseTvInputService {
     public void onCreate() {
         super.onCreate();
         mNetworkStateReceiver = new NetworkStateReceiver();
-        setAvailable(mNetworkStateReceiver.isConnected());
+        // TODO: Uncomment or remove when a new API design is locked down.
+        // setAvailable(mNetworkStateReceiver.isConnected());
     }
 
     @Override
@@ -118,7 +119,8 @@ public class HlsTvInputService extends BaseTvInputService {
                     Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
             mIsConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-            setAvailable(mIsConnected);
+            // TODO: Uncomment or remove when a new API design is locked down.
+            // setAvailable(mIsConnected);
         }
     }
 }

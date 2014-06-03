@@ -79,7 +79,7 @@ public class TunableTvView extends TvView implements StreamInfo {
                 public void onSessionCreated(TvInputManager.Session session) {
                     if (session != null) {
                         mSession = session;
-                        mSession.setVolume(mVolume);
+                        setStreamVolume(mVolume);
                         mHandler.sendEmptyMessage(MSG_TUNE);
                     } else {
                         Log.w(TAG, "Failed to create a session");
@@ -221,15 +221,15 @@ public class TunableTvView extends TvView implements StreamInfo {
         return mChannelId;
     }
 
-    public void setVolume(float volume) {
+    @Override
+    public void setStreamVolume(float volume) {
         if (!mStarted) {
             throw new IllegalStateException("TvView isn't started");
         }
-        if (DEBUG) Log.d(TAG, "setVolume " + volume);
+        if (DEBUG)
+            Log.d(TAG, "setStreamVolume " + volume);
         mVolume = volume;
-        if (mSession != null) {
-            mSession.setVolume(volume);
-        }
+        super.setStreamVolume(volume);
     }
 
     public interface OnTuneListener {

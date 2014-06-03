@@ -540,14 +540,14 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (mTvView.isPlaying()) {
             switch (mAudioFocusStatus) {
                 case AudioManager.AUDIOFOCUS_GAIN:
-                    mTvView.setVolume(AUDIO_MAX_VOLUME);
+                    mTvView.setStreamVolume(AUDIO_MAX_VOLUME);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS:
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                    mTvView.setVolume(AUDIO_MIN_VOLUME);
+                    mTvView.setStreamVolume(AUDIO_MIN_VOLUME);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    mTvView.setVolume(AUDIO_DUCKING_VOLUME);
+                    mTvView.setStreamVolume(AUDIO_DUCKING_VOLUME);
                     break;
             }
         }
@@ -628,7 +628,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             Log.w(TAG, "Fail to start the PIP");
             return;
         }
-        mPipView.setVolume(AUDIO_MIN_VOLUME);
+        mPipView.setStreamVolume(AUDIO_MIN_VOLUME);
         mPipShowing = true;
     }
 

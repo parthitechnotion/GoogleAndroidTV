@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.pm.ServiceInfo;
 import android.database.Cursor;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
@@ -177,7 +178,9 @@ public class Utils {
     }
 
     public static boolean hasChannel(Context context, TvInputInfo name, boolean browsableOnly) {
-        Uri uri = TvContract.buildChannelsUriForInput(name.getComponent(), browsableOnly);
+        ServiceInfo info = name.getServiceInfo();
+        ComponentName componentName = new ComponentName(info.packageName, info.name);
+        Uri uri = TvContract.buildChannelsUriForInput(componentName, browsableOnly);
         String[] projection = { TvContract.Channels._ID };
         Cursor cursor = null;
         try {
@@ -258,7 +261,7 @@ public class Utils {
         }
 
         for (ResolveInfo info : infos) {
-            if (info.activityInfo.packageName.equals(input.getPackageName())) {
+            if (info.activityInfo.packageName.equals(input.getServiceInfo().packageName)) {
                 return info.activityInfo;
             }
         }
