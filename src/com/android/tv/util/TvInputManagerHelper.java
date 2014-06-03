@@ -16,9 +16,9 @@
 
 package com.android.tv.util;
 
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
 import android.os.Handler;
-import android.tv.TvInputInfo;
-import android.tv.TvInputManager;
 import android.util.Log;
 
 import junit.framework.Assert;

@@ -26,7 +26,7 @@
     <application android:label="@string/sample_tv_input">
         <activity android:name=".SampleTvInputSettingsActivity">
             <intent-filter>
-                <action android:name="android.tv.SettingsActivity" />
+                <action android:name="android.media.tv.SettingsActivity" />
             </intent-filter>
         </activity>
         <service android:name="com.example.sampletvinput.LocalTvInputService"
@@ -34,7 +34,7 @@
             android:label="@string/local_input_label"
             android:process=":remoteLocalSampleTvInput">
             <intent-filter>
-                <action android:name="android.tv.TvInputService" />
+                <action android:name="android.media.tv.TvInputService" />
             </intent-filter>
         </service>
         <service android:name="com.example.sampletvinput.HlsTvInputService"
@@ -42,7 +42,7 @@
             android:label="@string/hls_input_label"
             android:process=":remoteHlsSampleTvInput">
             <intent-filter>
-                <action android:name="android.tv.TvInputService" />
+                <action android:name="android.media.tv.TvInputService" />
             </intent-filter>
         </service>
     </application>

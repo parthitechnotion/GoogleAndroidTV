@@ -18,9 +18,9 @@ package com.android.tv.input;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.tv.TvContract;
+import android.media.tv.TvInputInfo;
 import android.net.Uri;
-import android.provider.TvContract;
-import android.tv.TvInputInfo;
 
 import com.android.tv.data.ChannelMap;
 import com.android.tv.util.TvInputManagerHelper;

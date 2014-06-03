@@ -21,9 +21,9 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Handler;
-import android.provider.TvContract;
 import android.util.Log;
 
 import com.android.tv.data.Channel;

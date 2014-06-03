@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.view.View;
 
-import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.recommendation.TvRecommendation;

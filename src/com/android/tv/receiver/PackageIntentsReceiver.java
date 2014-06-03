@@ -22,10 +22,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
 import android.net.Uri;
 import android.os.Handler;
-import android.tv.TvInputInfo;
-import android.tv.TvInputManager;
 
 import com.android.tv.TvActivity;
 import com.android.tv.util.TvSettings;
@@ -47,7 +47,7 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
 
     private TvInputManager mTvInputManager;
     private SharedPreferences mPreferences;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
     private Runnable mTvActivityUpdater;
     private Runnable mDisplayInputNameCleaner;
 
