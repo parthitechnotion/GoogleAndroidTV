@@ -19,6 +19,7 @@ package com.example.sampletvinput;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.tv.TvContract;
@@ -32,19 +33,17 @@ import android.util.LongSparseArray;
 import android.view.KeyEvent;
 import android.view.Surface;
 
+import java.io.IOException;
 import java.util.List;
 
 abstract public class BaseTvInputService extends TvInputService {
     private static final String TAG = "BaseTvInputService";
     private static final boolean DEBUG = true;
 
-    private final LongSparseArray<String> mChannelMap = new LongSparseArray<String>();
+    private final LongSparseArray<ChannelInfo> mChannelMap = new LongSparseArray<ChannelInfo>();
     private final Handler mProgramUpdateHandler = new Handler();
 
-    // mNumberOfChannels and mSamples will be set in createSampleChannels().
-    protected int mNumberOfChannels;
     protected List<ChannelInfo> mChannels;
-
     private boolean mAvailable = true;
 
     @Override
@@ -70,8 +69,6 @@ abstract public class BaseTvInputService extends TvInputService {
 
     abstract public List<ChannelInfo> createSampleChannels();
 
-    abstract public boolean setDataSource(MediaPlayer player, String channelNumber);
-
     private void buildChannelMap() {
         Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()),
                 false);
@@ -79,6 +76,11 @@ abstract public class BaseTvInputService extends TvInputService {
                 TvContract.Channels._ID,
                 TvContract.Channels.COLUMN_DISPLAY_NUMBER
         };
+        mChannels = createSampleChannels();
+        if (mChannels == null || mChannels.isEmpty()) {
+            Log.w(TAG, "No channel list.");
+            return;
+        }
         Cursor cursor = null;
         try {
             do {
@@ -90,9 +92,9 @@ abstract public class BaseTvInputService extends TvInputService {
                 // Insert channels into the database. This needs to be done only for the first time.
                 ContentValues values = new ContentValues();
                 values.put(Channels.COLUMN_SERVICE_NAME, this.getClass().getName());
-                for (ChannelInfo info : createSampleChannels()) {
-                    values.put(Channels.COLUMN_DISPLAY_NUMBER, info.getNumber());
-                    values.put(Channels.COLUMN_DISPLAY_NAME, info.getName());
+                for (ChannelInfo info : mChannels) {
+                    values.put(Channels.COLUMN_DISPLAY_NUMBER, info.mNumber);
+                    values.put(Channels.COLUMN_DISPLAY_NAME, info.mName);
                     getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
                 }
             } while (true);
@@ -101,7 +103,7 @@ abstract public class BaseTvInputService extends TvInputService {
                 long channelId = cursor.getLong(0);
                 String channelNumber = cursor.getString(1);
                 if (DEBUG) Log.d(TAG, "Channel mapping: ID(" + channelId + ") -> " + channelNumber);
-                mChannelMap.put(channelId, channelNumber);
+                mChannelMap.put(channelId, getChannelByNumber(channelNumber));
             }
         } finally {
             if (cursor != null) {
@@ -110,12 +112,21 @@ abstract public class BaseTvInputService extends TvInputService {
         }
     }
 
-    private String getChannelNumber(Uri channelUri) {
-        String channelNumber = mChannelMap.get(ContentUris.parseId(channelUri));
-        if (channelNumber == null) {
+    private ChannelInfo getChannelByNumber(String channelNumber) {
+        for (ChannelInfo info : mChannels) {
+            if (info.mNumber.equals(channelNumber)) {
+                return info;
+            }
+        }
+        throw new IllegalArgumentException("Unknown channel: " + channelNumber);
+    }
+
+    private ChannelInfo getChannelByUri(Uri channelUri) {
+        ChannelInfo info = mChannelMap.get(ContentUris.parseId(channelUri));
+        if (info == null) {
             throw new IllegalArgumentException("Unknown channel: " + channelUri);
         }
-        return channelNumber;
+        return info;
     }
 
     class BaseTvInputSessionImpl extends TvInputSessionImpl {
@@ -151,12 +162,38 @@ abstract public class BaseTvInputService extends TvInputService {
             mPlayer.setVolume(volume, volume);
         }
 
+        private boolean setDataSource(MediaPlayer player, ChannelInfo channel) {
+            ProgramInfo program = channel.mProgram;
+            try {
+                if (program.mUrl != null) {
+                    player.setDataSource(program.mUrl);
+                } else {
+                    AssetFileDescriptor afd = getResources().openRawResourceFd(program.mResourceId);
+                    if (afd == null) {
+                        return false;
+                    }
+                    player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
+                            afd.getDeclaredLength());
+                    afd.close();
+                }
+                if (program.mUrl == null || !program.mUrl.startsWith("http")) {
+                    // TODO: Android media player does not support looping for HLS. Find a way to
+                    //     loop every contents.
+                    player.setLooping(true);
+                }
+            } catch (IllegalArgumentException | IllegalStateException | IOException e) {
+                // Do nothing.
+            }
+            return true;
+        }
+
         @Override
         public boolean onTune(Uri channelUri) {
             if (DEBUG) Log.d(TAG, "tune(" + channelUri + ")");
 
+            final ChannelInfo channel = getChannelByUri(channelUri);
             mPlayer.reset();
-            if (!setDataSource(mPlayer, getChannelNumber(channelUri))) {
+            if (!setDataSource(mPlayer, channel)) {
                 if (DEBUG) Log.d(TAG, "Failed to set the data source");
                 return false;
             }
@@ -173,15 +210,21 @@ abstract public class BaseTvInputService extends TvInputService {
                     @Override
                     public void onVideoSizeChanged(MediaPlayer player, int width, int height) {
                         if (mPlayer != null) {
-                            dispatchVideoStreamChanged(width, height, false);
-                            dispatchAudioStreamChanged(2);
-                            dispatchClosedCaptionStreamChanged(false);
+                            dispatchVideoStreamChanged(channel.mVideoWidth, channel.mVideoHeight,
+                                    false);
+                            dispatchAudioStreamChanged(channel.mAudioChannel);
+                            dispatchClosedCaptionStreamChanged(channel.mHasClosedCaption);
                         }
                     }
                 });
                 mPlayer.prepareAsync();
             } catch (IllegalStateException e1) {
                 return false;
+            }
+            int duration = mPlayer.getDuration();
+            if (duration > 0) {
+                long currentTimeMs = System.currentTimeMillis();
+                mPlayer.seekTo((int) (currentTimeMs % duration));
             }
             mPlayer.start();
 
@@ -200,7 +243,7 @@ abstract public class BaseTvInputService extends TvInputService {
             // the actual case where we get parsed program data only after tuning is done.
             final long DELAY_FOR_TESTING_IN_MILLIS = 1000; // 1 second
             mProgramUpdateHandler.postDelayed(
-                    new AddProgramRunnable(channelUri, "Program Title", "Program Description"),
+                    new AddProgramRunnable(channelUri, channel.mProgram),
                     DELAY_FOR_TESTING_IN_MILLIS);
             return true;
         }
@@ -226,53 +269,82 @@ abstract public class BaseTvInputService extends TvInputService {
         }
 
         private class AddProgramRunnable implements Runnable {
-            private static final int DEFAULT_PROGRAM_DURATION_IN_MILLIS = 30000; // 5 minutes
+            private static final int PROGRAM_REPEAT_COUNT = 24;
             private final Uri mChannelUri;
-            private final String mTitle;
-            private final String mDescription;
+            private final ProgramInfo mProgram;
 
-            public AddProgramRunnable(Uri channelUri, String title, String description) {
+            public AddProgramRunnable(Uri channelUri, ProgramInfo program) {
                 mChannelUri = channelUri;
-                mTitle = title;
-                mDescription = description;
+                mProgram = program;
             }
 
             @Override
             public void run() {
-                int duration = -1;
-                if (mPlayer != null) {
-                    duration = mPlayer.getDuration();
+                if (mProgram.mDurationSec == 0) {
+                    return;
                 }
-                if (duration == -1) {
-                    duration = DEFAULT_PROGRAM_DURATION_IN_MILLIS;
-                }
-                long time = System.currentTimeMillis();
+                long nowSec = System.currentTimeMillis() / 1000;
+                long startTimeSec = nowSec
+                        - positiveMod((nowSec - mProgram.mStartTimeSec), mProgram.mDurationSec);
                 ContentValues values = new ContentValues();
                 values.put(Programs.COLUMN_CHANNEL_ID, ContentUris.parseId(mChannelUri));
-                values.put(Programs.COLUMN_TITLE, mTitle);
-                values.put(Programs.COLUMN_SHORT_DESCRIPTION, mDescription);
-                values.put(Programs.COLUMN_START_TIME_UTC_MILLIS, time);
-                values.put(Programs.COLUMN_END_TIME_UTC_MILLIS, time + duration);
-                getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);
+                values.put(Programs.COLUMN_TITLE, mProgram.mTitle);
+                values.put(Programs.COLUMN_SHORT_DESCRIPTION, mProgram.mDescription);
+
+                for (int i = 0; i < PROGRAM_REPEAT_COUNT; ++i) {
+                    values.put(Programs.COLUMN_START_TIME_UTC_MILLIS,
+                            (startTimeSec + i * mProgram.mDurationSec) * 1000);
+                    values.put(Programs.COLUMN_END_TIME_UTC_MILLIS,
+                            (startTimeSec + (i + 1) * mProgram.mDurationSec) * 1000);
+                    getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);
+                }
+            }
+
+            private long positiveMod(long x, long modulo) {
+                return ((x % modulo) + modulo)  % modulo;
             }
         }
     }
 
-    static final class ChannelInfo {
-        private final String mNumber;
-        private final String mName;
+    public static final class ChannelInfo {
+        public final String mNumber;
+        public final String mName;
+        public final String mLogoUrl;
+        public final int mVideoWidth;
+        public final int mVideoHeight;
+        public final int mAudioChannel;
+        public final boolean mHasClosedCaption;
+        public final ProgramInfo mProgram;
 
-        public ChannelInfo(String number, String name) {
+        public ChannelInfo(String number, String name, String logoUrl, int videoWidth,
+                int videoHeight, int audioChannel, boolean hasClosedCaption, ProgramInfo program) {
             mNumber = number;
             mName = name;
+            mLogoUrl = logoUrl;
+            mVideoWidth = videoWidth;
+            mVideoHeight = videoHeight;
+            mAudioChannel = audioChannel;
+            mHasClosedCaption = hasClosedCaption;
+            mProgram = program;
         }
+    }
 
-        public String getNumber() {
-            return mNumber;
-        }
+    public static final class ProgramInfo {
+        public final String mTitle;
+        public final String mDescription;
+        public final long mStartTimeSec;
+        public final long mDurationSec;
+        public final String mUrl;
+        public final int mResourceId;
 
-        public String getName() {
-            return mName;
+        public ProgramInfo(String title, String description, long startTimeSec, long durationSec,
+                String url, int resourceId) {
+            mTitle = title;
+            mDescription = description;
+            mStartTimeSec = startTimeSec;
+            mDurationSec = durationSec;
+            mUrl = url;
+            mResourceId = resourceId;
         }
     }
 }

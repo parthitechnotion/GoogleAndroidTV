@@ -21,10 +21,10 @@ import android.database.ContentObserver;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Handler;
-import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -110,12 +110,14 @@ public class ChannelBannerView extends LinearLayout {
 
         if (info.hasClosedCaption()) {
             mClosedCaptionTextView.setText("CC");
+            mClosedCaptionTextView.setVisibility(View.VISIBLE);
         } else {
-            mResolutionTextView.setVisibility(View.GONE);
+            mClosedCaptionTextView.setVisibility(View.GONE);
         }
         if (info.getVideoDefinitionLevel() != StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN) {
             mResolutionTextView.setText(Utils.getVideoDefinitionLevelString(
                     info.getVideoDefinitionLevel()));
+            mResolutionTextView.setVisibility(View.VISIBLE);
         } else {
             mResolutionTextView.setVisibility(View.GONE);
         }
@@ -123,6 +125,7 @@ public class ChannelBannerView extends LinearLayout {
         mAspectRatioTextView.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(Utils.getAudioChannelString(info.getAudioChannelCount()))) {
             mAudioChannelTextView.setText(Utils.getAudioChannelString(info.getAudioChannelCount()));
+            mAudioChannelTextView.setVisibility(View.VISIBLE);
         } else {
             mAudioChannelTextView.setVisibility(View.GONE);
         }

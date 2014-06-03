@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EPG_DATA" />
     <uses-permission android:name="android.permission.WRITE_EPG_DATA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application android:label="@string/sample_tv_input">
         <activity android:name=".SampleTvInputSettingsActivity">
@@ -46,6 +47,16 @@
                 <action android:name="android.media.tv.TvInputService" />
             </intent-filter>
             <meta-data android:name="android.media.tv.input" android:resource="@xml/tvinputservice" />
+        </service>
+        <service android:name="com.example.sampletvinput.ExternalFileTvInputService"
+            android:permission="android.permission.BIND_TV_INPUT"
+            android:label="@string/external_input_label"
+            android:process=":remoteExternalSampleTvInput">
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <meta-data android:name="android.media.tv.input"
+                android:resource="@xml/tvinputservice" />
         </service>
     </application>
 </manifest>
