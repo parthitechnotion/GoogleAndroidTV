@@ -83,6 +83,8 @@ public class ShadowContainer extends FrameLayout {
                         .scaleY(mSelectedScale)
                         .setDuration(SCALE_ANIM_DURATION);
             } else {
+                setScaleX(mSelectedScale);
+                setScaleY(mSelectedScale);
                 mShadowViewNormal.animate().alpha(1f).setDuration(SCALE_ANIM_DURATION);
                 mShadowViewFocused.animate().alpha(0f).setDuration(SCALE_ANIM_DURATION);
 
