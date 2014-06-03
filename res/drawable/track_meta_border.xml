@@ -14,29 +14,11 @@
      limitations under the License.
 -->
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:id="@android:id/background">
-        <shape>
-            <solid android:color="#303030"/>
-        </shape>
-    </item>
-
-    <item android:id="@android:id/secondaryProgress">
-        <clip>
-            <shape>
-                <solid android:color="#EEEEEE"/>
-            </shape>
-        </clip>
-    </item>
-
-    <item android:id="@android:id/progress">
-        <clip>
-            <shape>
-                <solid android:color="#EEEEEE"/>
-            </shape>
-        </clip>
-    </item>
-
-</layer-list>
-
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#BEBEBE"/>
+    <corners android:radius="2dp"
+        android:topLeftRadius="2dp"
+        android:topRightRadius="2dp"
+        android:bottomLeftRadius="2dp"
+        android:bottomRightRadius="2dp"/>
+</shape>

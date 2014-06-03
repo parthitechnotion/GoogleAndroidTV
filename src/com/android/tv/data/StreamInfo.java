@@ -23,5 +23,9 @@ public interface StreamInfo {
     public final int VIDEO_DEFINITION_LEVEL_FULL_HD = 3;
     public final int VIDEO_DEFINITION_LEVEL_ULTRA_HD = 4;
 
+    public final int AUDIO_CHANNEL_COUNT_UNKNOWN = 0;
+
     int getVideoDefinitionLevel();
+    int getAudioChannelCount();
+    boolean hasClosedCaption();
 }
