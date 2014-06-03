@@ -60,17 +60,7 @@ public class BaseSideFragment extends Fragment {
         return fragView;
     }
 
-    public void initialize(String title, Object[] itemTags, int fragmentLayoutId,
-            int itemLayoutId) {
-        Preconditions.checkState(!TextUtils.isEmpty(title));
-        mTitle = title;
-        mItemTags = itemTags;
-        mFragmentLayoutId = fragmentLayoutId;
-        mItemLayoutId = itemLayoutId;
-        mAdapter.notifyDataSetChanged();
-    }
-
-    public void setPrevSelectedItem(int position) {
+    public void setPrevSelectedItemPosition(int position) {
         mPrevSelectedItemPosition = position;
         mAdapter.notifyDataSetChanged();
     }
@@ -87,6 +77,16 @@ public class BaseSideFragment extends Fragment {
     public void setSelectedPosition(int position) {
         mOptionItemListView.setSelectedPosition(position + 1);
         mOptionItemListView.requestFocus();
+    }
+
+    protected void initialize(String title, Object[] itemTags, int fragmentLayoutId,
+            int itemLayoutId) {
+        Preconditions.checkState(!TextUtils.isEmpty(title));
+        mTitle = title;
+        mItemTags = itemTags;
+        mFragmentLayoutId = fragmentLayoutId;
+        mItemLayoutId = itemLayoutId;
+        mAdapter.notifyDataSetChanged();
     }
 
     class OptionItemAdapter extends RecyclerView.Adapter<OptionItemAdapter.MyViewHolder> {
