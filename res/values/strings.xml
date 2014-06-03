@@ -37,7 +37,6 @@
     <string name="recently_watched">Recently Watched</string>
     <string name="new_input_device_name">New Input Device Name</string>
     <string name="name_already_exists">Name already exists</string>
-    <string name="input_setup_activity_not_found">Setup activity for \'<xliff:g id="majorNumber">%s</xliff:g>\' is not found.\r\nMaybe you need to setup the input manually.</string>
     <string name="OK">OK</string>
     <string name="not_implemented_yet">The feature will be implemented soon</string>
 
@@ -78,6 +77,7 @@
     <!-- Text displayed in edit channels activity when there aren't any channels in the TV input.
          [CHAR LIMIT=20] -->
     <string name="empty_channel_tvinput">No channels in the TV input.</string>
+    <string name="empty_channel_tvinput_and_no_setup_activity">No channels in the TV input \'<xliff:g id="tv_input">%s</xliff:g>\'.\nAnd setup activity for the TV input is not found.\nMaybe you need to setup the TV input manually or select another TV input.</string>
     <string name="all_the_channels_are_unchecked">If all the channels are unchecked, you can watch all the channels.</string>
 
     <!-- Format string for an item in the channel selection list. [CHAR LIMIT=30] -->

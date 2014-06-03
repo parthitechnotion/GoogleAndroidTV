@@ -16,7 +16,6 @@
 
 package com.android.tv.util;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
@@ -44,8 +43,6 @@ import java.util.List;
  */
 public class Utils {
     public static final String SERVICE_INTERFACE = "android.media.tv.TvInputService";
-    public static final String ACTION_SETTINGS = "android.media.tv.SettingsActivity";
-    public static final String ACTION_SETUP = "android.media.tv.SetupActivity";
     public static final String EXTRA_SERVICE_NAME = "serviceName";
     public static final String EXTRA_KEYCODE = "keycode";
 
@@ -202,32 +199,6 @@ public class Utils {
 
     public static boolean hasActivity(Context context, TvInputInfo input, String action) {
         return getActivityInfo(context, input, action) != null;
-    }
-
-    public static boolean startActivity(Context context, TvInputInfo input, String action) {
-        ActivityInfo activityInfo = getActivityInfo(context, input, action);
-        if (activityInfo == null) {
-            return false;
-        }
-
-        Intent intent = new Intent(action);
-        intent.setClassName(activityInfo.packageName, activityInfo.name);
-        intent.putExtra(Utils.EXTRA_SERVICE_NAME, input.getServiceName());
-        context.startActivity(intent);
-        return true;
-    }
-
-    public static boolean startActivityForResult(Activity activity, TvInputInfo input,
-            String action, int requestCode) {
-        ActivityInfo activityInfo = getActivityInfo(activity, input, action);
-        if (activityInfo == null) {
-            return false;
-        }
-
-        Intent intent = new Intent(Utils.ACTION_SETUP);
-        intent.setClassName(activityInfo.packageName, activityInfo.name);
-        activity.startActivityForResult(intent, requestCode);
-        return true;
     }
 
     public static int getVideoDefinitionLevelFromSize(int width, int height) {

@@ -18,6 +18,7 @@ package com.android.tv.input;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
@@ -51,18 +52,13 @@ public class TisTvInput extends TvInput {
     }
 
     @Override
-    public boolean hasActivity(String action) {
-        return Utils.hasActivity(mContext, mInputInfo, action);
+    public Intent getIntentForSetupActivity() {
+        return mInputInfo.getIntentForSetupActivity();
     }
 
     @Override
-    public boolean startActivity(String action) {
-        return Utils.startActivity(mContext, mInputInfo, action);
-    }
-
-    @Override
-    public boolean startActivityForResult(Activity activity, String action, int requestCode) {
-        return Utils.startActivityForResult(activity, mInputInfo, action, requestCode);
+    public Intent getIntentForSettingsActivity() {
+        return mInputInfo.getIntentForSettingsActivity();
     }
 
     @Override

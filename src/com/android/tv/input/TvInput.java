@@ -17,6 +17,7 @@
 package com.android.tv.input;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 
 import com.android.tv.data.ChannelMap;
@@ -24,10 +25,8 @@ import com.android.tv.data.ChannelMap;
 public abstract class TvInput {
     abstract public String getId();
     abstract public String getDisplayName();
-    abstract public boolean hasActivity(String action);
-    abstract public boolean startActivity(String action);
-    abstract public boolean startActivityForResult(Activity activity, String action,
-            int requestCode);
+    abstract public Intent getIntentForSetupActivity();
+    abstract public Intent getIntentForSettingsActivity();
     abstract public boolean isAvailable();
     abstract public boolean hasChannel(boolean browsableOnly);
     abstract public ChannelMap buildChannelMap(Activity activity, long initialChannelId,
