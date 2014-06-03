@@ -34,13 +34,16 @@
     <dimen name="action_tile_label_font_size">14sp</dimen>
 
     <!-- Option item list dimensions -->
+    <dimen name="option_fragment_shadow_width">500dp</dimen>
+    <dimen name="option_fragment_shadow_margin_right">270dp</dimen>
     <dimen name="option_fragment_width">360dp</dimen>
     <dimen name="option_fragment_header_padding_top">27dp</dimen>
     <dimen name="option_fragment_header_padding_left">32dp</dimen>
     <dimen name="option_fragment_header_text_size">34sp</dimen>
     <dimen name="option_fragment_header_text_height">87dp</dimen>
     <dimen name="option_item_height">48dp</dimen>
-    <dimen name="option_item_padding_left">32dp</dimen>
+    <dimen name="option_item_margin_left">32dp</dimen>
+    <dimen name="option_item_padding_left">16dp</dimen>
     <dimen name="option_item_text_size">18sp</dimen>
 
     <dimen name="channel_banner_large_text_size">54sp</dimen>

@@ -43,12 +43,15 @@ public class BaseSideFragment extends Fragment {
     private final OptionItemAdapter mAdapter = new OptionItemAdapter();
     private Object[] mItemTags;
     private int mPrevSelectedItemPosition;
+    private int mFragmentLayoutId;
     private int mItemLayoutId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View fragView = inflater.inflate(R.layout.option_fragment, container, false);
+        // initialize should be called before onCreateView.
+        Preconditions.checkState(mItemTags != null);
+        View fragView = inflater.inflate(mFragmentLayoutId, container, false);
         mTitleView = (TextView) fragView.findViewById(R.id.option_title);
         mTitleView.setText(mTitle);
         mOptionItemListView = (VerticalGridView) fragView.findViewById(R.id.option_list);
@@ -57,26 +60,18 @@ public class BaseSideFragment extends Fragment {
         return fragView;
     }
 
-    public void initialize(String title, Object[] itemTags, int itemLayoutId) {
+    public void initialize(String title, Object[] itemTags, int fragmentLayoutId,
+            int itemLayoutId) {
         Preconditions.checkState(!TextUtils.isEmpty(title));
         mTitle = title;
-        if (mTitleView != null) {
-            mTitleView.setText(title);
-        }
         mItemTags = itemTags;
+        mFragmentLayoutId = fragmentLayoutId;
         mItemLayoutId = itemLayoutId;
         mAdapter.notifyDataSetChanged();
     }
 
     public void setPrevSelectedItem(int position) {
         mPrevSelectedItemPosition = position;
-    }
-
-    public void setItems(String[] itemLabels, int selectedItem, Object[] tags) {
-        Preconditions.checkState(tags == null || itemLabels.length == tags.length);
-        Preconditions.checkState(itemLabels.length > 0);
-        Preconditions.checkState(selectedItem < itemLabels.length);
-        mPrevSelectedItemPosition = selectedItem;
         mAdapter.notifyDataSetChanged();
     }
 

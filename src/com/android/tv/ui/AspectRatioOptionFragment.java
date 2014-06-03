@@ -21,13 +21,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tv.R;
 import com.android.tv.data.AspectRatio;
 
-public class AspectRatioOptionFragment extends BaseSideFragment {
+public class AspectRatioOptionFragment extends BaseOptionFragment {
     private static final String TAG = "AspectRatioOptionFragment";
     private static final boolean DEBUG = true;
 
@@ -38,11 +37,8 @@ public class AspectRatioOptionFragment extends BaseSideFragment {
         for (int i = 0; i < AspectRatio.SIZE_OF_RATIO_TYPES; ++i) {
             items[i] = AspectRatio.getLabel(i, getActivity());
         }
-        initialize(getString(R.string.aspect_ratio_option_title), items, R.layout.option_item);
-        View fragView = super.onCreateView(inflater, container, savedInstanceState);
-        // TODO: implement to get the current aspect ratio.
-        setPrevSelectedItem(0);
-        return fragView;
+        initialize(getString(R.string.aspect_ratio_option_title), items);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -53,6 +49,7 @@ public class AspectRatioOptionFragment extends BaseSideFragment {
 
     @Override
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
+        super.onItemFocusChanged(v, focusGained, position, tag);
         if (DEBUG) Log.d(TAG, "onItemFocusChanged " + focusGained + ": position=" + position
                 + ", label=" + (String) tag);
         // TODO: temporally change aspect ratio to test the focused ratio.
@@ -60,21 +57,10 @@ public class AspectRatioOptionFragment extends BaseSideFragment {
 
     @Override
     public void onItemSelected(View v, int position, Object tag) {
+        super.onItemSelected(v, position, tag);
         if (DEBUG) Log.d(TAG, "onItemSelected: position=" + position + ", label=" + (String) tag);
         // TODO: change aspect ratio.
         Toast.makeText(getActivity(), R.string.not_implemented_yet, Toast.LENGTH_SHORT).show();
         getFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onBindView(View v, int position, Object tag, boolean prevSelected) {
-        TextView textView = (TextView) v.findViewById(R.id.option_item);
-        String text = (String) tag;
-        // TODO: Once we get the assets of Radio buttons, the selected item should be
-        // distinguished by icons.
-        if (prevSelected) {
-            text += " (Selected)";
-        }
-        textView.setText(text);
     }
 }
