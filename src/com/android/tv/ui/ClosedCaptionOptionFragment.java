@@ -17,21 +17,32 @@
 package com.android.tv.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.android.tv.R;
+import com.android.tv.TvActivity;
 
 public class ClosedCaptionOptionFragment extends BaseOptionFragment {
     private static final String TAG = "ClosedCaptionOptionFragment";
     private static final boolean DEBUG = true;
 
+    private static final int CC_ON = 0;
+    private static final int CC_OFF = 1;
+
+    private TvActivity mTvActivity;
+    private boolean mIsFirstResume;
+    private boolean mLastStoredCcEnabled;
+    private boolean mCcEnabled;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        mIsFirstResume = true;
+        mTvActivity = (TvActivity) getActivity();
+
         Object[] items = new Object[2];
         items[0] = getString(R.string.option_item_on);
         items[1] = getString(R.string.option_item_off);
@@ -43,23 +54,39 @@ public class ClosedCaptionOptionFragment extends BaseOptionFragment {
     @Override
     public void onResume() {
         super.onResume();
-        setSelectedPosition(0);
+        if (mIsFirstResume) {
+            mCcEnabled = mTvActivity.isClosedCaptionEnabled();
+            mLastStoredCcEnabled = mCcEnabled;
+            int initialPosition = mCcEnabled ? CC_ON : CC_OFF;
+            setSelectedPosition(initialPosition);
+            setPrevSelectedItemPosition(initialPosition);
+            mIsFirstResume = false;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mLastStoredCcEnabled != mCcEnabled) {
+            mTvActivity.restoreClosedCaptionEnabled();
+        }
     }
 
     @Override
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
         super.onItemFocusChanged(v, focusGained, position, tag);
-        if (DEBUG) Log.d(TAG, "onItemFocusChanged " + focusGained + ": position=" + position
-                + ", label=" + (String) tag);
-        // TODO: temporally change aspect ratio to test the focused ratio.
+        if (focusGained) {
+            mCcEnabled = (position == CC_ON);
+            mTvActivity.setClosedCaptionEnabled(mCcEnabled, false);
+        }
     }
 
     @Override
     public void onItemSelected(View v, int position, Object tag) {
+        mCcEnabled = (position == CC_ON);
+        mTvActivity.setClosedCaptionEnabled(mCcEnabled, true);
+        mLastStoredCcEnabled = mCcEnabled;
         super.onItemSelected(v, position, tag);
-        if (DEBUG) Log.d(TAG, "onItemSelected: position=" + position + ", label=" + (String) tag);
-        // TODO: change aspect ratio.
         Toast.makeText(getActivity(), R.string.not_implemented_yet, Toast.LENGTH_SHORT).show();
-        getFragmentManager().popBackStack();
     }
 }

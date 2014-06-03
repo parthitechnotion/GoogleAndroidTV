@@ -47,6 +47,9 @@ public class SimpleGuideFragment extends BaseSideFragment {
     private final TvActivity mTvActivity;
     private final ChannelMap mChannelMap;
     private int mCurPosition;
+    private boolean mClosingByItemSelected;
+    private int mFocusedBgColor;
+    private int mBgColor;
 
     public SimpleGuideFragment(TvActivity tvActivity, ChannelMap channelMap) {
         super();
@@ -57,6 +60,10 @@ public class SimpleGuideFragment extends BaseSideFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        mBgColor = getActivity().getResources().getColor(R.color.simple_guide_fragment_background);
+        mFocusedBgColor = getActivity().getResources().getColor(
+                R.color.simple_guide_fragment_focused_background);
+
         // TODO: add 'Show only' menu.
         initialize(getString(R.string.simple_guide_title), mChannelMap.getChannelList(true),
                 R.layout.simple_guide_fragment, R.layout.simple_guide_item);
@@ -73,10 +80,19 @@ public class SimpleGuideFragment extends BaseSideFragment {
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        if (!mClosingByItemSelected) {
+            ((TvActivity) getActivity()).onSideFragmentCanceled(getInitiator());
+        }
+    }
+
+    @Override
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
         if (DEBUG) Log.d(TAG, "onItemFocusChanged " + focusGained + ": position=" + position
                 + ", label=" + ((Channel) tag).getDisplayName());
         mCurPosition = position;
+        v.setBackgroundColor(focusGained ? mFocusedBgColor : mBgColor);
     }
 
     @Override
@@ -88,6 +104,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
         } else {
             // TODO: implement this ('Show only' menu).
         }
+        mClosingByItemSelected = true;
         getFragmentManager().popBackStack();
     }
 
@@ -133,36 +150,4 @@ public class SimpleGuideFragment extends BaseSideFragment {
         }
         return curChannelPos;
     }
-
-    // TODO: consider to use attrs to set background colors instead of defining this class in
-    // multiple place.
-    private static class ShadedItemContainer extends LinearLayout {
-        public ShadedItemContainer(Context context) {
-            this(context, null);
-        }
-
-        public ShadedItemContainer(Context context, AttributeSet attrs) {
-            this(context, attrs, 0);
-        }
-
-        public ShadedItemContainer(Context context, AttributeSet attrs, int defStyle) {
-            super(context, attrs, defStyle);
-        }
-
-        @Override
-        protected void onFocusChanged(boolean gainFocus, int direction,
-                Rect previouslyFocusedRect) {
-            super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-            if (isAttachedToWindow() && getVisibility() == View.VISIBLE) {
-                if (gainFocus) {
-                    setBackgroundColor(getContext().getResources().getColor(
-                            R.color.simple_guide_fragment_focused_background));
-                } else {
-                    setBackgroundColor(getContext().getResources().getColor(
-                            R.color.simple_guide_fragment_background));
-                }
-            }
-        }
-    }
-
 }

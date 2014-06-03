@@ -17,17 +17,13 @@
 package com.android.tv.ui;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.internal.util.Preconditions;
@@ -35,6 +31,11 @@ import com.android.tv.R;
 
 public class BaseSideFragment extends Fragment {
     private static final String TAG = "BaseSideFragment";
+
+    public static final String KEY_INITIATOR = "last_state";
+    public static final int INITIATOR_UNKNOWN = 0;
+    public static final int INITIATOR_SHORTCUT_KEY = 1;
+    public static final int INITIATOR_MENU = 2;
 
     private String mTitle;
     private TextView mTitleView;
@@ -45,12 +46,20 @@ public class BaseSideFragment extends Fragment {
     private int mPrevSelectedItemPosition;
     private int mFragmentLayoutId;
     private int mItemLayoutId;
+    private int mInitiator;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // initialize should be called before onCreateView.
         Preconditions.checkState(mItemTags != null);
+        Bundle arg = getArguments();
+        if (arg != null && arg.containsKey(KEY_INITIATOR)) {
+            mInitiator = arg.getInt(KEY_INITIATOR);
+        } else {
+            mInitiator = INITIATOR_UNKNOWN;
+        }
+
         View fragView = inflater.inflate(mFragmentLayoutId, container, false);
         mTitleView = (TextView) fragView.findViewById(R.id.option_title);
         mTitleView.setText(mTitle);
@@ -58,6 +67,10 @@ public class BaseSideFragment extends Fragment {
         mOptionItemListView.setAdapter(mAdapter);
         mLayoutInflater = inflater;
         return fragView;
+    }
+
+    public int getInitiator() {
+        return mInitiator;
     }
 
     public void setPrevSelectedItemPosition(int position) {
@@ -133,35 +146,6 @@ public class BaseSideFragment extends Fragment {
         private class MyViewHolder extends RecyclerView.ViewHolder {
             MyViewHolder(View view) {
                 super(view);
-            }
-        }
-    }
-
-    private static class ShadedItemContainer extends LinearLayout {
-        public ShadedItemContainer(Context context) {
-            this(context, null);
-        }
-
-        public ShadedItemContainer(Context context, AttributeSet attrs) {
-            this(context, attrs, 0);
-        }
-
-        public ShadedItemContainer(Context context, AttributeSet attrs, int defStyle) {
-            super(context, attrs, defStyle);
-        }
-
-        @Override
-        protected void onFocusChanged(boolean gainFocus, int direction,
-                Rect previouslyFocusedRect) {
-            super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-            if (isAttachedToWindow() && getVisibility() == View.VISIBLE) {
-                if (gainFocus) {
-                    setBackgroundColor(getContext().getResources().getColor(
-                            R.color.option_item_focused_background));
-                } else {
-                    setBackgroundColor(getContext().getResources().getColor(
-                            R.color.option_item_background));
-                }
             }
         }
     }

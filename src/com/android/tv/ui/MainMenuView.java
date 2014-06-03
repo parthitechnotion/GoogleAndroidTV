@@ -252,7 +252,8 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                         case MenuTag.CHANNEL_TAG_TYPE:
                             Channel channel = (Channel) tag.mObj;
                             if (channel.getType() == R.integer.channel_type_guide) {
-                                mTvActivity.showSimpleGuide();
+                                mTvActivity.showSimpleGuide(
+                                        BaseSideFragment.INITIATOR_MENU);
                             } else {
                                 mTvActivity.moveToChannel(channel.getId());
                             }
@@ -262,11 +263,13 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                             MenuAction action = (MenuAction) tag.mObj;
                             switch (action.getType()) {
                                 case MenuAction.SELECT_CLOSED_CAPTION:
-                                    mTvActivity.showClosedCaptionOption();
+                                    mTvActivity.showClosedCaptionOption(
+                                            BaseSideFragment.INITIATOR_MENU);
                                     break;
 
                                 case MenuAction.SELECT_ASPECT_RATIO:
-                                    mTvActivity.showAspectRatioOption();
+                                    mTvActivity.showAspectRatioOption(
+                                            BaseSideFragment.INITIATOR_MENU);
                                     break;
 
                                 case MenuAction.SELECT_TV_INPUT_TYPE:
