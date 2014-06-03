@@ -86,8 +86,8 @@
     <!-- Privacy setting dialog title-->
     <string name="privacy_dialog_title">Privacy Settings</string>
 
-    <!-- Recommended channel list title -->
-    <string name="recommended_channel_list_title">Recommended Channels</string>
+    <!-- Channel list title -->
+    <string name="channel_list_title">Channels</string>
 
     <!-- Confirmation of TV watch logging -->
     <string name="privacy_watch_logging">Send TV watch history to Google</string>

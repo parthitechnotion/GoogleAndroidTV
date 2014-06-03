@@ -37,8 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TvRecommendation {
     private static final String TAG = "TvRecommendation";
 
-    private static final long MIN_WATCH_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-
     private static final UriMatcher sUriMatcher;
     private static final int MATCH_CHANNEL_ID = 1;
     private static final int MATCH_WATCHED_PROGRAM_ID = 2;
@@ -59,6 +57,7 @@ public class TvRecommendation {
     private final List<ContentObserver> mContentObservers;
     private final Handler mHandler;
     private final Context mContext;
+    private final boolean mIncludeRecommendedOnly;
 
     /**
      * Create a TV recommendation object.
@@ -68,12 +67,14 @@ public class TvRecommendation {
      * {@link android.provider.TvContract.WatchedPrograms}.
      * @param handler The handler to run {@link android.database.ContentObserver#onChange(boolean)}
      * on, or null if none.
+     * @paran includeRecommendedOnly true to include only recommended results, or false.
      */
-    public TvRecommendation(Context context, Handler handler) {
+    public TvRecommendation(Context context, Handler handler, boolean includeRecommendedOnly) {
         mContext = context;
         mChannelRecordMap = new ConcurrentHashMap<Long, ChannelRecord>();
         mContentObservers = new ArrayList<ContentObserver>();
         mHandler = handler;
+        mIncludeRecommendedOnly = includeRecommendedOnly;
         registerContentObservers();
         buildChannelRecordMap();
     }
@@ -92,11 +93,9 @@ public class TvRecommendation {
      */
     // TODO: consider to change the return type from ChannelRecord[] to Channel[]
     public ChannelRecord[] getRecommendedChannelList(int size) {
-        if (size > mChannelRecordMap.size()) {
-            size = mChannelRecordMap.size();
-        }
+        ArrayList<ChannelRecord> results = new ArrayList<ChannelRecord>();
         for (ChannelRecord cr : mChannelRecordMap.values()) {
-            double maxScore = 0.0;
+            double maxScore = TvRecommender.NOT_RECOMMENDED;
             for (TvRecommenderWrapper recommender : sTvRecommenders) {
                 double score = recommender.calculateScaledScore(cr);
                 if (score > maxScore) {
@@ -104,9 +103,14 @@ public class TvRecommendation {
                 }
             }
             cr.mScore = maxScore;
+            if (!mIncludeRecommendedOnly || cr.mScore != TvRecommender.NOT_RECOMMENDED) {
+                results.add(cr);
+            }
         }
-        ChannelRecord[] allChannelRecords =
-                mChannelRecordMap.values().toArray(new ChannelRecord[0]);
+        ChannelRecord[] allChannelRecords = results.toArray(new ChannelRecord[0]);
+        if (size > allChannelRecords.length) {
+            size = allChannelRecords.length;
+        }
         Arrays.sort(allChannelRecords);
         return Arrays.copyOfRange(allChannelRecords, 0, size);
     }
@@ -235,11 +239,12 @@ public class TvRecommendation {
         long watchEndTimeMs = cursor.getLong(indexWatchEndTime);
         long watchDurationMs = watchEndTimeMs - cursor.getLong(indexWatchStartTime);
         ChannelRecord channelRecord = null;
-        if (watchEndTimeMs != 0l && watchDurationMs > MIN_WATCH_DURATION_MS) {
+        if (watchEndTimeMs != 0l) {
             channelRecord = mChannelRecordMap.get(
                     cursor.getLong(indexWatchChannelId));
             if (channelRecord != null && channelRecord.mLastWatchedTimeMs < watchEndTimeMs) {
                 channelRecord.mLastWatchedTimeMs = watchEndTimeMs;
+                channelRecord.mLastWatchDurationMs = watchDurationMs;
             }
         }
         return channelRecord;
@@ -248,11 +253,13 @@ public class TvRecommendation {
     public static class ChannelRecord implements Comparable<ChannelRecord> {
         private final Channel mChannel;
         private long mLastWatchedTimeMs;
+        private long mLastWatchDurationMs;
         private double mScore;
 
         public ChannelRecord(Channel channel) {
             mChannel = channel;
             mLastWatchedTimeMs = 0l;
+            mLastWatchDurationMs = 0;
         }
 
         public Channel getChannel() {
@@ -261,6 +268,10 @@ public class TvRecommendation {
 
         public long getLastWatchedTimeMs() {
             return mLastWatchedTimeMs;
+        }
+
+        public long getLastWatchDurationMs() {
+            return mLastWatchDurationMs;
         }
 
         public double getRecommendationScore() {

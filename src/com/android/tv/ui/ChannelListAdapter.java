@@ -31,15 +31,18 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
     private ChannelMap mChannelMap;
     private Channel[] mChannelList;
     private ItemListView mListView;
+    private final boolean mGuideIncluded;
     private final boolean mBrowsableOnly;
     private final String mFixedTitle;
     private String mTitle;
     private final int mTileHeight;
 
     public ChannelListAdapter(Context context, Handler handler,
-            View.OnClickListener onClickListener, boolean browsableOnly, String title,
+            View.OnClickListener onClickListener, boolean guideIncluded, boolean browsableOnly,
+            String title,
             int tileHeight) {
         super(context, handler, R.layout.channel_tile, onClickListener);
+        mGuideIncluded = guideIncluded;
         mBrowsableOnly = browsableOnly;
         mFixedTitle = title;
         mTileHeight = tileHeight;
@@ -65,10 +68,9 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
         mChannelMap = channelMap;
         mListView = listView;
 
-        if (mChannelMap == null) {
-            mChannelList = null;
-        } else {
-            Channel[] channels = mChannelMap.getChannelList(mBrowsableOnly);
+        mChannelList = mChannelMap == null ? null : mChannelMap.getChannelList(mBrowsableOnly);
+        if (mGuideIncluded) {
+            Channel[] channels = mChannelList == null ? new Channel[0] : mChannelList;
             Channel guideChannel = new Channel.Builder()
                     .setType(R.integer.channel_type_guide)
                     .build();

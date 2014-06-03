@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.view.View;
 
+import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.recommendation.TvRecommendation;
@@ -35,12 +36,14 @@ public class RecommendationListAdapter extends ItemListView.ItemListAdapter {
     private final int mTileHeight;
     private final int mMaxCount;
     private final TvRecommendation mRecommendationEngine;
+    private final boolean mGuideIncluded;
 
     public RecommendationListAdapter(Context context, Handler handler,
             View.OnClickListener onClickListener, TvRecommendation recommendationEngine,
-            int maxCount, int tileResId, String title, int tileHeight) {
+            boolean guideIncluded, int maxCount, int tileResId, String title, int tileHeight) {
         super(context, handler, tileResId, onClickListener);
         mRecommendationEngine = recommendationEngine;
+        mGuideIncluded = guideIncluded;
         mMaxCount = maxCount;
         mTitle = title;
         mTileHeight = tileHeight;
@@ -86,6 +89,19 @@ public class RecommendationListAdapter extends ItemListView.ItemListAdapter {
                 mChannelList[i] = records[i].getChannel();
             }
         }
+
+        if (mGuideIncluded) {
+            Channel[] channels = mChannelList == null ? new Channel[0] : mChannelList;
+            Channel guideChannel = new Channel.Builder()
+                    .setType(R.integer.channel_type_guide)
+                    .build();
+            mChannelList = new Channel[channels.length + 1];
+            mChannelList[0] = guideChannel;
+            for (int i = 0; i < channels.length; ++i) {
+                mChannelList[i + 1] = channels[i];
+            }
+        }
+
         setItemList(mChannelList);
     }
 
