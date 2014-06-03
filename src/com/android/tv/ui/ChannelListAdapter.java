@@ -83,13 +83,13 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
         setItemList(mChannelList);
 
         updateTitle();
-        selectCurrentChannel();
+        selectGuideChannel();
     }
 
     @Override
     public void onBeforeShowing() {
         updateTitle();
-        selectCurrentChannel();
+        selectGuideChannel();
     }
 
     private void updateTitle() {
@@ -102,6 +102,17 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
             if (mListView != null) {
                 mListView.setTitle(mTitle);
             }
+        }
+    }
+
+    private void selectGuideChannel() {
+        if (mListView == null) {
+            return;
+        }
+        if (mGuideIncluded) {
+            mListView.setSelectedPosition(0);
+        } else {
+            selectCurrentChannel();
         }
     }
 
