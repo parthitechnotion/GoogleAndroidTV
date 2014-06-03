@@ -442,7 +442,7 @@ public class TvActivity extends Activity implements
             Log.w(TAG, "There is no selected TV input during startSettingsActivity");
             return false;
         }
-        Intent intent = input.getIntentForSetupActivity();
+        Intent intent = input.getIntentForSettingsActivity();
         if (intent == null) {
             return false;
         }
