@@ -73,7 +73,6 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
             mChannelLogoView.setImageResource(R.drawable.ic_channel_guide);
             mChannelLogoView.setVisibility(VISIBLE);
             mProgramNameView.setText(R.string.menu_program_guide);
-            mProgramNameView.setVisibility(VISIBLE);
         } else {
             mChannelNumberView.setText(mChannel.getDisplayNumber());
             mChannelNameView.setText(mChannel.getDisplayName());
@@ -94,9 +93,8 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
         Program program = Utils.getCurrentProgram(getContext(),
                 Utils.getChannelUri(mChannel.getId()));
         if (program == null || TextUtils.isEmpty(program.getTitle())) {
-            mProgramNameView.setVisibility(GONE);
+            mProgramNameView.setText(getContext().getText(R.string.no_program_information));
         } else {
-            mProgramNameView.setVisibility(VISIBLE);
             mProgramNameView.setText(program.getTitle());
         }
     }
