@@ -17,26 +17,29 @@
 package com.android.tv.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.tv.R;
+import com.android.tv.TvActivity;
 
 public class BaseOptionFragment extends BaseSideFragment {
     private static final String TAG = "ClosedCaptionOptionFragment";
     private static final boolean DEBUG = true;
 
     private View mMainView;
+    private boolean mClosingByItemSelected;
+    private int mFocusedBgColor;
+    private int mBgColor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        mBgColor = getActivity().getResources().getColor(R.color.option_item_background);
+        mFocusedBgColor = getActivity().getResources().getColor(
+                R.color.option_item_focused_background);
         mMainView = super.onCreateView(inflater, container, savedInstanceState);
         return mMainView;
     }
@@ -44,7 +47,14 @@ public class BaseOptionFragment extends BaseSideFragment {
     @Override
     public void onResume() {
         super.onResume();
-        setSelectedPosition(0);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (!mClosingByItemSelected) {
+            ((TvActivity) getActivity()).onSideFragmentCanceled(getInitiator());
+        }
     }
 
     @Override
@@ -58,10 +68,17 @@ public class BaseOptionFragment extends BaseSideFragment {
     }
 
     @Override
+    public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
+        v.setBackgroundColor(focusGained ? mFocusedBgColor : mBgColor);
+    }
+
+    @Override
     public void onItemSelected(View v, int position, Object tag) {
         RadioButton radioButton = (RadioButton) v.findViewById(R.id.option_item);
         uncheckAllRadioButtons((ViewGroup) mMainView);
         radioButton.setChecked(true);
+        mClosingByItemSelected = true;
+        getFragmentManager().popBackStack();
     }
 
     @Override

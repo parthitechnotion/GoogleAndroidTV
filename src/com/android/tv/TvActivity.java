@@ -19,13 +19,14 @@ package com.android.tv;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.tv.TvInputInfo;
@@ -34,6 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
@@ -47,6 +49,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.tv.data.AspectRatio;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.StreamInfo;
@@ -59,6 +62,7 @@ import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
 import com.android.tv.ui.AspectRatioOptionFragment;
+import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
 import com.android.tv.ui.MainMenuView;
@@ -66,6 +70,7 @@ import com.android.tv.ui.SimpleGuideFragment;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.util.TvInputManagerHelper;
+import com.android.tv.util.TvSettings;
 import com.android.tv.util.Utils;
 
 import java.util.HashSet;
@@ -138,6 +143,10 @@ public class TvActivity extends Activity implements
     private boolean mDebugNonFullSizeScreen;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
     private boolean mIsShy = true;
+
+    private boolean mIsClosedCaptionEnabled;
+    private int mAspectRatio;
+    private SharedPreferences mSharedPreferences;
 
     static {
         AVAILABLE_DIALOG_TAGS.add(InputPickerDialogFragment.DIALOG_TAG);
@@ -255,6 +264,10 @@ public class TvActivity extends Activity implements
 
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
         mTvInputManagerHelper = new TvInputManagerHelper(mTvInputManager);
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        restoreClosedCaptionEnabled();
+        restoreAspectRatio();
         onNewIntent(getIntent());
     }
 
@@ -451,8 +464,22 @@ public class TvActivity extends Activity implements
         return true;
     }
 
-    public void showSimpleGuide() {
-        SimpleGuideFragment f = new SimpleGuideFragment(this, mChannelMap);
+    public void showSimpleGuide(int initiator) {
+        showSideFragment(new SimpleGuideFragment(this, mChannelMap), initiator);
+    }
+
+    public void showAspectRatioOption(int initiator) {
+        showSideFragment(new AspectRatioOptionFragment(), initiator);
+    }
+
+    public void showClosedCaptionOption(int initiator) {
+        showSideFragment(new ClosedCaptionOptionFragment(), initiator);
+    }
+
+    public void showSideFragment(Fragment f, int initiator) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(BaseSideFragment.KEY_INITIATOR, initiator);
+        f.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(R.id.right_panel, f);
         ft.addToBackStack(null);
@@ -460,22 +487,10 @@ public class TvActivity extends Activity implements
         ft.commit();
     }
 
-    public void showAspectRatioOption() {
-        AspectRatioOptionFragment f = new AspectRatioOptionFragment();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.right_panel, f);
-        ft.addToBackStack(null);
-        // TODO: add an animation.
-        ft.commit();
-    }
-
-    public void showClosedCaptionOption() {
-        ClosedCaptionOptionFragment f = new ClosedCaptionOptionFragment();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.right_panel, f);
-        ft.addToBackStack(null);
-        // TODO: add an animation.
-        ft.commit();
+    public void onSideFragmentCanceled(int initiator) {
+        if (initiator == BaseSideFragment.INITIATOR_MENU) {
+            displayMainMenu();
+        }
     }
 
     @Override
@@ -835,7 +850,7 @@ public class TvActivity extends Activity implements
                     return true;
                 }
                 case KeyEvent.KEYCODE_O: {
-                    showAspectRatioOption();
+                    showAspectRatioOption(BaseSideFragment.INITIATOR_SHORTCUT_KEY);
                     return true;
                 }
             }
@@ -960,6 +975,42 @@ public class TvActivity extends Activity implements
                 dialog.show(ft, tag);
             }
         });
+    }
+
+    public boolean isClosedCaptionEnabled() {
+        return mIsClosedCaptionEnabled;
+    }
+
+    public void setClosedCaptionEnabled(boolean enable, boolean storeInPreference) {
+        mIsClosedCaptionEnabled = enable;
+        if (storeInPreference) {
+            mSharedPreferences.edit().putBoolean(TvSettings.PREF_CLOSED_CAPTION_ENABLED, enable)
+                    .apply();
+        }
+        // TODO: send the change to TIS
+    }
+
+    public void restoreClosedCaptionEnabled() {
+        setClosedCaptionEnabled(mSharedPreferences.getBoolean(
+                TvSettings.PREF_CLOSED_CAPTION_ENABLED, false), false);
+    }
+
+    // Returns a constant defined in AspectRatio.
+    public int getAspectRatio() {
+        return mAspectRatio;
+    }
+
+    public void setAspectRatio(int ratio, boolean storeInPreference) {
+        mAspectRatio = ratio;
+        if (storeInPreference) {
+            mSharedPreferences.edit().putInt(TvSettings.PREF_ASPECT_RATIO, ratio).apply();
+        }
+        // TODO: change aspect ratio
+    }
+
+    public void restoreAspectRatio() {
+        setAspectRatio(mSharedPreferences.getInt(TvSettings.PREF_ASPECT_RATIO,
+                AspectRatio.RATIO_SET_BY_PROGRAM), false);
     }
 
     private class HideRunnable implements Runnable {
