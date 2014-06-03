@@ -104,6 +104,9 @@
     <!-- Title of the simple guide. [CHAR LIMIT=16]-->
     <string name="simple_guide_title">On Now</string>
 
+    <!-- Title of the show only simple guide. [CHAR LIMIT=16]-->
+    <string name="show_only_title">Show Only</string>
+
     <!-- Title of Aspect Ratio option. [CHAR LIMIT=16]-->
     <string name="aspect_ratio_option_title">Aspect Ratio</string>
 

@@ -45,13 +45,30 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/program_title"
-        android:layout_height="match_parent"
+    <LinearLayout
+        android:id="@+id/program"
         android:layout_width="match_parent"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="@dimen/simple_guide_program_title_padding_left"
-        android:textSize="@dimen/simple_guide_item_large_text_size"
-        android:textColor="@color/menu_default_text_color"
-        android:fontFamily="@string/font" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingLeft="@dimen/simple_guide_padding_left" >
+        <TextView
+            android:id="@+id/program_title"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="@dimen/simple_guide_program_title_padding_left"
+            android:textSize="@dimen/simple_guide_item_large_text_size"
+            android:textColor="@color/menu_default_text_color"
+            android:fontFamily="@string/font" />
+        <TextView
+            android:id="@+id/program_info"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="@dimen/simple_guide_program_title_padding_left"
+            android:textSize="@dimen/simple_guide_item_small_text_size"
+            android:textColor="@color/simple_guide_small_text_color"
+            android:fontFamily="@string/font" />
+        </LinearLayout>
 </LinearLayout>

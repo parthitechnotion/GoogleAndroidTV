@@ -23,4 +23,15 @@
         <item>Zoom</item>
         <item>Set by program</item>
     </string-array>
+
+    <!-- The show_only_label should be synced with src/com/android/tv/data/ShowOnlyItems.java -->
+    <string-array name="show_only_label">
+        <item>All channels</item>
+        <item>Favorites</item>
+        <item>Sports</item>
+        <item>Kids</item>
+        <item>Moview</item>
+        <item>Reality &amp; games</item>
+        <item>News &amp; talks</item>
+    </string-array>
 </resources>
