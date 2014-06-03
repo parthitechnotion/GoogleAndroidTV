@@ -62,6 +62,7 @@ import com.android.tv.ui.AspectRatioOptionFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
 import com.android.tv.ui.MainMenuView;
+import com.android.tv.ui.SimpleGuideFragment;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.util.TvInputManagerHelper;
@@ -448,6 +449,15 @@ public class TvActivity extends Activity implements
         }
         startActivity(intent);
         return true;
+    }
+
+    public void showSimpleGuide() {
+        SimpleGuideFragment f = new SimpleGuideFragment(this, mChannelMap);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(R.id.right_panel, f);
+        ft.addToBackStack(null);
+        // TODO: add an animation.
+        ft.commit();
     }
 
     public void showAspectRatioOption() {
