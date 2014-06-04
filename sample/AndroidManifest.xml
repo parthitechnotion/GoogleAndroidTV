@@ -36,7 +36,8 @@
             <intent-filter>
                 <action android:name="android.media.tv.TvInputService" />
             </intent-filter>
-            <meta-data android:name="android.media.tv.input" android:resource="@xml/tvinputservice" />
+            <meta-data android:name="android.media.tv.input"
+                android:resource="@xml/tvinputservice" />
         </service>
         <service android:name="com.example.sampletvinput.HlsTvInputService"
             android:permission="android.permission.BIND_TV_INPUT"
@@ -45,7 +46,8 @@
             <intent-filter>
                 <action android:name="android.media.tv.TvInputService" />
             </intent-filter>
-            <meta-data android:name="android.media.tv.input" android:resource="@xml/tvinputservice" />
+            <meta-data android:name="android.media.tv.input"
+                android:resource="@xml/tvinputservice" />
         </service>
     </application>
 </manifest>
