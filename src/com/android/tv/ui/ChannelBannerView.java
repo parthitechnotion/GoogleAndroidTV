@@ -109,11 +109,13 @@ public class ChannelBannerView extends LinearLayout {
         }
 
         if (info.hasClosedCaption()) {
+            mClosedCaptionTextView.setVisibility(View.VISIBLE);
             mClosedCaptionTextView.setText("CC");
         } else {
-            mResolutionTextView.setVisibility(View.GONE);
+            mClosedCaptionTextView.setVisibility(View.GONE);
         }
         if (info.getVideoDefinitionLevel() != StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN) {
+            mResolutionTextView.setVisibility(View.VISIBLE);
             mResolutionTextView.setText(Utils.getVideoDefinitionLevelString(
                     info.getVideoDefinitionLevel()));
         } else {
@@ -122,6 +124,7 @@ public class ChannelBannerView extends LinearLayout {
         // TODO: implement aspect ratio.
         mAspectRatioTextView.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(Utils.getAudioChannelString(info.getAudioChannelCount()))) {
+            mAudioChannelTextView.setVisibility(View.VISIBLE);
             mAudioChannelTextView.setText(Utils.getAudioChannelString(info.getAudioChannelCount()));
         } else {
             mAudioChannelTextView.setVisibility(View.GONE);
@@ -164,6 +167,7 @@ public class ChannelBannerView extends LinearLayout {
             long startTime = program.getStartTimeUtcMillis();
             long endTime = program.getEndTimeUtcMillis();
             if (startTime > 0 && endTime > 0) {
+                mProgramTimeTextView.setVisibility(View.VISIBLE);
                 mRemainingTimeView.setVisibility(View.VISIBLE);
 
                 String startTimeText = getFormattedTimeString(startTime);
@@ -185,9 +189,16 @@ public class ChannelBannerView extends LinearLayout {
                 mProgramTimeTextView.setVisibility(View.GONE);
                 mRemainingTimeView.setVisibility(View.GONE);
             }
+        } else {
+            mProgramTextView.setText(mContext.getString(R.string.channel_banner_no_title));
+            mProgramTimeTextView.setVisibility(View.GONE);
+            mRemainingTimeView.setVisibility(View.GONE);
         }
         if (!TextUtils.isEmpty(program.getDescription())) {
+            mProgrameDescriptionTextView.setVisibility(View.VISIBLE);
             mProgrameDescriptionTextView.setText(program.getDescription());
+        } else {
+            mProgrameDescriptionTextView.setVisibility(View.GONE);
         }
     }
 
