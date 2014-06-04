@@ -36,6 +36,7 @@ public class BaseSideFragment extends Fragment {
     public static final int INITIATOR_UNKNOWN = 0;
     public static final int INITIATOR_SHORTCUT_KEY = 1;
     public static final int INITIATOR_MENU = 2;
+    public static final int INITIATOR_SIMPLE_GUIDE = 3;
 
     private String mTitle;
     private TextView mTitleView;

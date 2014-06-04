@@ -33,4 +33,5 @@
     <color name="simple_guide_fragment_background">#333333</color>
     <color name="simple_guide_fragment_focused_background">#5C6467</color>
     <color name="simple_guide_fragment_header_background">#000000</color>
+    <color name="simple_guide_small_text_color">#888888</color>
 </resources>

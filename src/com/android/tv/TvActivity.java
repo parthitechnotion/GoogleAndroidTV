@@ -67,6 +67,7 @@ import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.SimpleGuideFragment;
+import com.android.tv.ui.SimpleGuideShowOnlyFragment;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.util.TvInputManagerHelper;
@@ -464,8 +465,13 @@ public class TvActivity extends Activity implements
         return true;
     }
 
-    public void showSimpleGuide(int initiator) {
-        showSideFragment(new SimpleGuideFragment(this, mChannelMap), initiator);
+    public void showSimpleGuide() {
+        showSideFragment(new SimpleGuideFragment(this, mChannelMap),
+                BaseSideFragment.INITIATOR_UNKNOWN);
+    }
+
+    public void showSimpleGuideShowOnlyMenu(int initiator) {
+        showSideFragment(new SimpleGuideShowOnlyFragment(this), initiator);
     }
 
     public void showAspectRatioOption(int initiator) {
@@ -490,6 +496,8 @@ public class TvActivity extends Activity implements
     public void onSideFragmentCanceled(int initiator) {
         if (initiator == BaseSideFragment.INITIATOR_MENU) {
             displayMainMenu();
+        } else if (initiator == BaseSideFragment.INITIATOR_SIMPLE_GUIDE) {
+            showSimpleGuide();
         }
     }
 
