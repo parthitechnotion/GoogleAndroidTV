@@ -33,6 +33,8 @@ import com.android.tv.input.TvInput;
 import com.android.tv.util.TvInputManagerHelper;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.TreeMap;
 
 /**
  * The class that abstracts the channel information for each input service and provides convenient
@@ -58,7 +60,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mIndexServiceName;
     private int mIndexBrowsable;
     private int mBrowsableChannelCount;
-    private final ArrayList<Channel> mChannelList = new ArrayList<Channel>();
+    private final TreeMap<Long, Channel> mChannelMap = new TreeMap<Long, Channel>();
 
     public ChannelMap(Activity activity, TvInput tvInput, long initChannelId,
             TvInputManagerHelper tvInputManagerHelper, Runnable onLoadFinished) {
@@ -83,13 +85,18 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return mInput;
     }
 
+    public boolean contains(Channel c) {
+        return mChannelMap.containsKey(c.getId());
+    }
+
     public Channel[] getChannelList(boolean browsableOnly) {
+        Collection<Channel> channelList = mChannelMap.values();
         if (mBrowsableChannelCount == 0 || !browsableOnly) {
-            return mChannelList.toArray(new Channel[0]);
+            return channelList.toArray(new Channel[0]);
         }
 
         ArrayList<Channel> list = new ArrayList<Channel>();
-        for (Channel channel : mChannelList) {
+        for (Channel channel : channelList) {
             if (channel.isBrowsable()) {
                 list.add(channel);
             }
@@ -229,19 +236,20 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mIndexServiceName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_SERVICE_NAME);
         mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
         mBrowsableChannelCount = 0;
-        mChannelList.clear();
+        mChannelMap.clear();
         if (mCursor.getCount() > 0) {
             long firstBrowsableChannelId = Channel.INVALID_ID;
 
             mCursor.moveToFirst();
             do {
-                mChannelList.add(new Channel.Builder()
+                Channel channel = new Channel.Builder()
                         .setId(mCursor.getLong(mIndexId))
                         .setServiceName(mCursor.getString(mIndexServiceName))
                         .setDisplayNumber(mCursor.getString(mIndexDisplayNumber))
                         .setDisplayName(mCursor.getString(mIndexDisplayName))
                         .setBrowsable(mCursor.getInt(mIndexBrowsable) == BROWSABLE)
-                        .build());
+                        .build();
+                mChannelMap.put(channel.getId(), channel);
                 if (mCursor.getInt(mIndexBrowsable) == BROWSABLE) {
                     ++mBrowsableChannelCount;
                     if (firstBrowsableChannelId == Channel.INVALID_ID) {

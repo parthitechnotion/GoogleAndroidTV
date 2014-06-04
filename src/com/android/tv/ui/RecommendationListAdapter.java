@@ -25,6 +25,8 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.recommendation.TvRecommendation;
 
+import java.util.ArrayList;
+
 /*
  * An adapter of recommended channel list.
  */
@@ -83,11 +85,16 @@ public class RecommendationListAdapter extends ItemListView.ItemListAdapter {
         TvRecommendation.ChannelRecord[] records =
                 mRecommendationEngine.getRecommendedChannelList(mMaxCount);
         mChannelList = null;
-        if (records != null && records.length > 0) {
-            mChannelList = new Channel[records.length];
+        if (mChannelMap != null && mChannelMap.size() > 0 && records != null
+                && records.length > 0) {
+            ArrayList<Channel> results = new ArrayList<Channel>();
             for (int i = 0; i < records.length; i++) {
-                mChannelList[i] = records[i].getChannel();
+                Channel channel = records[i].getChannel();
+                if (channel.isBrowsable() && mChannelMap.contains(channel)) {
+                    results.add(channel);
+                }
             }
+            mChannelList = results.toArray(new Channel[0]);
         }
 
         if (mGuideIncluded) {
