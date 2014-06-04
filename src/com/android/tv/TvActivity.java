@@ -251,7 +251,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 }
 
                 if (event.getX() > mLeftMargin && event.getX() < mRightMargin) {
-                    displayMainMenu();
+                    displayMainMenu(true);
                     return true;
                 }
                 return false;
@@ -489,7 +489,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     public void onSideFragmentCanceled(int initiator) {
         if (initiator == BaseSideFragment.INITIATOR_MENU) {
-            displayMainMenu();
+            displayMainMenu(false);
         } else if (initiator == BaseSideFragment.INITIATOR_SIMPLE_GUIDE) {
             showSimpleGuide();
         }
@@ -715,7 +715,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         });
     }
 
-    private void displayMainMenu() {
+    private void displayMainMenu(final boolean resetSelectedItemPosition) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -723,6 +723,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     return;
                 }
 
+                if (!mMainMenuView.isShown() && resetSelectedItemPosition) {
+                    mMainMenuView.resetSelectedItemPosition();
+                }
                 mHideMainMenu.showAndHide();
             }
         });
@@ -808,7 +811,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
                 case KeyEvent.KEYCODE_DPAD_LEFT:
                 case KeyEvent.KEYCODE_DPAD_RIGHT:
-                    displayMainMenu();
+                    displayMainMenu(true);
                     return true;
 
                 case KeyEvent.KEYCODE_ENTER:
@@ -823,7 +826,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                         updateChannelBanner(true);
                     }
                     if (keyCode != KeyEvent.KEYCODE_E) {
-                        displayMainMenu();
+                        displayMainMenu(true);
                     }
                     return true;
             }
