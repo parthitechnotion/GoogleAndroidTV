@@ -14,13 +14,12 @@
      limitations under the License.
 -->
 
-<view
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/simple_guide_item_height"
     android:focusable="true"
-    android:orientation="horizontal"
-    class="com.android.tv.ui.SimpleGuideFragment$ShadedItemContainer" >
+    android:orientation="horizontal" >
 
     <LinearLayout
         android:id="@+id/channel"
@@ -55,4 +54,4 @@
         android:textSize="@dimen/simple_guide_item_large_text_size"
         android:textColor="@color/menu_default_text_color"
         android:fontFamily="@string/font" />
-</view>
+</LinearLayout>

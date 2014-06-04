@@ -14,13 +14,11 @@
      limitations under the License.
 -->
 
-<view
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/option_item_height"
     android:focusable="true"
-    android:orientation="horizontal"
-    class="com.android.tv.ui.BaseSideFragment$ShadedItemContainer" >
+    android:orientation="horizontal" >
 
     <RadioButton
         android:id="@+id/option_item"
@@ -33,4 +31,4 @@
         android:textColor="@color/menu_default_text_color"
         android:focusable="false"
         android:fontFamily="@string/font" />
-</view>
+</LinearLayout>

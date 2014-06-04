@@ -26,4 +26,6 @@ public final class TvSettings {
     public static final String PREFS_FILE = "settings";
     public static final String PREF_TV_WATCH_LOGGING_ENABLED = "tv_watch_logging_enabled";
     public static final String PREF_DISPLAY_INPUT_NAME = "display_input_name_";
+    public static final String PREF_CLOSED_CAPTION_ENABLED = "is_cc_enabled";  // boolean value
+    public static final String PREF_ASPECT_RATIO = "aspect_ratio";  // int value
 }

@@ -17,22 +17,30 @@
 package com.android.tv.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.android.tv.R;
+import com.android.tv.TvActivity;
 import com.android.tv.data.AspectRatio;
 
 public class AspectRatioOptionFragment extends BaseOptionFragment {
     private static final String TAG = "AspectRatioOptionFragment";
     private static final boolean DEBUG = true;
 
+    private TvActivity mTvActivity;
+    private boolean mIsFirstResume;
+    private int mLastStoredAspectRatio;
+    private int mAspectRatio;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        mIsFirstResume = true;
+        mTvActivity = (TvActivity) getActivity();
+
         Object[] items = new Object[AspectRatio.SIZE_OF_RATIO_TYPES];
         for (int i = 0; i < AspectRatio.SIZE_OF_RATIO_TYPES; ++i) {
             items[i] = AspectRatio.getLabel(i, getActivity());
@@ -44,23 +52,39 @@ public class AspectRatioOptionFragment extends BaseOptionFragment {
     @Override
     public void onResume() {
         super.onResume();
-        setSelectedPosition(0);
+        if (mIsFirstResume) {
+            mAspectRatio = mTvActivity.getAspectRatio();
+            mLastStoredAspectRatio = mAspectRatio;
+            int initialPosition = mAspectRatio;
+            setSelectedPosition(initialPosition);
+            setPrevSelectedItemPosition(initialPosition);
+            mIsFirstResume = false;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mLastStoredAspectRatio != mAspectRatio) {
+            mTvActivity.restoreAspectRatio();
+        }
     }
 
     @Override
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
         super.onItemFocusChanged(v, focusGained, position, tag);
-        if (DEBUG) Log.d(TAG, "onItemFocusChanged " + focusGained + ": position=" + position
-                + ", label=" + (String) tag);
-        // TODO: temporally change aspect ratio to test the focused ratio.
+        if (focusGained) {
+            mAspectRatio = position;
+            mTvActivity.setAspectRatio(position, false);
+        }
     }
 
     @Override
     public void onItemSelected(View v, int position, Object tag) {
+        mAspectRatio = position;
+        mTvActivity.setAspectRatio(mAspectRatio, true);
+        mLastStoredAspectRatio = mAspectRatio;
         super.onItemSelected(v, position, tag);
-        if (DEBUG) Log.d(TAG, "onItemSelected: position=" + position + ", label=" + (String) tag);
-        // TODO: change aspect ratio.
         Toast.makeText(getActivity(), R.string.not_implemented_yet, Toast.LENGTH_SHORT).show();
-        getFragmentManager().popBackStack();
     }
 }
