@@ -16,8 +16,6 @@
 
 <resources>
 
-    <color name="option_item_background">#455A64</color>
-    <color name="option_item_focused_background">#5C6467</color>
     <color name="channel_tile_top">#03A9F4</color>
     <color name="channel_tile_bottom">#0288D1</color>
 
@@ -27,8 +25,11 @@
 
     <color name="menu_default_text_color">#FFEEEEEE</color>
 
-    <color name="option_fragment_background">#455A64</color>
-    <color name="option_fragment_header_background">#03A0F4</color>
+    <color name="option_fragment_background">#384248</color>
+    <color name="option_fragment_header_background">#00A6F6</color>
+
+    <color name="option_item_background">#384248</color>
+    <color name="option_item_focused_background">#5C6467</color>
 
     <color name="simple_guide_fragment_background">#333333</color>
     <color name="simple_guide_fragment_focused_background">#5C6467</color>

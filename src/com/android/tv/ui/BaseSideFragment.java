@@ -48,6 +48,7 @@ public class BaseSideFragment extends Fragment {
     private int mFragmentLayoutId;
     private int mItemLayoutId;
     private int mInitiator;
+    private boolean mHasDummyItem;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,9 +63,9 @@ public class BaseSideFragment extends Fragment {
         }
 
         View fragView = inflater.inflate(mFragmentLayoutId, container, false);
-        mTitleView = (TextView) fragView.findViewById(R.id.option_title);
+        mTitleView = (TextView) fragView.findViewById(R.id.side_panel_title);
         mTitleView.setText(mTitle);
-        mOptionItemListView = (VerticalGridView) fragView.findViewById(R.id.option_list);
+        mOptionItemListView = (VerticalGridView) fragView.findViewById(R.id.side_panel_list);
         mOptionItemListView.setAdapter(mAdapter);
         mLayoutInflater = inflater;
         return fragView;
@@ -89,17 +90,18 @@ public class BaseSideFragment extends Fragment {
     }
 
     public void setSelectedPosition(int position) {
-        mOptionItemListView.setSelectedPosition(position + 1);
+        mOptionItemListView.setSelectedPosition(mHasDummyItem ? position + 1 : position);
         mOptionItemListView.requestFocus();
     }
 
     protected void initialize(String title, Object[] itemTags, int fragmentLayoutId,
-            int itemLayoutId) {
+            int itemLayoutId, boolean addDummyItemForMargin) {
         Preconditions.checkState(!TextUtils.isEmpty(title));
         mTitle = title;
         mItemTags = itemTags;
         mFragmentLayoutId = fragmentLayoutId;
         mItemLayoutId = itemLayoutId;
+        mHasDummyItem = addDummyItemForMargin;
         mAdapter.notifyDataSetChanged();
     }
 
@@ -127,12 +129,14 @@ public class BaseSideFragment extends Fragment {
         @Override
         public void onBindViewHolder(MyViewHolder baseHolder, int position) {
             View v = baseHolder.itemView;
-            if (position <= 0 || position >= getItemCount() - 1) {
+            if (mHasDummyItem && (position <= 0 || position >= getItemCount() - 1)) {
                 // The first and the last items are dummy items to give a margin.
                 v.setVisibility(View.INVISIBLE);
             } else {
                 // Since position 0 is a dummy item, recalculate the position.
-                position = position - 1;
+                if (mHasDummyItem) {
+                    position = position - 1;
+                }
                 v.setVisibility(View.VISIBLE);
                 onBindView(v, position, mItemTags[position], position == mPrevSelectedItemPosition);
                 v.setTag(R.id.TAG_OPTION_ITEM_POSITOIN, position);
@@ -141,7 +145,7 @@ public class BaseSideFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return mItemTags == null ? 0 : mItemTags.length + 2;
+            return mItemTags == null ? 0 : mHasDummyItem ? mItemTags.length + 2 : mItemTags.length;
         }
 
         private class MyViewHolder extends RecyclerView.ViewHolder {

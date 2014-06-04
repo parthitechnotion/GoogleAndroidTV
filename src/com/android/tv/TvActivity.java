@@ -469,7 +469,7 @@ public class TvActivity extends Activity implements
     }
 
     public void showSimpleGuideShowOnlyMenu(int initiator) {
-        showSideFragment(new SimpleGuideShowOnlyFragment(this), initiator);
+        showSideFragment(new SimpleGuideShowOnlyFragment(), initiator);
     }
 
     public void showAspectRatioOption(int initiator) {

@@ -16,46 +16,28 @@
 
 package com.android.tv.ui;
 
-import android.content.ContentUris;
-import android.content.Context;
-import android.graphics.Rect;
-import android.media.tv.TvContract;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tv.R;
-import com.android.tv.TvActivity;
-import com.android.tv.data.AspectRatio;
-import com.android.tv.data.Channel;
 import com.android.tv.data.ShowOnlyItems;
-import com.android.tv.data.Program;
-import com.android.tv.util.Utils;
 
 public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
     private static final String TAG = "SimpleGuideShowOnlyFragment";
     private static final boolean DEBUG = true;
 
-    private final TvActivity mTvActivity;
     private View mMainView;
     private int mFocusedItemPosition;
-    private int mSelectedItemPosition;
     private int mFocusedBgColor;
     private int mBgColor;
 
-    public SimpleGuideShowOnlyFragment(TvActivity tvActivity) {
+    public SimpleGuideShowOnlyFragment() {
         super();
-        mTvActivity = tvActivity;
     }
 
     @Override
@@ -70,10 +52,13 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
             items[i] = ShowOnlyItems.getLabel(i, getActivity());
         }
         initialize(getString(R.string.show_only_title), items,
-                R.layout.simple_guide_fragment, R.layout.show_only_item);
+                R.layout.simple_guide_fragment, R.layout.show_only_item, false);
         // TODO: set the current position correctly.
         mFocusedItemPosition = 0;
         mMainView = super.onCreateView(inflater, container, savedInstanceState);
+        // This fragment is always added on top of SimpleGuideFragment. So we need to make
+        // this fragment shadow invisible.
+        mMainView.findViewById(R.id.side_panel_shadow).setVisibility(View.INVISIBLE);
         return mMainView;
     }
 
@@ -106,7 +91,6 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
             return;
         }
 
-        mSelectedItemPosition = position;
         mFocusedItemPosition = position;
 
         RadioButton radioButton = (RadioButton) v.findViewById(R.id.show_only_item);
