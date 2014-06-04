@@ -20,6 +20,9 @@ import com.android.tv.recommendation.TvRecommendation.ChannelRecord;
 import com.android.tv.recommendation.TvRecommendation.TvRecommender;
 
 public class RecentChannelRecommender extends TvRecommender {
+    private static final long MIN_WATCH_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+    private static final double FACTOR_OF_TOO_SHORT_WATCH_DURATION = 1. / 1000000000.0;
+
     private long mLastWatchLogUpdateTimeMs;
 
     public RecentChannelRecommender() {
@@ -36,6 +39,11 @@ public class RecentChannelRecommender extends TvRecommender {
         if (cr.getLastWatchedTimeMs() == 0l) {
             return NOT_RECOMMENDED;
         }
-        return ((double) cr.getLastWatchedTimeMs()) / mLastWatchLogUpdateTimeMs;
+
+        double ret = ((double) cr.getLastWatchedTimeMs()) / mLastWatchLogUpdateTimeMs;
+        if (cr.getLastWatchDurationMs() <= MIN_WATCH_DURATION_MS) {
+            ret *= FACTOR_OF_TOO_SHORT_WATCH_DURATION;
+        }
+        return ret;
     }
 }

@@ -99,15 +99,11 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     protected void onAttachedToWindow() {
         Context context = getContext();
 
-        // List for enabled channels
-        mAllAdapterList.add(new ChannelListAdapter(context, mHandler, this, true, null,
-                context.getResources().getDimensionPixelOffset(R.dimen.channel_list_view_height)));
-
-        // List for recommended channels
-        mTvRecommendation = new TvRecommendation(context, mHandler);
+        // List for guide + recent channels
+        mTvRecommendation = new TvRecommendation(context, mHandler, true);
         mAllAdapterList.add(new RecommendationListAdapter(context, mHandler, this,
-                mTvRecommendation, MAX_COUNT_FOR_RECOMMENDATION, R.layout.channel_tile,
-                context.getString(R.string.recommended_channel_list_title),
+                mTvRecommendation, true, MAX_COUNT_FOR_RECOMMENDATION, R.layout.channel_tile,
+                context.getString(R.string.channel_list_title),
                 context.getResources().getDimensionPixelOffset(R.dimen.channel_list_view_height)));
 
         // List for options
