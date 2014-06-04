@@ -17,19 +17,15 @@
 package com.android.tv.ui;
 
 import android.content.ContentUris;
-import android.content.Context;
-import android.graphics.Rect;
 import android.media.tv.TvContract;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.tv.R;
@@ -76,7 +72,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
         }
 
         initialize(getString(R.string.simple_guide_title), itemTags,
-                R.layout.simple_guide_fragment, R.layout.simple_guide_item);
+                R.layout.simple_guide_fragment, R.layout.simple_guide_item, false);
         mCurPosition = getCurrentChannelPosition();
         setPrevSelectedItemPosition(mCurPosition);
         return super.onCreateView(inflater, container, savedInstanceState);
