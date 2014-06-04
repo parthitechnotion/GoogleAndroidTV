@@ -148,22 +148,26 @@ public class Utils {
         Uri uri = TvContract.buildProgramsUriForChannel(channelUri, time, time);
         String[] projection = {
                 TvContract.Programs.COLUMN_TITLE,
+                TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
                 TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
                 TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS };
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         String title = null;
+        String description = null;
         long startTime = -1;
         long endTime = -1;
         if (cursor.moveToNext()) {
             title = cursor.getString(0);
-            startTime = cursor.getLong(1);
-            endTime = cursor.getLong(2);
+            description = cursor.getString(1);
+            startTime = cursor.getLong(2);
+            endTime = cursor.getLong(3);
         }
         cursor.close();
 
         // TODO: Consider providing the entire data if needed.
         return new Program.Builder()
                 .setTitle(title)
+                .setDescription(description)
                 .setStartTimeUtcMillis(startTime)
                 .setEndTimeUtcMillis(endTime).build();
     }
@@ -214,7 +218,6 @@ public class Utils {
         return StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
     }
 
-    /* TODO: remove this method once we have assets for video formats */
     public static String getVideoDefinitionLevelString(int videoFormat) {
         switch (videoFormat) {
             case StreamInfo.VIDEO_DEFINITION_LEVEL_ULTRA_HD:
@@ -229,7 +232,6 @@ public class Utils {
         return "";
     }
 
-    /* TODO: remove this method once we have assets for audio channels */
     public static String getAudioChannelString(int channelCount) {
         switch (channelCount) {
             case 1:
@@ -238,6 +240,8 @@ public class Utils {
                 return "STEREO";
             case 6:
                 return "5.1";
+            case 8:
+                return "7.1";
         }
         return "";
     }

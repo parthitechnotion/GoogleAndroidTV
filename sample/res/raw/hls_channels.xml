@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2014 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<Channels>
+    <Channel
+        display_number="2-1"
+        display_name="NTSC(SD)"
+        video_width="720"
+        video_height="480"
+        audio_channel_count="2"
+        has_closed_caption="false" >
+        <Program
+            title="Bip-Bop"
+            start_time="2014-06-06 10:00"
+            duration_sec="3600"
+            video_url="http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8"
+            description="Bip-Bop sample video - Low resolution" />
+    </Channel>
+    <Channel
+        display_number="2-2"
+        display_name="NTSC(HD)"
+        video_width="1280"
+        video_height="720"
+        audio_channel_count="2"
+        has_closed_caption="false" >
+        <Program
+            title="Bip-Bop"
+            start_time="2014-06-06 10:00"
+            duration_sec="3600"
+            video_url="http://devimages.apple.com/iphone/samples/bipbop/gear4/prog_index.m3u8"
+            description="Bip-Bop sample video - High resolution" />
+    </Channel>
+    <Channel
+        display_number="3-1"
+        display_name="BUNNY"
+        video_width="1280"
+        video_height="720"
+        audio_channel_count="2"
+        has_closed_caption="false" >
+        <Program
+            title="Big Buck Bunny"
+            start_time="2014-06-06 10:00"
+            duration_sec="3600"
+            video_url="http://playertest.longtailvideo.com/adaptive/bbbfull/bbbfull.m3u8"
+            description="Big Buck Bunny Sample Video" />
+    </Channel>
+</Channels>

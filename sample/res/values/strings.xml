@@ -18,6 +18,7 @@
     <string name="sample_tv_input">SampleTvInput</string>
     <string name="local_input_label">Sample Input 1: Overlay View Test</string>
     <string name="hls_input_label">Sample Input 2: HLS Streaming</string>
+    <string name="external_input_label">Sample Input 3: External Files</string>
     <string name="overlay_view_test">Overlay View Test</string>
     <string name="webview_toggle_button">Toggle WebView</string>
 </resources>

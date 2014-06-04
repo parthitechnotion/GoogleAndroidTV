@@ -20,28 +20,21 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.util.Log;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HlsTvInputService extends BaseTvInputService {
-    private static final String CHANNEL_1_NUMBER = "2-1";
-    private static final String CHANNEL_2_NUMBER = "2-2";
-    private static final String CHANNEL_3_NUMBER = "3-1";
-    private static final String CHANNEL_1_NAME = "NTSC(SD)";
-    private static final String CHANNEL_2_NAME = "NTSC(HD)";
-    private static final String CHANNEL_3_NAME = "BUNNY";
-    private static final String SOURCE_1 =
-            "http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8";
-    private static final String SOURCE_2 =
-            "http://devimages.apple.com/iphone/samples/bipbop/gear4/prog_index.m3u8";
-    private static final String SOURCE_3 =
-            "http://playertest.longtailvideo.com/adaptive/bbbfull/bbbfull.m3u8";
+    private static String TAG = "HlsTvInputService";
 
     private NetworkStateReceiver mNetworkStateReceiver;
 
@@ -63,32 +56,14 @@ public class HlsTvInputService extends BaseTvInputService {
     @Override
     public List<ChannelInfo> createSampleChannels() {
         List<ChannelInfo> list = new ArrayList<ChannelInfo>();
-        list.add(new ChannelInfo(CHANNEL_1_NUMBER, CHANNEL_1_NAME));
-        list.add(new ChannelInfo(CHANNEL_2_NUMBER, CHANNEL_2_NAME));
-        list.add(new ChannelInfo(CHANNEL_3_NUMBER, CHANNEL_3_NAME));
-        return list;
-    }
-
-    @Override
-    public boolean setDataSource(MediaPlayer player, String channelNumber) {
-        String dataSource;
-        if (CHANNEL_1_NUMBER.equals(channelNumber)) {
-            dataSource = SOURCE_1;
-        } else if (CHANNEL_2_NUMBER.equals(channelNumber)) {
-            dataSource = SOURCE_2;
-        } else if (CHANNEL_3_NUMBER.equals(channelNumber)) {
-            dataSource = SOURCE_3;
-        } else {
-            throw new IllegalArgumentException("Unknown channel number: " + channelNumber);
-        }
-
         try {
-            player.setDataSource(dataSource);
-        } catch (IllegalArgumentException | SecurityException | IllegalStateException
-                | IOException e) {
-            return false;
+            InputStream is = getResources().openRawResource(R.raw.hls_channels);
+            list = ChannelXMLParser.parseChannelXML(is);
+        } catch (XmlPullParserException | IOException e) {
+            // TODO: Disable this service.
+            Log.w(TAG, "failed to load channels.");
         }
-        return true;
+        return list;
     }
 
     private class NetworkStateReceiver extends BroadcastReceiver {
