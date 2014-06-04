@@ -2,11 +2,8 @@ package com.android.tv.ui;
 
 import android.content.Context;
 import android.media.tv.TvInputInfo;
-import android.media.tv.TvInputManager;
-import android.media.tv.TvInputManager.Session;
+import android.media.tv.TvInputManager.TvInputListener;
 import android.media.tv.TvView;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -23,34 +20,16 @@ public class TunableTvView extends TvView implements StreamInfo {
     private static final String TAG = "TunableTvView";
 
     private static final int DELAY_FOR_SURFACE_RELEASE = 300;
-    private static final int MSG_TUNE = 0;
 
     private float mVolume;
     private long mChannelId = Channel.INVALID_ID;
     private TvInputManagerHelper mInputManagerHelper;
     private boolean mStarted;
     private TvInputInfo mInputInfo;
-    private TvInputManager.Session mSession;
     private OnTuneListener mOnTuneListener;
     private int mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
     private int mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
     private boolean mHasClosedCaption = false;
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_TUNE:
-                    Preconditions.checkState(mChannelId != Channel.INVALID_ID);
-                    Preconditions.checkNotNull(mSession);
-
-                    mSession.tune(Utils.getChannelUri(mChannelId));
-                    if (mOnTuneListener != null) {
-                        mOnTuneListener.onTuned(true, mChannelId);
-                    }
-                    break;
-            }
-        }
-    };
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
@@ -73,42 +52,33 @@ public class TunableTvView extends TvView implements StreamInfo {
         }
     };
 
-    private final TvInputManager.SessionCallback mSessionCallback =
-            new TvInputManager.SessionCallback() {
+    private final TvInputListener mListener =
+            new TvInputListener() {
                 @Override
-                public void onSessionCreated(TvInputManager.Session session) {
-                    if (session != null) {
-                        mSession = session;
-                        setStreamVolume(mVolume);
-                        mHandler.sendEmptyMessage(MSG_TUNE);
-                    } else {
-                        Log.w(TAG, "Failed to create a session");
+                public void onError(String inputId, int errorCode) {
+                    if (errorCode == TvView.ERROR_BUSY) {
+                        Log.w(TAG, "Failed to bind an input");
                         long channelId = mChannelId;
                         mChannelId = Channel.INVALID_ID;
                         mInputInfo = null;
-                        mSession = null;
                         if (mOnTuneListener != null) {
                             mOnTuneListener.onTuned(false, channelId);
+                            mOnTuneListener = null;
+                        }
+                    } else if (errorCode == TvView.ERROR_TV_INPUT_DISCONNECTED) {
+                        Log.w(TAG, "Session is released by crash");
+                        long channelId = mChannelId;
+                        mChannelId = Channel.INVALID_ID;
+                        mInputInfo = null;
+                        if (mOnTuneListener != null) {
+                            mOnTuneListener.onUnexpectedStop(channelId);
                             mOnTuneListener = null;
                         }
                     }
                 }
 
                 @Override
-                public void onSessionReleased(TvInputManager.Session session) {
-                    Log.w(TAG, "Session is released by crash");
-                    long channelId = mChannelId;
-                    mChannelId = Channel.INVALID_ID;
-                    mInputInfo = null;
-                    mSession = null;
-                    if (mOnTuneListener != null) {
-                        mOnTuneListener.onUnexpectedStop(channelId);
-                        mOnTuneListener = null;
-                    }
-                }
-
-                @Override
-                public void onVideoStreamChanged(Session session, int width, int height,
+                public void onVideoStreamChanged(String inputId, int width, int height,
                         boolean interlaced) {
                     mVideoFormat = Utils.getVideoDefinitionLevelFromSize(width, height);
                     if (mOnTuneListener != null) {
@@ -117,7 +87,7 @@ public class TunableTvView extends TvView implements StreamInfo {
                 }
 
                 @Override
-                public void onAudioStreamChanged(Session session, int channelCount) {
+                public void onAudioStreamChanged(String inputId, int channelCount) {
                     mAudioChannelCount = channelCount;
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
@@ -125,8 +95,7 @@ public class TunableTvView extends TvView implements StreamInfo {
                 }
 
                 @Override
-                public void onClosedCaptionStreamChanged(Session session,
-                        boolean hasClosedCaption) {
+                public void onClosedCaptionStreamChanged(String inputId, boolean hasClosedCaption) {
                     mHasClosedCaption = hasClosedCaption;
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
@@ -159,10 +128,8 @@ public class TunableTvView extends TvView implements StreamInfo {
         if (!mStarted) {
             return;
         }
-        mHandler.removeMessages(MSG_TUNE);
         mStarted = false;
-        mSession = null;
-        unbindTvInput();
+        reset();
         mChannelId = Channel.INVALID_ID;
         mInputInfo = null;
         mOnTuneListener = null;
@@ -177,7 +144,6 @@ public class TunableTvView extends TvView implements StreamInfo {
             throw new IllegalStateException("TvView isn't started");
         }
         if (DEBUG) Log.d(TAG, "tuneTo " + channelId);
-        mHandler.removeMessages(MSG_TUNE);
         mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
         mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
         mHasClosedCaption = false;
@@ -189,9 +155,7 @@ public class TunableTvView extends TvView implements StreamInfo {
         mOnTuneListener = listener;
         mChannelId = channelId;
         if (!inputInfo.equals(mInputInfo)) {
-            mSession = null;
-            unbindTvInput();
-
+            reset();
             // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
             // know when the surface is released at TIS, we don't need this hack.
             try {
@@ -199,16 +163,13 @@ public class TunableTvView extends TvView implements StreamInfo {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
             mInputInfo = inputInfo;
-            bindTvInput(mInputInfo.getId(), mSessionCallback);
-            // mChannelId will be tuned after onSessionCreated.
-        } else {
-            if (mSession == null) {
-                // onSessionCreated is not called yet. MSG_TUNE will be sent in onSessionCreated.
-            } else {
-                mHandler.sendEmptyMessage(MSG_TUNE);
-            }
+        }
+        setTvInputListener(mListener);
+        tune(mInputInfo.getId(), Utils.getChannelUri(mChannelId));
+        if (mOnTuneListener != null) {
+            // TODO: Add a callback for tune complete and call onTuned when it was successful.
+            mOnTuneListener.onTuned(true, mChannelId);
         }
         return true;
     }
