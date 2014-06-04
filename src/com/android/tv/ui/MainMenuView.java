@@ -29,7 +29,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.android.internal.util.Preconditions;
 import com.android.tv.R;
@@ -185,11 +184,34 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
             }
         }
 
-        if (mAdapter.getItemCount() > 0) {
-            mMenuList.setSelectedPosition(0);
-        }
         requestFocus();
         bringToFront();
+    }
+
+    public void resetSelectedItemPosition() {
+        Preconditions.checkState(mHandler.getLooper().isCurrentThread());
+        resetAllSelectedItemPositions(MainMenuView.this);
+    }
+
+    private static void resetAllSelectedItemPositions(ViewGroup parent) {
+        int count = parent.getChildCount();
+        for (int i = 0; i < count; ++i) {
+            View v = parent.getChildAt(i);
+            if (v instanceof HorizontalGridView) {
+                HorizontalGridView gridView = (HorizontalGridView) v;
+                if (gridView.getAdapter() != null && gridView.getAdapter().getItemCount() > 0) {
+                    gridView.setSelectedPosition(0);
+                }
+            } else if (v instanceof VerticalGridView) {
+                VerticalGridView gridView = (VerticalGridView) v;
+                if (gridView.getAdapter() != null && gridView.getAdapter().getItemCount() > 0) {
+                    gridView.setSelectedPosition(0);
+                }
+            }
+            if (v instanceof ViewGroup) {
+                resetAllSelectedItemPositions((ViewGroup) v);
+            }
+        }
     }
 
     @Override
