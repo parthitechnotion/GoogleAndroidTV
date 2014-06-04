@@ -18,6 +18,7 @@ package com.android.tv.ui;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v17.leanback.widget.OnChildSelectedListener;
 import android.support.v17.leanback.widget.VerticalGridView;
@@ -30,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.android.internal.util.Preconditions;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
 import com.android.tv.data.Channel;
@@ -61,6 +63,12 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     private OptionsAdapter mOptionsAdapter;
 
     private final Handler mHandler = new Handler();
+
+    private final Runnable mChannelMapUpdateApplyer = new Runnable() {
+        public void run() {
+            updateAdapters(true);
+        }
+    };
 
     private final ArrayList<ItemListView.ItemListAdapter> mAllAdapterList =
             new ArrayList<ItemListView.ItemListAdapter>();
@@ -132,10 +140,17 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
 
     public void setChannelMap(ChannelMap channelMap) {
         mChannelMap = channelMap;
-        updateAdapters(true);
+        if (mHandler.getLooper() == Looper.myLooper()) {
+            mChannelMapUpdateApplyer.run();
+        } else {
+            mHandler.removeCallbacks(mChannelMapUpdateApplyer);
+            mHandler.post(mChannelMapUpdateApplyer);
+        }
     }
 
     private void updateAdapters(boolean channelMapUpdateRequired) {
+        Preconditions.checkState(mHandler.getLooper() == Looper.myLooper());
+
         ArrayList<ItemListView.ItemListAdapter> availableAdapterList =
                 new ArrayList<ItemListView.ItemListAdapter>();
         for (ItemListView.ItemListAdapter adapter : mAllAdapterList) {
@@ -152,6 +167,8 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     }
 
     private void show() {
+        Preconditions.checkState(mHandler.getLooper() == Looper.myLooper());
+
         if (mOptionsAdapter != null) {
             mOptionsAdapter.setMoreOptionsShown(false);
         }
@@ -172,7 +189,9 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
             }
         }
 
-        mMenuList.setSelectedPosition(0);
+        if (mAdapter.getItemCount() > 0) {
+            mMenuList.setSelectedPosition(0);
+        }
         requestFocus();
         bringToFront();
     }

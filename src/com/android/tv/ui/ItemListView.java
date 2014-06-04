@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.android.internal.util.Preconditions;
 import com.android.tv.R;
 import com.android.tv.data.ChannelMap;
 
@@ -78,7 +79,11 @@ public class ItemListView extends LinearLayout {
     }
 
     public void setSelectedPosition(int position) {
-        mListView.setSelectedPosition(position);
+        Preconditions.checkNotNull(mListView.getAdapter());
+
+        if (mListView.getAdapter().getItemCount() > position) {
+            mListView.setSelectedPosition(position);
+        }
     }
 
     public void onDeselected() {
