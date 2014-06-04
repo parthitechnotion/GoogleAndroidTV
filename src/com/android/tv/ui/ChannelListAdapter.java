@@ -90,6 +90,15 @@ public class ChannelListAdapter extends ItemListView.ItemListAdapter {
     public void onBeforeShowing() {
         updateTitle();
         selectGuideChannel();
+
+        if (mListView != null && mChannelMap != null) {
+            for (int i = 0; i < mListView.getChildCount(); i++) {
+                View v = mListView.getChildAt(i);
+                if (v instanceof ChannelTileView) {
+                    ((ChannelTileView) v).updateProgramInformation();
+                }
+            }
+        }
     }
 
     private void updateTitle() {

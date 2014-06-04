@@ -17,6 +17,7 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -25,6 +26,8 @@ import android.widget.TextView;
 import com.android.internal.util.Preconditions;
 import com.android.tv.R;
 import com.android.tv.data.Channel;
+import com.android.tv.data.Program;
+import com.android.tv.util.Utils;
 
 /**
  * A view to render channel tile.
@@ -34,6 +37,7 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
     private TextView mChannelNameView;
     private TextView mChannelNumberView;
     private TextView mProgramNameView;
+    private Channel mChannel;
 
     public ChannelTileView(Context context) {
         super(context);
@@ -60,36 +64,40 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
     public void populateViews(View.OnClickListener listener, Object item) {
         Preconditions.checkNotNull(item);
 
-        Channel channel = (Channel) item;
+        mChannel = (Channel) item;
         setOnClickListener(listener);
-        setTag(MainMenuView.MenuTag.buildTag(channel));
+        setTag(MainMenuView.MenuTag.buildTag(mChannel));
 
-        if (channel.getType() == R.integer.channel_type_guide) {
+        if (mChannel.getType() == R.integer.channel_type_guide) {
             mChannelNameView.setVisibility(INVISIBLE);
             mChannelLogoView.setImageResource(R.drawable.ic_channel_guide);
             mChannelLogoView.setVisibility(VISIBLE);
             mProgramNameView.setText(R.string.menu_program_guide);
             mProgramNameView.setVisibility(VISIBLE);
         } else {
-            mChannelNumberView.setText(channel.getDisplayNumber());
-            // TODO: setVisibility of mChannelNameView and mChannelLogoView properly.
-            if (Math.random() < 0.5) {
-                mChannelNameView.setText(channel.getDisplayName());
-                mChannelNameView.setVisibility(VISIBLE);
-                mChannelLogoView.setVisibility(INVISIBLE);
-            } else {
-                mChannelNameView.setVisibility(INVISIBLE);
-                // TODO: use channel logo instead of app_icon.
-                mChannelLogoView.setImageResource(R.drawable.app_icon);
-                mChannelLogoView.setVisibility(VISIBLE);
-            }
-            // TODO: mProgramNameView should be shown with a program title.
-            if (Math.random() < 0.5) {
-                mProgramNameView.setVisibility(VISIBLE);
-                mProgramNameView.setText(channel.getDisplayName());
-            } else {
-                mProgramNameView.setVisibility(GONE);
-            }
+            mChannelNumberView.setText(mChannel.getDisplayNumber());
+            mChannelNameView.setText(mChannel.getDisplayName());
+            mChannelNameView.setVisibility(VISIBLE);
+            // TODO: need to set up mChannelLogoView when log image is available.
+            mChannelLogoView.setVisibility(INVISIBLE);
+
+            updateProgramInformation();
+        }
+    }
+
+    public void updateProgramInformation() {
+        if (mProgramNameView == null || mChannel == null
+                || mChannel.getType() == R.integer.channel_type_guide) {
+            return;
+        }
+
+        Program program = Utils.getCurrentProgram(getContext(),
+                Utils.getChannelUri(mChannel.getId()));
+        if (program == null || TextUtils.isEmpty(program.getTitle())) {
+            mProgramNameView.setVisibility(GONE);
+        } else {
+            mProgramNameView.setVisibility(VISIBLE);
+            mProgramNameView.setText(program.getTitle());
         }
     }
 }
