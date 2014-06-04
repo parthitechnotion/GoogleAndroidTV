@@ -28,13 +28,11 @@ public class MenuAction {
     public static final int SELECT_ASPECT_RATIO = 1;
     public static final int SELECT_TV_INPUT_TYPE = 2;
     public static final int TOGGLE_PIP_TYPE = 3;
-    public static final int MORE_TYPE = 4;
 
     // TODO: UX is not ready.
-    public static final int EDIT_CHANNEL_LIST_TYPE = 5;
-    public static final int AUTO_SCAN_CHANNELS_TYPE = 6;
-    public static final int PRIVACY_SETTING_TYPE = 7;
-    public static final int INPUT_SETTING_TYPE = 8;
+    public static final int EDIT_CHANNEL_LIST_TYPE = 4;
+    public static final int AUTO_SCAN_CHANNELS_TYPE = 5;
+    public static final int INPUT_SETTING_TYPE = 6;
 
     public static final MenuAction SELECT_CLOSED_CAPTION_ACTION =
             new MenuAction(R.string.menu_closed_caption, SELECT_CLOSED_CAPTION,
@@ -48,9 +46,6 @@ public class MenuAction {
     public static final MenuAction TOGGLE_PIP_ACTION =
             new MenuAction(R.string.menu_toggle_pip, TOGGLE_PIP_TYPE,
                     R.drawable.ic_tvoption_pip);
-    public static final MenuAction MORE_ACTION =
-            new MenuAction(R.string.source_specific_setting, MORE_TYPE,
-                    R.drawable.ic_tvoption_more);
 
     // TODO: UX is not ready.
     public static final MenuAction EDIT_CHANNEL_LIST_ACTION =
@@ -58,9 +53,6 @@ public class MenuAction {
                     R.drawable.ic_tvoption_more);
     public static final MenuAction AUTO_SCAN_CHANNELS_ACTION =
             new MenuAction(R.string.menu_auto_scan, AUTO_SCAN_CHANNELS_TYPE,
-                    R.drawable.ic_tvoption_more);
-    public static final MenuAction PRIVACY_SETTING_ACTION =
-            new MenuAction(R.string.menu_privacy_setting, PRIVACY_SETTING_TYPE,
                     R.drawable.ic_tvoption_more);
     public static final MenuAction INPUT_SETTING_ACTION =
             new MenuAction(R.string.menu_input_setting, INPUT_SETTING_TYPE,

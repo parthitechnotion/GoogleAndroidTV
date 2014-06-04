@@ -36,7 +36,6 @@ import com.android.tv.R;
 import com.android.tv.TvActivity;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
-import com.android.tv.dialog.PrivacySettingDialogFragment;
 import com.android.tv.recommendation.TvRecommendation;
 
 import java.util.ArrayList;
@@ -169,10 +168,6 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
 
     private void show() {
         Preconditions.checkState(mHandler.getLooper() == Looper.myLooper());
-
-        if (mOptionsAdapter != null) {
-            mOptionsAdapter.setMoreOptionsShown(false);
-        }
         if (mChannelMap != null) {
             boolean adapterVisibilityChanged = false;
 
@@ -280,22 +275,12 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                                     mTvActivity.togglePipView();
                                     break;
 
-                                case MenuAction.MORE_TYPE:
-                                    mOptionsAdapter.setMoreOptionsShown(true);
-                                    break;
-
                                 case MenuAction.EDIT_CHANNEL_LIST_TYPE:
                                     mTvActivity.showEditChannelsDialog();
                                     break;
 
                                 case MenuAction.AUTO_SCAN_CHANNELS_TYPE:
                                     mTvActivity.startSetupActivity();
-                                    break;
-
-                                case MenuAction.PRIVACY_SETTING_TYPE:
-                                    mTvActivity.showDialogFragment(
-                                            PrivacySettingDialogFragment.DIALOG_TAG,
-                                            new PrivacySettingDialogFragment());
                                     break;
 
                                 case MenuAction.INPUT_SETTING_TYPE:
@@ -306,11 +291,6 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                     }
                 }
             });
-            if (tag.mType == MenuTag.MENU_ACTION_TAG_TYPE
-                    && ((MenuAction) tag.mObj).getType() == MenuAction.MORE_TYPE) {
-                // Don't hide menu in the case of More.
-                return;
-            }
         }
 
         setVisibility(View.GONE);

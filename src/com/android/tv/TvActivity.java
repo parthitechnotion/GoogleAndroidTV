@@ -56,7 +56,6 @@ import com.android.tv.data.StreamInfo;
 import com.android.tv.dialog.EditChannelsDialogFragment;
 import com.android.tv.dialog.EditInputDialogFragment;
 import com.android.tv.dialog.InputPickerDialogFragment;
-import com.android.tv.dialog.PrivacySettingDialogFragment;
 import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
@@ -154,7 +153,6 @@ public class TvActivity extends Activity implements
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditChannelsDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditInputDialogFragment.DIALOG_TAG);
-        AVAILABLE_DIALOG_TAGS.add(PrivacySettingDialogFragment.DIALOG_TAG);
     }
 
     // PIP is used for debug/verification of multiple sessions rather than real PIP feature.
