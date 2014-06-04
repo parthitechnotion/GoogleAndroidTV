@@ -18,6 +18,7 @@ package com.android.tv.util;
 
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
+import android.media.tv.TvInputManager.TvInputListener;
 import android.os.Handler;
 import android.util.Log;
 
@@ -41,15 +42,19 @@ public class TvInputManagerHelper {
             new HashMap<String, Boolean>();
     private final Map<String, TvInputInfo> mInputMap =
             new HashMap<String, TvInputInfo>();
-    private final TvInputManager.TvInputListener mListener =
-            new TvInputManager.TvInputListener() {
+    private final TvInputListener mInternalListener =
+            new TvInputListener() {
                 @Override
                 public void onAvailabilityChanged(String inputId, boolean isAvailable) {
                     mInputAvailabilityMap.put(inputId, Boolean.valueOf(isAvailable));
+                    for (TvInputListener listener : mListeners) {
+                        listener.onAvailabilityChanged(inputId, isAvailable);
+                    }
                 }
             };
     private final Handler mHandler = new Handler();
     private boolean mStarted;
+    private final HashSet<TvInputListener> mListeners = new HashSet<TvInputListener>();
 
     public TvInputManagerHelper(TvInputManager tvInputManager) {
         mTvInputManager = tvInputManager;
@@ -66,7 +71,7 @@ public class TvInputManagerHelper {
         }
         for (TvInputInfo input : inputs) {
             String inputId = input.getId();
-            mTvInputManager.registerListener(inputId, mListener, mHandler);
+            mTvInputManager.registerListener(inputId, mInternalListener, mHandler);
             boolean available = mTvInputManager.getAvailability(inputId);
             mInputAvailabilityMap.put(inputId, available);
             mInputMap.put(inputId, input);
@@ -90,13 +95,13 @@ public class TvInputManagerHelper {
             if (mInputAvailabilityMap.get(inputId) != null) {
                 continue;
             }
-            mTvInputManager.registerListener(inputId, mListener, mHandler);
+            mTvInputManager.registerListener(inputId, mInternalListener, mHandler);
             boolean available = mTvInputManager.getAvailability(inputId);
             mInputAvailabilityMap.put(inputId, available);
         }
         for (String inputId : mInputAvailabilityMap.keySet()) {
             if (!inputIds.contains(inputId)) {
-                mTvInputManager.unregisterListener(inputId, mListener);
+                mTvInputManager.unregisterListener(inputId, mInternalListener);
                 mInputAvailabilityMap.remove(inputId);
             }
         }
@@ -109,7 +114,7 @@ public class TvInputManagerHelper {
         }
         mStarted = false;
         for (String inputId : mInputAvailabilityMap.keySet()) {
-            mTvInputManager.unregisterListener(inputId, mListener);
+            mTvInputManager.unregisterListener(inputId, mInternalListener);
         }
         mInputAvailabilityMap.clear();
         mInputMap.clear();
@@ -169,5 +174,13 @@ public class TvInputManagerHelper {
             }
         }
         return available;
+    }
+
+    public void addListener(TvInputListener listener) {
+        mListeners.add(listener);
+    }
+
+    public void removeListener(TvInputListener listener) {
+        mListeners.remove(listener);
     }
 }

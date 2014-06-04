@@ -55,7 +55,6 @@ import com.android.tv.data.ChannelMap;
 import com.android.tv.data.StreamInfo;
 import com.android.tv.dialog.EditChannelsDialogFragment;
 import com.android.tv.dialog.EditInputDialogFragment;
-import com.android.tv.dialog.InputPickerDialogFragment;
 import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
@@ -64,6 +63,7 @@ import com.android.tv.ui.AspectRatioOptionFragment;
 import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
+import com.android.tv.ui.InputPickerFragment;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.SimpleGuideFragment;
 import com.android.tv.ui.SimpleGuideShowOnlyFragment;
@@ -78,9 +78,7 @@ import java.util.HashSet;
 /**
  * The main activity for demonstrating TV app.
  */
-public class TvActivity extends Activity implements
-        InputPickerDialogFragment.InputPickerDialogListener,
-        AudioManager.OnAudioFocusChangeListener {
+public class TvActivity extends Activity implements AudioManager.OnAudioFocusChangeListener {
     // STOPSHIP: Turn debugging off
     private static final boolean DEBUG = true;
     private static final String TAG = "TvActivity";
@@ -149,7 +147,6 @@ public class TvActivity extends Activity implements
     private SharedPreferences mSharedPreferences;
 
     static {
-        AVAILABLE_DIALOG_TAGS.add(InputPickerDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditChannelsDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditInputDialogFragment.DIALOG_TAG);
@@ -249,7 +246,7 @@ public class TvActivity extends Activity implements
             @Override
             public boolean onSingleTapUp(MotionEvent event) {
                 if (mChannelMap == null) {
-                    showInputPickerDialog();
+                    showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
                     return true;
                 }
 
@@ -334,13 +331,13 @@ public class TvActivity extends Activity implements
         }
         if (channelId == Channel.INVALID_ID) {
             // If failed to pick a channel, try a different input.
-            showInputPickerDialog();
+            showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
             return;
         }
         String inputId = Utils.getInputIdForChannel(this, channelId);
         if (TextUtils.isEmpty(inputId)) {
             // If failed to determine the input for that channel, try a different input.
-            showInputPickerDialog();
+            showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
             return;
         }
         TvInputInfo inputInfo = mTvInputManagerHelper.getTvInputInfo(inputId);
@@ -348,7 +345,7 @@ public class TvActivity extends Activity implements
             // TODO: if the last selected TV input is uninstalled, getLastWatchedChannelId
             // should return Channel.INVALID_ID.
             Log.w(TAG, "Input (id=" + inputId + ") doesn't exist");
-            showInputPickerDialog();
+            showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
             return;
         }
         String lastSelectedInputId = Utils.getLastSelectedInputId(this);
@@ -364,7 +361,7 @@ public class TvActivity extends Activity implements
     private void startTvIfAvailableOrRetry(TvInput input, long channelId, int retryCount) {
         if (!input.isAvailable()) {
             if (retryCount >= START_TV_MAX_RETRY) {
-                showInputPickerDialog();
+                showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
                 return;
             }
             if (DEBUG) Log.d(TAG, "Retry start TV (retryCount=" + retryCount + ")");
@@ -389,7 +386,6 @@ public class TvActivity extends Activity implements
         super.onStop();
     }
 
-    @Override
     public void onInputPicked(TvInput input) {
         if (input.equals(getSelectedTvInput())) {
             // Nothing has changed thus nothing to do.
@@ -402,7 +398,7 @@ public class TvActivity extends Activity implements
                         getString(R.string.empty_channel_tvinput_and_no_setup_activity),
                         input.getDisplayName());
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                showInputPickerDialog();
+                showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
             }
             return;
         }
@@ -425,10 +421,6 @@ public class TvActivity extends Activity implements
         }
 
         showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, new EditChannelsDialogFragment());
-    }
-
-    public void showInputPickerDialog() {
-        showDialogFragment(InputPickerDialogFragment.DIALOG_TAG, new InputPickerDialogFragment());
     }
 
     public boolean startSetupActivity() {
@@ -470,6 +462,10 @@ public class TvActivity extends Activity implements
 
     public void showSimpleGuideShowOnlyMenu(int initiator) {
         showSideFragment(new SimpleGuideShowOnlyFragment(), initiator);
+    }
+
+    public void showInputPicker(int initiator) {
+        showSideFragment(new InputPickerFragment(), initiator);
     }
 
     public void showAspectRatioOption(int initiator) {
@@ -786,7 +782,7 @@ public class TvActivity extends Activity implements
                 case KeyEvent.KEYCODE_DPAD_CENTER:
                 case KeyEvent.KEYCODE_E:
                 case KeyEvent.KEYCODE_MENU:
-                    showInputPickerDialog();
+                    showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
                     return true;
             }
         } else {
@@ -797,7 +793,7 @@ public class TvActivity extends Activity implements
 
                 case KeyEvent.KEYCODE_TV_INPUT:
                 case KeyEvent.KEYCODE_I:
-                    showInputPickerDialog();
+                    showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
                     return true;
 
                 case KeyEvent.KEYCODE_CHANNEL_UP:

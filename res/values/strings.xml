@@ -19,7 +19,7 @@
     <string name="font" translatable="false">Roboto</string>
 
     <string name="tv_app">TV</string>
-    <string name="select_input_device">Select Input Device</string>
+    <string name="select_input_device">Select TV Input</string>
     <!-- Used in the "Select Input Device" dialog to indicate that the user is already watching TV
         from the current TV input, i.e. this input device is already selected. -->
     <string name="selected">(Selected)</string>
