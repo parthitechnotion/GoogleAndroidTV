@@ -221,15 +221,6 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
         }
     }
 
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            setVisibility(View.INVISIBLE);
-            return true;
-        }
-        return super.onKeyUp(keyCode, event);
-    }
-
     public static class MenuTag {
         static final int CHANNEL_TAG_TYPE = 0;
         static final int MENU_ACTION_TAG_TYPE = 1;
@@ -262,7 +253,12 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         final MenuTag tag = (MenuTag) v.getTag();
+        boolean excludeChannelBanner = false;
         if (tag != null) {
+            if (tag.mType == MenuTag.CHANNEL_TAG_TYPE
+                    && ((Channel) tag.mObj).getType() != R.integer.channel_type_guide) {
+                excludeChannelBanner = true;
+            }
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -315,7 +311,7 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
             });
         }
 
-        setVisibility(View.GONE);
+        mTvActivity.hideOverlay(excludeChannelBanner);
     }
 
     @Override
