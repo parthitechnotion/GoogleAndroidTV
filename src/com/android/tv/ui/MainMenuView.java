@@ -268,7 +268,7 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                                     break;
 
                                 case MenuAction.SELECT_TV_INPUT_TYPE:
-                                    mTvActivity.showInputPickerDialog();
+                                    mTvActivity.showInputPicker(BaseSideFragment.INITIATOR_MENU);
                                     break;
 
                                 case MenuAction.TOGGLE_PIP_TYPE:

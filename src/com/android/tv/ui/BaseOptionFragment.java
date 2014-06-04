@@ -89,7 +89,9 @@ public class BaseOptionFragment extends BaseSideFragment {
         } else {
             radioButton.setChecked(false);
         }
-        radioButton.setText((String) tag);
+        if (tag instanceof String) {
+            radioButton.setText((String) tag);
+        }
     }
 
     private static void uncheckAllRadioButtons(ViewGroup parent) {
