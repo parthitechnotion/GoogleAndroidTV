@@ -18,6 +18,7 @@ package com.android.tv.input;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
@@ -51,18 +52,13 @@ public class UnifiedTvInput extends TvInput {
     }
 
     @Override
-    public boolean hasActivity(String action) {
-        return false;
+    public Intent getIntentForSetupActivity() {
+        return null;
     }
 
     @Override
-    public boolean startActivity(String action) {
-        throw new UnsupportedOperationException("No activity for any action");
-    }
-
-    @Override
-    public boolean startActivityForResult(Activity activity, String action, int requestCode) {
-        throw new UnsupportedOperationException("No activity for any action");
+    public Intent getIntentForSettingsActivity() {
+        return null;
     }
 
     @Override

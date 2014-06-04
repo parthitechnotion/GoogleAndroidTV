@@ -23,7 +23,6 @@ import android.view.View;
 import com.android.tv.R;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.input.TvInput;
-import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
 
@@ -70,11 +69,11 @@ public class OptionsAdapter extends ItemListView.ItemListAdapter {
             if (channelMap != null) {
                 actionList.add(MenuAction.EDIT_CHANNEL_LIST_ACTION);
             }
-            if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETUP)) {
+            if (channelMap != null && tvInput.getIntentForSetupActivity() != null) {
                 actionList.add(MenuAction.AUTO_SCAN_CHANNELS_ACTION);
             }
             actionList.add(MenuAction.PRIVACY_SETTING_ACTION);
-            if (channelMap != null && tvInput.hasActivity(Utils.ACTION_SETTINGS)) {
+            if (channelMap != null && tvInput.getIntentForSettingsActivity() != null) {
                 actionList.add(MenuAction.INPUT_SETTING_ACTION);
             }
         }
