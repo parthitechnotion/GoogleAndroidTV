@@ -70,13 +70,13 @@ public class RecommendationListAdapter extends ItemListView.ItemListAdapter {
         mListView = listView;
 
         updateChannelList();
-        selectCurrentChannel();
+        selectGuideChannel();
     }
 
     @Override
     public void onBeforeShowing() {
         updateChannelList();
-        selectCurrentChannel();
+        selectGuideChannel();
     }
 
     private void updateChannelList() {
@@ -103,6 +103,17 @@ public class RecommendationListAdapter extends ItemListView.ItemListAdapter {
         }
 
         setItemList(mChannelList);
+    }
+
+    private void selectGuideChannel() {
+        if (mListView == null) {
+            return;
+        }
+        if (mGuideIncluded) {
+            mListView.setSelectedPosition(0);
+        } else {
+            selectCurrentChannel();
+        }
     }
 
     private void selectCurrentChannel() {
