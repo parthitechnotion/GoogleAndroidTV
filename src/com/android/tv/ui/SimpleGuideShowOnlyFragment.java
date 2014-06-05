@@ -84,12 +84,6 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
     @Override
     public void onItemSelected(View v, int position, Object tag) {
         if (DEBUG) Log.d(TAG, "onItemSelected: position=" + position + ", label=" + (String) tag);
-        // TODO: enable all items.
-        if (position != ShowOnlyItems.POSITION_ALL_CHANNELS) {
-            Toast.makeText(getActivity(), R.string.not_implemented_yet, Toast.LENGTH_SHORT).show();
-            getFragmentManager().popBackStack();
-            return;
-        }
 
         mFocusedItemPosition = position;
 
@@ -110,6 +104,9 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
             radioButton.setChecked(false);
         }
         radioButton.setText((String) tag);
+        // TODO: enable all items.
+        v.setEnabled(position == ShowOnlyItems.POSITION_ALL_CHANNELS);
+        radioButton.setEnabled(position == ShowOnlyItems.POSITION_ALL_CHANNELS);
     }
 
     private static void uncheckAllRadioButtons(ViewGroup parent) {

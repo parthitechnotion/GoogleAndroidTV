@@ -28,7 +28,7 @@
         android:paddingLeft="@dimen/show_only_item_padding_left"
         android:layout_marginLeft="@dimen/show_only_item_margin_left"
         android:textSize="@dimen/show_only_item_text_size"
-        android:textColor="@color/menu_default_text_color"
+        android:textColor="@color/side_panel_item_text"
         android:focusable="false"
         android:fontFamily="@string/font" />
 </LinearLayout>
