@@ -36,12 +36,23 @@
             android:singleLine="true"
             android:ellipsize="end"
             android:textColor="@color/menu_default_text_color"
+            android:textSize="@dimen/simple_guide_item_small_text_size"
             android:fontFamily="@string/font" />
 
         <ImageView android:id="@+id/channel_logo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left" />
+
+        <TextView android:id="@+id/channel_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="@color/menu_default_text_color"
+            android:textSize="@dimen/simple_guide_item_small_text_size"
+            android:fontFamily="@string/font" />
 
     </LinearLayout>
 
@@ -57,7 +68,6 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:gravity="left|center_vertical"
-            android:paddingLeft="@dimen/simple_guide_program_title_padding_left"
             android:textSize="@dimen/simple_guide_item_large_text_size"
             android:textColor="@color/menu_default_text_color"
             android:fontFamily="@string/font" />
@@ -66,7 +76,6 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:gravity="left|center_vertical"
-            android:paddingLeft="@dimen/simple_guide_program_title_padding_left"
             android:textSize="@dimen/simple_guide_item_small_text_size"
             android:textColor="@color/simple_guide_small_text_color"
             android:fontFamily="@string/font" />
