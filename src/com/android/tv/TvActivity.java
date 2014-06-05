@@ -461,13 +461,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         return true;
     }
 
-    public void showSimpleGuide() {
-        showSideFragment(new SimpleGuideFragment(this, mChannelMap),
-                BaseSideFragment.INITIATOR_UNKNOWN);
-    }
-
-    public void showSimpleGuideShowOnlyMenu(int initiator) {
-        showSideFragment(new SimpleGuideShowOnlyFragment(), initiator);
+    public void showSimpleGuide(int initiator) {
+        showSideFragment(new SimpleGuideFragment(this, mChannelMap), initiator);
     }
 
     public void showInputPicker(int initiator) {
@@ -496,8 +491,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     public void onSideFragmentCanceled(int initiator) {
         if (initiator == BaseSideFragment.INITIATOR_MENU) {
             displayMainMenu(false);
-        } else if (initiator == BaseSideFragment.INITIATOR_SIMPLE_GUIDE) {
-            showSimpleGuide();
         }
     }
 

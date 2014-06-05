@@ -16,6 +16,7 @@
 
 package com.android.tv.ui;
 
+import android.app.FragmentTransaction;
 import android.content.ContentUris;
 import android.media.tv.TvContract;
 import android.os.Bundle;
@@ -108,7 +109,11 @@ public class SimpleGuideFragment extends BaseSideFragment {
             mClosingByItemSelected = true;
             getFragmentManager().popBackStack();
         } else {
-            mTvActivity.showSimpleGuideShowOnlyMenu(INITIATOR_SIMPLE_GUIDE);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.right_panel, new SimpleGuideShowOnlyFragment());
+            ft.addToBackStack(null);
+            // TODO: add an animation.
+            ft.commit();
         }
     }
 
