@@ -35,6 +35,7 @@ import com.android.tv.R;
 import com.android.tv.TvActivity;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
+import com.android.tv.recommendation.RecentChannelRecommender;
 import com.android.tv.recommendation.TvRecommendation;
 
 import java.util.ArrayList;
@@ -108,6 +109,7 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
 
         // List for guide + recent channels
         mTvRecommendation = new TvRecommendation(context, mHandler, true);
+        mTvRecommendation.registerTvRecommender(new RecentChannelRecommender());
         mAllAdapterList.add(new RecommendationListAdapter(context, mHandler, this,
                 mTvRecommendation, true, MAX_COUNT_FOR_RECOMMENDATION, R.layout.channel_tile,
                 context.getString(R.string.channel_list_title),

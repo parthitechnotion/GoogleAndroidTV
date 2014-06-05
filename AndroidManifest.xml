@@ -57,6 +57,12 @@
             android:enabled="true">
         </provider>
 
+        <service android:name="com.android.tv.notification.NotificationService"/>
+        <receiver android:name="com.android.tv.notification.NotificationReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
         <receiver android:name="com.android.tv.receiver.PackageIntentsReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
