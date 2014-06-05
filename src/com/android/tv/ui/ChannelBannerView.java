@@ -24,10 +24,13 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.tv.R;
@@ -50,6 +53,7 @@ public class ChannelBannerView extends LinearLayout {
     private TextView mChannelNameTextView;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
+    private RelativeLayout mChannelInfoBarView;
     private Uri mCurrentChannelUri;
 
     private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
@@ -101,6 +105,14 @@ public class ChannelBannerView extends LinearLayout {
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
+        mChannelInfoBarView = (RelativeLayout) findViewById(R.id.channel_info_bar);
+        mChannelInfoBarView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                alignBaseline();
+            }
+        });
     }
 
     public void updateViews(ChannelMap channelMap, StreamInfo info) {
@@ -134,14 +146,28 @@ public class ChannelBannerView extends LinearLayout {
         }
 
         String displayNumber = channelMap.getCurrentDisplayNumber();
-        String displayName = channelMap.getCurrentDisplayName();
         if (displayNumber == null) {
             displayNumber = "";
         }
+        if (displayNumber.length() <= 3) {
+            mChannelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    mContext.getResources().getDimension(
+                        R.dimen.channel_banner_title_large_text_size));
+        } else if (displayNumber.length() <= 4) {
+            mChannelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    mContext.getResources().getDimension(
+                        R.dimen.channel_banner_title_medium_text_size));
+        } else {
+            mChannelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    mContext.getResources().getDimension(
+                        R.dimen.channel_banner_title_small_text_size));
+        }
+        mChannelTextView.setText(displayNumber);
+
+        String displayName = channelMap.getCurrentDisplayName();
         if (displayName == null) {
             displayName = "";
         }
-        mChannelTextView.setText(displayNumber);
         mChannelNameTextView.setText(displayName);
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
@@ -202,6 +228,39 @@ public class ChannelBannerView extends LinearLayout {
             mProgrameDescriptionTextView.setText(program.getDescription());
         } else {
             mProgrameDescriptionTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void alignBaseline() {
+        final int dummyPadding = mChannelInfoBarView.getHeight() -
+                (int) mContext.getResources().getDimension(
+                        R.dimen.channel_banner_channel_info_bar_height);
+
+        for (int i = 0; i < mChannelInfoBarView.getChildCount(); i++) {
+            View view = mChannelInfoBarView.getChildAt(i);
+            int[] rules = ((RelativeLayout.LayoutParams) view.getLayoutParams()).getRules();
+
+            if (rules[RelativeLayout.ALIGN_PARENT_BOTTOM] == RelativeLayout.TRUE) {
+                int marginBottom = dummyPadding;
+                if (view instanceof TextView) {
+                    TextView tv = (TextView) view;
+                    if (!tv.getIncludeFontPadding()) {
+                        marginBottom -= (tv.getHeight() - tv.getBaseline());
+                    }
+                } else if (view instanceof ImageView) {
+                    // TV Input Logo.
+                    marginBottom += mContext.getResources().getDimension(
+                        R.dimen.channel_banner_tvinput_logo_padding_bottom);
+                }
+
+                ViewGroup.MarginLayoutParams layout =
+                        (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+                if (marginBottom >= 0 && marginBottom != layout.bottomMargin) {
+                    layout.setMargins(
+                            layout.leftMargin, layout.topMargin, layout.rightMargin, marginBottom);
+                    view.setLayoutParams(layout);
+                }
+            }
         }
     }
 
