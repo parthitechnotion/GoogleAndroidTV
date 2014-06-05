@@ -16,8 +16,6 @@
 
 package com.android.tv;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -46,6 +44,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -85,9 +85,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     private static final int MSG_START_TV_RETRY = 1;
 
-    private static final int DURATION_SHOW_CHANNEL_BANNER = 2000;
+    private static final int DURATION_SHOW_CHANNEL_BANNER = 8000;
     private static final int DURATION_SHOW_CONTROL_GUIDE = 1000;
-    private static final int DURATION_SHOW_MAIN_MENU = DURATION_SHOW_CHANNEL_BANNER;
+    private static final int DURATION_SHOW_MAIN_MENU = 5000;
     private static final float AUDIO_MAX_VOLUME = 1.0f;
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
@@ -306,6 +306,12 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         startTv(mInitChannelId);
         mInitChannelId = Channel.INVALID_ID;
+    }
+
+    @Override
+    protected void onPause() {
+        hideOverlay(false);
+        super.onPause();
     }
 
     private void startTv(long channelId) {
@@ -699,6 +705,13 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
     }
 
+    public void hideOverlay(boolean excludeChannelBanner) {
+        mHideMainMenu.hideImmediately();
+        if (!excludeChannelBanner) {
+            mHideChannelBanner.hideImmediately();
+        }
+    }
+
     private void updateChannelBanner(final boolean showBanner) {
         runOnUiThread(new Runnable() {
             @Override
@@ -758,12 +771,14 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             }
             return super.onKeyUp(keyCode, event);
         }
-        if (mMainMenuView.getVisibility() == View.VISIBLE) {
+        if (mMainMenuView.isShown() || mChannelBanner.isShown()) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                mMainMenuView.setVisibility(View.GONE);
+                hideOverlay(false);
                 return true;
             }
-            return super.onKeyUp(keyCode, event);
+            if (mMainMenuView.isShown()) {
+                return super.onKeyUp(keyCode, event);
+            }
         }
 
         if (mHandler.hasMessages(MSG_START_TV_RETRY)) {
@@ -1030,34 +1045,52 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
         @Override
         public void run() {
+            startHideAnimation(false);
+        }
+
+        private void startHideAnimation(boolean fastFadeOutRequired) {
             mOnHideAnimation = true;
-            mView.animate()
-                    .alpha(0f)
-                    .setDuration(mShortAnimationDuration)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            mOnHideAnimation = false;
-                            mView.setVisibility(View.GONE);
-                        }
-                    });
+            Animation anim = AnimationUtils.loadAnimation(TvActivity.this,
+                    android.R.anim.fade_out);
+            anim.setInterpolator(AnimationUtils.loadInterpolator(TvActivity.this,
+                    android.R.interpolator.fast_out_linear_in));
+            if (fastFadeOutRequired) {
+                anim.setDuration(mShortAnimationDuration);
+            }
+            anim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mOnHideAnimation = false;
+                    mView.setVisibility(View.GONE);
+                }
+            });
+
+            mView.startAnimation(anim);
+        }
+
+        private void hideImmediately() {
+            if (mView.getVisibility() == View.VISIBLE && !mOnHideAnimation) {
+                mHandler.removeCallbacks(this);
+                startHideAnimation(true);
+            }
         }
 
         private void showAndHide() {
             if (mView.getVisibility() != View.VISIBLE) {
-                mView.setAlpha(0f);
                 mView.setVisibility(View.VISIBLE);
-                mView.animate()
-                        .alpha(1f)
-                        .setDuration(mShortAnimationDuration)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                // Currently the target alpha isn't kept, but it was before.
-                                // TODO: Remove this if frameworks keeps the target value again.
-                                mView.setAlpha(1f);
-                            }
-                        });
+                Animation anim = AnimationUtils.loadAnimation(TvActivity.this,
+                        android.R.anim.fade_in);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(TvActivity.this,
+                        android.R.interpolator.linear_out_slow_in));
+                mView.startAnimation(anim);
             }
             // Schedule the hide animation after a few seconds.
             mHandler.removeCallbacks(this);
