@@ -41,7 +41,7 @@ public class BaseSideFragment extends Fragment {
     private TextView mTitleView;
     private VerticalGridView mOptionItemListView;
     private LayoutInflater mLayoutInflater;
-    private final OptionItemAdapter mAdapter = new OptionItemAdapter();
+    protected final OptionItemAdapter mAdapter = new OptionItemAdapter();
     private Object[] mItemTags;
     private int mPrevSelectedItemPosition;
     private int mFragmentLayoutId;

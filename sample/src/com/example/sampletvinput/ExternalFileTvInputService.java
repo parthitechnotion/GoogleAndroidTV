@@ -32,7 +32,10 @@ public class ExternalFileTvInputService extends BaseTvInputService {
 
     @Override
     public List<ChannelInfo> createSampleChannels() {
-        Log.d(TAG, "createSampleChannels");
+        return parseSampleChannels();
+    }
+
+    public static List<ChannelInfo> parseSampleChannels() {
         List<ChannelInfo> list = new ArrayList<ChannelInfo>();
         File file = new File(CHANNEL_XML_PATH);
         try {

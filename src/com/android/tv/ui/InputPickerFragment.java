@@ -44,8 +44,6 @@ public class InputPickerFragment extends BaseOptionFragment {
 
     private TvInput mSelectedInput;
 
-    // The first item of the adapter is always 'Unified TV input'.
-    private ArrayAdapter<String> mAdapter;
     private TvActivity mTvActivity;
     private boolean mIsFirstResume;
     private int mInitialPosition;
