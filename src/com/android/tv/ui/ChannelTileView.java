@@ -69,12 +69,14 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
         setTag(MainMenuView.MenuTag.buildTag(mChannel));
 
         if (mChannel.getType() == R.integer.channel_type_guide) {
+            mChannelNumberView.setVisibility(INVISIBLE);
             mChannelNameView.setVisibility(INVISIBLE);
             mChannelLogoView.setImageResource(R.drawable.ic_channel_guide);
             mChannelLogoView.setVisibility(VISIBLE);
             mProgramNameView.setText(R.string.menu_program_guide);
         } else {
             mChannelNumberView.setText(mChannel.getDisplayNumber());
+            mChannelNumberView.setVisibility(VISIBLE);
             mChannelNameView.setText(mChannel.getDisplayName());
             mChannelNameView.setVisibility(VISIBLE);
             // TODO: need to set up mChannelLogoView when log image is available.
