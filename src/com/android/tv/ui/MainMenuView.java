@@ -294,7 +294,8 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                                     break;
 
                                 case MenuAction.EDIT_CHANNEL_LIST_TYPE:
-                                    mTvActivity.showEditChannelsDialog();
+                                    mTvActivity.showEditChannelsFragment(
+                                            BaseSideFragment.INITIATOR_MENU);
                                     break;
 
                                 case MenuAction.AUTO_SCAN_CHANNELS_TYPE:
