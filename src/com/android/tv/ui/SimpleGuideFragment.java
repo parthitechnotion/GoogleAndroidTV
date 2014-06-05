@@ -123,16 +123,14 @@ public class SimpleGuideFragment extends BaseSideFragment {
         TextView programInfoView = (TextView) v.findViewById(R.id.program_info);
         ImageView channelLogoView = (ImageView) v.findViewById(R.id.channel_logo);
         TextView channelNumberView = (TextView) v.findViewById(R.id.channel_number);
+        TextView channelNameView = (TextView) v.findViewById(R.id.channel_name);
         String text = "";
         if (tag instanceof Channel) {
             Channel channel = (Channel) tag;
             channelNumberView.setText(channel.getDisplayNumber());
-            channelNumberView.setTextSize(
-                    TypedValue.COMPLEX_UNIT_PX,
-                    getResources().getDimensionPixelOffset(
-                            R.dimen.simple_guide_item_large_text_size));
-            // TODO: show channel logo and adjust the text size of channelNumberView.
+            // TODO: show channel logo if possible.
             channelLogoView.setVisibility(View.GONE);
+            channelNameView.setText(channel.getDisplayName());
             Program program = Utils.getCurrentProgram(mTvActivity,
                     ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channel.getId()));
             text = program.getTitle();

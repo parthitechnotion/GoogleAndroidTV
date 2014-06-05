@@ -49,8 +49,7 @@
     <dimen name="option_item_text_size">18sp</dimen>
 
     <!-- Simple Guide demensions -->
-    <dimen name="simple_guide_padding_left">32dp</dimen>
-    <dimen name="simple_guide_program_title_padding_left">10dp</dimen>
+    <dimen name="simple_guide_padding_left">10dp</dimen>
     <dimen name="simple_guide_channel_width">60dp</dimen>
     <dimen name="simple_guide_item_height">48dp</dimen>
     <dimen name="simple_guide_item_small_text_size">10sp</dimen>
