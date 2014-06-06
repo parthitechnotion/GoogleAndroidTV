@@ -58,8 +58,14 @@
     <dimen name="show_only_item_padding_left">16dp</dimen>
     <dimen name="show_only_item_text_size">18sp</dimen>
 
-    <dimen name="channel_banner_large_text_size">54sp</dimen>
+    <!-- Channel banner dimensions -->
+    <dimen name="channel_banner_channel_info_bar_height">54dp</dimen>
+    <dimen name="channel_banner_channel_info_bar_height_include_padding">64dp</dimen>
+    <dimen name="channel_banner_title_large_text_size">54sp</dimen>
+    <dimen name="channel_banner_title_medium_text_size">44sp</dimen>
+    <dimen name="channel_banner_title_small_text_size">24sp</dimen>
     <dimen name="channel_banner_medium_text_size">28sp</dimen>
     <dimen name="channel_banner_small_text_size">14sp</dimen>
     <dimen name="channel_banner_track_meta_text_size">9sp</dimen>
+    <dimen name="channel_banner_tvinput_logo_padding_bottom">-2dp</dimen>
 </resources>
