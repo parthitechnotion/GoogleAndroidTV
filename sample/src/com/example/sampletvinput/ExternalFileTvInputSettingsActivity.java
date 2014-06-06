@@ -56,12 +56,6 @@ public class ExternalFileTvInputSettingsActivity extends Activity {
         getContentResolver().delete(TvContract.Channels.CONTENT_URI, null, null);
         getContentResolver().delete(TvContract.Programs.CONTENT_URI, null, null);
         List<ChannelInfo> channels = ExternalFileTvInputService.parseSampleChannels();
-        ContentValues values = new ContentValues();
-        values.put(Channels.COLUMN_SERVICE_NAME, ExternalFileTvInputService.class.getName());
-        for (ChannelInfo info : channels) {
-            values.put(Channels.COLUMN_DISPLAY_NUMBER, info.mNumber);
-            values.put(Channels.COLUMN_DISPLAY_NAME, info.mName);
-            getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
-        }
+        ChannelUtils.populateChannels(this, ExternalFileTvInputService.class.getName(), channels);
     }
 }
