@@ -18,6 +18,7 @@ package com.android.tv.ui;
 
 import android.content.Context;
 import android.database.ContentObserver;
+import android.graphics.Bitmap;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.tv.R;
+import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
@@ -42,7 +44,7 @@ import com.android.tv.util.Utils;
 /**
  * A view to render channel banner.
  */
-public class ChannelBannerView extends LinearLayout {
+public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoCallback {
     private TextView mClosedCaptionTextView;
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
@@ -51,6 +53,7 @@ public class ChannelBannerView extends LinearLayout {
     private TextView mProgrameDescriptionTextView;
     private TextView mChannelTextView;
     private TextView mChannelNameTextView;
+    private ImageView mChannelLogoImageView;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
     private RelativeLayout mChannelInfoBarView;
@@ -102,6 +105,7 @@ public class ChannelBannerView extends LinearLayout {
         mRemainingTimeView = (ProgressBar) findViewById(R.id.remaining_time);
         mChannelTextView = (TextView) findViewById(R.id.channel_text);
         mChannelNameTextView = (TextView) findViewById(R.id.channel_name);
+        mChannelLogoImageView = (ImageView) findViewById(R.id.channel_logo);
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
@@ -169,9 +173,20 @@ public class ChannelBannerView extends LinearLayout {
             displayName = "";
         }
         mChannelNameTextView.setText(displayName);
+        channelMap.getCurrentChannel().loadLogo(getContext(), this);
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
         updateProgramInfo();
+    }
+
+    @Override
+    public void onLoadLogoFinished(Channel channel, Bitmap logo) {
+        if (logo == null) {
+            mChannelLogoImageView.setVisibility(View.GONE);
+        } else {
+            mChannelLogoImageView.setImageBitmap(logo);
+            mChannelLogoImageView.setVisibility(View.VISIBLE);
+        }
     }
 
     private String getFormattedTimeString(long time) {
