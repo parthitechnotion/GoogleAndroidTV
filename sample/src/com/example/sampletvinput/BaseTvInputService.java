@@ -52,7 +52,8 @@ abstract public class BaseTvInputService extends TvInputService {
         super.onCreate();
 
         buildChannelMap();
-        setAvailable(mAvailable);
+        // TODO: Uncomment or remove when a new API design is locked down.
+        // setAvailable(mAvailable);
     }
 
     @Override
@@ -62,7 +63,7 @@ abstract public class BaseTvInputService extends TvInputService {
     }
 
     @Override
-    public TvInputSessionImpl onCreateSession() {
+    public TvInputService.Session onCreateSession() {
         if (DEBUG) Log.d(TAG, "onCreateSession()");
         return new BaseTvInputSessionImpl();
     }
@@ -129,7 +130,7 @@ abstract public class BaseTvInputService extends TvInputService {
         return info;
     }
 
-    class BaseTvInputSessionImpl extends TvInputSessionImpl {
+    class BaseTvInputSessionImpl extends TvInputService.Session {
         private MediaPlayer mPlayer;
         private float mVolume;
         private boolean mMute;
@@ -156,8 +157,8 @@ abstract public class BaseTvInputService extends TvInputService {
         }
 
         @Override
-        public void onSetVolume(float volume) {
-            if (DEBUG) Log.d(TAG, "onSetVolume(" + volume + ")");
+        public void onSetStreamVolume(float volume) {
+            if (DEBUG) Log.d(TAG, "onSetStreamVolume(" + volume + ")");
             mVolume = volume;
             mPlayer.setVolume(volume, volume);
         }
@@ -261,7 +262,8 @@ abstract public class BaseTvInputService extends TvInputService {
                 // It simulates availability changes such as HDMI cable plug-off/plug-in.
                 // The availability is toggled whenever 'a' key is dispatched from a TV app.
                 mAvailable = !mAvailable;
-                setAvailable(mAvailable);
+                // TODO: Uncomment or remove when a new API design is locked down.
+                // setAvailable(mAvailable);
                 return true;
             }
             return false;

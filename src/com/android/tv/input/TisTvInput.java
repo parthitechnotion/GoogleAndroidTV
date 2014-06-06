@@ -17,8 +17,10 @@
 package com.android.tv.input;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
@@ -80,7 +82,9 @@ public class TisTvInput extends TvInput {
 
     @Override
     public Uri buildChannelsUri() {
-        return TvContract.buildChannelsUriForInput(mInputInfo.getComponent(), false);
+        ServiceInfo info = mInputInfo.getServiceInfo();
+        ComponentName name = new ComponentName(info.packageName, info.name);
+        return TvContract.buildChannelsUriForInput(name, false);
     }
 
     @Override

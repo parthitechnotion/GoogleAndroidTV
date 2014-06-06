@@ -16,6 +16,7 @@
 
 package com.example.sampletvinput;
 
+import android.media.tv.TvInputService;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,8 +48,8 @@ public class LocalTvInputService extends BaseTvInputService {
     private static final String WEBVIEW_SITE = "http://www.android.com";
 
     @Override
-    public TvInputSessionImpl onCreateSession() {
-        TvInputSessionImpl impl = new BaseLocalTvInput1SessionImpl();
+    public TvInputService.Session onCreateSession() {
+        TvInputService.Session impl = new BaseLocalTvInput1SessionImpl();
         impl.setOverlayViewEnabled(true);
         return impl;
     }
