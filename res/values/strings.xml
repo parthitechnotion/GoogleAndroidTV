@@ -69,7 +69,7 @@
     <string name="unified_tv_input_label">Unified TV input</string>
 
     <!-- Edit channel list (enable/disable individual channels) -->
-    <string name="edit_channels_title">Edit channel list for\n<xliff:g id="tv_input">%s</xliff:g></string>
+    <string name="edit_channels_title">Edit <xliff:g id="tv_input">%s</xliff:g> channels</string>
     <!-- Text displayed in edit channels activity when there aren't any channels in the TV input.
          [CHAR LIMIT=20] -->
     <string name="empty_channel_tvinput">No channels in the TV input.</string>
