@@ -237,13 +237,8 @@ abstract public class BaseTvInputService extends TvInputService {
             }
 
             // Create empty program information and insert it into the database.
-            // Delay intentionally to see whether the updated program information dynamically
-            // replaces the previous one on the channel banner (for testing). This is to simulate
-            // the actual case where we get parsed program data only after tuning is done.
-            final long DELAY_FOR_TESTING_IN_MILLIS = 1000; // 1 second
-            mProgramUpdateHandler.postDelayed(
-                    new AddProgramRunnable(channelUri, channel.mProgram),
-                    DELAY_FOR_TESTING_IN_MILLIS);
+            mProgramUpdateHandler.post(
+                    new AddProgramRunnable(channelUri, channel.mProgram));
             return true;
         }
 
