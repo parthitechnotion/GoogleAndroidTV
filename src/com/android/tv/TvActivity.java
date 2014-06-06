@@ -53,7 +53,6 @@ import com.android.tv.data.AspectRatio;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.StreamInfo;
-import com.android.tv.dialog.EditChannelsDialogFragment;
 import com.android.tv.dialog.EditInputDialogFragment;
 import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.input.TisTvInput;
@@ -63,10 +62,10 @@ import com.android.tv.ui.AspectRatioOptionFragment;
 import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
+import com.android.tv.ui.EditChannelsFragment;
 import com.android.tv.ui.InputPickerFragment;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.SimpleGuideFragment;
-import com.android.tv.ui.SimpleGuideShowOnlyFragment;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.util.TvInputManagerHelper;
@@ -91,7 +90,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private static final float AUDIO_MAX_VOLUME = 1.0f;
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
-    private static final int START_TV_MAX_RETRY = 4;
+    // Wait for 3 seconds
+    private static final int START_TV_MAX_RETRY = 12;
     private static final int START_TV_RETRY_INTERVAL = 250;
 
     // TODO: add more KEYCODEs to the white list.
@@ -148,7 +148,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     static {
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
-        AVAILABLE_DIALOG_TAGS.add(EditChannelsDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditInputDialogFragment.DIALOG_TAG);
     }
 
@@ -421,12 +420,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         return mChannelMap == null ? null : mChannelMap.getTvInput();
     }
 
-    public void showEditChannelsDialog() {
-        if (getSelectedTvInput() == null) {
-            return;
-        }
-
-        showDialogFragment(EditChannelsDialogFragment.DIALOG_TAG, new EditChannelsDialogFragment());
+    public void showEditChannelsFragment(int initiator) {
+        showSideFragment(new EditChannelsFragment(mChannelMap.getChannelList(false)), initiator);
     }
 
     public boolean startSetupActivity() {
