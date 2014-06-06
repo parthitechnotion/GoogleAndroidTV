@@ -91,13 +91,7 @@ abstract public class BaseTvInputService extends TvInputService {
                 }
                 if (DEBUG) Log.d(TAG, "Couldn't find the channel list. Inserting new channels...");
                 // Insert channels into the database. This needs to be done only for the first time.
-                ContentValues values = new ContentValues();
-                values.put(Channels.COLUMN_SERVICE_NAME, this.getClass().getName());
-                for (ChannelInfo info : mChannels) {
-                    values.put(Channels.COLUMN_DISPLAY_NUMBER, info.mNumber);
-                    values.put(Channels.COLUMN_DISPLAY_NAME, info.mName);
-                    getContentResolver().insert(TvContract.Channels.CONTENT_URI, values);
-                }
+                ChannelUtils.populateChannels(this, this.getClass().getName(), mChannels);
             } while (true);
 
             while (cursor.moveToNext()) {
