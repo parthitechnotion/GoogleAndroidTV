@@ -41,17 +41,13 @@ public class TvRecommendation {
     private static final int MATCH_CHANNEL_ID = 1;
     private static final int MATCH_WATCHED_PROGRAM_ID = 2;
 
-    private static final List<TvRecommenderWrapper> sTvRecommenders =
-            new ArrayList<TvRecommenderWrapper>();
-
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(TvContract.AUTHORITY, "channel/#", MATCH_CHANNEL_ID);
         sUriMatcher.addURI(TvContract.AUTHORITY, "watched_program/#", MATCH_WATCHED_PROGRAM_ID);
-
-        sTvRecommenders.add(new TvRecommenderWrapper(new RecentChannelRecommender()));
     }
 
+    private final List<TvRecommenderWrapper> mTvRecommenders;
     private final Map<Long, ChannelRecord> mChannelRecordMap;
     // TODO: Consider to define each observer rather than the list or observers.
     private final List<ContentObserver> mContentObservers;
@@ -75,6 +71,7 @@ public class TvRecommendation {
         mContentObservers = new ArrayList<ContentObserver>();
         mHandler = handler;
         mIncludeRecommendedOnly = includeRecommendedOnly;
+        mTvRecommenders = new ArrayList<TvRecommenderWrapper>();
         registerContentObservers();
         buildChannelRecordMap();
     }
@@ -82,6 +79,15 @@ public class TvRecommendation {
     public void release() {
         unregisterContentObservers();
         mChannelRecordMap.clear();
+    }
+
+    public void registerTvRecommender(TvRecommender recommender) {
+        registerTvRecommender(recommender,
+                TvRecommenderWrapper.DEFAULT_BASE_SCORE, TvRecommenderWrapper.DEFAULT_WEIGHT);
+    }
+
+    public void registerTvRecommender(TvRecommender recommender, double baseScore, double weight) {
+        mTvRecommenders.add(new TvRecommenderWrapper(recommender, baseScore, weight));
     }
 
     /**
@@ -96,7 +102,7 @@ public class TvRecommendation {
         ArrayList<ChannelRecord> results = new ArrayList<ChannelRecord>();
         for (ChannelRecord cr : mChannelRecordMap.values()) {
             double maxScore = TvRecommender.NOT_RECOMMENDED;
-            for (TvRecommenderWrapper recommender : sTvRecommenders) {
+            for (TvRecommenderWrapper recommender : mTvRecommenders) {
                 double score = recommender.calculateScaledScore(cr);
                 if (score > maxScore) {
                     maxScore = score;;
@@ -132,7 +138,7 @@ public class TvRecommendation {
                         if (cursor != null && cursor.moveToFirst()) {
                             ChannelRecord channelRecord =
                                     updateChannelRecordFromWatchedProgramCursor(cursor);
-                            for (TvRecommenderWrapper recommender : sTvRecommenders) {
+                            for (TvRecommenderWrapper recommender : mTvRecommenders) {
                                 recommender.onNewWatchLog(channelRecord);
                             }
                         }
@@ -252,18 +258,25 @@ public class TvRecommendation {
 
     public static class ChannelRecord implements Comparable<ChannelRecord> {
         private final Channel mChannel;
+        private final Uri mChannelUri;
         private long mLastWatchedTimeMs;
         private long mLastWatchDurationMs;
         private double mScore;
 
         public ChannelRecord(Channel channel) {
             mChannel = channel;
+            mChannelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI,
+                    channel.getId());
             mLastWatchedTimeMs = 0l;
             mLastWatchDurationMs = 0;
         }
 
         public Channel getChannel() {
             return mChannel;
+        }
+
+        public Uri getChannelUri() {
+            return mChannelUri;
         }
 
         public long getLastWatchedTimeMs() {
