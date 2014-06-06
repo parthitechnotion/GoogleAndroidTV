@@ -25,7 +25,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
+import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tv.R;
@@ -34,18 +35,38 @@ import com.android.tv.data.Channel;
 import com.android.tv.input.TvInput;
 
 public class EditChannelsFragment extends BaseSideFragment {
-    private static final String TAG = "EditChannelsFragment";
-    private static final boolean DEBUG = true;
+    private static final int ACTION_SHOW_ALL = 0;
+    private static final int ACTION_HIDE_ALL = 1;
 
     private TvInput mSelectedInput;
 
     private TvActivity mTvActivity;
+    private Item[] mItems;
+    private String[] mActions;
     private Channel[] mChannels;
+    private int mBrowsableChannelCount;
 
     private int mBgColor;
     private int mFocusedBgColor;
 
-    private int mBrowsableChannelCount;
+    private static final class Item {
+        private static final int TYPE_ACTION = 0;
+        private static final int TYPE_CHANNEL = 1;
+
+        private Item(int action) {
+            mType = TYPE_ACTION;
+            mAction = action;
+        }
+
+        private Item(Channel channel) {
+            mType = TYPE_CHANNEL;
+            mChannel = channel;
+        }
+
+        private int mType;
+        private int mAction;
+        private Channel mChannel;
+    }
 
     public EditChannelsFragment(Channel[] channels) {
         mChannels = channels;
@@ -67,15 +88,25 @@ public class EditChannelsFragment extends BaseSideFragment {
         mFocusedBgColor = getActivity().getResources().getColor(
                 R.color.option_item_focused_background);
 
+        mActions = getActivity().getResources().getStringArray(R.array.edit_channels_actions);
+        mItems = new Item[mActions.length + mChannels.length];
+        int index = 0;
+        for (; index<mActions.length; ++index) {
+            mItems[index] = new Item(index);
+        }
+        for (Channel channel : mChannels) {
+            mItems[index++] = new Item(channel);
+        }
         String displayName = mSelectedInput.getDisplayName();
         String title = String.format(getString(R.string.edit_channels_title), displayName);
-        initialize(title, mChannels, R.layout.edit_channels_fragment, R.layout.edit_channels_item,
+        initialize(title, mItems, R.layout.edit_channels_fragment, R.layout.edit_channels_item,
                 false);
 
         if (mBrowsableChannelCount <= 0) {
             Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
                     Toast.LENGTH_SHORT).show();
         }
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -83,42 +114,80 @@ public class EditChannelsFragment extends BaseSideFragment {
     public void onBindView(View v, int position, Object tag, boolean prevSelected) {
         super.onBindView(v, position, tag, prevSelected);
 
-        Channel channel = (Channel) tag;
-        String channelNumber = channel.getDisplayNumber();
-        String channelName = channel.getDisplayName();
-        String channelString;
-        if (TextUtils.isEmpty(channelName)) {
-            channelString = channelNumber;
-        } else {
-            channelString = String.format(getString(R.string.channel_item),
-                    channelNumber, channelName);
+        RadioButton button = (RadioButton) v.findViewById(R.id.radio_button);
+        TextView textView = (TextView) v.findViewById(R.id.channel_text_view);
+
+        Item item = (Item) tag;
+        if (item.mType == Item.TYPE_ACTION) {
+            button.setVisibility(View.INVISIBLE);
+            textView.setText(mActions[item.mAction]);
+        } else if (item.mType == Item.TYPE_CHANNEL) {
+            button.setVisibility(View.VISIBLE);
+            button.setChecked(item.mChannel.isBrowsable());
+
+            String channelNumber = item.mChannel.getDisplayNumber();
+            String channelName = item.mChannel.getDisplayName();
+            String channelString;
+            if (TextUtils.isEmpty(channelName)) {
+                channelString = channelNumber;
+            } else {
+                channelString = String.format(getString(R.string.channel_item),
+                        channelNumber, channelName);
+            }
+            textView.setText(channelString);
         }
-        CheckedTextView checkedTextView =
-                (CheckedTextView) v.findViewById(R.id.channel_text_view);
-        checkedTextView.setText(channelString);
-        checkedTextView.setChecked(channel.isBrowsable());
     }
 
     @Override
     public void onItemSelected(View v, int position, Object tag) {
-        CheckedTextView checkedTextView =
-                (CheckedTextView) v.findViewById(R.id.channel_text_view);
-        boolean checked = checkedTextView.isChecked();
+        Item item = (Item) tag;
+        if (item.mType == Item.TYPE_ACTION) {
+            if (item.mAction == ACTION_SHOW_ALL) {
+                updateAllChannels(true);
+            } else if (item.mAction == ACTION_HIDE_ALL) {
+                updateAllChannels(false);
+            }
+        } else if (item.mType == Item.TYPE_CHANNEL) {
+            RadioButton button = (RadioButton) v.findViewById(R.id.radio_button);
+            boolean checked = button.isChecked();
 
-        Channel channel = (Channel) tag;
-        Uri uri = TvContract.buildChannelUri(channel.getId());
-        ContentValues values = new ContentValues();
-        values.put(TvContract.Channels.COLUMN_BROWSABLE, checked ? 0 : 1);
-        getActivity().getContentResolver().update(uri, values, null, null);
+            Channel channel = item.mChannel;
+            Uri uri = TvContract.buildChannelUri(channel.getId());
+            ContentValues values = new ContentValues();
+            values.put(TvContract.Channels.COLUMN_BROWSABLE, checked ? 0 : 1);
+            getActivity().getContentResolver().update(uri, values, null, null);
+            channel.setBrowsable(!checked);
 
-        checkedTextView.setChecked(!checked);
-        mBrowsableChannelCount += checked ? -1 : 1;
-        if (mBrowsableChannelCount <= 0) {
-            Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
-                    Toast.LENGTH_SHORT).show();
+            button.setChecked(!checked);
+            mBrowsableChannelCount += checked ? -1 : 1;
+            if (mBrowsableChannelCount <= 0) {
+                Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
+                        Toast.LENGTH_SHORT).show();
+            }
         }
 
         super.onItemSelected(v, position, tag);
+    }
+
+    private void updateAllChannels(boolean browsable) {
+        Uri uri = mSelectedInput.buildChannelsUri();
+        ContentValues values = new ContentValues();
+        values.put(TvContract.Channels.COLUMN_BROWSABLE, browsable ? 1 : 0);
+
+        getActivity().getContentResolver().update(uri, values, null, null);
+
+        for (Channel channel : mChannels) {
+            channel.setBrowsable(browsable);
+        }
+        mAdapter.notifyDataSetChanged();
+
+        if (browsable) {
+            mBrowsableChannelCount = mChannels.length;
+        } else  {
+            mBrowsableChannelCount = 0;
+            Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

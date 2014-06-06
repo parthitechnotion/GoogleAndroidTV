@@ -23,6 +23,18 @@
     android:gravity="left|center_vertical"
     android:padding="10dip">
 
+    <RadioButton
+        android:id="@+id/radio_button"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="@dimen/option_item_padding_left"
+        android:layout_marginLeft="@dimen/option_item_margin_left"
+        android:textSize="@dimen/option_item_text_size"
+        android:textColor="@color/side_panel_item_text"
+        android:focusable="false"
+        android:fontFamily="@string/font" />
+
     <!-- This is "gone" for now, since we don't have channel icons. -->
     <ImageView android:id="@+id/channel_image_view"
         android:layout_width="90dip"
@@ -38,15 +50,15 @@
         android:layout_weight="0"
         android:paddingLeft="10dip"
         android:paddingRight="0dip"
-        android:scaleType="center" />
+        android:scaleType="center"
+        android:visibility="gone" />
 
-    <CheckedTextView
+    <TextView
         android:id="@+id/channel_text_view"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:gravity="center_vertical"
-        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
         android:paddingLeft="0dip"
         android:paddingRight="10dip"
         android:singleLine="true"
