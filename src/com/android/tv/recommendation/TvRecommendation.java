@@ -16,12 +16,15 @@
 
 package com.android.tv.recommendation;
 
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.media.tv.TvContract;
+import android.media.tv.TvContract.Channels;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
@@ -30,21 +33,28 @@ import com.android.tv.data.Channel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TvRecommendation {
     private static final String TAG = "TvRecommendation";
 
+    private static final String PATH_INPUT = "input";
+
     private static final UriMatcher sUriMatcher;
     private static final int MATCH_CHANNEL_ID = 1;
     private static final int MATCH_WATCHED_PROGRAM_ID = 2;
+    private static final int MATCH_INPUT_PACKAGE_SERVICE_CHANNEL = 3;
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(TvContract.AUTHORITY, "channel/#", MATCH_CHANNEL_ID);
         sUriMatcher.addURI(TvContract.AUTHORITY, "watched_program/#", MATCH_WATCHED_PROGRAM_ID);
+        sUriMatcher.addURI(TvContract.AUTHORITY, "input/*/*/channel",
+                MATCH_INPUT_PACKAGE_SERVICE_CHANNEL);
     }
 
     private final List<TvRecommenderWrapper> mTvRecommenders;
@@ -59,11 +69,11 @@ public class TvRecommendation {
      * Create a TV recommendation object.
      *
      * @param context The context to register {@link ContentObserver}s for
-     * {@link android.provider.TvContract.Channels} and
-     * {@link android.provider.TvContract.WatchedPrograms}.
+     * {@link android.media.tv.TvContract.Channels} and
+     * {@link android.media.tv.TvContract.WatchedPrograms}.
      * @param handler The handler to run {@link android.database.ContentObserver#onChange(boolean)}
      * on, or null if none.
-     * @paran includeRecommendedOnly true to include only recommended results, or false.
+     * @param includeRecommendedOnly true to include only recommended results, or false.
      */
     public TvRecommendation(Context context, Handler handler, boolean includeRecommendedOnly) {
         mContext = context;
@@ -105,7 +115,7 @@ public class TvRecommendation {
             for (TvRecommenderWrapper recommender : mTvRecommenders) {
                 double score = recommender.calculateScaledScore(cr);
                 if (score > maxScore) {
-                    maxScore = score;;
+                    maxScore = score;
                 }
             }
             cr.mScore = maxScore;
@@ -157,7 +167,8 @@ public class TvRecommendation {
         observer = new ContentObserver(mHandler) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
-                if (sUriMatcher.match(uri) == MATCH_CHANNEL_ID) {
+                int match = sUriMatcher.match(uri);
+                if (match == MATCH_CHANNEL_ID) {
                     long channelId = ContentUris.parseId(uri);
                     Cursor cursor = null;
                     try {
@@ -178,12 +189,55 @@ public class TvRecommendation {
                             cursor.close();
                         }
                     }
+                } else if (match == MATCH_INPUT_PACKAGE_SERVICE_CHANNEL) {
+                    String packageName = TvContract.getPackageName(uri);
+                    String serviceName = TvContract.getServiceName(uri);
+
+                    Set<Long> channelIdSet = new HashSet<Long>();
+                    for (ChannelRecord cr : mChannelRecordMap.values()) {
+                        if (serviceName.equals(cr.mChannel.getServiceName())) {
+                            channelIdSet.add(cr.mChannel.getId());
+                        }
+                    }
+
+                    Uri inputUri = TvContract.buildChannelsUriForInput(
+                            new ComponentName(packageName, serviceName), false);
+                    Cursor c = null;
+                    try {
+                        c = mContext.getContentResolver().query(inputUri, null, null, null, null);
+                        if (c != null) {
+                            int channelIdIndex = c.getColumnIndex(Channels._ID);
+                            long channelId;
+                            while (c.moveToNext()) {
+                                channelId = c.getLong(channelIdIndex);
+                                ChannelRecord oldChannelRecord = mChannelRecordMap.get(channelId);
+                                ChannelRecord newChannelRecord =
+                                        new ChannelRecord(Channel.fromCursor(c));
+                                newChannelRecord.mLastWatchedTimeMs = (oldChannelRecord == null)
+                                        ? 0 : oldChannelRecord.mLastWatchedTimeMs;
+                                mChannelRecordMap.put(channelId, newChannelRecord);
+                                channelIdSet.remove(channelId);
+                            }
+                        }
+                    } finally {
+                        if (c != null) {
+                            c.close();
+                        }
+                    }
+
+                    for (Long channelId : channelIdSet) {
+                        mChannelRecordMap.remove(channelId);
+                    }
                 }
             }
         };
         mContentObservers.add(observer);
         mContext.getContentResolver().registerContentObserver(
                 TvContract.Channels.CONTENT_URI, true, observer);
+        mContext.getContentResolver().registerContentObserver(
+                new Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT)
+                        .authority(TvContract.AUTHORITY).appendPath(PATH_INPUT).build(),
+                true, observer);
     }
 
     private void unregisterContentObservers() {
@@ -312,7 +366,7 @@ public class TvRecommendation {
          * The return value should be in the range of [0.0, 1.0] or NOT_RECOMMENDED for denoting
          * that it gives up to calculate the score for the channel.
          *
-         * @param channelRecord The channel record which will be evaluated by this recommender.
+         * @param cr The channel record which will be evaluated by this recommender.
          * @return The recommendation score
          */
         protected abstract double calculateScore(final ChannelRecord cr);
@@ -328,10 +382,6 @@ public class TvRecommendation {
         // The weight of the recommender. The return-value of getScore() will be multiplied by
         // this value.
         private final double mWeight;
-
-        public TvRecommenderWrapper(TvRecommender recommender) {
-            this(recommender, DEFAULT_BASE_SCORE, DEFAULT_WEIGHT);
-        }
 
         public TvRecommenderWrapper(TvRecommender recommender, double baseScore, double weight) {
             mRecommender = recommender;
