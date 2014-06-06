@@ -62,7 +62,7 @@ public class OptionsAdapter extends ItemListView.ItemListAdapter {
         actionList.add(MenuAction.SELECT_ASPECT_RATIO_ACTION);
         actionList.add(MenuAction.SELECT_TV_INPUT_ACTION);
         actionList.add(MenuAction.TOGGLE_PIP_ACTION);
-        if (channelMap != null) {
+        if (channelMap != null && channelMap.size() != 0) {
             actionList.add(MenuAction.EDIT_CHANNEL_LIST_ACTION);
         }
         if (channelMap != null && tvInput.getIntentForSetupActivity() != null) {

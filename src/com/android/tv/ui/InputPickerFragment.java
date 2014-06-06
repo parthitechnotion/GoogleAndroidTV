@@ -19,11 +19,9 @@ package com.android.tv.ui;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
 
 import com.android.internal.util.Preconditions;
@@ -39,9 +37,6 @@ import java.util.Collection;
 import java.util.Comparator;
 
 public class InputPickerFragment extends BaseOptionFragment {
-    private static final String TAG = "InputPickerFragment";
-    private static final boolean DEBUG = true;
-
     private TvInput mSelectedInput;
 
     private TvActivity mTvActivity;
@@ -57,8 +52,6 @@ public class InputPickerFragment extends BaseOptionFragment {
                     mAdapter.notifyDataSetChanged();
                 }
             };
-
-    private final Handler mHandler = new Handler();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

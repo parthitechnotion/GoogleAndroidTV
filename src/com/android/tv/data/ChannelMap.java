@@ -32,6 +32,7 @@ import android.util.Log;
 import com.android.tv.input.TvInput;
 import com.android.tv.util.TvInputManagerHelper;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -91,7 +92,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public Channel[] getChannelList(boolean browsableOnly) {
         if (mBrowsableChannelCount == 0 || !browsableOnly) {
-            return mChannelList;
+            return Arrays.copyOf(mChannelList, mChannelList.length);
         }
 
         Channel[] channels = new Channel[mBrowsableChannelCount];

@@ -19,6 +19,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
+    android:focusable="true"
     android:gravity="left|center_vertical"
     android:padding="10dip">
 
@@ -50,5 +51,6 @@
         android:paddingRight="10dip"
         android:singleLine="true"
         android:ellipsize="marquee"
-        android:marqueeRepeatLimit="1" />
+        android:marqueeRepeatLimit="1"
+        android:fontFamily="@string/font" />
 </LinearLayout>
