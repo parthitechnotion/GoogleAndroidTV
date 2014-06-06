@@ -17,13 +17,25 @@
 package com.android.tv.data;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.tv.TvContract;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A convenience class to create and insert channel entries into the database.
  */
 public final class Channel {
+    private static final String TAG = "Channel";
+
     public static final long INVALID_ID = -1;
 
     /** ID of this channel. Matches to BaseColumns._ID. */
@@ -38,6 +50,17 @@ public final class Channel {
     private String mDescription;
     private boolean mIsBrowsable;
     private byte[] mData;
+
+    private boolean mIsLogoLoaded;
+    private LoadLogoTask mLoadLogoTask;;
+    private Bitmap mLogo;
+
+    public interface LoadLogoCallback {
+        void onLoadLogoFinished(Channel channel, Bitmap logo);
+    }
+
+    private final List<LoadLogoCallback> mPendingLoadLogoCallbacks =
+            new ArrayList<LoadLogoCallback>();
 
     public static Channel fromCursor(Cursor cursor) {
         Channel channel = new Channel();
@@ -287,6 +310,81 @@ public final class Channel {
 
         public Channel build() {
             return mChannel;
+        }
+    }
+
+    public boolean isLogoLoaded() {
+        return mIsLogoLoaded;
+    }
+
+    public boolean isLogoLoading() {
+        return mLoadLogoTask != null;
+    }
+
+    // Assumes call from UI thread.
+    public void loadLogo(Context context, LoadLogoCallback callback) {
+        if (isLogoLoaded()) {
+            callback.onLoadLogoFinished(this, mLogo);
+        } else {
+            mPendingLoadLogoCallbacks.add(callback);
+            if (!isLogoLoading()) {
+                mLoadLogoTask = new LoadLogoTask(context);
+                mLoadLogoTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        }
+    }
+
+    // Assumes call from UI thread.
+    private void setLogo(Bitmap logo) {
+        mIsLogoLoaded = true;
+        if (isLogoLoading()) {
+            mLoadLogoTask.cancel(true);
+            mLoadLogoTask = null;
+        }
+        mLogo = logo;
+
+        for (LoadLogoCallback callback : mPendingLoadLogoCallbacks) {
+            callback.onLoadLogoFinished(this, logo);
+        }
+        mPendingLoadLogoCallbacks.clear();
+    }
+
+    private class LoadLogoTask extends AsyncTask<Void, Void, Bitmap> {
+        private Context mContext;
+
+        LoadLogoTask(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public Bitmap doInBackground(Void... params) {
+            Log.v(TAG, "Load logo for " + Channel.this);
+
+            InputStream is = null;
+            try {
+                is = mContext.getContentResolver().openInputStream(
+                        TvContract.buildChannelLogoUri(mId));
+            } catch (FileNotFoundException e) {
+                // Logo may not exist.
+                Log.i(TAG, "Logo not found", e);
+                return null;
+            }
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            if (bitmap == null) {
+                Log.e(TAG, "Failed to decode logo image for " + Channel.this);
+            }
+            return bitmap;
+        }
+
+        @Override
+        public void onPostExecute(Bitmap logo) {
+            if (isCancelled()) {
+                Log.w(TAG, "Load logo canceled for " + Channel.this);
+                return;
+            }
+            Log.v(TAG, "Loaded logo for " + Channel.this + ": " + logo);
+            mLoadLogoTask = null;
+            setLogo(logo);
         }
     }
 }
