@@ -17,6 +17,7 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -32,7 +33,8 @@ import com.android.tv.util.Utils;
 /**
  * A view to render channel tile.
  */
-public class ChannelTileView extends ShadowContainer implements ItemListView.TileView {
+public class ChannelTileView extends ShadowContainer
+        implements ItemListView.TileView, Channel.LoadLogoCallback {
     private ImageView mChannelLogoView;
     private TextView mChannelNameView;
     private TextView mChannelNumberView;
@@ -77,13 +79,36 @@ public class ChannelTileView extends ShadowContainer implements ItemListView.Til
         } else {
             mChannelNumberView.setText(mChannel.getDisplayNumber());
             mChannelNumberView.setVisibility(VISIBLE);
-            mChannelNameView.setText(mChannel.getDisplayName());
-            mChannelNameView.setVisibility(VISIBLE);
-            // TODO: need to set up mChannelLogoView when log image is available.
-            mChannelLogoView.setVisibility(INVISIBLE);
-
+            if (!mChannel.isLogoLoaded()) {
+                showName();
+            }
+            mChannel.loadLogo(getContext(), this);
             updateProgramInformation();
         }
+    }
+
+    @Override
+    public void onLoadLogoFinished(Channel channel, Bitmap logo) {
+        if (channel.getId() != mChannel.getId()) {
+            return;
+        }
+        if (logo == null) {
+            showName();
+        } else {
+            showLogo(logo);
+        }
+    }
+
+    private void showName() {
+        mChannelNameView.setText(mChannel.getDisplayName());
+        mChannelNameView.setVisibility(VISIBLE);
+        mChannelLogoView.setVisibility(INVISIBLE);
+    }
+
+    private void showLogo(Bitmap logo) {
+        mChannelLogoView.setImageBitmap(logo);
+        mChannelLogoView.setVisibility(VISIBLE);
+        mChannelNameView.setVisibility(INVISIBLE);
     }
 
     public void updateProgramInformation() {
