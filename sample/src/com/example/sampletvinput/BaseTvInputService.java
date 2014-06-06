@@ -202,6 +202,11 @@ abstract public class BaseTvInputService extends TvInputService {
                     @Override
                     public void onPrepared(MediaPlayer player) {
                         if (mPlayer != null && !mPlayer.isPlaying()) {
+                            int duration = mPlayer.getDuration();
+                            if (duration > 0) {
+                                long currentTimeMs = System.currentTimeMillis();
+                                mPlayer.seekTo((int) (currentTimeMs % duration));
+                            }
                             mPlayer.start();
                         }
                     }
@@ -221,12 +226,6 @@ abstract public class BaseTvInputService extends TvInputService {
             } catch (IllegalStateException e1) {
                 return false;
             }
-            int duration = mPlayer.getDuration();
-            if (duration > 0) {
-                long currentTimeMs = System.currentTimeMillis();
-                mPlayer.seekTo((int) (currentTimeMs % duration));
-            }
-            mPlayer.start();
 
             try {
                 // Delete existing program information of the channel.
