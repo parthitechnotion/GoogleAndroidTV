@@ -60,12 +60,12 @@ public class NotificationService extends IntentService {
     protected void onHandleIntent(final Intent intent) {
         ChannelRecord[] channelRecords =
                 mTvRecommendation.getRecommendedChannelList(NOTIFICATION_COUNT);
-        for (ChannelRecord cr : channelRecords) {
-            sendNotification(cr);
+        for (int i = 0; i < channelRecords.length; ++i) {
+            sendNotification(channelRecords[i], i);
         }
     }
 
-    public void sendNotification(ChannelRecord cr) {
+    public void sendNotification(ChannelRecord cr, int notifyId) {
         Intent intent = new Intent(Intent.ACTION_VIEW, cr.getChannelUri());
         PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
         Program program = Utils.getCurrentProgram(this, cr.getChannelUri());
@@ -78,6 +78,6 @@ public class NotificationService extends IntentService {
                 .setSmallIcon(R.drawable.app_icon)
                 .setCategory(Notification.CATEGORY_RECOMMENDATION)
                 .build();
-        mNotificationManager.notify(NOTIFY_TAG, (int) cr.getChannel().getId(), notification);
+        mNotificationManager.notify(NOTIFY_TAG, notifyId, notification);
     }
 }
