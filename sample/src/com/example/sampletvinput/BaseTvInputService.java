@@ -222,18 +222,14 @@ abstract public class BaseTvInputService extends TvInputService {
                 return false;
             }
 
-            try {
-                // Delete existing program information of the channel.
-                Uri uri = TvContract.buildProgramsUriForChannel(channelUri);
-                getContentResolver().delete(uri, null, null);
-            } catch (RuntimeException e) {
-                Log.w(TAG, "Fail to get id from uri: " + channelUri);
-                getContentResolver().delete(TvContract.Programs.CONTENT_URI, null, null);
-            }
-
             // Create empty program information and insert it into the database.
-            mProgramUpdateHandler.post(
-                    new AddProgramRunnable(channelUri, channel.mProgram));
+            // Delay intentionally to see whether the updated program information dynamically
+            // replaces the previous one on the channel banner (for testing). This is to simulate
+            // the actual case where we get parsed program data only after tuning is done.
+            final long DELAY_FOR_TESTING_IN_MILLIS = 1000; // 1 second
+            mProgramUpdateHandler.postDelayed(
+                    new AddProgramRunnable(channelUri, channel.mProgram),
+                    DELAY_FOR_TESTING_IN_MILLIS);
             return true;
         }
 
@@ -282,16 +278,35 @@ abstract public class BaseTvInputService extends TvInputService {
                 values.put(Programs.COLUMN_SHORT_DESCRIPTION, mProgram.mDescription);
 
                 for (int i = 0; i < PROGRAM_REPEAT_COUNT; ++i) {
-                    values.put(Programs.COLUMN_START_TIME_UTC_MILLIS,
-                            (startTimeSec + i * mProgram.mDurationSec) * 1000);
-                    values.put(Programs.COLUMN_END_TIME_UTC_MILLIS,
-                            (startTimeSec + (i + 1) * mProgram.mDurationSec) * 1000);
-                    getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);
+                    if (!hasProgramInfo((startTimeSec + i * mProgram.mDurationSec + 1) * 1000)) {
+                        values.put(Programs.COLUMN_START_TIME_UTC_MILLIS,
+                                (startTimeSec + i * mProgram.mDurationSec) * 1000);
+                        values.put(Programs.COLUMN_END_TIME_UTC_MILLIS,
+                                (startTimeSec + (i + 1) * mProgram.mDurationSec) * 1000);
+                        getContentResolver().insert(TvContract.Programs.CONTENT_URI, values);
+                    }
                 }
             }
 
             private long positiveMod(long x, long modulo) {
                 return ((x % modulo) + modulo)  % modulo;
+            }
+
+            private boolean hasProgramInfo(long timeMs) {
+                Uri uri = TvContract.buildProgramsUriForChannel(mChannelUri, timeMs, timeMs);
+                String[] projection = { TvContract.Programs._ID };
+                Cursor cursor = null;
+                try {
+                    cursor = getContentResolver().query(uri, projection, null, null, null);
+                    if (cursor.getCount() > 0) {
+                        return true;
+                    }
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
+                }
+                return false;
             }
         }
     }
