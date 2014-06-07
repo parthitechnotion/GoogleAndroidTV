@@ -22,124 +22,108 @@
     android:layout_marginTop="27dp"
     android:layout_marginLeft="132dp"
     android:layout_marginRight="132dp"
-    android:paddingTop="12dp"
+    android:paddingTop="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="32dp"
-    android:paddingBottom="6dp"
+    android:paddingBottom="16dp"
     android:background="@drawable/channel_banner_tile_border">
 
-    <!-- It will look like having height @dimen/channel_banner_channel_info_bar_height
-         after the baseline alignment -->
-    <RelativeLayout
-        android:id="@+id/channel_info_bar"
+    <TextView android:id="@+id/channel_text"
+        android:layout_width="112dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/channel_banner_title_large_margin_top"
+        android:textColor="#EEEEEE"
+        android:fontFamily="sans-serif-thin"
+        android:textSize="@dimen/channel_banner_title_large_text_size" />
+
+    <ImageView android:id="@+id/channel_logo"
+        android:layout_width="64dp"
+        android:layout_height="44dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true" />
+
+    <TextView android:id="@+id/program_text"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/channel_banner_channel_info_bar_height_include_padding" >
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/channel_banner_program_large_margin_top"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/channel_text"
+        android:layout_toLeftOf="@id/channel_logo"
+        android:maxLines="2"
+        android:minHeight="36dp"
+        android:lineSpacingExtra="1.5sp"
+        android:ellipsize="end"
+        android:textColor="#EEEEEE"
+        android:fontFamily="sans-serif"
+        android:textSize="@dimen/channel_banner_program_large_text_size" />
 
-        <TextView android:id="@+id/channel_text"
-            android:layout_width="112dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:textColor="#EEEEEE"
-            android:fontFamily="sans-serif-thin"
-            android:includeFontPadding="false"
-            android:textSize="@dimen/channel_banner_title_large_text_size" />
+    <!-- Use setCompoundDrawables*() for TV input logo -->
+    <TextView android:id="@+id/channel_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="12dp"
+        android:layout_below="@id/program_text"
+        android:layout_toRightOf="@id/channel_text"
+        android:textColor="#EEEEEE"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="@dimen/channel_banner_small_text_size" />
 
-        <!-- delme: android:paddingTop="11dp" -->
-        <TextView android:id="@+id/program_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@id/channel_text"
-            android:textColor="#EEEEEE"
-            android:fontFamily="sans-serif"
-            android:includeFontPadding="false"
-            android:textSize="@dimen/channel_banner_medium_text_size" />
+    <TextView android:id="@+id/program_time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="12dp"
+        android:layout_alignBaseline="@id/channel_name"
+        android:layout_toRightOf="@id/channel_name"
+        android:textColor="#80EEEEEE"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="@dimen/channel_banner_small_text_size" />
 
-        <!-- Setting negative padding here has no effect.
-             We should repeat doing it again programatically. -->
-        <ImageView android:id="@+id/tvinput_logo"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginRight="8dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/channel_text"
-            android:paddingBottom="@dimen/channel_banner_tvinput_logo_padding_bottom"
-            android:visibility="gone" />
+    <ProgressBar
+        android:id="@+id/remaining_time"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="60dp"
+        android:layout_height="4dp"
+        android:layout_alignBottom="@id/channel_name"
+        android:layout_toRightOf="@id/program_time_text"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="3dp"
+        android:progressDrawable="@drawable/progress_horizontal"
+        android:indeterminate="false"
+        android:max="100" />
 
-        <TextView android:id="@+id/channel_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="12dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/tvinput_logo"
-            android:textColor="#EEEEEE"
-            android:includeFontPadding="false"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="@dimen/channel_banner_small_text_size" />
+    <TextView android:id="@+id/closed_caption"
+        style="@style/channel_banner_track_meta_text"
+        android:layout_alignBaseline="@id/channel_name"
+        android:layout_toRightOf="@id/remaining_time" />
 
-        <TextView android:id="@+id/program_time_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="12dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/channel_name"
-            android:includeFontPadding="false"
-            android:textColor="#7FEEEEEE"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="@dimen/channel_banner_small_text_size" />
+    <TextView android:id="@+id/aspect_ratio"
+        style="@style/channel_banner_track_meta_text"
+        android:layout_alignBaseline="@id/channel_name"
+        android:layout_toRightOf="@id/closed_caption" />
 
-        <ProgressBar
-            android:id="@+id/remaining_time"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="60dp"
-            android:layout_height="4dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/program_time_text"
-            android:layout_marginRight="12dp"
-            android:progressDrawable="@drawable/progress_horizontal"
-            android:indeterminate="false"
-            android:max="100" />
+    <TextView android:id="@+id/resolution"
+        style="@style/channel_banner_track_meta_text"
+        android:layout_alignBaseline="@id/channel_name"
+        android:layout_toRightOf="@id/aspect_ratio" />
 
-        <TextView android:id="@+id/closed_caption"
-            style="@style/channel_banner_track_meta_text"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/remaining_time" />
-
-        <TextView android:id="@+id/aspect_ratio"
-            style="@style/channel_banner_track_meta_text"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/closed_caption" />
-
-        <TextView android:id="@+id/resolution"
-            style="@style/channel_banner_track_meta_text"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/aspect_ratio" />
-
-        <TextView android:id="@+id/audio_channel"
-            style="@style/channel_banner_track_meta_text"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/resolution" />
-
-        <ImageView android:id="@+id/channel_logo"
-            android:layout_width="64dp"
-            android:layout_height="match_parent"
-            android:paddingTop="16dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_gravity="right" />
-    </RelativeLayout>
+    <TextView android:id="@+id/audio_channel"
+        style="@style/channel_banner_track_meta_text"
+        android:layout_alignBaseline="@id/channel_name"
+        android:layout_toRightOf="@id/resolution" />
 
     <TextView android:id="@+id/program_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:paddingLeft="148dp"
+        android:layout_toRightOf="@id/channel_text"
+        android:layout_below="@id/channel_name"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="-3.5sp"
         android:maxLines="4"
-        android:gravity="left|top"
+        android:lineSpacingExtra="3.5sp"
         android:ellipsize="end"
-        android:singleLine="false"
-        android:textColor="#7FEEEEEE"
-        android:textSize="@dimen/channel_banner_small_text_size" />
+        android:textColor="#80EEEEEE"
+        android:textSize="14sp" />
 
 </com.android.tv.ui.ChannelBannerView>
