@@ -19,6 +19,8 @@ package com.android.tv.ui;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Handler;
@@ -29,7 +31,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -44,7 +45,7 @@ import com.android.tv.util.Utils;
 /**
  * A view to render channel banner.
  */
-public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoCallback {
+public class ChannelBannerView extends RelativeLayout implements Channel.LoadLogoCallback {
     private TextView mClosedCaptionTextView;
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
@@ -56,7 +57,6 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
     private ImageView mChannelLogoImageView;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
-    private RelativeLayout mChannelInfoBarView;
     private Uri mCurrentChannelUri;
 
     private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
@@ -67,18 +67,15 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
     };
 
     public ChannelBannerView(Context context) {
-        super(context);
-        mContext = context;
+        this(context, null);
     }
 
     public ChannelBannerView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mContext = context;
+        super(context, attrs, 0);
     }
 
     public ChannelBannerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mContext = context;
     }
 
     @Override
@@ -109,14 +106,6 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
-        mChannelInfoBarView = (RelativeLayout) findViewById(R.id.channel_info_bar);
-        mChannelInfoBarView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom,
-                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                alignBaseline();
-            }
-        });
     }
 
     public void updateViews(ChannelMap channelMap, StreamInfo info) {
@@ -153,18 +142,22 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
         if (displayNumber == null) {
             displayNumber = "";
         }
+
         if (displayNumber.length() <= 3) {
-            mChannelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    mContext.getResources().getDimension(
-                        R.dimen.channel_banner_title_large_text_size));
+            updateTextView(
+                    mChannelTextView,
+                    R.dimen.channel_banner_title_large_text_size,
+                    R.dimen.channel_banner_title_large_margin_top);
         } else if (displayNumber.length() <= 4) {
-            mChannelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    mContext.getResources().getDimension(
-                        R.dimen.channel_banner_title_medium_text_size));
+            updateTextView(
+                    mChannelTextView,
+                    R.dimen.channel_banner_title_medium_text_size,
+                    R.dimen.channel_banner_title_medium_margin_top);
         } else {
-            mChannelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    mContext.getResources().getDimension(
-                        R.dimen.channel_banner_title_small_text_size));
+            updateTextView(
+                    mChannelTextView,
+                    R.dimen.channel_banner_title_small_text_size,
+                    R.dimen.channel_banner_title_small_margin_top);
         }
         mChannelTextView.setText(displayNumber);
 
@@ -173,10 +166,20 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
             displayName = "";
         }
         mChannelNameTextView.setText(displayName);
-        channelMap.getCurrentChannel().loadLogo(getContext(), this);
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
+        channelMap.getCurrentChannel().loadLogo(getContext(), this);
+
         updateProgramInfo();
+    }
+
+    private void updateTextView(TextView textView, int sizeRes, int marginTopRes) {
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                getContext().getResources().getDimension(sizeRes));
+        RelativeLayout.LayoutParams lp =
+                (RelativeLayout.LayoutParams) textView.getLayoutParams();
+        lp.topMargin = (int) getContext().getResources().getDimension(marginTopRes);
+        textView.setLayoutParams(lp);
     }
 
     @Override
@@ -200,13 +203,30 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
             return;
         }
 
-        Program program = Utils.getCurrentProgram(mContext, mCurrentChannelUri);
+        Program program = Utils.getCurrentProgram(getContext(), mCurrentChannelUri);
         if (program == null) {
             handleNoProgramInformation();
             return;
         }
-        if (!TextUtils.isEmpty(program.getTitle())) {
-            mProgramTextView.setText(program.getTitle());
+
+        String title = program.getTitle();
+        if (!TextUtils.isEmpty(title)) {
+            float textSize = getContext().getResources().getDimension(
+                    R.dimen.channel_banner_program_large_text_size);
+            int width = mProgramTextView.getWidth();
+            int estimatedLineCount = estimateLineCount(title, textSize, width);
+            if (estimatedLineCount > 1) {
+                updateTextView(
+                        mProgramTextView,
+                        R.dimen.channel_banner_program_medium_text_size,
+                        R.dimen.channel_banner_program_medium_margin_top);
+            } else {
+                updateTextView(
+                        mProgramTextView,
+                        R.dimen.channel_banner_program_large_text_size,
+                        R.dimen.channel_banner_program_large_margin_top);
+            }
+            mProgramTextView.setText(title);
 
             long startTime = program.getStartTimeUtcMillis();
             long endTime = program.getEndTimeUtcMillis();
@@ -217,7 +237,7 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
                 String startTimeText = getFormattedTimeString(startTime);
                 String endTimeText = getFormattedTimeString(endTime);
 
-                mProgramTimeTextView.setText(mContext.getString(
+                mProgramTimeTextView.setText(getContext().getString(
                         R.string.channel_banner_program_time_format, startTimeText, endTimeText));
 
                 long currTime = System.currentTimeMillis();
@@ -234,7 +254,7 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
                 mRemainingTimeView.setVisibility(View.GONE);
             }
         } else {
-            mProgramTextView.setText(mContext.getString(R.string.channel_banner_no_title));
+            mProgramTextView.setText(getContext().getString(R.string.channel_banner_no_title));
             mProgramTimeTextView.setVisibility(View.GONE);
             mRemainingTimeView.setVisibility(View.GONE);
         }
@@ -246,43 +266,21 @@ public class ChannelBannerView extends LinearLayout implements Channel.LoadLogoC
         }
     }
 
-    private void alignBaseline() {
-        final int dummyPadding = mChannelInfoBarView.getHeight() -
-                (int) mContext.getResources().getDimension(
-                        R.dimen.channel_banner_channel_info_bar_height);
-
-        for (int i = 0; i < mChannelInfoBarView.getChildCount(); i++) {
-            View view = mChannelInfoBarView.getChildAt(i);
-            int[] rules = ((RelativeLayout.LayoutParams) view.getLayoutParams()).getRules();
-
-            if (rules[RelativeLayout.ALIGN_PARENT_BOTTOM] == RelativeLayout.TRUE) {
-                int marginBottom = dummyPadding;
-                if (view instanceof TextView) {
-                    TextView tv = (TextView) view;
-                    if (!tv.getIncludeFontPadding()) {
-                        marginBottom -= (tv.getHeight() - tv.getBaseline());
-                    }
-                } else if (view instanceof ImageView) {
-                    // TV Input Logo.
-                    marginBottom += mContext.getResources().getDimension(
-                        R.dimen.channel_banner_tvinput_logo_padding_bottom);
-                }
-
-                ViewGroup.MarginLayoutParams layout =
-                        (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-                if (marginBottom >= 0 && marginBottom != layout.bottomMargin) {
-                    layout.setMargins(
-                            layout.leftMargin, layout.topMargin, layout.rightMargin, marginBottom);
-                    view.setLayoutParams(layout);
-                }
-            }
-        }
-    }
-
     private void handleNoProgramInformation() {
-        mProgramTextView.setText(mContext.getString(R.string.channel_banner_no_title));
+        mProgramTextView.setText(getContext().getString(R.string.channel_banner_no_title));
         mProgramTimeTextView.setVisibility(View.GONE);
         mRemainingTimeView.setVisibility(View.GONE);
         mProgrameDescriptionTextView.setVisibility(View.GONE);
+    }
+
+    private int estimateLineCount(String str, float textSize, int width) {
+        if (width == 0) {
+            return -1;
+        }
+        Rect bounds = new Rect();
+        Paint paint = new Paint();
+        paint.setTextSize(textSize);
+        paint.getTextBounds(str, 0, str.length(), bounds);
+        return (bounds.width() + width - 1) / width;
     }
 }
