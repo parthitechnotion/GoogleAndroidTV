@@ -99,7 +99,7 @@ public class EditChannelsFragment extends BaseSideFragment {
         }
         String displayName = mSelectedInput.getDisplayName();
         String title = String.format(getString(R.string.edit_channels_title), displayName);
-        initialize(title, mItems, R.layout.edit_channels_fragment, R.layout.edit_channels_item,
+        initialize(title, mItems, R.layout.option_fragment, R.layout.edit_channels_item,
                 false);
 
         if (mBrowsableChannelCount <= 0) {

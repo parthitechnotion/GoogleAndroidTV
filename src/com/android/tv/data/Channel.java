@@ -52,7 +52,7 @@ public final class Channel {
     private byte[] mData;
 
     private boolean mIsLogoLoaded;
-    private LoadLogoTask mLoadLogoTask;;
+    private LoadLogoTask mLoadLogoTask;
     private Bitmap mLogo;
 
     public interface LoadLogoCallback {

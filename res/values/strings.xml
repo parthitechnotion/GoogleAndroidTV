@@ -17,6 +17,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!--  DO NOT TRANSLATE -->
     <string name="font" translatable="false">Roboto</string>
+    <string name="condensed_font" translatable="false">Roboto Condensed</string>
 
     <string name="tv_app">TV</string>
     <string name="select_input_device">Select TV Input</string>
@@ -98,7 +99,7 @@
     <string name="reset">Reset</string>
 
     <!-- Title of the simple guide. [CHAR LIMIT=16]-->
-    <string name="simple_guide_title">On Now</string>
+    <string name="simple_guide_title">Program Guide</string>
 
     <!-- Title of the show only simple guide. [CHAR LIMIT=16]-->
     <string name="show_only_title">Show Only</string>
