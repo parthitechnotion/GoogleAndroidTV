@@ -30,8 +30,6 @@
         android:gravity="left|center_vertical"
         android:paddingLeft="@dimen/option_item_padding_left"
         android:layout_marginLeft="@dimen/option_item_margin_left"
-        android:textSize="@dimen/option_item_text_size"
-        android:textColor="@color/side_panel_item_text"
         android:focusable="false"
         android:fontFamily="@string/font" />
 
@@ -57,12 +55,12 @@
         android:id="@+id/channel_text_view"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:gravity="center_vertical"
         android:paddingLeft="0dip"
         android:paddingRight="10dip"
         android:singleLine="true"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="1"
-        android:fontFamily="@string/font" />
+        android:textSize="@dimen/option_item_text_size"
+        android:textColor="@color/side_panel_item_text" />
 </LinearLayout>
