@@ -58,8 +58,10 @@
             android:enabled="true">
         </provider>
 
+        <!-- Recommendataion notification disabled.  See b/15485368. -->
         <service android:name="com.android.tv.notification.NotificationService"/>
-        <receiver android:name="com.android.tv.notification.NotificationReceiver">
+        <receiver android:name="com.android.tv.notification.NotificationReceiver"
+            android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
