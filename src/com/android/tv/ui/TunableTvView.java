@@ -2,16 +2,14 @@ package com.android.tv.ui;
 
 import android.content.Context;
 import android.media.tv.TvInputInfo;
-import android.media.tv.TvInputManager.TvInputListener;
 import android.media.tv.TvView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
-import com.android.internal.util.Preconditions;
 import com.android.tv.data.Channel;
 import com.android.tv.data.StreamInfo;
-import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -30,6 +28,7 @@ public class TunableTvView extends TvView implements StreamInfo {
     private int mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
     private int mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
     private boolean mHasClosedCaption = false;
+    private SurfaceView mSurface;
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
@@ -113,7 +112,14 @@ public class TunableTvView extends TvView implements StreamInfo {
 
     public TunableTvView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        getHolder().addCallback(mSurfaceHolderCallback);
+        for (int i = 0; i < getChildCount(); ++i) {
+            if (getChildAt(i) instanceof SurfaceView) {
+                mSurface = (SurfaceView) getChildAt(i);
+                mSurface.getHolder().addCallback(mSurfaceHolderCallback);
+                return;
+            }
+        }
+        throw new RuntimeException("TvView does not have SurfaceView.");
     }
 
     public void start(TvInputManagerHelper tvInputManagerHelper) {
@@ -180,6 +186,10 @@ public class TunableTvView extends TvView implements StreamInfo {
 
     public long getCurrentChannelId() {
         return mChannelId;
+    }
+
+    public void setPip(boolean isPip) {
+        mSurface.setZOrderMediaOverlay(isPip);
     }
 
     @Override
