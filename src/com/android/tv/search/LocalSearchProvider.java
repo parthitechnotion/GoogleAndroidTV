@@ -35,6 +35,8 @@ public class LocalSearchProvider extends ContentProvider {
     };
 
     private static final String EXPECTED_PATH_PREFIX = "/" + SearchManager.SUGGEST_URI_PATH_QUERY;
+    // The launcher passes 10 as a 'limit' parameter by default.
+    private static final int DEFAULT_SEARCH_LIMIT = 10;
 
     @Override
     public boolean onCreate() {
@@ -45,9 +47,15 @@ public class LocalSearchProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         String query = uri.getLastPathSegment();
+        int limit = DEFAULT_SEARCH_LIMIT;
+        try {
+            limit = Integer.parseInt(uri.getQueryParameter(SearchManager.SUGGEST_PARAMETER_LIMIT));
+        } catch (NumberFormatException | UnsupportedOperationException e) {
+            // Ignore the exceptions
+        }
         List<SearchResult> results = new ArrayList<SearchResult>();
         if (!TextUtils.isEmpty(query)) {
-            results.addAll(TvProviderSearch.search(getContext(), query));
+            results.addAll(TvProviderSearch.search(getContext(), query, limit));
         }
         return createSuggestionsCursor(results);
     }

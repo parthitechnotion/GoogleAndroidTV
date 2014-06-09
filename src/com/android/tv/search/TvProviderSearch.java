@@ -28,43 +28,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TvProviderSearch {
-    public static List<SearchResult> search(Context context, String query) {
+    public static List<SearchResult> search(Context context, String query, int limit) {
         List<SearchResult> results = new ArrayList<SearchResult>();
         results.addAll(searchChannels(context, query, new String[] {
                 Channels.COLUMN_DISPLAY_NAME,
                 Channels.COLUMN_DESCRIPTION
-        }));
+        }, limit));
+        if (results.size() >= limit) {
+            return results;
+        }
+
+        limit -= results.size();
         results.addAll(searchPrograms(context, query, new String[] {
                 Programs.COLUMN_TITLE,
                 Programs.COLUMN_SHORT_DESCRIPTION
-        }));
+        }, limit));
         return results;
     }
 
     private static List<SearchResult> searchChannels(Context context, String query,
-            String[] columnNames) {
+            String[] columnNames, int limit) {
         String[] projection = {
                 Channels._ID,
                 Channels.COLUMN_DISPLAY_NAME,
                 Channels.COLUMN_DESCRIPTION,
         };
-        return search(context, Channels.CONTENT_URI, projection, query, columnNames);
+
+        return search(context, Channels.CONTENT_URI, projection, query, columnNames, limit);
     }
 
     // TODO: Consider the case when the searched programs are already ended or the user select a
     //       searched program which doesn't air right now.
     private static List<SearchResult> searchPrograms(Context context, String query,
-            String[] columnNames) {
+            String[] columnNames, final int limit) {
         String[] projection = {
                 Programs.COLUMN_CHANNEL_ID,
                 Programs.COLUMN_TITLE,
                 Programs.COLUMN_SHORT_DESCRIPTION,
         };
-        return search(context, Programs.CONTENT_URI, projection, query, columnNames);
+
+        return search(context, Programs.CONTENT_URI, projection, query, columnNames, limit);
     }
 
     private static List<SearchResult> search(Context context, Uri uri, String[] projection,
-            String query, String[] columnNames) {
+            String query, String[] columnNames, int limit) {
         List<SearchResult> results = new ArrayList<SearchResult>();
 
         StringBuilder sb = new StringBuilder("1=0");
@@ -84,8 +91,9 @@ public class TvProviderSearch {
                     null);
             if (cursor != null) {
                 // TODO: Need to add image when available.
+                int count = 0;
                 while (cursor.moveToNext()) {
-                    int id = cursor.getInt(0);
+                    long id = cursor.getLong(0);
                     String title = cursor.getString(1);
                     String description = cursor.getString(2);
 
@@ -97,6 +105,10 @@ public class TvProviderSearch {
                                     .toString())
                             .build();
                     results.add(result);
+
+                    if (++count >= limit) {
+                        break;
+                    }
                 }
             }
         } finally {
