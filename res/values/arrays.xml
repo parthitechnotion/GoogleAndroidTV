@@ -15,13 +15,11 @@
 -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- The aspect_ratio_label should be synced with src/com/android/tv/data/AspectRatio.java -->
-    <string-array name="aspect_ratio_label">
-        <item>16 : 9</item>
-        <item>4 : 3</item>
+    <!-- The display_mode_label should be synced with src/com/android/tv/data/DisplayMode.java -->
+    <string-array name="display_mode_label">
+        <item>Normal</item>
         <item>Full</item>
         <item>Zoom</item>
-        <item>Set by program</item>
     </string-array>
 
     <!-- The show_only_label should be synced with src/com/android/tv/data/ShowOnlyItems.java -->

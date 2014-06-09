@@ -20,19 +20,17 @@ import android.content.Context;
 
 import com.android.tv.R;
 
-public class AspectRatio {
+public class DisplayMode {
 
-    // The values should be synced with R.arrays.aspect_ratio_label
-    public static final int RATIO_16_9 = 0;
-    public static final int RATIO_4_3 = 1;
-    public static final int RATIO_FULL = 2;
-    public static final int RATIO_ZOOM = 3;
-    public static final int RATIO_SET_BY_PROGRAM = 4;
-    public static final int SIZE_OF_RATIO_TYPES = RATIO_SET_BY_PROGRAM + 1;
+    // The values should be synced with R.arrays.display_mode_label
+    public static final int MODE_NORMAL = 0;
+    public static final int RATIO_FULL = 1;
+    public static final int RATIO_ZOOM = 2;
+    public static final int SIZE_OF_RATIO_TYPES = RATIO_ZOOM + 1;
 
-    private AspectRatio() { }
+    private DisplayMode() { }
 
-    public static final String getLabel(int ratio, Context context) {
-        return context.getResources().getStringArray(R.array.aspect_ratio_label)[ratio];
+    public static final String getLabel(int mode, Context context) {
+        return context.getResources().getStringArray(R.array.display_mode_label)[mode];
     }
 }
