@@ -29,6 +29,8 @@ public interface StreamInfo {
 
     TvInputInfo getCurrentTvInputInfo();
 
+    int getVideoWidth();
+    int getVideoHeight();
     int getVideoDefinitionLevel();
     int getAudioChannelCount();
     boolean hasClosedCaption();
