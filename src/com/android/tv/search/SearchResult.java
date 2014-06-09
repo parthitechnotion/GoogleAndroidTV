@@ -17,6 +17,7 @@
 package com.android.tv.search;
 
 public class SearchResult {
+    private long mChannelId;
     private String mTitle;
     private String mDescription;
     private String mImageUri;
@@ -25,6 +26,10 @@ public class SearchResult {
 
     private SearchResult() {
         // do nothing
+    }
+
+    public long getChannelId() {
+        return mChannelId;
     }
 
     public String getTitle() {
@@ -60,6 +65,11 @@ public class SearchResult {
 
         public SearchResult build() {
             return result;
+        }
+
+        public Builder setChannelId(long ChannelId) {
+            result.mChannelId = ChannelId;
+            return this;
         }
 
         public Builder setTitle(String title) {
