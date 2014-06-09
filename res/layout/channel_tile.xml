@@ -23,7 +23,12 @@
     android:focusable="true"
     android:clickable="true">
 
-    <LinearLayout
+    <ImageView android:id="@+id/program_poster_art"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_gravity="top" />
+
+    <LinearLayout android:id="@+id/channel_infos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"

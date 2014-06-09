@@ -17,6 +17,7 @@
 <resources>
 
     <color name="channel_tile_top">#03A9F4</color>
+    <color name="channel_tile_top_on_image">#66000000</color>
     <color name="channel_tile_bottom">#0288D1</color>
     <color name="channel_tile_text_color">#FFEEEEEE</color>
 

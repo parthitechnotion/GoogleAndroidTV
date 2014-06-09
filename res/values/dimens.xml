@@ -27,6 +27,8 @@
     <dimen name="focused_list_title_text_size">20sp</dimen>
     <dimen name="unfocused_list_title_text_size">16sp</dimen>
 
+    <dimen name="channel_tile_round_radius">2dp</dimen>
+
     <!-- Action tile dimensions -->
     <dimen name="action_tile_inter_card_spacing">8dp</dimen>
     <dimen name="action_tile_outer_length">116dp</dimen>
