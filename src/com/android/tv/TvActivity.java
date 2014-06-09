@@ -59,6 +59,7 @@ import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
 import com.android.tv.ui.DisplayModeOptionFragment;
+import com.android.tv.notification.NotificationService;
 import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
@@ -292,6 +293,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     protected void onStart() {
         super.onStart();
         mTvInputManagerHelper.start();
+        hideRecommendationNotification();
     }
 
     @Override
@@ -385,6 +387,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         stopTv();
         stopPip();
         mTvInputManagerHelper.stop();
+        showRecommendationNoticiation();
         super.onStop();
     }
 
@@ -1030,6 +1033,18 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     public void restoreDisplayMode() {
         setDisplayMode(mSharedPreferences.getInt(TvSettings.PREF_DISPLAY_MODE,
                 DisplayMode.MODE_NORMAL), false);
+    }
+
+    private void showRecommendationNoticiation() {
+        Intent notificationIntent = new Intent(TvActivity.this, NotificationService.class);
+        notificationIntent.setAction(NotificationService.ACTION_SHOW_RECOMMENDATION);
+        startService(notificationIntent);
+    }
+
+    private void hideRecommendationNotification() {
+        Intent notificationIntent = new Intent(TvActivity.this, NotificationService.class);
+        notificationIntent.setAction(NotificationService.ACTION_HIDE_RECOMMENDATION);
+        startService(notificationIntent);
     }
 
     private class HideRunnable implements Runnable {
