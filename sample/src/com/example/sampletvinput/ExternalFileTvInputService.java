@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ExternalFileTvInputService extends BaseTvInputService {
     private static String TAG = "ExternalFileTvInputService";
-    private static String CHANNEL_XML_PATH = "/sdcard/tvinput/channels.xml";
+    public static String CHANNEL_XML_PATH = "/sdcard/tvinput/channels.xml";
 
     @Override
     public List<ChannelInfo> createSampleChannels() {
