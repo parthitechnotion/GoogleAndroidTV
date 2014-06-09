@@ -193,7 +193,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             }
         });
         mPipView = (TunableTvView) findViewById(R.id.pip_view);
-        mPipView.setZOrderMediaOverlay(true);
+        mPipView.setPip(true);
 
         mControlGuide = (LinearLayout) findViewById(R.id.control_guide);
         mChannelBanner = (ChannelBannerView) findViewById(R.id.channel_banner);
