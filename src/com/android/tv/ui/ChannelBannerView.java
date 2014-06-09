@@ -30,6 +30,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -45,7 +46,7 @@ import com.android.tv.util.Utils;
 /**
  * A view to render channel banner.
  */
-public class ChannelBannerView extends RelativeLayout implements Channel.LoadLogoCallback {
+public class ChannelBannerView extends FrameLayout implements Channel.LoadLogoCallback {
     private TextView mClosedCaptionTextView;
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
