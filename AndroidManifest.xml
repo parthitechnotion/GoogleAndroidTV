@@ -29,7 +29,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:banner="@drawable/banner"
-        android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
+        android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen">
         <activity android:name="com.android.tv.TvActivity"
             android:configChanges="keyboard|keyboardHidden"
             android:screenOrientation="landscape"
