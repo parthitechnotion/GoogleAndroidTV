@@ -180,6 +180,7 @@ public class TunableTvView extends TvView implements StreamInfo {
         return true;
     }
 
+    @Override
     public TvInputInfo getCurrentTvInputInfo() {
         return mInputInfo;
     }

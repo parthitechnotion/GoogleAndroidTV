@@ -16,6 +16,8 @@
 
 package com.android.tv.data;
 
+import android.media.tv.TvInputInfo;
+
 public interface StreamInfo {
     public final int VIDEO_DEFINITION_LEVEL_UNKNOWN = 0;
     public final int VIDEO_DEFINITION_LEVEL_SD = 1;
@@ -24,6 +26,8 @@ public interface StreamInfo {
     public final int VIDEO_DEFINITION_LEVEL_ULTRA_HD = 4;
 
     public final int AUDIO_CHANNEL_COUNT_UNKNOWN = 0;
+
+    TvInputInfo getCurrentTvInputInfo();
 
     int getVideoDefinitionLevel();
     int getAudioChannelCount();
