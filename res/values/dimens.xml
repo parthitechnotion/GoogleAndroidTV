@@ -72,13 +72,15 @@
     <dimen name="channel_banner_title_large_text_size">54sp</dimen>
     <dimen name="channel_banner_title_medium_text_size">44sp</dimen>
     <dimen name="channel_banner_title_small_text_size">34sp</dimen>
-    <dimen name="channel_banner_title_large_margin_top">-17sp</dimen>
-    <dimen name="channel_banner_title_medium_margin_top">-13sp</dimen>
-    <dimen name="channel_banner_title_small_margin_top">-10sp</dimen>
+    <dimen name="channel_banner_title_large_margin_top">-18sp</dimen>
+    <dimen name="channel_banner_title_medium_margin_top">-15sp</dimen>
+    <dimen name="channel_banner_title_small_margin_top">-11sp</dimen>
     <dimen name="channel_banner_program_large_text_size">28sp</dimen>
     <dimen name="channel_banner_program_medium_text_size">20sp</dimen>
     <dimen name="channel_banner_program_large_margin_top">-9sp</dimen>
-    <dimen name="channel_banner_program_medium_margin_top">-7sp</dimen>
+    <dimen name="channel_banner_program_medium_margin_top">-6.5sp</dimen>
+    <dimen name="channel_banner_anchor_one_line_y">44dp</dimen>
+    <dimen name="channel_banner_anchor_two_line_y">64dp</dimen>
     <dimen name="channel_banner_small_text_size">14sp</dimen>
     <dimen name="channel_banner_track_meta_text_size">9sp</dimen>
 </resources>
