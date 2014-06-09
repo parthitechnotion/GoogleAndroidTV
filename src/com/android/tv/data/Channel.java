@@ -321,6 +321,10 @@ public final class Channel {
         return mLoadLogoTask != null;
     }
 
+    public Bitmap getLogo() {
+        return mLogo;
+    }
+
     // Assumes call from UI thread.
     public void loadLogo(Context context, LoadLogoCallback callback) {
         if (isLogoLoaded()) {

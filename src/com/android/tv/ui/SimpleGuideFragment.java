@@ -132,21 +132,39 @@ public class SimpleGuideFragment extends BaseSideFragment {
         ProgressBar remainingTimeView = (ProgressBar) v.findViewById(R.id.remaining_time);
         if (tag instanceof Channel) {
             Channel channel = (Channel) tag;
-            channelLogoView.setVisibility(View.GONE);
-            channelNumberView.setVisibility(View.GONE);
-            channel.loadLogo(getActivity(), new LoadLogoCallback() {
-                @Override
-                public void onLoadLogoFinished(Channel channel, Bitmap logo) {
-                    if (logo != null) {
-                        channelNumberAloneView.setVisibility(View.GONE);
-                        channelLogoView.setVisibility(View.VISIBLE);
-                        channelNumberView.setVisibility(View.VISIBLE);
-                        channelLogoView.setImageBitmap(logo);
+            if (!channel.isLogoLoaded()) {
+                channel.loadLogo(getActivity(), new LoadLogoCallback() {
+                    @Override
+                    public void onLoadLogoFinished(Channel channel, Bitmap logo) {
+                        if (logo != null) {
+                            channelNumberAloneView.setVisibility(View.GONE);
+                            channelLogoView.setVisibility(View.VISIBLE);
+                            channelNumberView.setVisibility(View.VISIBLE);
+                            channelLogoView.setImageBitmap(logo);
+                            channelNumberView.setText(channel.getDisplayNumber());
+                        } else {
+                            channelLogoView.setVisibility(View.GONE);
+                            channelNumberView.setVisibility(View.GONE);
+                            channelNumberAloneView.setVisibility(View.VISIBLE);
+                            channelNumberAloneView.setText(channel.getDisplayNumber());
+                        }
                     }
+                });
+            } else {
+                Bitmap logo = channel.getLogo();
+                if (logo != null) {
+                    channelNumberAloneView.setVisibility(View.GONE);
+                    channelLogoView.setVisibility(View.VISIBLE);
+                    channelNumberView.setVisibility(View.VISIBLE);
+                    channelLogoView.setImageBitmap(logo);
+                    channelNumberView.setText(channel.getDisplayNumber());
+                } else {
+                    channelLogoView.setVisibility(View.GONE);
+                    channelNumberView.setVisibility(View.GONE);
+                    channelNumberAloneView.setVisibility(View.VISIBLE);
+                    channelNumberAloneView.setText(channel.getDisplayNumber());
                 }
-            });
-            channelNumberAloneView.setText(channel.getDisplayNumber());
-            channelNumberAloneView.setVisibility(View.VISIBLE);
+            }
             Program program = Utils.getCurrentProgram(mTvActivity,
                     ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channel.getId()));
             String text = program.getTitle();
