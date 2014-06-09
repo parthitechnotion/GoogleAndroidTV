@@ -18,6 +18,8 @@ package com.android.tv.ui;
 
 import android.app.FragmentTransaction;
 import android.content.ContentUris;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.tv.TvContract;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.tv.R;
@@ -35,6 +38,7 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.Program;
 import com.android.tv.data.ShowOnlyItems;
+import com.android.tv.data.Channel.LoadLogoCallback;
 import com.android.tv.util.Utils;
 
 public class SimpleGuideFragment extends BaseSideFragment {
@@ -61,9 +65,9 @@ public class SimpleGuideFragment extends BaseSideFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mBgColor = getActivity().getResources().getColor(R.color.simple_guide_fragment_background);
+        mBgColor = getActivity().getResources().getColor(R.color.option_item_background);
         mFocusedBgColor = getActivity().getResources().getColor(
-                R.color.simple_guide_fragment_focused_background);
+                R.color.option_item_focused_background);
 
         Channel[] channels = mChannelMap.getChannelList(true);
         Object[] itemTags = new Object[channels.length + 1];
@@ -73,7 +77,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
         }
 
         initialize(getString(R.string.simple_guide_title), itemTags,
-                R.layout.simple_guide_fragment, R.layout.simple_guide_item, false);
+                R.layout.option_fragment, R.layout.simple_guide_item, false);
         mCurPosition = getCurrentChannelPosition();
         setPrevSelectedItemPosition(mCurPosition);
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -119,36 +123,62 @@ public class SimpleGuideFragment extends BaseSideFragment {
 
     @Override
     public void onBindView(View v, int position, Object tag, boolean prevSelected) {
+        final ImageView channelLogoView = (ImageView) v.findViewById(R.id.channel_logo);
+        final TextView channelNumberView = (TextView) v.findViewById(R.id.channel_number);
+        final TextView channelNumberAloneView =
+                (TextView) v.findViewById(R.id.channel_number_alone);
         TextView programTitleView = (TextView) v.findViewById(R.id.program_title);
-        TextView programInfoView = (TextView) v.findViewById(R.id.program_info);
-        ImageView channelLogoView = (ImageView) v.findViewById(R.id.channel_logo);
-        TextView channelNumberView = (TextView) v.findViewById(R.id.channel_number);
         TextView channelNameView = (TextView) v.findViewById(R.id.channel_name);
-        String text = "";
+        ProgressBar remainingTimeView = (ProgressBar) v.findViewById(R.id.remaining_time);
         if (tag instanceof Channel) {
             Channel channel = (Channel) tag;
-            channelNumberView.setText(channel.getDisplayNumber());
-            // TODO: show channel logo if possible.
             channelLogoView.setVisibility(View.GONE);
-            channelNameView.setText(channel.getDisplayName());
+            channelNumberView.setVisibility(View.GONE);
+            channel.loadLogo(getActivity(), new LoadLogoCallback() {
+                @Override
+                public void onLoadLogoFinished(Channel channel, Bitmap logo) {
+                    if (logo != null) {
+                        channelNumberAloneView.setVisibility(View.GONE);
+                        channelLogoView.setVisibility(View.VISIBLE);
+                        channelNumberView.setVisibility(View.VISIBLE);
+                        channelLogoView.setImageBitmap(logo);
+                    }
+                }
+            });
+            channelNumberAloneView.setText(channel.getDisplayNumber());
+            channelNumberAloneView.setVisibility(View.VISIBLE);
             Program program = Utils.getCurrentProgram(mTvActivity,
                     ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channel.getId()));
-            text = program.getTitle();
+            String text = program.getTitle();
             if (TextUtils.isEmpty(text)) {
-                text = "[" + getResources().getString(R.string.no_program_information) + "]";
-            }
-            if (prevSelected) {
-                text += " (Selected)";
+                text = getResources().getString(R.string.no_program_information);
             }
             programTitleView.setText(text);
-            programInfoView.setVisibility(View.GONE);
+            channelNameView.setText(channel.getDisplayName());
+
+            long startTime = program.getStartTimeUtcMillis();
+            long endTime = program.getEndTimeUtcMillis();
+            if (startTime > 0 && endTime > 0) {
+                long currTime = System.currentTimeMillis();
+                if (currTime <= startTime) {
+                    remainingTimeView.setProgress(0);
+                } else if (currTime >= endTime) {
+                    remainingTimeView.setProgress(100);
+                } else {
+                    remainingTimeView.setProgress(
+                            (int) (100 *(currTime - startTime) / (endTime - startTime)));
+                }
+                remainingTimeView.setVisibility(View.VISIBLE);
+            } else {
+                remainingTimeView.setVisibility(View.GONE);
+            }
         } else {
-            channelNumberView.setText("");
-            channelNumberView.setVisibility(View.VISIBLE);
             channelLogoView.setVisibility(View.GONE);
+            channelNumberView.setVisibility(View.GONE);
+            channelNumberAloneView.setVisibility(View.INVISIBLE);
+            remainingTimeView.setVisibility(View.GONE);
             programTitleView.setText(getString(R.string.show_only_title));
-            programInfoView.setVisibility(View.VISIBLE);
-            programInfoView.setText(ShowOnlyItems.getLabel(
+            channelNameView.setText(ShowOnlyItems.getLabel(
                     mSelectedShowOnlyItemPosition, mTvActivity));
         }
     }

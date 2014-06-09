@@ -43,16 +43,16 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mBgColor = getActivity().getResources().getColor(R.color.simple_guide_fragment_background);
+        mBgColor = getActivity().getResources().getColor(R.color.option_item_background);
         mFocusedBgColor = getActivity().getResources().getColor(
-                R.color.simple_guide_fragment_focused_background);
+                R.color.option_item_focused_background);
 
         Object[] items = new Object[ShowOnlyItems.SHOW_ONLY_ITEM_SIZE];
         for (int i = 0; i < ShowOnlyItems.SHOW_ONLY_ITEM_SIZE; ++i) {
             items[i] = ShowOnlyItems.getLabel(i, getActivity());
         }
         initialize(getString(R.string.show_only_title), items,
-                R.layout.simple_guide_fragment, R.layout.show_only_item, false);
+                R.layout.option_fragment, R.layout.show_only_item, false);
         // TODO: set the current position correctly.
         mFocusedItemPosition = 0;
         mMainView = super.onCreateView(inflater, container, savedInstanceState);

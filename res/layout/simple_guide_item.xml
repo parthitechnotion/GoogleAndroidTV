@@ -26,34 +26,30 @@
         android:layout_width="@dimen/simple_guide_channel_width"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
         android:paddingLeft="@dimen/simple_guide_padding_left" >
-
-        <TextView android:id="@+id/channel_number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="left"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textColor="@color/menu_default_text_color"
-            android:textSize="@dimen/simple_guide_item_small_text_size"
-            android:fontFamily="@string/font" />
 
         <ImageView android:id="@+id/channel_logo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left" />
+            android:gravity="center_horizontal"
+            android:paddingTop="@dimen/simple_guide_channel_padding_top" />
 
-        <TextView android:id="@+id/channel_name"
+        <TextView android:id="@+id/channel_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:singleLine="true"
-            android:ellipsize="end"
+            android:gravity="center_horizontal|bottom"
+            android:paddingBottom="@dimen/simple_guide_channel_padding_bottom"
             android:textColor="@color/menu_default_text_color"
             android:textSize="@dimen/simple_guide_item_small_text_size"
-            android:fontFamily="@string/font" />
+            android:fontFamily="@string/condensed_font" />
 
+        <TextView android:id="@+id/channel_number_alone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical"
+            android:textColor="@color/menu_default_text_color"
+            android:textSize="@dimen/simple_guide_item_small_text_size"
+            android:fontFamily="@string/condensed_font" />
     </LinearLayout>
 
     <LinearLayout
@@ -61,23 +57,52 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        android:paddingLeft="@dimen/simple_guide_padding_left" >
+        android:paddingLeft="@dimen/simple_guide_item_padding_left" >
         <TextView
             android:id="@+id/program_title"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/simple_guide_item_program_title_height"
             android:layout_width="match_parent"
-            android:gravity="left|center_vertical"
+            android:gravity="left|bottom"
+            android:singleLine="true"
             android:textSize="@dimen/simple_guide_item_large_text_size"
             android:textColor="@color/menu_default_text_color"
-            android:fontFamily="@string/font" />
-        <TextView
-            android:id="@+id/program_info"
-            android:layout_height="wrap_content"
+            android:fontFamily="@string/condensed_font" />
+
+        <LinearLayout
+            android:id="@+id/detail"
             android:layout_width="match_parent"
-            android:gravity="left|center_vertical"
-            android:textSize="@dimen/simple_guide_item_small_text_size"
-            android:textColor="@color/simple_guide_small_text_color"
-            android:fontFamily="@string/font" />
+            android:layout_height="@dimen/simple_guide_item_program_detail_height"
+            android:orientation="horizontal"
+            android:gravity="top" >
+
+            <TextView android:id="@+id/channel_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="@color/menu_default_text_color"
+                android:textSize="@dimen/simple_guide_item_small_text_size"
+                android:fontFamily="@string/condensed_font" />
+
+            <ProgressBar
+                android:id="@+id/remaining_time"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="@dimen/simple_guide_progress_width"
+                android:layout_height="@dimen/simple_guide_progress_height"
+                android:gravity="bottom"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="12dp"
+                android:progressDrawable="@drawable/progress_horizontal"
+                android:indeterminate="false"
+                android:max="100" />
+
+            <ImageView android:id="@+id/hd_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:layout_marginLeft="12dp"
+                android:visibility="gone" />
         </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
