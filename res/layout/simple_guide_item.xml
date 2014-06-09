@@ -78,7 +78,7 @@
             <TextView android:id="@+id/channel_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
+                android:layout_gravity="bottom"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textColor="@color/menu_default_text_color"
@@ -90,9 +90,9 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="@dimen/simple_guide_progress_width"
                 android:layout_height="@dimen/simple_guide_progress_height"
-                android:gravity="bottom"
-                android:layout_marginTop="10dp"
+                android:layout_gravity="bottom"
                 android:layout_marginLeft="12dp"
+                android:layout_marginBottom="3.5dp"
                 android:progressDrawable="@drawable/progress_horizontal"
                 android:indeterminate="false"
                 android:max="100" />
@@ -100,8 +100,9 @@
             <ImageView android:id="@+id/hd_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
+                android:layout_gravity="bottom"
                 android:layout_marginLeft="12dp"
+                android:layout_marginBottom="3.5dp"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>

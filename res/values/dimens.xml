@@ -55,8 +55,8 @@
     <dimen name="simple_guide_channel_width">68dp</dimen>
     <dimen name="simple_guide_item_padding_left">20dp</dimen>
     <dimen name="simple_guide_item_padding_top">9dp</dimen>
-    <dimen name="simple_guide_item_program_title_height">28dp</dimen>
-    <dimen name="simple_guide_item_program_detail_height">20dp</dimen>
+    <dimen name="simple_guide_item_program_title_height">33dp</dimen>
+    <dimen name="simple_guide_item_program_detail_height">18dp</dimen>
     <dimen name="simple_guide_item_height">64dp</dimen>
     <dimen name="simple_guide_item_small_text_size">12sp</dimen>
     <dimen name="simple_guide_item_large_text_size">18sp</dimen>
