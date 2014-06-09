@@ -26,6 +26,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="32dp"
     android:paddingBottom="16dp"
+    android:clipToPadding="false"
     android:background="@drawable/channel_banner_tile_border">
 
     <TextView android:id="@+id/channel_text"
