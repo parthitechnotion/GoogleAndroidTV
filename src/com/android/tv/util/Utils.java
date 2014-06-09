@@ -224,9 +224,9 @@ public class Utils {
     public static String getVideoDefinitionLevelString(int videoFormat) {
         switch (videoFormat) {
             case StreamInfo.VIDEO_DEFINITION_LEVEL_ULTRA_HD:
-                return "UltraHD";
+                return "Ultra HD";
             case StreamInfo.VIDEO_DEFINITION_LEVEL_FULL_HD:
-                return "FullHD";
+                return "Full HD";
             case StreamInfo.VIDEO_DEFINITION_LEVEL_HD:
                 return "HD";
             case StreamInfo.VIDEO_DEFINITION_LEVEL_SD:
