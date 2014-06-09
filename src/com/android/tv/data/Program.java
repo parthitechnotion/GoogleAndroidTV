@@ -29,6 +29,8 @@ public final class Program {
     private long mEndTimeUtcMillis;
     private String mDescription;
     private String mLongDescription;
+    private String mPosterArtUri;
+    private String mThumbnailUri;
 
     private Program() {
         // Do nothing.
@@ -82,6 +84,22 @@ public final class Program {
         mLongDescription = longDescription;
     }
 
+    public String getPosterArtUri() {
+        return mPosterArtUri;
+    }
+
+    public void setPosterArtUri(String posterArtUri) {
+        mPosterArtUri = posterArtUri;
+    }
+
+    public String getThumbnailUri() {
+        return mThumbnailUri;
+    }
+
+    public void setThumbnailUri(String thumbnailUri) {
+        mThumbnailUri = thumbnailUri;
+    }
+
     public ContentValues toContentValues() {
         ContentValues values = new ContentValues();
         values.put(TvContract.Programs.COLUMN_CHANNEL_ID, mChannelId);
@@ -90,6 +108,8 @@ public final class Program {
         values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, mEndTimeUtcMillis);
         values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, mDescription);
         values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, mLongDescription);
+        values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, mPosterArtUri);
+        values.put(TvContract.Programs.COLUMN_THUMBNAIL_URI, mThumbnailUri);
         return values;
     }
 
@@ -103,6 +123,8 @@ public final class Program {
                 .append(", endTimeUtcSec=").append(mEndTimeUtcMillis)
                 .append(", description=").append(mDescription)
                 .append(", longDescription=").append(mLongDescription)
+                .append(", posterArtUri=").append(mPosterArtUri)
+                .append(", thumbnailUri=").append(mThumbnailUri)
                 .append("}")
                 .toString();
     }
@@ -118,6 +140,8 @@ public final class Program {
         mEndTimeUtcMillis = other.mEndTimeUtcMillis;
         mDescription = other.mDescription;
         mLongDescription = other.mLongDescription;
+        mPosterArtUri = other.mPosterArtUri;
+        mThumbnailUri = other.mThumbnailUri;
     }
 
     public static final class Builder {
@@ -166,6 +190,16 @@ public final class Program {
 
         public Builder setLongDescription(String longDescription) {
             mProgram.mLongDescription = longDescription;
+            return this;
+        }
+
+        public Builder setPosterArtUri(String posterArtUri) {
+            mProgram.mPosterArtUri = posterArtUri;
+            return this;
+        }
+
+        public Builder setThumbnailUri(String thumbnailUri) {
+            mProgram.mThumbnailUri = thumbnailUri;
             return this;
         }
 

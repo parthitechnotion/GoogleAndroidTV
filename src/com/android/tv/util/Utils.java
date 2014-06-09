@@ -151,17 +151,23 @@ public class Utils {
                 TvContract.Programs.COLUMN_TITLE,
                 TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
                 TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
-                TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS };
+                TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS,
+                TvContract.Programs.COLUMN_POSTER_ART_URI,
+                TvContract.Programs.COLUMN_THUMBNAIL_URI };
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         String title = null;
         String description = null;
         long startTime = -1;
         long endTime = -1;
+        String posterArtUri = null;
+        String thumbnailUri = null;
         if (cursor.moveToNext()) {
             title = cursor.getString(0);
             description = cursor.getString(1);
             startTime = cursor.getLong(2);
             endTime = cursor.getLong(3);
+            posterArtUri = cursor.getString(4);
+            thumbnailUri = cursor.getString(5);
         }
         cursor.close();
 
@@ -170,7 +176,9 @@ public class Utils {
                 .setTitle(title)
                 .setDescription(description)
                 .setStartTimeUtcMillis(startTime)
-                .setEndTimeUtcMillis(endTime).build();
+                .setEndTimeUtcMillis(endTime)
+                .setPosterArtUri(posterArtUri)
+                .setThumbnailUri(thumbnailUri).build();
     }
 
     public static boolean hasChannel(Context context, TvInputInfo name) {
