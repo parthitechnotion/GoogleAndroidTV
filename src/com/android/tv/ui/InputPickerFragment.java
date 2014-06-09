@@ -61,7 +61,7 @@ public class InputPickerFragment extends BaseOptionFragment {
         mInputManager = mTvActivity.getTvInputManagerHelper();
         Collection<TvInputInfo> inputInfos = mInputManager.getTvInputInfos(false);
         int inputSize = inputInfos.size();
-        Preconditions.checkState(inputSize > 1);
+        Preconditions.checkState(inputSize > 0);
         mInputManager.addListener(mAvailabilityListener);
         mSelectedInput = mTvActivity.getSelectedTvInput();
 
