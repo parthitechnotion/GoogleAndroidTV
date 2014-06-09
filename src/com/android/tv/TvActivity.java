@@ -49,7 +49,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.tv.data.AspectRatio;
+import com.android.tv.data.DisplayMode;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.StreamInfo;
@@ -58,7 +58,7 @@ import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
-import com.android.tv.ui.AspectRatioOptionFragment;
+import com.android.tv.ui.DisplayModeOptionFragment;
 import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
@@ -143,7 +143,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private boolean mIsShy = true;
 
     private boolean mIsClosedCaptionEnabled;
-    private int mAspectRatio;
+    private int mDisplayMode;
     private SharedPreferences mSharedPreferences;
 
     static {
@@ -262,7 +262,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         restoreClosedCaptionEnabled();
-        restoreAspectRatio();
+        restoreDisplayMode();
         onNewIntent(getIntent());
     }
 
@@ -461,8 +461,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         showSideFragment(new InputPickerFragment(), initiator);
     }
 
-    public void showAspectRatioOption(int initiator) {
-        showSideFragment(new AspectRatioOptionFragment(), initiator);
+    public void showDisplayModeOption(int initiator) {
+        showSideFragment(new DisplayModeOptionFragment(), initiator);
     }
 
     public void showClosedCaptionOption(int initiator) {
@@ -869,7 +869,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     return true;
                 }
                 case KeyEvent.KEYCODE_O: {
-                    showAspectRatioOption(BaseSideFragment.INITIATOR_SHORTCUT_KEY);
+                    showDisplayModeOption(BaseSideFragment.INITIATOR_SHORTCUT_KEY);
                     return true;
                 }
             }
@@ -1014,22 +1014,22 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 TvSettings.PREF_CLOSED_CAPTION_ENABLED, false), false);
     }
 
-    // Returns a constant defined in AspectRatio.
-    public int getAspectRatio() {
-        return mAspectRatio;
+    // Returns a constant defined in DisplayMode.
+    public int getDisplayMode() {
+        return mDisplayMode;
     }
 
-    public void setAspectRatio(int ratio, boolean storeInPreference) {
-        mAspectRatio = ratio;
+    public void setDisplayMode(int displayMode, boolean storeInPreference) {
+        mDisplayMode = displayMode;
         if (storeInPreference) {
-            mSharedPreferences.edit().putInt(TvSettings.PREF_ASPECT_RATIO, ratio).apply();
+            mSharedPreferences.edit().putInt(TvSettings.PREF_DISPLAY_MODE, displayMode).apply();
         }
-        // TODO: change aspect ratio
+        // TODO: change display mode
     }
 
-    public void restoreAspectRatio() {
-        setAspectRatio(mSharedPreferences.getInt(TvSettings.PREF_ASPECT_RATIO,
-                AspectRatio.RATIO_SET_BY_PROGRAM), false);
+    public void restoreDisplayMode() {
+        setDisplayMode(mSharedPreferences.getInt(TvSettings.PREF_DISPLAY_MODE,
+                DisplayMode.MODE_NORMAL), false);
     }
 
     private class HideRunnable implements Runnable {

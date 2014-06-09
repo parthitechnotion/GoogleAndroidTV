@@ -24,9 +24,9 @@ import android.widget.Toast;
 
 import com.android.tv.R;
 import com.android.tv.TvActivity;
-import com.android.tv.data.AspectRatio;
+import com.android.tv.data.DisplayMode;
 
-public class AspectRatioOptionFragment extends BaseOptionFragment {
+public class DisplayModeOptionFragment extends BaseOptionFragment {
     private static final String TAG = "AspectRatioOptionFragment";
     private static final boolean DEBUG = true;
 
@@ -41,11 +41,11 @@ public class AspectRatioOptionFragment extends BaseOptionFragment {
         mIsFirstResume = true;
         mTvActivity = (TvActivity) getActivity();
 
-        Object[] items = new Object[AspectRatio.SIZE_OF_RATIO_TYPES];
-        for (int i = 0; i < AspectRatio.SIZE_OF_RATIO_TYPES; ++i) {
-            items[i] = AspectRatio.getLabel(i, getActivity());
+        Object[] items = new Object[DisplayMode.SIZE_OF_RATIO_TYPES];
+        for (int i = 0; i < DisplayMode.SIZE_OF_RATIO_TYPES; ++i) {
+            items[i] = DisplayMode.getLabel(i, getActivity());
         }
-        initialize(getString(R.string.aspect_ratio_option_title), items);
+        initialize(getString(R.string.display_mode_option_title), items);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -53,7 +53,7 @@ public class AspectRatioOptionFragment extends BaseOptionFragment {
     public void onResume() {
         super.onResume();
         if (mIsFirstResume) {
-            mAspectRatio = mTvActivity.getAspectRatio();
+            mAspectRatio = mTvActivity.getDisplayMode();
             mLastStoredAspectRatio = mAspectRatio;
             int initialPosition = mAspectRatio;
             setSelectedPosition(initialPosition);
@@ -66,7 +66,7 @@ public class AspectRatioOptionFragment extends BaseOptionFragment {
     public void onDetach() {
         super.onDetach();
         if (mLastStoredAspectRatio != mAspectRatio) {
-            mTvActivity.restoreAspectRatio();
+            mTvActivity.restoreDisplayMode();
         }
     }
 
@@ -75,14 +75,14 @@ public class AspectRatioOptionFragment extends BaseOptionFragment {
         super.onItemFocusChanged(v, focusGained, position, tag);
         if (focusGained) {
             mAspectRatio = position;
-            mTvActivity.setAspectRatio(position, false);
+            mTvActivity.setDisplayMode(position, false);
         }
     }
 
     @Override
     public void onItemSelected(View v, int position, Object tag) {
         mAspectRatio = position;
-        mTvActivity.setAspectRatio(mAspectRatio, true);
+        mTvActivity.setDisplayMode(mAspectRatio, true);
         mLastStoredAspectRatio = mAspectRatio;
         super.onItemSelected(v, position, tag);
         Toast.makeText(getActivity(), R.string.not_implemented_yet, Toast.LENGTH_SHORT).show();
