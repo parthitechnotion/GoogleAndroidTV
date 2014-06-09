@@ -18,6 +18,7 @@
 
     <color name="channel_tile_top">#03A9F4</color>
     <color name="channel_tile_bottom">#0288D1</color>
+    <color name="channel_tile_text_color">#FFEEEEEE</color>
 
     <color name="focused_list_title">#FFEEEEEE</color>
     <color name="unfocused_list_title">#7FEEEEEE</color>

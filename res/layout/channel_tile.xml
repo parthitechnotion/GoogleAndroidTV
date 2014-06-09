@@ -47,9 +47,9 @@
                 android:singleLine="false"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:fontFamily="@string/font"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:fontFamily="@string/condensed_font"
+                android:textColor="@color/channel_tile_text_color"
+                android:textSize="18sp" />
 
             <TextView android:id="@+id/channel_number"
                 android:layout_width="match_parent"
@@ -57,21 +57,22 @@
                 android:layout_gravity="left|bottom"
                 android:layout_marginLeft="12dp"
                 android:layout_marginBottom="8dp"
-                android:fontFamily="@string/font"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:fontFamily="@string/condensed_font"
+                android:textColor="@color/channel_tile_text_color"
+                android:textSize="12sp" />
         </FrameLayout>
 
         <TextView android:id="@+id/program_name"
             android:layout_width="match_parent"
             android:layout_height="38dp"
             android:gravity="center_vertical"
-            android:padding="12dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
             android:singleLine="true"
             android:ellipsize="end"
-            android:fontFamily="@string/font"
-            android:textColor="#FFFFFF"
-            android:textSize="11sp"
+            android:fontFamily="@string/condensed_font"
+            android:textColor="@color/channel_tile_text_color"
+            android:textSize="12sp"
             android:background="@drawable/channel_tile_bottom" />
     </LinearLayout>
 </com.android.tv.ui.ChannelTileView>
