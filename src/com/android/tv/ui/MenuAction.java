@@ -25,7 +25,7 @@ import com.android.tv.R;
  */
 public class MenuAction {
     public static final int SELECT_CLOSED_CAPTION = 0;
-    public static final int SELECT_ASPECT_RATIO = 1;
+    public static final int SELECT_DISPLAY_MODE = 1;
     public static final int SELECT_TV_INPUT_TYPE = 2;
     public static final int TOGGLE_PIP_TYPE = 3;
 
@@ -37,9 +37,9 @@ public class MenuAction {
     public static final MenuAction SELECT_CLOSED_CAPTION_ACTION =
             new MenuAction(R.string.menu_closed_caption, SELECT_CLOSED_CAPTION,
                     R.drawable.ic_tvoption_cc);
-    public static final MenuAction SELECT_ASPECT_RATIO_ACTION =
-            new MenuAction(R.string.menu_aspect_ratio, SELECT_ASPECT_RATIO,
-                    R.drawable.ic_tvoption_aspect);
+    public static final MenuAction SELECT_DISPLAY_MODE_ACTION =
+            new MenuAction(R.string.menu_display_mode, SELECT_DISPLAY_MODE,
+                    R.drawable.ic_tvoption_display_mode);
     public static final MenuAction SELECT_TV_INPUT_ACTION =
             new MenuAction(R.string.menu_select_input, SELECT_TV_INPUT_TYPE,
                     R.drawable.ic_tvoptions_input_settings);

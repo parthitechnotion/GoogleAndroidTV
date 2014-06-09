@@ -48,8 +48,8 @@
     <string name="menu_program_guide">Program Guide</string>
     <!-- "Closed Caption" menu option [CHAR LIMIT=15] -->
     <string name="menu_closed_caption">Closed Caption</string>
-    <!-- "Aspect Ration" menu option [CHAR LIMIT=15] -->
-    <string name="menu_aspect_ratio">Aspect Ratio</string>
+    <!-- "Display Mode" menu option [CHAR LIMIT=15] -->
+    <string name="menu_display_mode">Display Mode</string>
     <!-- "Select TV Input" menu option [CHAR LIMIT=15] -->
     <string name="menu_select_input">TV Input</string>
     <!-- Toggle PIP [CHAR LIMIT=15] -->
@@ -104,8 +104,8 @@
     <!-- Title of the show only simple guide. [CHAR LIMIT=16]-->
     <string name="show_only_title">Show Only</string>
 
-    <!-- Title of Aspect Ratio option. [CHAR LIMIT=16]-->
-    <string name="aspect_ratio_option_title">Aspect Ratio</string>
+    <!-- Title of Display Mode option. [CHAR LIMIT=16]-->
+    <string name="display_mode_option_title">Display Mode</string>
 
     <!-- Title of Closed Caption option. [CHAR LIMIT=16]-->
     <string name="closed_caption_option_title">Closed Caption</string>

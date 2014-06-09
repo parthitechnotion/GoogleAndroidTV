@@ -59,7 +59,7 @@ public class OptionsAdapter extends ItemListView.ItemListAdapter {
 
         ArrayList<MenuAction> actionList = new ArrayList<MenuAction>();
         actionList.add(MenuAction.SELECT_CLOSED_CAPTION_ACTION);
-        actionList.add(MenuAction.SELECT_ASPECT_RATIO_ACTION);
+        actionList.add(MenuAction.SELECT_DISPLAY_MODE_ACTION);
         actionList.add(MenuAction.SELECT_TV_INPUT_ACTION);
         actionList.add(MenuAction.TOGGLE_PIP_ACTION);
         if (channelMap != null && channelMap.size() != 0) {

@@ -282,8 +282,8 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                                             BaseSideFragment.INITIATOR_MENU);
                                     break;
 
-                                case MenuAction.SELECT_ASPECT_RATIO:
-                                    mTvActivity.showAspectRatioOption(
+                                case MenuAction.SELECT_DISPLAY_MODE:
+                                    mTvActivity.showDisplayModeOption(
                                             BaseSideFragment.INITIATOR_MENU);
                                     break;
 

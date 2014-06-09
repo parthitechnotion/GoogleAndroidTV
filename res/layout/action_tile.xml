@@ -42,7 +42,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@null"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_tvoption_aspect" />
+                android:src="@drawable/ic_tvoption_display_mode" />
         </FrameLayout>
 
         <TextView
