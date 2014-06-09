@@ -384,9 +384,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         mHandler.removeMessages(MSG_START_TV_RETRY);
         stopTv();
         stopPip();
-        if (!isShyModeSet()) {
-            setShynessMode(true);
-        }
         mTvInputManagerHelper.stop();
         super.onStop();
     }
@@ -536,6 +533,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             switch (mAudioFocusStatus) {
                 case AudioManager.AUDIOFOCUS_GAIN:
                     mTvView.setStreamVolume(AUDIO_MAX_VOLUME);
+                    if (isShyModeSet()) {
+                        setShynessMode(false);
+                    }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS:
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -544,6 +544,13 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                     mTvView.setStreamVolume(AUDIO_DUCKING_VOLUME);
                     break;
+            }
+        }
+        // When the activity loses the audio focus, set the Shy mode regardless of the play status.
+        if (mAudioFocusStatus == AudioManager.AUDIOFOCUS_LOSS ||
+                mAudioFocusStatus == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            if (!isShyModeSet()) {
+                setShynessMode(true);
             }
         }
     }
@@ -584,6 +591,10 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             mChannelMap = null;
         }
         mTunePendding = false;
+
+        if (!isShyModeSet()) {
+            setShynessMode(true);
+        }
     }
 
     private boolean isPlaying() {
