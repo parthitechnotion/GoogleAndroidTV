@@ -23,11 +23,11 @@ import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.tv.TvContract;
-import android.media.tv.TvContract.Channels;
 import android.media.tv.TvContract.Programs;
 import android.media.tv.TvInputService;
 import android.net.Uri;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.KeyEvent;
@@ -276,6 +276,9 @@ abstract public class BaseTvInputService extends TvInputService {
                 values.put(Programs.COLUMN_CHANNEL_ID, ContentUris.parseId(mChannelUri));
                 values.put(Programs.COLUMN_TITLE, mProgram.mTitle);
                 values.put(Programs.COLUMN_SHORT_DESCRIPTION, mProgram.mDescription);
+                if (!TextUtils.isEmpty(mProgram.mPosterArtUri)) {
+                    values.put(Programs.COLUMN_POSTER_ART_URI, mProgram.mPosterArtUri);
+                }
 
                 for (int i = 0; i < PROGRAM_REPEAT_COUNT; ++i) {
                     if (!hasProgramInfo((startTimeSec + i * mProgram.mDurationSec + 1) * 1000)) {
@@ -336,15 +339,17 @@ abstract public class BaseTvInputService extends TvInputService {
 
     public static final class ProgramInfo {
         public final String mTitle;
+        public final String mPosterArtUri;
         public final String mDescription;
         public final long mStartTimeSec;
         public final long mDurationSec;
         public final String mUrl;
         public final int mResourceId;
 
-        public ProgramInfo(String title, String description, long startTimeSec, long durationSec,
-                String url, int resourceId) {
+        public ProgramInfo(String title, String posterArtUri, String description, long startTimeSec,
+                long durationSec, String url, int resourceId) {
             mTitle = title;
+            mPosterArtUri = posterArtUri;
             mDescription = description;
             mStartTimeSec = startTimeSec;
             mDurationSec = durationSec;

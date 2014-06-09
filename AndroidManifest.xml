@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.ALL_EPG_DATA" />
     <uses-permission android:name="android.permission.READ_EPG_DATA" />
     <uses-permission android:name="android.permission.WRITE_EPG_DATA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application android:label="@string/tv_app"
