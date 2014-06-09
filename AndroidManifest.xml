@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.ALL_EPG_DATA" />
     <uses-permission android:name="android.permission.READ_EPG_DATA" />
     <uses-permission android:name="android.permission.WRITE_EPG_DATA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application android:label="@string/tv_app"
@@ -58,12 +59,11 @@
             android:enabled="true">
         </provider>
 
-        <!-- Recommendataion notification disabled.  See b/15485368. -->
-        <service android:name="com.android.tv.notification.NotificationService"/>
-        <receiver android:name="com.android.tv.notification.NotificationReceiver"
-            android:enabled="false">
+        <service android:name="com.android.tv.notification.NotificationService" />
+
+        <receiver android:name="com.android.tv.receiver.NotificationReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.android.tv.receiver.PackageIntentsReceiver">
