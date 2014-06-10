@@ -18,6 +18,7 @@ package com.android.tv.util;
 
 import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -65,6 +66,9 @@ public class Utils {
     // preferences stored in the preference of a specific tv input.
     private static final String PREF_KEY_LAST_WATCHED_CHANNEL_ID = "last_watched_channel_id";
 
+    // STOPSHIP: Use the one defined in the contract class instead.
+    private static final String TvContract_Programs_COLUMN_VIDEO_RESOLUTION = "video_resolution";
+
     private static int VIDEO_SD_WIDTH = 704;
     private static int VIDEO_SD_HEIGHT = 480;
     private static int VIDEO_HD_WIDTH = 1280;
@@ -87,6 +91,7 @@ public class Utils {
             this.height = height;
         }
 
+        @Override
         public String toString() {
             return String.format("%d:%d", width, height);
         }
@@ -180,6 +185,7 @@ public class Utils {
                 TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
                 TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
                 TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS,
+                TvContract_Programs_COLUMN_VIDEO_RESOLUTION,
                 TvContract.Programs.COLUMN_POSTER_ART_URI,
                 TvContract.Programs.COLUMN_THUMBNAIL_URI };
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
@@ -189,13 +195,15 @@ public class Utils {
         long endTime = -1;
         String posterArtUri = null;
         String thumbnailUri = null;
+        String videoDefinitionLevel = "";
         if (cursor.moveToNext()) {
             title = cursor.getString(0);
             description = cursor.getString(1);
             startTime = cursor.getLong(2);
             endTime = cursor.getLong(3);
-            posterArtUri = cursor.getString(4);
-            thumbnailUri = cursor.getString(5);
+            videoDefinitionLevel = cursor.getString(4);
+            posterArtUri = cursor.getString(5);
+            thumbnailUri = cursor.getString(6);
         }
         cursor.close();
 
@@ -205,8 +213,41 @@ public class Utils {
                 .setDescription(description)
                 .setStartTimeUtcMillis(startTime)
                 .setEndTimeUtcMillis(endTime)
+                .setVideoDefinitionLevel(videoDefinitionLevel)
                 .setPosterArtUri(posterArtUri)
                 .setThumbnailUri(thumbnailUri).build();
+    }
+
+    public static void updateCurrentVideoResolution(Context context, Long channelId, int format) {
+        if (channelId == Channel.INVALID_ID) {
+            return;
+        }
+        Uri channelUri = TvContract.buildChannelUri(channelId);
+        long time = System.currentTimeMillis();
+        Uri uri = TvContract.buildProgramsUriForChannel(channelUri, time, time);
+        Cursor cursor = null;
+        String[] projection = { TvContract.Programs._ID };
+        long programId = Program.INVALID_ID;
+        try {
+            cursor = context.getContentResolver().query(uri, projection, null, null, null);
+            if (cursor == null || !cursor.moveToNext()) {
+                return;
+            }
+            programId = cursor.getLong(0);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        String videoResolution = getVideoDefinitionLevelString(format);
+        if (TextUtils.isEmpty(videoResolution)) {
+            return;
+        }
+        Uri programUri = TvContract.buildProgramUri(programId);
+        ContentValues values = new ContentValues();
+        values.put(TvContract_Programs_COLUMN_VIDEO_RESOLUTION, videoResolution);
+        context.getContentResolver().update(programUri, values, null, null);
     }
 
     public static boolean hasChannel(Context context, TvInputInfo name) {
