@@ -33,8 +33,6 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
 
     private View mMainView;
     private int mFocusedItemPosition;
-    private int mFocusedBgColor;
-    private int mBgColor;
 
     public SimpleGuideShowOnlyFragment() {
         super();
@@ -43,16 +41,13 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mBgColor = getActivity().getResources().getColor(R.color.option_item_background);
-        mFocusedBgColor = getActivity().getResources().getColor(
-                R.color.option_item_focused_background);
-
         Object[] items = new Object[ShowOnlyItems.SHOW_ONLY_ITEM_SIZE];
         for (int i = 0; i < ShowOnlyItems.SHOW_ONLY_ITEM_SIZE; ++i) {
             items[i] = ShowOnlyItems.getLabel(i, getActivity());
         }
         initialize(getString(R.string.show_only_title), items,
-                R.layout.option_fragment, R.layout.show_only_item, false);
+                R.layout.option_fragment, R.layout.show_only_item, false,
+                R.color.option_item_background, R.color.option_item_focused_background);
         // TODO: set the current position correctly.
         mFocusedItemPosition = 0;
         mMainView = super.onCreateView(inflater, container, savedInstanceState);
@@ -77,7 +72,7 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
         if (DEBUG) Log.d(TAG, "onItemFocusChanged " + focusGained + ": position=" + position
                 + ", label=" + (String) tag);
-        v.setBackgroundColor(focusGained ? mFocusedBgColor : mBgColor);
+        super.onItemFocusChanged(v, focusGained, position, tag);
         mFocusedItemPosition = position;
     }
 

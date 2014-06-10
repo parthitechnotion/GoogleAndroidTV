@@ -50,6 +50,8 @@ public class BaseSideFragment extends Fragment {
     private int mInitiator;
     private boolean mHasDummyItem;
     private Handler mHandler = new Handler();
+    private int mItemBgColor;
+    private int mItemFocusedBgColor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,6 +84,7 @@ public class BaseSideFragment extends Fragment {
     }
 
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
+        v.setBackgroundColor(focusGained ? mItemFocusedBgColor : mItemBgColor);
     }
 
     public void onItemSelected(View v, int position, Object tag) {
@@ -96,13 +99,16 @@ public class BaseSideFragment extends Fragment {
     }
 
     protected void initialize(String title, Object[] itemTags, int fragmentLayoutId,
-            int itemLayoutId, boolean addDummyItemForMargin) {
+            int itemLayoutId, boolean addDummyItemForMargin,
+            int itemBgColorResId, int itemFocusedBgColorResId) {
         Preconditions.checkState(!TextUtils.isEmpty(title));
         mTitle = title;
         mItemTags = itemTags;
         mFragmentLayoutId = fragmentLayoutId;
         mItemLayoutId = itemLayoutId;
         mHasDummyItem = addDummyItemForMargin;
+        mItemBgColor = getActivity().getResources().getColor(itemBgColorResId);
+        mItemFocusedBgColor = getActivity().getResources().getColor(itemFocusedBgColorResId);
         mAdapter.notifyDataSetChanged();
     }
 

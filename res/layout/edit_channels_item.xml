@@ -16,51 +16,65 @@
 
 <!-- A channel in the list. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:focusable="true"
-    android:gravity="left|center_vertical"
-    android:padding="10dip">
+    android:layout_height="wrap_content"
+    android:focusable="true" >
 
-    <RadioButton
-        android:id="@+id/radio_button"
-        android:layout_height="match_parent"
-        android:layout_width="wrap_content"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="@dimen/option_item_padding_left"
-        android:layout_marginLeft="@dimen/option_item_margin_left"
-        android:focusable="false"
-        android:fontFamily="@string/font" />
-
-    <!-- This is "gone" for now, since we don't have channel icons. -->
-    <ImageView android:id="@+id/channel_image_view"
-        android:layout_width="90dip"
-        android:layout_height="match_parent"
-        android:layout_weight="0"
-        android:paddingLeft="10dip"
-        android:paddingRight="0dip"
-        android:visibility="gone" />
-
-    <ImageView android:id="@+id/channel_source_view"
-        android:layout_width="60dip"
-        android:layout_height="match_parent"
-        android:layout_weight="0"
-        android:paddingLeft="10dip"
-        android:paddingRight="0dip"
-        android:scaleType="center"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/channel_text_view"
+    <LinearLayout
+        android:id="@+id/item_container"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:gravity="center_vertical"
-        android:paddingLeft="0dip"
-        android:paddingRight="10dip"
-        android:singleLine="true"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="1"
-        android:textSize="@dimen/option_item_text_size"
-        android:textColor="@color/side_panel_item_text" />
+        android:paddingLeft="@dimen/side_panel_padding_left"
+        android:gravity="left|center_vertical" >
+
+        <CheckBox
+            android:id="@+id/check_box"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="@dimen/option_item_padding_left"
+            android:focusable="false"
+            android:fontFamily="@string/font" />
+
+        <!-- This is "gone" for now, since we don't have channel icons. -->
+        <ImageView android:id="@+id/channel_image_view"
+            android:layout_width="90dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:paddingLeft="10dip"
+            android:paddingRight="0dip"
+            android:visibility="gone" />
+
+        <ImageView android:id="@+id/channel_source_view"
+            android:layout_width="60dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:paddingLeft="10dip"
+            android:paddingRight="0dip"
+            android:scaleType="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/channel_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="center_vertical"
+            android:paddingLeft="0dip"
+            android:paddingRight="10dip"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="1"
+            android:textSize="@dimen/option_item_text_size"
+            android:textColor="@color/side_panel_item_text" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:background="@color/side_panel_divider" />
 </LinearLayout>

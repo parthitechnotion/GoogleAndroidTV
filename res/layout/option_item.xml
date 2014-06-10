@@ -17,6 +17,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/option_item_height"
+    android:paddingRight="@dimen/side_panel_padding_right"
+    android:paddingLeft="@dimen/side_panel_padding_left"
     android:focusable="true"
     android:orientation="horizontal" >
 
@@ -26,9 +28,9 @@
         android:layout_width="match_parent"
         android:gravity="left|center_vertical"
         android:paddingLeft="@dimen/option_item_padding_left"
-        android:layout_marginLeft="@dimen/option_item_margin_left"
         android:textSize="@dimen/option_item_text_size"
         android:textColor="@color/side_panel_item_text"
+        android:singleLine="true"
         android:focusable="false"
         android:fontFamily="@string/font" />
 </LinearLayout>

@@ -25,10 +25,11 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.internal.util.Preconditions;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
 import com.android.tv.data.Channel;
@@ -46,20 +47,15 @@ public class EditChannelsFragment extends BaseSideFragment {
     private Channel[] mChannels;
     private int mBrowsableChannelCount;
 
-    private int mBgColor;
-    private int mFocusedBgColor;
-
     private static final class Item {
         private static final int TYPE_ACTION = 0;
         private static final int TYPE_CHANNEL = 1;
+        private static final int TYPE_DIVIDER = 2;
 
-        private Item(int action) {
-            mType = TYPE_ACTION;
+        private Item(int type, int action, Channel channel) {
+            mType = type;
             mAction = action;
-        }
-
-        private Item(Channel channel) {
-            mType = TYPE_CHANNEL;
+            Preconditions.checkState(!(type == TYPE_CHANNEL && channel == null));
             mChannel = channel;
         }
 
@@ -90,23 +86,20 @@ public class EditChannelsFragment extends BaseSideFragment {
         mTvActivity = (TvActivity) getActivity();
         mSelectedInput = mTvActivity.getSelectedTvInput();
 
-        mBgColor = getActivity().getResources().getColor(R.color.option_item_background);
-        mFocusedBgColor = getActivity().getResources().getColor(
-                R.color.option_item_focused_background);
-
         mActions = getActivity().getResources().getStringArray(R.array.edit_channels_actions);
-        mItems = new Item[mActions.length + mChannels.length];
+        mItems = new Item[mActions.length + mChannels.length + 1];
         int index = 0;
-        for (; index<mActions.length; ++index) {
-            mItems[index] = new Item(index);
+        for (; index < mActions.length; ++index) {
+            mItems[index] = new Item(Item.TYPE_ACTION, index ,null);
         }
+        mItems[index++] = new Item(Item.TYPE_DIVIDER, 0, null);
         for (Channel channel : mChannels) {
-            mItems[index++] = new Item(channel);
+            mItems[index++] = new Item(Item.TYPE_CHANNEL, 0, channel);
         }
         String displayName = mSelectedInput.getDisplayName();
         String title = String.format(getString(R.string.edit_channels_title), displayName);
         initialize(title, mItems, R.layout.option_fragment, R.layout.edit_channels_item,
-                false);
+                false, R.color.option_item_background, R.color.option_item_focused_background);
 
         if (mBrowsableChannelCount <= 0) {
             Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
@@ -117,19 +110,28 @@ public class EditChannelsFragment extends BaseSideFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // TODO: the current channel should be initially focused.
+        setSelectedPosition(0);
+    }
+
+    @Override
     public void onBindView(View v, int position, Object tag, boolean prevSelected) {
         super.onBindView(v, position, tag, prevSelected);
 
-        RadioButton button = (RadioButton) v.findViewById(R.id.radio_button);
+        CheckBox checkBox = (CheckBox) v.findViewById(R.id.check_box);
         TextView textView = (TextView) v.findViewById(R.id.channel_text_view);
+        View itemContainer = v.findViewById(R.id.item_container);
+        View divider = v.findViewById(R.id.divider);
 
         Item item = (Item) tag;
         if (item.mType == Item.TYPE_ACTION) {
-            button.setVisibility(View.INVISIBLE);
+            checkBox.setVisibility(View.GONE);
             textView.setText(mActions[item.mAction]);
         } else if (item.mType == Item.TYPE_CHANNEL) {
-            button.setVisibility(View.VISIBLE);
-            button.setChecked(item.mChannel.isBrowsable());
+            checkBox.setVisibility(View.VISIBLE);
+            checkBox.setChecked(item.mChannel.isBrowsable());
 
             String channelNumber = item.mChannel.getDisplayNumber();
             String channelName = item.mChannel.getDisplayName();
@@ -142,6 +144,9 @@ public class EditChannelsFragment extends BaseSideFragment {
             }
             textView.setText(channelString);
         }
+        divider.setVisibility(item.mType == Item.TYPE_DIVIDER ? View.VISIBLE : View.GONE);
+        itemContainer.setVisibility(item.mType != Item.TYPE_DIVIDER ? View.VISIBLE : View.GONE);
+        v.setFocusable(item.mType != Item.TYPE_DIVIDER);
     }
 
     @Override
@@ -154,8 +159,8 @@ public class EditChannelsFragment extends BaseSideFragment {
                 updateAllChannels(false);
             }
         } else if (item.mType == Item.TYPE_CHANNEL) {
-            RadioButton button = (RadioButton) v.findViewById(R.id.radio_button);
-            boolean checked = button.isChecked();
+            CheckBox checkBox = (CheckBox) v.findViewById(R.id.check_box);
+            boolean checked = checkBox.isChecked();
 
             Channel channel = item.mChannel;
             Uri uri = TvContract.buildChannelUri(channel.getId());
@@ -164,7 +169,7 @@ public class EditChannelsFragment extends BaseSideFragment {
             getActivity().getContentResolver().update(uri, values, null, null);
             channel.setBrowsable(!checked);
 
-            button.setChecked(!checked);
+            checkBox.setChecked(!checked);
             mBrowsableChannelCount += checked ? -1 : 1;
             if (mBrowsableChannelCount <= 0) {
                 Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,
@@ -198,6 +203,6 @@ public class EditChannelsFragment extends BaseSideFragment {
 
     @Override
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
-        v.setBackgroundColor(focusGained ? mFocusedBgColor : mBgColor);
+        super.onItemFocusChanged(v, focusGained, position, tag);
     }
 }

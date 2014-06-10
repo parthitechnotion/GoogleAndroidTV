@@ -67,7 +67,7 @@
     <string name="menu_input_setting">Input Setting</string>
 
     <!-- Unified TV input label -->
-    <string name="unified_tv_input_label">Unified TV input</string>
+    <string name="unified_tv_input_label">Unified TV Input</string>
 
     <!-- Edit channel list (enable/disable individual channels) -->
     <string name="edit_channels_title">Edit <xliff:g id="tv_input">%s</xliff:g> channels</string>
