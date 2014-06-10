@@ -74,6 +74,24 @@ public class Utils {
     private static int VIDEO_ULTRA_HD_WIDTH = 2048;
     private static int VIDEO_ULTRA_HD_HEIGHT = 1536;
 
+    private enum AspectRatio {
+        ASPECT_RATIO_4_3(4, 3),
+        ASPECT_RATIO_16_9(16, 9),
+        ASPECT_RATIO_21_9(21, 9);
+
+        final int width;
+        final int height;
+
+        AspectRatio(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        public String toString() {
+            return String.format("%d:%d", width, height);
+        }
+    }
+
     // TODO: Remove this and add inputId into TvProvider.
     public static String getInputIdForComponentName(ComponentName name) {
         return name.flattenToShortString();
@@ -224,6 +242,19 @@ public class Utils {
 
     public static boolean hasActivity(Context context, TvInputInfo input, String action) {
         return getActivityInfo(context, input, action) != null;
+    }
+
+    public static String getAspectRatioString(int width, int height) {
+        if (width == 0 || height == 0) {
+            return "";
+        }
+
+        for (AspectRatio ratio: AspectRatio.values()) {
+            if (Math.abs((float) ratio.height / ratio.width - (float) height / width) < 0.05f) {
+                return ratio.toString();
+            }
+        }
+        return "";
     }
 
     public static int getVideoDefinitionLevelFromSize(int width, int height) {

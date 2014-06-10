@@ -25,6 +25,8 @@ public class TunableTvView extends TvView implements StreamInfo {
     private boolean mStarted;
     private TvInputInfo mInputInfo;
     private OnTuneListener mOnTuneListener;
+    private int mVideoWidth;
+    private int mVideoHeight;
     private int mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
     private int mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
     private boolean mHasClosedCaption = false;
@@ -79,6 +81,8 @@ public class TunableTvView extends TvView implements StreamInfo {
                 @Override
                 public void onVideoStreamChanged(String inputId, int width, int height,
                         boolean interlaced) {
+                    mVideoWidth = width;
+                    mVideoHeight = height;
                     mVideoFormat = Utils.getVideoDefinitionLevelFromSize(width, height);
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
@@ -150,6 +154,8 @@ public class TunableTvView extends TvView implements StreamInfo {
             throw new IllegalStateException("TvView isn't started");
         }
         if (DEBUG) Log.d(TAG, "tuneTo " + channelId);
+        mVideoWidth = 0;
+        mVideoHeight = 0;
         mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
         mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
         mHasClosedCaption = false;
@@ -208,6 +214,16 @@ public class TunableTvView extends TvView implements StreamInfo {
         void onTuned(boolean success, long channelId);
         void onUnexpectedStop(long channelId);
         void onStreamInfoChanged(StreamInfo info);
+    }
+
+    @Override
+    public int getVideoWidth() {
+        return mVideoWidth;
+    }
+
+    @Override
+    public int getVideoHeight() {
+        return mVideoHeight;
     }
 
     @Override
