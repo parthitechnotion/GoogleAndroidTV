@@ -45,12 +45,14 @@ public class TvRecommendation {
     private static final String PATH_INPUT = "input";
 
     private static final UriMatcher sUriMatcher;
-    private static final int MATCH_CHANNEL_ID = 1;
-    private static final int MATCH_WATCHED_PROGRAM_ID = 2;
-    private static final int MATCH_INPUT_PACKAGE_SERVICE_CHANNEL = 3;
+    private static final int MATCH_CHANNEL = 1;
+    private static final int MATCH_CHANNEL_ID = 2;
+    private static final int MATCH_WATCHED_PROGRAM_ID = 3;
+    private static final int MATCH_INPUT_PACKAGE_SERVICE_CHANNEL = 4;
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        sUriMatcher.addURI(TvContract.AUTHORITY, "channel", MATCH_CHANNEL);
         sUriMatcher.addURI(TvContract.AUTHORITY, "channel/#", MATCH_CHANNEL_ID);
         sUriMatcher.addURI(TvContract.AUTHORITY, "watched_program/#", MATCH_WATCHED_PROGRAM_ID);
         sUriMatcher.addURI(TvContract.AUTHORITY, "input/*/*/channel",
@@ -58,10 +60,10 @@ public class TvRecommendation {
     }
 
     private final List<TvRecommenderWrapper> mTvRecommenders;
-    private final Map<Long, ChannelRecord> mChannelRecordMap;
+    private Map<Long, ChannelRecord> mChannelRecordMap;
     // TODO: Consider to define each observer rather than the list or observers.
-    private final List<ContentObserver> mContentObservers;
     private final Handler mHandler;
+    private final ContentObserver mContentObserver;
     private final Context mContext;
     private final boolean mIncludeRecommendedOnly;
 
@@ -78,97 +80,46 @@ public class TvRecommendation {
     public TvRecommendation(Context context, Handler handler, boolean includeRecommendedOnly) {
         mContext = context;
         mChannelRecordMap = new ConcurrentHashMap<Long, ChannelRecord>();
-        mContentObservers = new ArrayList<ContentObserver>();
         mHandler = handler;
+        mContentObserver = createContentObserver();
         mIncludeRecommendedOnly = includeRecommendedOnly;
         mTvRecommenders = new ArrayList<TvRecommenderWrapper>();
         registerContentObservers();
         buildChannelRecordMap();
     }
 
-    public void release() {
-        unregisterContentObservers();
-        mChannelRecordMap.clear();
-    }
-
-    public void registerTvRecommender(TvRecommender recommender) {
-        registerTvRecommender(recommender,
-                TvRecommenderWrapper.DEFAULT_BASE_SCORE, TvRecommenderWrapper.DEFAULT_WEIGHT);
-    }
-
-    public void registerTvRecommender(TvRecommender recommender, double baseScore, double weight) {
-        mTvRecommenders.add(new TvRecommenderWrapper(recommender, baseScore, weight));
-    }
-
-    /**
-     * Get the channel list of recommendation up to {@code n} or the number of channels.
-     *
-     * @param size The number of channels that might be recommended.
-     * @return Top {@code size} channels recommended. If {@code size} is bigger than the number of
-     * channels, the number of results could be less than {@code size}.
-     */
-    // TODO: consider to change the return type from ChannelRecord[] to Channel[]
-    public ChannelRecord[] getRecommendedChannelList(int size) {
-        ArrayList<ChannelRecord> results = new ArrayList<ChannelRecord>();
-        for (ChannelRecord cr : mChannelRecordMap.values()) {
-            double maxScore = TvRecommender.NOT_RECOMMENDED;
-            for (TvRecommenderWrapper recommender : mTvRecommenders) {
-                double score = recommender.calculateScaledScore(cr);
-                if (score > maxScore) {
-                    maxScore = score;
-                }
-            }
-            cr.mScore = maxScore;
-            if (!mIncludeRecommendedOnly || cr.mScore != TvRecommender.NOT_RECOMMENDED) {
-                results.add(cr);
-            }
-        }
-        ChannelRecord[] allChannelRecords = results.toArray(new ChannelRecord[0]);
-        if (size > allChannelRecords.length) {
-            size = allChannelRecords.length;
-        }
-        Arrays.sort(allChannelRecords);
-        return Arrays.copyOfRange(allChannelRecords, 0, size);
-    }
-
-    private void registerContentObservers() {
-        ContentObserver observer = new ContentObserver(mHandler) {
-            @Override
-            public void onChange(boolean selfChange, Uri uri) {
-                if (sUriMatcher.match(uri) == MATCH_WATCHED_PROGRAM_ID) {
-                    String[] projection = {
-                            TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS,
-                            TvContract.WatchedPrograms.COLUMN_WATCH_END_TIME_UTC_MILLIS,
-                            TvContract.WatchedPrograms.COLUMN_CHANNEL_ID };
-
-                    Cursor cursor = null;
-                    try {
-                        cursor = mContext.getContentResolver().query(
-                                uri, projection, null, null, null);
-                        if (cursor != null && cursor.moveToFirst()) {
-                            ChannelRecord channelRecord =
-                                    updateChannelRecordFromWatchedProgramCursor(cursor);
-                            for (TvRecommenderWrapper recommender : mTvRecommenders) {
-                                recommender.onNewWatchLog(channelRecord);
-                            }
-                        }
-                    } finally {
-                        if (cursor != null) {
-                            cursor.close();
-                        }
-                    }
-                }
-            }
-        };
-        mContentObservers.add(observer);
-        mContext.getContentResolver().registerContentObserver(
-                TvContract.WatchedPrograms.CONTENT_URI, true, observer);
-
-        observer = new ContentObserver(mHandler) {
+    private ContentObserver createContentObserver() {
+        return new ContentObserver(mHandler) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
                 int match = sUriMatcher.match(uri);
-                if (match == MATCH_CHANNEL_ID) {
+                if (match == MATCH_CHANNEL) {
+                    Map<Long, ChannelRecord> channelRecordMap =
+                            new ConcurrentHashMap<Long, ChannelRecord>();
+
+                    Cursor c = null;
+                    try {
+                        c = mContext.getContentResolver().query(uri, null, null, null, null);
+                        if (c != null) {
+                            int channelIdIndex = c.getColumnIndex(Channels._ID);
+                            long channelId;
+                            while (c.moveToNext()) {
+                                channelId = c.getLong(channelIdIndex);
+                                ChannelRecord oldChannelRecord = mChannelRecordMap.get(channelId);
+                                ChannelRecord newChannelRecord =
+                                        new ChannelRecord(Channel.fromCursor(c));
+                                newChannelRecord.mLastWatchedTimeMs = (oldChannelRecord == null)
+                                        ? 0 : oldChannelRecord.mLastWatchedTimeMs;
+                                channelRecordMap.put(channelId, newChannelRecord);
+                            }
+                        }
+                    } finally {
+                        if (c != null) {
+                            c.close();
+                        }
+                    }
+                    mChannelRecordMap = channelRecordMap;
+                } else if (match == MATCH_CHANNEL_ID) {
                     long channelId = ContentUris.parseId(uri);
                     Cursor cursor = null;
                     try {
@@ -228,23 +179,91 @@ public class TvRecommendation {
                     for (Long channelId : channelIdSet) {
                         mChannelRecordMap.remove(channelId);
                     }
+                } else if (match == MATCH_WATCHED_PROGRAM_ID) {
+                    String[] projection = {
+                            TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS,
+                            TvContract.WatchedPrograms.COLUMN_WATCH_END_TIME_UTC_MILLIS,
+                            TvContract.WatchedPrograms.COLUMN_CHANNEL_ID };
+
+                    Cursor cursor = null;
+                    try {
+                        cursor = mContext.getContentResolver().query(
+                                uri, projection, null, null, null);
+                        if (cursor != null && cursor.moveToFirst()) {
+                            ChannelRecord channelRecord =
+                                    updateChannelRecordFromWatchedProgramCursor(cursor);
+                            for (TvRecommenderWrapper recommender : mTvRecommenders) {
+                                recommender.onNewWatchLog(channelRecord);
+                            }
+                        }
+                    } finally {
+                        if (cursor != null) {
+                            cursor.close();
+                        }
+                    }
                 }
             }
         };
-        mContentObservers.add(observer);
+    }
+
+    public void release() {
+        unregisterContentObservers();
+        mChannelRecordMap.clear();
+    }
+
+    public void registerTvRecommender(TvRecommender recommender) {
+        registerTvRecommender(recommender,
+                TvRecommenderWrapper.DEFAULT_BASE_SCORE, TvRecommenderWrapper.DEFAULT_WEIGHT);
+    }
+
+    public void registerTvRecommender(TvRecommender recommender, double baseScore, double weight) {
+        mTvRecommenders.add(new TvRecommenderWrapper(recommender, baseScore, weight));
+    }
+
+    /**
+     * Get the channel list of recommendation up to {@code n} or the number of channels.
+     *
+     * @param size The number of channels that might be recommended.
+     * @return Top {@code size} channels recommended. If {@code size} is bigger than the number of
+     * channels, the number of results could be less than {@code size}.
+     */
+    // TODO: consider to change the return type from ChannelRecord[] to Channel[]
+    public ChannelRecord[] getRecommendedChannelList(int size) {
+        ArrayList<ChannelRecord> results = new ArrayList<ChannelRecord>();
+        for (ChannelRecord cr : mChannelRecordMap.values()) {
+            double maxScore = TvRecommender.NOT_RECOMMENDED;
+            for (TvRecommenderWrapper recommender : mTvRecommenders) {
+                double score = recommender.calculateScaledScore(cr);
+                if (score > maxScore) {
+                    maxScore = score;
+                }
+            }
+            cr.mScore = maxScore;
+            if (!mIncludeRecommendedOnly || cr.mScore != TvRecommender.NOT_RECOMMENDED) {
+                results.add(cr);
+            }
+        }
+        ChannelRecord[] allChannelRecords = results.toArray(new ChannelRecord[0]);
+        if (size > allChannelRecords.length) {
+            size = allChannelRecords.length;
+        }
+        Arrays.sort(allChannelRecords);
+        return Arrays.copyOfRange(allChannelRecords, 0, size);
+    }
+
+    private void registerContentObservers() {
         mContext.getContentResolver().registerContentObserver(
-                TvContract.Channels.CONTENT_URI, true, observer);
+                TvContract.WatchedPrograms.CONTENT_URI, true, mContentObserver);
+        mContext.getContentResolver().registerContentObserver(
+                TvContract.Channels.CONTENT_URI, true, mContentObserver);
         mContext.getContentResolver().registerContentObserver(
                 new Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT)
                         .authority(TvContract.AUTHORITY).appendPath(PATH_INPUT).build(),
-                true, observer);
+                true, mContentObserver);
     }
 
     private void unregisterContentObservers() {
-        for (ContentObserver observer : mContentObservers) {
-            mContext.getContentResolver().unregisterContentObserver(observer);
-        }
-        mContentObservers.clear();
+        mContext.getContentResolver().unregisterContentObserver(mContentObserver);
     }
 
     private void buildChannelRecordMap() {
