@@ -62,6 +62,7 @@
             android:id="@+id/program_title"
             android:layout_height="@dimen/simple_guide_item_program_title_height"
             android:layout_width="match_parent"
+            android:layout_marginRight="56dp"
             android:gravity="left|bottom"
             android:singleLine="true"
             android:textSize="@dimen/simple_guide_item_large_text_size"
@@ -76,14 +77,24 @@
             android:gravity="top" >
 
             <TextView android:id="@+id/channel_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1.0"
                 android:layout_gravity="bottom"
+                android:layout_marginRight="8dp"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textColor="@color/menu_default_text_color"
                 android:textSize="@dimen/simple_guide_item_small_text_size"
                 android:fontFamily="@string/condensed_font" />
+
+            <ImageView android:id="@+id/hd_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="3.5dp"
+                android:visibility="gone" />
 
             <ProgressBar
                 android:id="@+id/remaining_time"
@@ -91,19 +102,11 @@
                 android:layout_width="@dimen/simple_guide_progress_width"
                 android:layout_height="@dimen/simple_guide_progress_height"
                 android:layout_gravity="bottom"
-                android:layout_marginLeft="12dp"
+                android:layout_marginRight="56dp"
                 android:layout_marginBottom="3.5dp"
                 android:progressDrawable="@drawable/progress_horizontal"
                 android:indeterminate="false"
                 android:max="100" />
-
-            <ImageView android:id="@+id/hd_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginLeft="12dp"
-                android:layout_marginBottom="3.5dp"
-                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
