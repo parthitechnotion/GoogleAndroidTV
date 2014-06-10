@@ -18,6 +18,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:foreground="@android:color/transparent"
     android:keepScreenOn="true" >
 
     <com.android.tv.ui.TunableTvView android:id="@+id/tv_view"
@@ -59,11 +60,7 @@
             android:background="@android:drawable/ic_media_next" />
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <include layout="@layout/channel_banner" />
-    </FrameLayout>
+    <include layout="@layout/channel_banner" />
 
     <include layout="@layout/main_menu" />
 
