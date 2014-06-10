@@ -28,6 +28,8 @@
     <dimen name="unfocused_list_title_text_size">16sp</dimen>
 
     <dimen name="channel_tile_round_radius">2dp</dimen>
+    <dimen name="channel_tile_poster_art_width">160dp</dimen>
+    <dimen name="channel_tile_poster_art_height">90dp</dimen>
 
     <!-- Action tile dimensions -->
     <dimen name="action_tile_inter_card_spacing">8dp</dimen>

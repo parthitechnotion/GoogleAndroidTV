@@ -54,6 +54,8 @@ public class ChannelTileView extends ShadowContainer
     private static final String TAG = "ChannelTileView";
 
     private float mRoundRadius;
+    private float mPosterArtWidth;
+    private float mPosterArtHeight;
     private LinearLayout mChannelInfosLayout;
     private ImageView mProgramPosterArtView;
     private ImageView mChannelLogoView;
@@ -89,6 +91,8 @@ public class ChannelTileView extends ShadowContainer
         mNormalBackgroud = getResources().getDrawable(R.drawable.channel_tile_top);
         mBackgroundOnImage = getResources().getDrawable(R.drawable.channel_tile_top_on_image);
         mRoundRadius = getResources().getDimension(R.dimen.channel_tile_round_radius);
+        mPosterArtWidth = getResources().getDimension(R.dimen.channel_tile_poster_art_width);
+        mPosterArtHeight = getResources().getDimension(R.dimen.channel_tile_poster_art_height);
     }
 
     @Override
@@ -142,6 +146,13 @@ public class ChannelTileView extends ShadowContainer
         mChannelNameView.setVisibility(INVISIBLE);
     }
 
+    private void setProgramPosterArt(Bitmap bm) {
+        mProgramPosterArtView.setImageBitmap(getRoundedCornerBitmap(bm,
+                mRoundRadius, mPosterArtWidth, mPosterArtHeight));
+        mProgramPosterArtView.setVisibility(VISIBLE);
+        mChannelInfosLayout.setBackground(mBackgroundOnImage);
+    }
+
     public void updateProgramInformation() {
         if (mProgramNameView == null || mProgramPosterArtView == null || mChannel == null
                 || mChannel.getType() == R.integer.channel_type_guide) {
@@ -157,10 +168,16 @@ public class ChannelTileView extends ShadowContainer
         }
         String posterArtUri = program.getPosterArtUri();
         if (!TextUtils.isEmpty(posterArtUri)) {
-            mProgramPosterArtView.setImageURI(Uri.parse(posterArtUri));
-            if (mProgramPosterArtView.getDrawable() != null) {
-                mProgramPosterArtView.setVisibility(VISIBLE);
-                mChannelInfosLayout.setBackground(mBackgroundOnImage);
+            Bitmap bm = null;
+            try {
+                bm = BitmapFactory.decodeStream(getContext().getContentResolver().openInputStream(
+                        Uri.parse(posterArtUri)));
+            } catch (IOException ie) {
+                // Ignore exception
+            }
+
+            if (bm != null) {
+                setProgramPosterArt(bm);
             } else {
                 mProgramPosterArtView.setVisibility(INVISIBLE);
                 mChannelInfosLayout.setBackground(mNormalBackgroud);
@@ -171,10 +188,7 @@ public class ChannelTileView extends ShadowContainer
                         protected Bitmap doInBackground(URL... params) {
                             URL imageUrl = params[0];
                             try {
-                                Bitmap bm = BitmapFactory.decodeStream(imageUrl.openStream());
-                                return getRoundedCornerBitmap(bm, mRoundRadius,
-                                        mProgramPosterArtView.getWidth(),
-                                        mProgramPosterArtView.getHeight());
+                                return BitmapFactory.decodeStream(imageUrl.openStream());
                             } catch (IOException ie) {
                                 Log.w(TAG, "failed to read url: " + imageUrl, ie);
                             }
@@ -185,9 +199,7 @@ public class ChannelTileView extends ShadowContainer
                         @Override
                         protected void onPostExecute(Bitmap bm) {
                             if (bm != null) {
-                                mProgramPosterArtView.setImageBitmap(bm);
-                                mProgramPosterArtView.setVisibility(VISIBLE);
-                                mChannelInfosLayout.setBackground(mBackgroundOnImage);
+                                setProgramPosterArt(bm);
                             }
                         }
                     };
@@ -202,8 +214,8 @@ public class ChannelTileView extends ShadowContainer
         }
     }
 
-    private static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx, int targetWidth,
-            int targetHeight) {
+    private static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx, float targetWidth,
+            float targetHeight) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
                 Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
