@@ -79,6 +79,12 @@ public class EditChannelsFragment extends BaseSideFragment {
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mTvActivity.hideOverlays(false, false, true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mTvActivity = (TvActivity) getActivity();
