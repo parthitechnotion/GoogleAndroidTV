@@ -58,6 +58,8 @@ public class Utils {
 
     // preferences stored in the default preference.
     private static final String PREF_KEY_LAST_SELECTED_TV_INPUT = "last_selected_tv_input";
+    private static final String PREF_KEY_LAST_SELECTED_PHYS_TV_INPUT =
+            "last_selected_phys_tv_input";
 
     private static final String PREFIX_PREF_NAME = "com.android.tv.";
     // preferences stored in the preference of a specific tv input.
@@ -110,7 +112,8 @@ public class Utils {
         return getInputIdForComponentName(componentName);
     }
 
-    public static void setLastWatchedChannelId(Context context, String inputId, long channelId) {
+    public static void setLastWatchedChannelId(Context context, String inputId, String physInputId,
+            long channelId) {
         if (TextUtils.isEmpty(inputId)) {
             throw new IllegalArgumentException("inputId cannot be empty");
         }
@@ -118,6 +121,8 @@ public class Utils {
                 .putLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, channelId).apply();
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putString(PREF_KEY_LAST_SELECTED_TV_INPUT, inputId).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putString(PREF_KEY_LAST_SELECTED_PHYS_TV_INPUT, physInputId).apply();
     }
 
     public static long getLastWatchedChannelId(Context context) {
@@ -139,6 +144,11 @@ public class Utils {
     public static String getLastSelectedInputId(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(PREF_KEY_LAST_SELECTED_TV_INPUT, null);
+    }
+
+    public static String getLastSelectedPhysInputId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_KEY_LAST_SELECTED_PHYS_TV_INPUT, null);
     }
 
     public static Program getCurrentProgram(Context context, Uri channelUri) {
