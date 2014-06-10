@@ -83,7 +83,7 @@
         android:layout_marginRight="12dp"
         android:layout_marginBottom="-4sp"
         android:layout_alignBottom="@id/anchor"
-        android:layout_toRightOf="@id/input_icon"
+        android:layout_toRightOf="@id/tvinput_logo"
         android:textColor="#EEEEEE"
         android:fontFamily="sans-serif-condensed"
         android:textSize="@dimen/channel_banner_small_text_size" />
