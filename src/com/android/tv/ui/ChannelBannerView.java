@@ -35,7 +35,6 @@ import android.util.AttributeSet;
 import android.util.LruCache;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -139,8 +138,8 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
             return;
         }
 
-        Drawable tvInputLogo =
-                (info == null) ? null : mChannelInfoLogoCache.get(info.getCurrentTvInputInfo());
+        TvInputInfo inputInfo = (info == null) ? null : info.getCurrentTvInputInfo();
+        Drawable tvInputLogo = (inputInfo == null) ? null : mChannelInfoLogoCache.get(inputInfo);
         if (tvInputLogo != null) {
             mTvInputLogoImageView.setVisibility(View.VISIBLE);
             mTvInputLogoImageView.setImageDrawable(tvInputLogo);
