@@ -163,12 +163,19 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         } else {
             mResolutionTextView.setVisibility(View.GONE);
         }
-        // TODO: implement aspect ratio.
-        mAspectRatioTextView.setVisibility(View.GONE);
+
+        String aspectRatio =
+                Utils.getAspectRatioString(info.getVideoWidth(), info.getVideoHeight());
+        if (!TextUtils.isEmpty(aspectRatio)) {
+            mAspectRatioTextView.setVisibility(View.VISIBLE);
+            mAspectRatioTextView.setText(aspectRatio);
+        } else {
+            mAspectRatioTextView.setVisibility(View.GONE);
+        }
+
         if (!TextUtils.isEmpty(Utils.getAudioChannelString(info.getAudioChannelCount()))) {
             mAudioChannelTextView.setVisibility(View.VISIBLE);
             mAudioChannelTextView.setText(Utils.getAudioChannelString(info.getAudioChannelCount()));
-            mAudioChannelTextView.setVisibility(View.VISIBLE);
         } else {
             mAudioChannelTextView.setVisibility(View.GONE);
         }
