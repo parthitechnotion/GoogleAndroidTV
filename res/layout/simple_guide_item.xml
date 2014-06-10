@@ -26,19 +26,18 @@
         android:layout_width="@dimen/simple_guide_channel_width"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="@dimen/simple_guide_padding_left" >
+        android:layout_marginLeft="@dimen/simple_guide_margin_left" >
 
         <ImageView android:id="@+id/channel_logo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="36dp"
+            android:layout_height="22dp"
             android:gravity="center_horizontal"
-            android:paddingTop="@dimen/simple_guide_channel_padding_top" />
+            android:layout_marginTop="@dimen/simple_guide_channel_margin_top" />
 
         <TextView android:id="@+id/channel_number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="36dp"
+            android:layout_height="18dp"
             android:gravity="center_horizontal|bottom"
-            android:paddingBottom="@dimen/simple_guide_channel_padding_bottom"
             android:textColor="@color/menu_default_text_color"
             android:textSize="@dimen/simple_guide_item_small_text_size"
             android:fontFamily="@string/condensed_font" />

@@ -18,6 +18,7 @@ package com.android.tv.ui;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -48,6 +49,7 @@ public class BaseSideFragment extends Fragment {
     private int mItemLayoutId;
     private int mInitiator;
     private boolean mHasDummyItem;
+    private Handler mHandler = new Handler();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,6 +141,24 @@ public class BaseSideFragment extends Fragment {
                 v.setVisibility(View.VISIBLE);
                 onBindView(v, position, mItemTags[position], position == mPrevSelectedItemPosition);
                 v.setTag(R.id.TAG_OPTION_ITEM_POSITOIN, position);
+                if (v instanceof ViewGroup) {
+                    final ViewGroup viewGroup = (ViewGroup) v;
+                    mHandler.post(new Runnable() {
+                        void requestLayout(ViewGroup v) {
+                            for (int i = 0; i < v.getChildCount(); i++) {
+                                v.getChildAt(i).requestLayout();
+                                if (v.getChildAt(i) instanceof ViewGroup) {
+                                    requestLayout((ViewGroup) v.getChildAt(i));
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void run() {
+                            requestLayout(viewGroup);
+                        }
+                    });
+                }
             }
         }
 
