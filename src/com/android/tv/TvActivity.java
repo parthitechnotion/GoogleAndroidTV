@@ -361,9 +361,13 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         String inputId = Utils.getInputIdForChannel(this, channelId);
         if (TextUtils.isEmpty(inputId)) {
-            // If failed to determine the input for that channel, try a different input.
-            showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
-            return;
+            // If the channel is invalid, try to use the last selected physical tv input.
+            inputId = Utils.getLastSelectedPhysInputId(this);
+            if (TextUtils.isEmpty(inputId)) {
+                // If failed to determine the input for that channel, try a different input.
+                showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
+                return;
+            }
         }
         TvInputInfo inputInfo = mTvInputManagerHelper.getTvInputInfo(inputId);
         if (inputInfo == null) {
@@ -724,7 +728,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     // TODO: show something to user about this error.
                 } else {
                     Utils.setLastWatchedChannelId(TvActivity.this, inputId,
-                            channelId);
+                            mTvView.getCurrentTvInputInfo().getId(), channelId);
                 }
             }
 
