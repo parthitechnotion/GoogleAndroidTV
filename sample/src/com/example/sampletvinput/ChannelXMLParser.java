@@ -48,6 +48,7 @@ public class ChannelXMLParser {
     private static final String ATTR_LOGO_URL = "logo_url";
 
     private static final String ATTR_TITLE = "title";
+    private static final String ATTR_POSTER_ART_URI = "poster_art_uri";
     private static final String ATTR_START_TIME = "start_time";
     private static final String ATTR_DURATION_SEC = "duration_sec";
     private static final String ATTR_VIDEO_URL = "video_url";
@@ -127,11 +128,14 @@ public class ChannelXMLParser {
         long durationSec = 0;
         String videoUrl = null;
         String description = null;
+        String posterArtUri = null;
         for (int i = 0; i < parser.getAttributeCount(); ++i) {
             String attr = parser.getAttributeName(i);
             String value = parser.getAttributeValue(i);
             if (ATTR_TITLE.equals(attr)) {
                 title = value;
+            } else if (ATTR_POSTER_ART_URI.equals(attr)) {
+                posterArtUri = value;
             } else if (ATTR_START_TIME.equals(attr)) {
                 try {
                     startTimeSec = format.parse(value).getTime() / 1000;
@@ -146,6 +150,7 @@ public class ChannelXMLParser {
                 description = value;
             }
         }
-        return new ProgramInfo(title, description, startTimeSec, durationSec, videoUrl, 0);
+        return new ProgramInfo(title, posterArtUri, description, startTimeSec, durationSec,
+                videoUrl, 0);
     }
 }
