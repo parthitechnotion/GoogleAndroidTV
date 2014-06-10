@@ -78,9 +78,9 @@ public class InputPickerFragment extends BaseOptionFragment {
                 return ((TvInput) lhs).getDisplayName().compareTo(((TvInput) rhs).getDisplayName());
             }
         });
-        i = 0;
+
         mInitialPosition = 0;
-        for (; i < items.length; ++i) {
+        for (i = 0; i < items.length; ++i) {
             if (items[i].equals(mSelectedInput)) {
                 mInitialPosition = i;
                 break;
@@ -121,7 +121,7 @@ public class InputPickerFragment extends BaseOptionFragment {
 
     @Override
     public void onItemSelected(View v, int position, Object tag) {
-        if (mInitialPosition != position) {
+        if (!((TvInput) tag).equals(mSelectedInput)) {
             mTvActivity.onInputPicked((TvInput) tag);
         }
         super.onItemSelected(v, position, tag);
