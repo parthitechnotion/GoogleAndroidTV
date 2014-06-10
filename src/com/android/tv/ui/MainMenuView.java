@@ -255,11 +255,11 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         final MenuTag tag = (MenuTag) v.getTag();
-        boolean excludeChannelBanner = false;
+        boolean hideChannelBanner = true;
         if (tag != null) {
             if (tag.mType == MenuTag.CHANNEL_TAG_TYPE
                     && ((Channel) tag.mObj).getType() != R.integer.channel_type_guide) {
-                excludeChannelBanner = true;
+                hideChannelBanner = false;
             }
             mHandler.post(new Runnable() {
                 @Override
@@ -314,7 +314,7 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
             });
         }
 
-        mTvActivity.hideOverlay(excludeChannelBanner);
+        mTvActivity.hideOverlays(true, hideChannelBanner, false);
     }
 
     @Override

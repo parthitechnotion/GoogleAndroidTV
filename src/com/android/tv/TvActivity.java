@@ -46,6 +46,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -88,12 +89,17 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private static final int DURATION_SHOW_CHANNEL_BANNER = 8000;
     private static final int DURATION_SHOW_CONTROL_GUIDE = 1000;
     private static final int DURATION_SHOW_MAIN_MENU = 5000;
+    private static final int DURATION_SHOW_SIDE_FRAGMENT = 60000;
     private static final float AUDIO_MAX_VOLUME = 1.0f;
     private static final float AUDIO_MIN_VOLUME = 0.0f;
     private static final float AUDIO_DUCKING_VOLUME = 0.3f;
     // Wait for 3 seconds
     private static final int START_TV_MAX_RETRY = 12;
     private static final int START_TV_RETRY_INTERVAL = 250;
+
+    private static final int SIDE_FRAGMENT_TAG_SHOW = 0;
+    private static final int SIDE_FRAGMENT_TAG_HIDE = 1;
+    private static final int SIDE_FRAGMENT_TAG_RESET = 2;
 
     // TODO: add more KEYCODEs to the white list.
     private static final int[] KEYCODE_WHITELIST = {
@@ -124,9 +130,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private LinearLayout mControlGuide;
     private MainMenuView mMainMenuView;
     private ChannelBannerView mChannelBanner;
+    private FrameLayout mSideFragmentLayout;
     private HideRunnable mHideChannelBanner;
     private HideRunnable mHideControlGuide;
     private HideRunnable mHideMainMenu;
+    private HideRunnable mHideSideFragment;
     private int mShortAnimationDuration;
     private int mDisplayWidth;
     private GestureDetector mGestureDetector;
@@ -198,16 +206,26 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         mControlGuide = (LinearLayout) findViewById(R.id.control_guide);
         mChannelBanner = (ChannelBannerView) findViewById(R.id.channel_banner);
         mMainMenuView = (MainMenuView) findViewById(R.id.main_menu);
+        mSideFragmentLayout = (FrameLayout) findViewById(R.id.right_panel);
         mMainMenuView.setTvActivity(this);
 
         // Initially hide the channel banner and the control guide.
         mChannelBanner.setVisibility(View.GONE);
         mMainMenuView.setVisibility(View.GONE);
         mControlGuide.setVisibility(View.GONE);
+        mSideFragmentLayout.setVisibility(View.GONE);
+        mSideFragmentLayout.setTag(SIDE_FRAGMENT_TAG_RESET);
 
         mHideControlGuide = new HideRunnable(mControlGuide, DURATION_SHOW_CONTROL_GUIDE);
         mHideChannelBanner = new HideRunnable(mChannelBanner, DURATION_SHOW_CHANNEL_BANNER);
         mHideMainMenu = new HideRunnable(mMainMenuView, DURATION_SHOW_MAIN_MENU);
+        mHideSideFragment = new HideRunnable(mSideFragmentLayout, DURATION_SHOW_SIDE_FRAGMENT,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        resetSideFragment();
+                    }
+                });
 
         mShortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
@@ -311,7 +329,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     @Override
     protected void onPause() {
-        hideOverlay(false);
+        hideOverlays(true, true, true);
         super.onPause();
     }
 
@@ -473,19 +491,34 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void showSideFragment(Fragment f, int initiator) {
+        mSideFragmentLayout.setTag(SIDE_FRAGMENT_TAG_SHOW);
+
         Bundle bundle = new Bundle();
         bundle.putInt(BaseSideFragment.KEY_INITIATOR, initiator);
         f.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(R.id.right_panel, f);
         ft.addToBackStack(null);
-        // TODO: add an animation.
         ft.commit();
+
+        mHideSideFragment.showAndHide();
     }
 
     public void onSideFragmentCanceled(int initiator) {
+        if (mSideFragmentLayout.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
+            return;
+        }
         if (initiator == BaseSideFragment.INITIATOR_MENU) {
             displayMainMenu(false);
+        }
+    }
+
+    private void resetSideFragment() {
+        mSideFragmentLayout.setTag(SIDE_FRAGMENT_TAG_RESET);
+        while (true) {
+            if (!getFragmentManager().popBackStackImmediate()) {
+                break;
+            }
         }
     }
 
@@ -707,10 +740,20 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
     }
 
-    public void hideOverlay(boolean excludeChannelBanner) {
-        mHideMainMenu.hideImmediately();
-        if (!excludeChannelBanner) {
+    public void hideOverlays(boolean hideMainMenu, boolean hideChannelBanner,
+            boolean hideSidePanel) {
+        if (hideMainMenu) {
+            mHideMainMenu.hideImmediately();
+        }
+        if (hideChannelBanner) {
             mHideChannelBanner.hideImmediately();
+        }
+        if (hideSidePanel) {
+            if (mSideFragmentLayout.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
+                return;
+            }
+            mSideFragmentLayout.setTag(SIDE_FRAGMENT_TAG_HIDE);
+            mHideSideFragment.hideImmediately();
         }
     }
 
@@ -775,7 +818,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         if (mMainMenuView.isShown() || mChannelBanner.isShown()) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                hideOverlay(false);
+                hideOverlays(true, true, false);
                 return true;
             }
             if (mMainMenuView.isShown()) {
@@ -916,6 +959,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (mMainMenuView.getVisibility() == View.VISIBLE) {
             mHideMainMenu.showAndHide();
         }
+        if (mSideFragmentLayout.getTag() == SIDE_FRAGMENT_TAG_SHOW) {
+            mHideSideFragment.showAndHide();
+        }
     }
 
     @Override
@@ -1051,10 +1097,16 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         private final View mView;
         private final long mWaitingTime;
         private boolean mOnHideAnimation;
+        private final Runnable mPostHideListener;
 
         public HideRunnable(View view, long waitingTime) {
+            this(view, waitingTime, null);
+        }
+
+        public HideRunnable(View view, long waitingTime, Runnable postHideListener) {
             mView = view;
             mWaitingTime = waitingTime;
+            mPostHideListener = postHideListener;
         }
 
         @Override
@@ -1084,6 +1136,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 public void onAnimationEnd(Animation animation) {
                     mOnHideAnimation = false;
                     mView.setVisibility(View.GONE);
+                    if (mPostHideListener != null) {
+                        mPostHideListener.run();
+                    }
                 }
             });
 
