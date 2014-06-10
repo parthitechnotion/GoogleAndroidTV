@@ -93,8 +93,9 @@ public class SimpleGuideFragment extends BaseSideFragment {
     public void onDetach() {
         super.onDetach();
         if (!mClosingByItemSelected) {
-            ((TvActivity) getActivity()).onSideFragmentCanceled(getInitiator());
+            mTvActivity.onSideFragmentCanceled(getInitiator());
         }
+        mTvActivity.hideOverlays(false, false, true);
     }
 
     @Override

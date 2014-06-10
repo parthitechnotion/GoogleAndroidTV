@@ -55,6 +55,7 @@ public class BaseOptionFragment extends BaseSideFragment {
         if (!mClosingByItemSelected) {
             ((TvActivity) getActivity()).onSideFragmentCanceled(getInitiator());
         }
+        ((TvActivity) getActivity()).hideOverlays(false, false, true);
     }
 
     @Override
