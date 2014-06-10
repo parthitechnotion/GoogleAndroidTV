@@ -42,12 +42,10 @@ public class MenuAction {
                     R.drawable.ic_tvoption_display_mode);
     public static final MenuAction SELECT_TV_INPUT_ACTION =
             new MenuAction(R.string.menu_select_input, SELECT_TV_INPUT_TYPE,
-                    R.drawable.ic_tvoptions_input_settings);
+                    R.drawable.ic_tvoptions_input);
     public static final MenuAction TOGGLE_PIP_ACTION =
             new MenuAction(R.string.menu_toggle_pip, TOGGLE_PIP_TYPE,
                     R.drawable.ic_tvoption_pip);
-
-    // TODO: UX is not ready.
     public static final MenuAction EDIT_CHANNEL_LIST_ACTION =
             new MenuAction(R.string.menu_edit_channels, EDIT_CHANNEL_LIST_TYPE,
                     R.drawable.ic_tvoptions_edit_channels);
@@ -56,7 +54,7 @@ public class MenuAction {
                     R.drawable.ic_tvoptions_scan);
     public static final MenuAction INPUT_SETTING_ACTION =
             new MenuAction(R.string.menu_input_setting, INPUT_SETTING_TYPE,
-                    R.drawable.ic_tvoption_more);
+                    R.drawable.ic_tvoptions_input_settings);
 
     private final int mActionNameResId;
     private final int mType;
