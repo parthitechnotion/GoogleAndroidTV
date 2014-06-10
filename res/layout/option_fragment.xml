@@ -32,15 +32,16 @@
         android:layout_width="@dimen/side_panel_width"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/option_fragment_background" >
+        android:background="@color/side_panel_background" >
         <LinearLayout
             android:layout_gravity="right"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/side_panel_header_padding_top"
-            android:paddingLeft="@dimen/side_panel_header_padding_left"
+            android:paddingLeft="@dimen/side_panel_padding_left"
+            android:paddingRight="@dimen/side_panel_padding_right"
             android:orientation="vertical"
-            android:background="@color/option_fragment_header_background" >
+            android:background="@color/side_panel_header_background" >
             <TextView
                 android:id="@+id/side_panel_title"
                 android:layout_width="match_parent"
@@ -48,6 +49,7 @@
                 android:gravity="center_vertical"
                 android:textSize="@dimen/side_panel_header_text_size"
                 android:textColor="@color/menu_default_text_color"
+                android:singleLine="true"
                 android:fontFamily="@string/font" />
         </LinearLayout>
 

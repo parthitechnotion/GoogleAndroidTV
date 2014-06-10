@@ -31,22 +31,12 @@ public class BaseOptionFragment extends BaseSideFragment {
 
     private View mMainView;
     private boolean mClosingByItemSelected;
-    private int mFocusedBgColor;
-    private int mBgColor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mBgColor = getActivity().getResources().getColor(R.color.option_item_background);
-        mFocusedBgColor = getActivity().getResources().getColor(
-                R.color.option_item_focused_background);
         mMainView = super.onCreateView(inflater, container, savedInstanceState);
         return mMainView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -60,17 +50,14 @@ public class BaseOptionFragment extends BaseSideFragment {
 
     @Override
     public final void initialize(String title, Object[] itemTags, int fragmentLayoutId,
-            int itemLayoutId, boolean addDummyItemForMargin) {
+            int itemLayoutId, boolean addDummyItemForMargin,
+            int itemBgColor, int itemFocusedBgColor) {
         throw new UnsupportedOperationException("Call initialize(String title, Object[] itemTags)");
     }
 
     public void initialize(String title, Object[] itemTags) {
-        super.initialize(title, itemTags, R.layout.option_fragment, R.layout.option_item, true);
-    }
-
-    @Override
-    public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
-        v.setBackgroundColor(focusGained ? mFocusedBgColor : mBgColor);
+        super.initialize(title, itemTags, R.layout.option_fragment, R.layout.option_item, true,
+                R.color.option_item_background, R.color.option_item_focused_background);
     }
 
     @Override

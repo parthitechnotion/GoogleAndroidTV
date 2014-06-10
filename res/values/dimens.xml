@@ -41,14 +41,14 @@
     <dimen name="side_panel_shadow_width">500dp</dimen>
     <dimen name="side_panel_shadow_margin_right">270dp</dimen>
     <dimen name="side_panel_width">360dp</dimen>
+    <dimen name="side_panel_padding_right">56dp</dimen>
+    <dimen name="side_panel_padding_left">32dp</dimen>
     <dimen name="side_panel_header_padding_top">27dp</dimen>
-    <dimen name="side_panel_header_padding_left">32dp</dimen>
     <dimen name="side_panel_header_text_size">24sp</dimen>
     <dimen name="side_panel_header_text_height">60dp</dimen>
 
     <!-- Option item list dimensions -->
     <dimen name="option_item_height">48dp</dimen>
-    <dimen name="option_item_margin_left">32dp</dimen>
     <dimen name="option_item_padding_left">16dp</dimen>
     <dimen name="option_item_text_size">18sp</dimen>
 

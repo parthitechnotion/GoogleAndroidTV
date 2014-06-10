@@ -50,8 +50,6 @@ public class SimpleGuideFragment extends BaseSideFragment {
     private final ChannelMap mChannelMap;
     private int mCurPosition;
     private boolean mClosingByItemSelected;
-    private int mBgColor;
-    private int mFocusedBgColor;
     // TODO: user shared preference for this.
     private final int mSelectedShowOnlyItemPosition;
 
@@ -65,10 +63,6 @@ public class SimpleGuideFragment extends BaseSideFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mBgColor = getActivity().getResources().getColor(R.color.option_item_background);
-        mFocusedBgColor = getActivity().getResources().getColor(
-                R.color.option_item_focused_background);
-
         Channel[] channels = mChannelMap.getChannelList(true);
         Object[] itemTags = new Object[channels.length + 1];
         itemTags[0] = new Object(); // a dummy object for the show only menu.
@@ -77,7 +71,8 @@ public class SimpleGuideFragment extends BaseSideFragment {
         }
 
         initialize(getString(R.string.simple_guide_title), itemTags,
-                R.layout.option_fragment, R.layout.simple_guide_item, false);
+                R.layout.option_fragment, R.layout.simple_guide_item, false,
+                R.color.option_item_background, R.color.option_item_focused_background);
         mCurPosition = getCurrentChannelPosition();
         setPrevSelectedItemPosition(mCurPosition);
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -102,8 +97,8 @@ public class SimpleGuideFragment extends BaseSideFragment {
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
         if (DEBUG) Log.d(TAG, "onItemFocusChanged " + focusGained + ": position=" + position
                 + ", label=" + tag);
+        super.onItemFocusChanged(v, focusGained, position, tag);
         mCurPosition = position;
-        v.setBackgroundColor(focusGained ? mFocusedBgColor : mBgColor);
     }
 
     @Override
