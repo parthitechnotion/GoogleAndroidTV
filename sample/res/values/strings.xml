@@ -22,4 +22,5 @@
     <string name="overlay_view_test">Overlay View Test</string>
     <string name="webview_toggle_button">Toggle WebView</string>
     <string name="update_channels_button">Update Channels</string>
+    <string name="failed_to_load_channels">Failed to load channels from %s.</string>
 </resources>

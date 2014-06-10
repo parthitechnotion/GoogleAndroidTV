@@ -18,6 +18,7 @@ package com.example.sampletvinput;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.os.Bundle;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.sampletvinput.BaseTvInputService.ChannelInfo;
 
@@ -44,7 +46,14 @@ public class ExternalFileTvInputSettingsActivity extends Activity {
         btn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateChannels();
+                if (updateChannels() > 0) {
+                    setResult(Activity.RESULT_OK);
+                } else {
+                    Context context = ExternalFileTvInputSettingsActivity.this;
+                    Toast.makeText(context, context.getString(R.string.failed_to_load_channels,
+                            ExternalFileTvInputService.CHANNEL_XML_PATH), Toast.LENGTH_SHORT)
+                            .show();
+                }
                 finish();
             }
         });
@@ -52,10 +61,11 @@ public class ExternalFileTvInputSettingsActivity extends Activity {
         layout.addView(btn);
     }
 
-    private void updateChannels() {
+    private int updateChannels() {
         getContentResolver().delete(TvContract.Channels.CONTENT_URI, null, null);
         getContentResolver().delete(TvContract.Programs.CONTENT_URI, null, null);
         List<ChannelInfo> channels = ExternalFileTvInputService.parseSampleChannels();
         ChannelUtils.populateChannels(this, ExternalFileTvInputService.class.getName(), channels);
+        return channels.size();
     }
 }
