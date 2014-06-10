@@ -17,16 +17,22 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ServiceInfo;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.media.tv.TvContract;
+import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
+import android.util.LruCache;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +52,7 @@ import com.android.tv.util.Utils;
  * A view to render channel banner.
  */
 public class ChannelBannerView extends RelativeLayout implements Channel.LoadLogoCallback {
+    private static final int CACHE_SIZE = 10;
     private TextView mClosedCaptionTextView;
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
@@ -54,11 +61,27 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     private TextView mProgrameDescriptionTextView;
     private TextView mChannelTextView;
     private TextView mChannelNameTextView;
+    private ImageView mTvInputLogoImageView;
     private ImageView mChannelLogoImageView;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
     private View mAnchorView;
     private Uri mCurrentChannelUri;
+    private final LruCache<TvInputInfo, Drawable> mChannelInfoLogoCache =
+            new LruCache<TvInputInfo, Drawable> (CACHE_SIZE) {
+                @Override
+                protected Drawable create(TvInputInfo info) {
+                    try {
+                        PackageManager pm = getContext().getPackageManager();
+                        ServiceInfo serviceInfo = pm.getServiceInfo(info.getComponent(), 0);
+                        if (serviceInfo != null) {
+                            return serviceInfo.loadLogo(pm);
+                        }
+                    } catch (NameNotFoundException e) {
+                    }
+                    return null;
+                }
+            };
 
     private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
         @Override
@@ -103,6 +126,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         mRemainingTimeView = (ProgressBar) findViewById(R.id.remaining_time);
         mChannelTextView = (TextView) findViewById(R.id.channel_text);
         mChannelNameTextView = (TextView) findViewById(R.id.channel_name);
+        mTvInputLogoImageView = (ImageView) findViewById(R.id.tvinput_logo);
         mChannelLogoImageView = (ImageView) findViewById(R.id.channel_logo);
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
@@ -113,6 +137,15 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     public void updateViews(ChannelMap channelMap, StreamInfo info) {
         if (channelMap == null || !channelMap.isLoadFinished()) {
             return;
+        }
+
+        Drawable tvInputLogo =
+                (info == null) ? null : mChannelInfoLogoCache.get(info.getCurrentTvInputInfo());
+        if (tvInputLogo != null) {
+            mTvInputLogoImageView.setVisibility(View.VISIBLE);
+            mTvInputLogoImageView.setImageDrawable(tvInputLogo);
+        } else {
+            mTvInputLogoImageView.setVisibility(View.GONE);
         }
 
         if (info.hasClosedCaption()) {
