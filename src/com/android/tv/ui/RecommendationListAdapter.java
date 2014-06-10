@@ -99,7 +99,7 @@ public class RecommendationListAdapter extends ItemListView.ItemListAdapter {
             ArrayList<Channel> results = new ArrayList<Channel>();
             for (int i = 0; i < records.length; i++) {
                 Channel channel = records[i].getChannel();
-                if (channel.isBrowsable() && mChannelMap.contains(channel)) {
+                if (mChannelMap.containsAndIsBrowsable(channel)) {
                     results.add(channel);
                 }
             }

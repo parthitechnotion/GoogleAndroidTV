@@ -84,8 +84,9 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         return mInput;
     }
 
-    public boolean contains(Channel c) {
-        return mChannels.keySet().contains(c.getId());
+    public boolean containsAndIsBrowsable(Channel c) {
+        return mChannels.keySet().contains(c.getId())
+                && (c.isBrowsable() || mBrowsableChannelCount == 0);
     }
 
     public Channel[] getChannelList(boolean browsableOnly) {
