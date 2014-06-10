@@ -30,7 +30,6 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -46,7 +45,7 @@ import com.android.tv.util.Utils;
 /**
  * A view to render channel banner.
  */
-public class ChannelBannerView extends FrameLayout implements Channel.LoadLogoCallback {
+public class ChannelBannerView extends RelativeLayout implements Channel.LoadLogoCallback {
     private TextView mClosedCaptionTextView;
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
@@ -58,6 +57,7 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadLogoCa
     private ImageView mChannelLogoImageView;
     private TextView mProgramTextView;
     private TextView mProgramTimeTextView;
+    private View mAnchorView;
     private Uri mCurrentChannelUri;
 
     private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
@@ -107,6 +107,7 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadLogoCa
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
+        mAnchorView = findViewById(R.id.anchor);
     }
 
     public void updateViews(ChannelMap channelMap, StreamInfo info) {
@@ -175,12 +176,20 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadLogoCa
     }
 
     private void updateTextView(TextView textView, int sizeRes, int marginTopRes) {
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                getContext().getResources().getDimension(sizeRes));
-        RelativeLayout.LayoutParams lp =
-                (RelativeLayout.LayoutParams) textView.getLayoutParams();
-        lp.topMargin = (int) getContext().getResources().getDimension(marginTopRes);
-        textView.setLayoutParams(lp);
+        float textSize = getContext().getResources().getDimension(sizeRes);
+        if (textView.getTextSize() != textSize) {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        }
+        updateTopMargin(textView, marginTopRes);
+    }
+
+    private void updateTopMargin(View view, int marginTopRes) {
+        LayoutParams lp = (LayoutParams) view.getLayoutParams();
+        int topMargin = (int) getContext().getResources().getDimension(marginTopRes);
+        if (lp.topMargin != topMargin) {
+            lp.topMargin = topMargin;
+            view.setLayoutParams(lp);
+        }
     }
 
     @Override
@@ -212,21 +221,38 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadLogoCa
 
         String title = program.getTitle();
         if (!TextUtils.isEmpty(title)) {
-            float textSize = getContext().getResources().getDimension(
-                    R.dimen.channel_banner_program_large_text_size);
             int width = mProgramTextView.getWidth();
-            int estimatedLineCount = estimateLineCount(title, textSize, width);
+            if (width == 0) {
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateProgramInfo();
+                    }
+                });
+            }
+            float largeTextSize = getContext().getResources().getDimension(
+                    R.dimen.channel_banner_program_large_text_size);
+            int estimatedLineCount = estimateLineCount(title, largeTextSize, width);
+            boolean oneline = true;
             if (estimatedLineCount > 1) {
                 updateTextView(
                         mProgramTextView,
                         R.dimen.channel_banner_program_medium_text_size,
                         R.dimen.channel_banner_program_medium_margin_top);
+                float mediumTextSize = getContext().getResources().getDimension(
+                        R.dimen.channel_banner_program_medium_text_size);
+                if (estimateLineCount(title, mediumTextSize, width) > 1) {
+                    oneline = false;
+                }
             } else {
                 updateTextView(
                         mProgramTextView,
                         R.dimen.channel_banner_program_large_text_size,
                         R.dimen.channel_banner_program_large_margin_top);
             }
+            updateTopMargin(mAnchorView, oneline
+                    ? R.dimen.channel_banner_anchor_one_line_y
+                    : R.dimen.channel_banner_anchor_two_line_y);
             mProgramTextView.setText(title);
 
             long startTime = program.getStartTimeUtcMillis();
