@@ -17,4 +17,5 @@
 <resources>
     <integer name="action_item_anim_duration">100</integer>
     <integer name="channel_type_guide">0x10000000</integer>
+    <integer name="notif_card_ch_logo_alpha">153</integer>
 </resources>

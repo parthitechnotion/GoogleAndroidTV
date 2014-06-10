@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
 import android.net.Uri;
@@ -107,7 +108,7 @@ public class TvRecommendation {
                                 channelId = c.getLong(channelIdIndex);
                                 ChannelRecord oldChannelRecord = mChannelRecordMap.get(channelId);
                                 ChannelRecord newChannelRecord =
-                                        new ChannelRecord(Channel.fromCursor(c));
+                                        new ChannelRecord(mContext, Channel.fromCursor(c));
                                 newChannelRecord.mLastWatchedTimeMs = (oldChannelRecord == null)
                                         ? 0 : oldChannelRecord.mLastWatchedTimeMs;
                                 channelRecordMap.put(channelId, newChannelRecord);
@@ -128,7 +129,7 @@ public class TvRecommendation {
                         if (cursor != null && cursor.moveToFirst()) {
                             ChannelRecord oldChannelRecord = mChannelRecordMap.get(channelId);
                             ChannelRecord newChannelRecord =
-                                    new ChannelRecord(Channel.fromCursor(cursor));
+                                    new ChannelRecord(mContext, Channel.fromCursor(cursor));
                             newChannelRecord.mLastWatchedTimeMs = (oldChannelRecord == null)
                                     ? 0 : oldChannelRecord.mLastWatchedTimeMs;
                             mChannelRecordMap.put(channelId, newChannelRecord);
@@ -163,7 +164,7 @@ public class TvRecommendation {
                                 channelId = c.getLong(channelIdIndex);
                                 ChannelRecord oldChannelRecord = mChannelRecordMap.get(channelId);
                                 ChannelRecord newChannelRecord =
-                                        new ChannelRecord(Channel.fromCursor(c));
+                                        new ChannelRecord(mContext, Channel.fromCursor(c));
                                 newChannelRecord.mLastWatchedTimeMs = (oldChannelRecord == null)
                                         ? 0 : oldChannelRecord.mLastWatchedTimeMs;
                                 mChannelRecordMap.put(channelId, newChannelRecord);
@@ -251,6 +252,10 @@ public class TvRecommendation {
         return Arrays.copyOfRange(allChannelRecords, 0, size);
     }
 
+    public ChannelRecord[] getRecommendedChannelList() {
+        return getRecommendedChannelList(mChannelRecordMap.size());
+    }
+
     private void registerContentObservers() {
         mContext.getContentResolver().registerContentObserver(
                 TvContract.WatchedPrograms.CONTENT_URI, true, mContentObserver);
@@ -275,8 +280,8 @@ public class TvRecommendation {
             if (cursor != null) {
                 int indexId = cursor.getColumnIndex(TvContract.Channels._ID);
                 while (cursor.moveToNext()) {
-                    mChannelRecordMap.put(cursor.getLong(indexId),
-                            new ChannelRecord(Channel.fromCursor(cursor)));
+                    ChannelRecord cr = new ChannelRecord(mContext, Channel.fromCursor(cursor));
+                    mChannelRecordMap.put(cursor.getLong(indexId), cr);
                 }
             }
         } finally {
@@ -329,19 +334,21 @@ public class TvRecommendation {
         return channelRecord;
     }
 
-    public static class ChannelRecord implements Comparable<ChannelRecord> {
+    public static class ChannelRecord
+            implements Comparable<ChannelRecord>, Channel.LoadLogoCallback {
         private final Channel mChannel;
         private final Uri mChannelUri;
         private long mLastWatchedTimeMs;
         private long mLastWatchDurationMs;
         private double mScore;
 
-        public ChannelRecord(Channel channel) {
+        public ChannelRecord(Context context, Channel channel) {
             mChannel = channel;
             mChannelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI,
                     channel.getId());
             mLastWatchedTimeMs = 0l;
             mLastWatchDurationMs = 0;
+            mChannel.loadLogo(context, this);
         }
 
         public Channel getChannel() {
@@ -368,6 +375,11 @@ public class TvRecommendation {
         public int compareTo(ChannelRecord another) {
             // Make Array.sort work in descending order.
             return (mScore == another.mScore) ? 0 : (mScore > another.mScore) ? -1 : 1;
+        }
+
+        @Override
+        public void onLoadLogoFinished(Channel channel, Bitmap logo) {
+            // do nothing
         }
     }
 
