@@ -99,7 +99,8 @@ public class EditChannelsFragment extends BaseSideFragment {
         String displayName = mSelectedInput.getDisplayName();
         String title = String.format(getString(R.string.edit_channels_title), displayName);
         initialize(title, mItems, R.layout.option_fragment, R.layout.edit_channels_item,
-                false, R.color.option_item_background, R.color.option_item_focused_background);
+                false, R.color.option_item_background, R.color.option_item_focused_background,
+                R.dimen.edit_channels_item_height);
 
         if (mBrowsableChannelCount <= 0) {
             Toast.makeText(getActivity(), R.string.all_the_channels_are_unchecked,

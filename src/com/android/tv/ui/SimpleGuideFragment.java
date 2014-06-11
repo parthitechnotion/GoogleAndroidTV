@@ -72,7 +72,8 @@ public class SimpleGuideFragment extends BaseSideFragment {
 
         initialize(getString(R.string.simple_guide_title), itemTags,
                 R.layout.option_fragment, R.layout.simple_guide_item, false,
-                R.color.option_item_background, R.color.option_item_focused_background);
+                R.color.option_item_background, R.color.option_item_focused_background,
+                R.dimen.simple_guide_item_height);
         mCurPosition = getCurrentChannelPosition();
         setPrevSelectedItemPosition(mCurPosition);
         return super.onCreateView(inflater, container, savedInstanceState);

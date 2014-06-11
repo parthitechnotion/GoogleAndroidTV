@@ -50,7 +50,7 @@
                 android:textSize="@dimen/side_panel_header_text_size"
                 android:textColor="@color/menu_default_text_color"
                 android:singleLine="true"
-                android:fontFamily="@string/font" />
+                android:fontFamily="@string/condensed_font" />
         </LinearLayout>
 
         <android.support.v17.leanback.widget.VerticalGridView
@@ -60,6 +60,8 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:paddingTop="48dp"
+            android:paddingBottom="48dp"
             lb:verticalMargin="0dp" />
     </LinearLayout>
 </FrameLayout>

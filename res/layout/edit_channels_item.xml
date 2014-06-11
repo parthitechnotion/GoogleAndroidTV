@@ -25,7 +25,7 @@
         android:id="@+id/item_container"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:layout_height="@dimen/edit_channels_item_height"
         android:paddingLeft="@dimen/side_panel_padding_left"
         android:gravity="left|center_vertical" >
 
@@ -74,7 +74,5 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1.5dp"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
         android:background="@color/side_panel_divider" />
 </LinearLayout>
