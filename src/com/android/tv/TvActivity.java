@@ -140,6 +140,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private GestureDetector mGestureDetector;
     private ChannelMap mChannelMap;
     private long mInitChannelId;
+    private String mInitTvInputId;
 
     private TvInput mTvInputForSetup;
     private TvInputManagerHelper mTvInputManagerHelper;
@@ -323,8 +324,20 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             // TODO: Direct the user to a Play Store landing page for TvInputService apps.
             return;
         }
-        startTv(mInitChannelId);
+        boolean tvStarted = false;
+        if (mInitTvInputId != null) {
+            TvInputInfo inputInfo = mTvInputManagerHelper.getTvInputInfo(mInitTvInputId);
+            if (inputInfo != null) {
+                startTvIfAvailableOrRetry(new TisTvInput(mTvInputManagerHelper, inputInfo, this),
+                        Channel.INVALID_ID, 0);
+                tvStarted = true;
+            }
+        }
+        if (!tvStarted) {
+            startTv(mInitChannelId);
+        }
         mInitChannelId = Channel.INVALID_ID;
+        mInitTvInputId = null;
     }
 
     @Override
@@ -460,6 +473,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         startActivityForResult(intent, REQUEST_START_SETUP_ACTIIVTY);
         mTvInputForSetup = input;
+        mInitTvInputId = null;
         stopTv();
         return true;
     }
@@ -531,7 +545,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         switch (requestCode) {
             case REQUEST_START_SETUP_ACTIIVTY:
                 if (resultCode == Activity.RESULT_OK && mTvInputForSetup != null) {
-                    startTvWithLastWatchedChannel(mTvInputForSetup);
+                    mInitTvInputId = mTvInputForSetup.getId();
                 }
                 break;
 

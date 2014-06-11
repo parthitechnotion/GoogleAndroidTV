@@ -70,7 +70,7 @@ abstract public class BaseTvInputService extends TvInputService {
 
     abstract public List<ChannelInfo> createSampleChannels();
 
-    private void buildChannelMap() {
+    private synchronized void buildChannelMap() {
         Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()),
                 false);
         String[] projection = {
@@ -98,7 +98,7 @@ abstract public class BaseTvInputService extends TvInputService {
                 long channelId = cursor.getLong(0);
                 String channelNumber = cursor.getString(1);
                 if (DEBUG) Log.d(TAG, "Channel mapping: ID(" + channelId + ") -> " + channelNumber);
-                mChannelMap.put(channelId, getChannelByNumber(channelNumber));
+                mChannelMap.put(channelId, getChannelByNumber(channelNumber, false));
             }
         } finally {
             if (cursor != null) {
@@ -107,18 +107,26 @@ abstract public class BaseTvInputService extends TvInputService {
         }
     }
 
-    private ChannelInfo getChannelByNumber(String channelNumber) {
+    private ChannelInfo getChannelByNumber(String channelNumber, boolean isRetry) {
         for (ChannelInfo info : mChannels) {
             if (info.mNumber.equals(channelNumber)) {
                 return info;
             }
         }
+        if (!isRetry) {
+            buildChannelMap();
+            return getChannelByNumber(channelNumber, true);
+        }
         throw new IllegalArgumentException("Unknown channel: " + channelNumber);
     }
 
-    private ChannelInfo getChannelByUri(Uri channelUri) {
+    private ChannelInfo getChannelByUri(Uri channelUri, boolean isRetry) {
         ChannelInfo info = mChannelMap.get(ContentUris.parseId(channelUri));
         if (info == null) {
+            if (!isRetry) {
+                buildChannelMap();
+                return getChannelByUri(channelUri, true);
+            }
             throw new IllegalArgumentException("Unknown channel: " + channelUri);
         }
         return info;
@@ -186,7 +194,7 @@ abstract public class BaseTvInputService extends TvInputService {
         public boolean onTune(Uri channelUri) {
             if (DEBUG) Log.d(TAG, "tune(" + channelUri + ")");
 
-            final ChannelInfo channel = getChannelByUri(channelUri);
+            final ChannelInfo channel = getChannelByUri(channelUri, false);
             mPlayer.reset();
             if (!setDataSource(mPlayer, channel)) {
                 if (DEBUG) Log.d(TAG, "Failed to set the data source");
