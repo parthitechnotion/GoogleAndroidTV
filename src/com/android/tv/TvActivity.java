@@ -147,8 +147,10 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private AudioManager mAudioManager;
     private int mAudioFocusStatus;
     private boolean mTunePendding;
-    private boolean mPipShowing;
+    private boolean mPipEnabled;
+    private long mPipChannelId;
     private boolean mDebugNonFullSizeScreen;
+    private boolean mActivityResumed;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
     private boolean mIsShy = true;
 
@@ -219,8 +221,24 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
         mHideControlGuide = new HideRunnable(mControlGuide, DURATION_SHOW_CONTROL_GUIDE);
         mHideChannelBanner = new HideRunnable(mChannelBanner, DURATION_SHOW_CHANNEL_BANNER);
-        mHideMainMenu = new HideRunnable(mMainMenuView, DURATION_SHOW_MAIN_MENU);
-        mHideSideFragment = new HideRunnable(mSideFragmentLayout, DURATION_SHOW_SIDE_FRAGMENT,
+        mHideMainMenu = new HideRunnable(mMainMenuView, DURATION_SHOW_MAIN_MENU,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mPipEnabled) {
+                            mPipView.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                },
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mPipEnabled && mActivityResumed) {
+                            mPipView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+        mHideSideFragment = new HideRunnable(mSideFragmentLayout, DURATION_SHOW_SIDE_FRAGMENT, null,
                 new Runnable() {
                     @Override
                     public void run() {
@@ -279,6 +297,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
         mTvInputManagerHelper = new TvInputManagerHelper(mTvInputManager);
+        mTvInputManagerHelper.start();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         restoreClosedCaptionEnabled();
@@ -311,7 +330,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     protected void onStart() {
         super.onStart();
-        mTvInputManagerHelper.start();
         hideRecommendationNotification();
     }
 
@@ -338,11 +356,23 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         mInitChannelId = Channel.INVALID_ID;
         mInitTvInputId = null;
+        if (mPipEnabled) {
+            if (!mPipView.isPlaying()) {
+                startPip();
+            } else if (!mPipView.isShown()) {
+                mPipView.setVisibility(View.VISIBLE);
+            }
+        }
+        mActivityResumed = true;
     }
 
     @Override
     protected void onPause() {
         hideOverlays(true, true, true);
+        if (mPipEnabled) {
+            mPipView.setVisibility(View.INVISIBLE);
+        }
+        mActivityResumed = false;
         super.onPause();
     }
 
@@ -421,7 +451,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         mHandler.removeMessages(MSG_START_TV_RETRY);
         stopTv();
         stopPip();
-        mTvInputManagerHelper.stop();
         showRecommendationNoticiation();
         super.onStop();
     }
@@ -656,24 +685,24 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     private void startPip() {
-        if (!isPlaying()) {
-            Log.w(TAG, "TV content should be playing");
+        if (mPipChannelId == Channel.INVALID_ID) {
+            Log.w(TAG, "PIP channel id is an invalid id.");
             return;
         }
         if (DEBUG) Log.d(TAG, "startPip()");
         mPipView.start(mTvInputManagerHelper);
-        boolean success = mPipView.tuneTo(mTvView.getCurrentChannelId(), new OnTuneListener() {
+        boolean success = mPipView.tuneTo(mPipChannelId, new OnTuneListener() {
             @Override
             public void onUnexpectedStop(long channelId) {
                 Log.w(TAG, "The PIP is Unexpectedly stopped");
-                stopPip();
+                enablePipView(false);
             }
 
             @Override
             public void onTuned(boolean success, long channelId) {
                 if (!success) {
                     Log.w(TAG, "Fail to start the PIP during channel tunning");
-                    stopPip();
+                    enablePipView(false);
                 } else {
                     mPipView.setVisibility(View.VISIBLE);
                 }
@@ -689,7 +718,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             return;
         }
         mPipView.setStreamVolume(AUDIO_MIN_VOLUME);
-        mPipShowing = true;
     }
 
     private void stopPip() {
@@ -698,7 +726,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             mPipView.setVisibility(View.INVISIBLE);
             mPipView.stop();
         }
-        mPipShowing = false;
     }
 
     private final Runnable mOnChannelsLoadFinished = new Runnable() {
@@ -822,6 +849,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     protected void onDestroy() {
         if (DEBUG) Log.d(TAG, "onDestroy()");
+        mTvInputManagerHelper.stop();
         super.onDestroy();
     }
 
@@ -991,10 +1019,24 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void togglePipView() {
-        if (mPipShowing) {
-            stopPip();
+        enablePipView(!mPipEnabled);
+    }
+
+    public void enablePipView(boolean enable) {
+        if (enable == mPipEnabled) {
+            return;
+        }
+        if (enable) {
+            long pipChannelId = mTvView.getCurrentChannelId();
+            if (pipChannelId != Channel.INVALID_ID) {
+                mPipEnabled = true;
+                mPipChannelId = pipChannelId;
+                startPip();
+            }
         } else {
-            startPip();
+            mPipEnabled = false;
+            mPipChannelId = Channel.INVALID_ID;
+            stopPip();
         }
     }
 
@@ -1115,15 +1157,18 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         private final View mView;
         private final long mWaitingTime;
         private boolean mOnHideAnimation;
+        private final Runnable mPreShowListener;
         private final Runnable mPostHideListener;
 
         public HideRunnable(View view, long waitingTime) {
-            this(view, waitingTime, null);
+            this(view, waitingTime, null, null);
         }
 
-        public HideRunnable(View view, long waitingTime, Runnable postHideListener) {
+        public HideRunnable(View view, long waitingTime, Runnable preShowListener,
+                Runnable postHideListener) {
             mView = view;
             mWaitingTime = waitingTime;
+            mPreShowListener = preShowListener;
             mPostHideListener = postHideListener;
         }
 
@@ -1172,6 +1217,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
         private void showAndHide() {
             if (mView.getVisibility() != View.VISIBLE) {
+                if (mPreShowListener != null) {
+                    mPreShowListener.run();
+                }
                 mView.setVisibility(View.VISIBLE);
                 Animation anim = AnimationUtils.loadAnimation(TvActivity.this,
                         android.R.anim.fade_in);
