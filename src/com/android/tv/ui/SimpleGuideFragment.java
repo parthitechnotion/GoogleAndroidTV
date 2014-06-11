@@ -18,13 +18,11 @@ package com.android.tv.ui;
 
 import android.app.FragmentTransaction;
 import android.content.ContentUris;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.tv.TvContract;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,10 +33,10 @@ import android.widget.TextView;
 import com.android.tv.R;
 import com.android.tv.TvActivity;
 import com.android.tv.data.Channel;
+import com.android.tv.data.Channel.LoadLogoCallback;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.Program;
 import com.android.tv.data.ShowOnlyItems;
-import com.android.tv.data.Channel.LoadLogoCallback;
 import com.android.tv.util.Utils;
 
 public class SimpleGuideFragment extends BaseSideFragment {
@@ -127,6 +125,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
         TextView programTitleView = (TextView) v.findViewById(R.id.program_title);
         TextView channelNameView = (TextView) v.findViewById(R.id.channel_name);
         ProgressBar remainingTimeView = (ProgressBar) v.findViewById(R.id.remaining_time);
+        TextView resolutionTextView = (TextView) v.findViewById(R.id.resolution);
         if (tag instanceof Channel) {
             Channel channel = (Channel) tag;
             if (!channel.isLogoLoaded()) {
@@ -170,6 +169,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
             }
             programTitleView.setText(text);
             channelNameView.setText(channel.getDisplayName());
+            // TODO: Handle when the text is too long.
 
             long startTime = program.getStartTimeUtcMillis();
             long endTime = program.getEndTimeUtcMillis();
@@ -186,6 +186,14 @@ public class SimpleGuideFragment extends BaseSideFragment {
                 remainingTimeView.setVisibility(View.VISIBLE);
             } else {
                 remainingTimeView.setVisibility(View.GONE);
+            }
+
+            String videoDefinitionLevel = program.getVideoDefinitionLevel();
+            if (!TextUtils.isEmpty(videoDefinitionLevel)) {
+                resolutionTextView.setVisibility(View.VISIBLE);
+                resolutionTextView.setText(videoDefinitionLevel);
+            } else {
+                resolutionTextView.setVisibility(View.GONE);
             }
         } else {
             channelLogoView.setVisibility(View.GONE);

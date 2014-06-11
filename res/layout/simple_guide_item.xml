@@ -45,7 +45,7 @@
         <TextView android:id="@+id/channel_number_alone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_horizontal|center_vertical"
+            android:gravity="center"
             android:textColor="@color/menu_default_text_color"
             android:textSize="@dimen/simple_guide_item_small_text_size"
             android:fontFamily="@string/condensed_font" />
@@ -72,40 +72,45 @@
             android:id="@+id/detail"
             android:layout_width="match_parent"
             android:layout_height="@dimen/simple_guide_item_program_detail_height"
+            android:gravity="bottom"
             android:orientation="horizontal"
-            android:gravity="top" >
-
-            <TextView android:id="@+id/channel_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:layout_gravity="bottom"
-                android:layout_marginRight="8dp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:textColor="@color/menu_default_text_color"
-                android:textSize="@dimen/simple_guide_item_small_text_size"
-                android:fontFamily="@string/condensed_font" />
-
-            <ImageView android:id="@+id/hd_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="3.5dp"
-                android:visibility="gone" />
+            android:paddingRight="56dp" >
 
             <ProgressBar
                 android:id="@+id/remaining_time"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="@dimen/simple_guide_progress_width"
                 android:layout_height="@dimen/simple_guide_progress_height"
-                android:layout_gravity="bottom"
-                android:layout_marginRight="56dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="3.5dp"
                 android:progressDrawable="@drawable/progress_horizontal"
                 android:indeterminate="false"
                 android:max="100" />
+
+            <TextView android:id="@+id/channel_name"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="8dp"
+                android:gravity="bottom"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="@color/menu_default_text_color"
+                android:textSize="@dimen/simple_guide_item_small_text_size"
+                android:fontFamily="@string/condensed_font" />
+
+            <TextView android:id="@+id/resolution"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:gravity="bottom"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:textColor="@color/side_panel_background"
+                android:textSize="9sp"
+                android:fontFamily="@string/condensed_font"
+                android:background="@drawable/track_meta_border"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
