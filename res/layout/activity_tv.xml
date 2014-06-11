@@ -28,10 +28,11 @@
 
     <com.android.tv.ui.TunableTvView android:id="@+id/pip_view"
         android:visibility="invisible"
-        android:layout_margin="30dp"
+        android:layout_marginRight="56dp"
+        android:layout_marginBottom="27dp"
         android:layout_width="240dp"
         android:layout_height="135dp"
-        android:layout_gravity="right|top" />
+        android:layout_gravity="right|bottom" />
 
     <LinearLayout
         android:id="@+id/control_guide"
