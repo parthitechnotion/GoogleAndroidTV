@@ -81,9 +81,14 @@ public class TunableTvView extends TvView implements StreamInfo {
                 @Override
                 public void onVideoStreamChanged(String inputId, int width, int height,
                         boolean interlaced) {
+                    if (DEBUG) {
+                        Log.d(TAG, "onVideoStreamChanged(inputId=" + inputId + ", width=" + width
+                                + ", height=" + height + ")");
+                    }
                     mVideoWidth = width;
                     mVideoHeight = height;
                     mVideoFormat = Utils.getVideoDefinitionLevelFromSize(width, height);
+                    Utils.updateCurrentVideoResolution(getContext(), mChannelId, mVideoFormat);
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
                     }

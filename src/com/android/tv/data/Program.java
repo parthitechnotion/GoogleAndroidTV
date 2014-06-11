@@ -23,12 +23,15 @@ import android.media.tv.TvContract;
  * A convenience class to create and insert program information entries into the database.
  */
 public final class Program {
+    public static final long INVALID_ID = -1;
+
     private long mChannelId;
     private String mTitle;
     private long mStartTimeUtcMillis;
     private long mEndTimeUtcMillis;
     private String mDescription;
     private String mLongDescription;
+    private String mVideoDefinitionLevel;
     private String mPosterArtUri;
     private String mThumbnailUri;
 
@@ -84,6 +87,14 @@ public final class Program {
         mLongDescription = longDescription;
     }
 
+    public String getVideoDefinitionLevel() {
+        return mVideoDefinitionLevel;
+    }
+
+    public void setVideoDefinitionLevel(String videoDefinitionLevel) {
+        mVideoDefinitionLevel = videoDefinitionLevel;
+    }
+
     public String getPosterArtUri() {
         return mPosterArtUri;
     }
@@ -123,6 +134,7 @@ public final class Program {
                 .append(", endTimeUtcSec=").append(mEndTimeUtcMillis)
                 .append(", description=").append(mDescription)
                 .append(", longDescription=").append(mLongDescription)
+                .append(", videoDefinitionLevel=").append(mVideoDefinitionLevel)
                 .append(", posterArtUri=").append(mPosterArtUri)
                 .append(", thumbnailUri=").append(mThumbnailUri)
                 .append("}")
@@ -140,6 +152,7 @@ public final class Program {
         mEndTimeUtcMillis = other.mEndTimeUtcMillis;
         mDescription = other.mDescription;
         mLongDescription = other.mLongDescription;
+        mVideoDefinitionLevel = other.mVideoDefinitionLevel;
         mPosterArtUri = other.mPosterArtUri;
         mThumbnailUri = other.mThumbnailUri;
     }
@@ -190,6 +203,11 @@ public final class Program {
 
         public Builder setLongDescription(String longDescription) {
             mProgram.mLongDescription = longDescription;
+            return this;
+        }
+
+        public Builder setVideoDefinitionLevel(String videoDefinitionLevel) {
+            mProgram.mVideoDefinitionLevel = videoDefinitionLevel;
             return this;
         }
 
