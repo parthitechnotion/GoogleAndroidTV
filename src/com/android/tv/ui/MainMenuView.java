@@ -256,11 +256,27 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
     public void onClick(View v) {
         final MenuTag tag = (MenuTag) v.getTag();
         boolean hideChannelBanner = true;
+        boolean withAnimation = true;
         if (tag != null) {
-            if (tag.mType == MenuTag.CHANNEL_TAG_TYPE
-                    && ((Channel) tag.mObj).getType() != R.integer.channel_type_guide) {
-                hideChannelBanner = false;
+            switch (tag.mType) {
+                case MenuTag.CHANNEL_TAG_TYPE:
+                    Channel channel = (Channel) tag.mObj;
+                    if (channel.getType() != R.integer.channel_type_guide) {
+                        hideChannelBanner = false;
+                    }
+                    break;
+
+                case MenuTag.MENU_ACTION_TAG_TYPE:
+                    MenuAction action = (MenuAction) tag.mObj;
+                    switch (action.getType()) {
+                        case MenuAction.AUTO_SCAN_CHANNELS_TYPE:
+                        case MenuAction.INPUT_SETTING_TYPE:
+                            withAnimation = false;
+                            break;
+                    }
+                    break;
             }
+
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -314,7 +330,7 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
             });
         }
 
-        mTvActivity.hideOverlays(true, hideChannelBanner, false);
+        mTvActivity.hideOverlays(true, hideChannelBanner, false, withAnimation);
     }
 
     @Override

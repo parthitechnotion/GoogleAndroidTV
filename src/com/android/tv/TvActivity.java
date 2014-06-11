@@ -448,6 +448,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     protected void onStop() {
         if (DEBUG) Log.d(TAG, "onStop()");
+        hideOverlays(true, true, true, false);
         mHandler.removeMessages(MSG_START_TV_RETRY);
         stopTv();
         stopPip();
@@ -787,18 +788,23 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     public void hideOverlays(boolean hideMainMenu, boolean hideChannelBanner,
             boolean hideSidePanel) {
+        hideOverlays(hideMainMenu, hideChannelBanner, hideSidePanel, true);
+    }
+
+    public void hideOverlays(boolean hideMainMenu, boolean hideChannelBanner,
+            boolean hideSidePanel, boolean withAnimation) {
         if (hideMainMenu) {
-            mHideMainMenu.hideImmediately();
+            mHideMainMenu.hideImmediately(withAnimation);
         }
         if (hideChannelBanner) {
-            mHideChannelBanner.hideImmediately();
+            mHideChannelBanner.hideImmediately(withAnimation);
         }
         if (hideSidePanel) {
             if (mSideFragmentLayout.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
                 return;
             }
             mSideFragmentLayout.setTag(SIDE_FRAGMENT_TAG_HIDE);
-            mHideSideFragment.hideImmediately();
+            mHideSideFragment.hideImmediately(withAnimation);
         }
     }
 
@@ -1197,19 +1203,35 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    mOnHideAnimation = false;
-                    mView.setVisibility(View.GONE);
-                    if (mPostHideListener != null) {
-                        mPostHideListener.run();
+                    if (mOnHideAnimation) {
+                        hideView();
                     }
                 }
             });
 
+            mView.clearAnimation();
             mView.startAnimation(anim);
         }
 
-        private void hideImmediately() {
-            if (mView.getVisibility() == View.VISIBLE && !mOnHideAnimation) {
+        private void hideView() {
+            mOnHideAnimation = false;
+            mView.setVisibility(View.GONE);
+            if (mPostHideListener != null) {
+                mPostHideListener.run();
+            }
+        }
+
+        private void hideImmediately(boolean withAnimation) {
+            if (mView.getVisibility() != View.VISIBLE) {
+                return;
+            }
+            if (!withAnimation) {
+                mHandler.removeCallbacks(this);
+                hideView();
+                mView.clearAnimation();
+                return;
+            }
+            if (!mOnHideAnimation) {
                 mHandler.removeCallbacks(this);
                 startHideAnimation(true);
             }
@@ -1225,14 +1247,15 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                         android.R.anim.fade_in);
                 anim.setInterpolator(AnimationUtils.loadInterpolator(TvActivity.this,
                         android.R.interpolator.linear_out_slow_in));
+                mView.clearAnimation();
                 mView.startAnimation(anim);
             }
             // Schedule the hide animation after a few seconds.
             mHandler.removeCallbacks(this);
             if (mOnHideAnimation) {
+                mOnHideAnimation = false;
                 mView.clearAnimation();
                 mView.setAlpha(1f);
-                mOnHideAnimation = false;
             }
             mHandler.postDelayed(this, mWaitingTime);
         }
