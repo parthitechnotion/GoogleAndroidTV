@@ -28,7 +28,7 @@
     <color name="menu_default_text_color">#FFEEEEEE</color>
     <color name="menu_default_disabled_text_color">#FF777777</color>
 
-    <color name="accent_color">#7FCAC3</color>
+    <color name="accent_color">#00A6F6</color>
 
     <color name="side_panel_divider">#495257</color>
     <color name="side_panel_background">#384248</color>

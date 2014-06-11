@@ -69,6 +69,9 @@
     <dimen name="show_only_item_padding_left">16dp</dimen>
     <dimen name="show_only_item_text_size">18sp</dimen>
 
+    <!-- Edit channels dimensions -->
+    <dimen name="edit_channels_item_height">64dp</dimen>
+
     <!-- Channel banner dimensions -->
     <dimen name="channel_banner_title_large_text_size">54sp</dimen>
     <dimen name="channel_banner_title_medium_text_size">44sp</dimen>

@@ -52,6 +52,7 @@ public class BaseSideFragment extends Fragment {
     private Handler mHandler = new Handler();
     private int mItemBgColor;
     private int mItemFocusedBgColor;
+    private int mItemHeight;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +70,15 @@ public class BaseSideFragment extends Fragment {
         mTitleView = (TextView) fragView.findViewById(R.id.side_panel_title);
         mTitleView.setText(mTitle);
         mOptionItemListView = (VerticalGridView) fragView.findViewById(R.id.side_panel_list);
+        mOptionItemListView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                int padding = ((v.getHeight() + mItemHeight) / 2) % mItemHeight + mItemHeight;
+                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), padding);
+            }
+        });
+
         mOptionItemListView.setAdapter(mAdapter);
         mLayoutInflater = inflater;
         return fragView;
@@ -100,7 +110,8 @@ public class BaseSideFragment extends Fragment {
 
     protected void initialize(String title, Object[] itemTags, int fragmentLayoutId,
             int itemLayoutId, boolean addDummyItemForMargin,
-            int itemBgColorResId, int itemFocusedBgColorResId) {
+            int itemBgColorResId, int itemFocusedBgColorResId,
+            int itemHeightResId) {
         Preconditions.checkState(!TextUtils.isEmpty(title));
         mTitle = title;
         mItemTags = itemTags;
@@ -109,6 +120,7 @@ public class BaseSideFragment extends Fragment {
         mHasDummyItem = addDummyItemForMargin;
         mItemBgColor = getActivity().getResources().getColor(itemBgColorResId);
         mItemFocusedBgColor = getActivity().getResources().getColor(itemFocusedBgColorResId);
+        mItemHeight = getActivity().getResources().getDimensionPixelOffset(itemHeightResId);
         mAdapter.notifyDataSetChanged();
     }
 
