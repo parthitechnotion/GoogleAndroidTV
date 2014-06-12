@@ -61,7 +61,14 @@
 
         <service android:name="com.android.tv.notification.NotificationService" />
 
-        <receiver android:name="com.android.tv.receiver.NotificationReceiver">
+        <!--
+            TV Recommendataion at LeanbackLauncher is disabled.
+            You can enable it from console as follows (required 'root' authority).
+            1) $ pm enable com.android.tv/com.android.tv.receiver.NotificationReceiver
+            2) $ reboot
+        -->
+        <receiver android:name="com.android.tv.receiver.NotificationReceiver"
+            android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
