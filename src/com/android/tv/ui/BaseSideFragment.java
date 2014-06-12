@@ -48,7 +48,6 @@ public class BaseSideFragment extends Fragment {
     private int mFragmentLayoutId;
     private int mItemLayoutId;
     private int mInitiator;
-    private boolean mHasDummyItem;
     private Handler mHandler = new Handler();
     private int mItemBgColor;
     private int mItemFocusedBgColor;
@@ -104,20 +103,18 @@ public class BaseSideFragment extends Fragment {
     }
 
     public void setSelectedPosition(int position) {
-        mOptionItemListView.setSelectedPosition(mHasDummyItem ? position + 1 : position);
+        mOptionItemListView.setSelectedPosition(position);
         mOptionItemListView.requestFocus();
     }
 
     protected void initialize(String title, Object[] itemTags, int fragmentLayoutId,
-            int itemLayoutId, boolean addDummyItemForMargin,
-            int itemBgColorResId, int itemFocusedBgColorResId,
+            int itemLayoutId, int itemBgColorResId, int itemFocusedBgColorResId,
             int itemHeightResId) {
         Preconditions.checkState(!TextUtils.isEmpty(title));
         mTitle = title;
         mItemTags = itemTags;
         mFragmentLayoutId = fragmentLayoutId;
         mItemLayoutId = itemLayoutId;
-        mHasDummyItem = addDummyItemForMargin;
         mItemBgColor = getActivity().getResources().getColor(itemBgColorResId);
         mItemFocusedBgColor = getActivity().getResources().getColor(itemFocusedBgColorResId);
         mItemHeight = getActivity().getResources().getDimensionPixelOffset(itemHeightResId);
@@ -148,41 +145,32 @@ public class BaseSideFragment extends Fragment {
         @Override
         public void onBindViewHolder(MyViewHolder baseHolder, int position) {
             View v = baseHolder.itemView;
-            if (mHasDummyItem && (position <= 0 || position >= getItemCount() - 1)) {
-                // The first and the last items are dummy items to give a margin.
-                v.setVisibility(View.INVISIBLE);
-            } else {
-                // Since position 0 is a dummy item, recalculate the position.
-                if (mHasDummyItem) {
-                    position = position - 1;
-                }
-                v.setVisibility(View.VISIBLE);
-                onBindView(v, position, mItemTags[position], position == mPrevSelectedItemPosition);
-                v.setTag(R.id.TAG_OPTION_ITEM_POSITOIN, position);
-                if (v instanceof ViewGroup) {
-                    final ViewGroup viewGroup = (ViewGroup) v;
-                    mHandler.post(new Runnable() {
-                        void requestLayout(ViewGroup v) {
-                            for (int i = 0; i < v.getChildCount(); i++) {
-                                v.getChildAt(i).requestLayout();
-                                if (v.getChildAt(i) instanceof ViewGroup) {
-                                    requestLayout((ViewGroup) v.getChildAt(i));
-                                }
+            v.setVisibility(View.VISIBLE);
+            onBindView(v, position, mItemTags[position], position == mPrevSelectedItemPosition);
+            v.setTag(R.id.TAG_OPTION_ITEM_POSITOIN, position);
+            if (v instanceof ViewGroup) {
+                final ViewGroup viewGroup = (ViewGroup) v;
+                mHandler.post(new Runnable() {
+                    void requestLayout(ViewGroup v) {
+                        for (int i = 0; i < v.getChildCount(); i++) {
+                            v.getChildAt(i).requestLayout();
+                            if (v.getChildAt(i) instanceof ViewGroup) {
+                                requestLayout((ViewGroup) v.getChildAt(i));
                             }
                         }
+                    }
 
-                        @Override
-                        public void run() {
-                            requestLayout(viewGroup);
-                        }
-                    });
-                }
+                    @Override
+                    public void run() {
+                        requestLayout(viewGroup);
+                    }
+                });
             }
         }
 
         @Override
         public int getItemCount() {
-            return mItemTags == null ? 0 : mHasDummyItem ? mItemTags.length + 2 : mItemTags.length;
+            return mItemTags == null ? 0 : mItemTags.length;
         }
 
         private class MyViewHolder extends RecyclerView.ViewHolder {

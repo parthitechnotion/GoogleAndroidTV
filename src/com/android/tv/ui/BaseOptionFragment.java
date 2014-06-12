@@ -50,13 +50,12 @@ public class BaseOptionFragment extends BaseSideFragment {
 
     @Override
     public final void initialize(String title, Object[] itemTags, int fragmentLayoutId,
-            int itemLayoutId, boolean addDummyItemForMargin,
-            int itemBgColor, int itemFocusedBgColor, int itemHeightResId) {
+            int itemLayoutId, int itemBgColor, int itemFocusedBgColor, int itemHeightResId) {
         throw new UnsupportedOperationException("Call initialize(String title, Object[] itemTags)");
     }
 
     public void initialize(String title, Object[] itemTags) {
-        super.initialize(title, itemTags, R.layout.option_fragment, R.layout.option_item, false,
+        super.initialize(title, itemTags, R.layout.option_fragment, R.layout.option_item,
                 R.color.option_item_background, R.color.option_item_focused_background,
                 R.dimen.option_item_height);
     }

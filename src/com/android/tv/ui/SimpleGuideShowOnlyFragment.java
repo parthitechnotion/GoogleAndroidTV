@@ -46,7 +46,7 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
             items[i] = ShowOnlyItems.getLabel(i, getActivity());
         }
         initialize(getString(R.string.show_only_title), items,
-                R.layout.option_fragment, R.layout.show_only_item, false,
+                R.layout.option_fragment, R.layout.show_only_item,
                 R.color.option_item_background, R.color.option_item_focused_background,
                 R.dimen.simple_guide_item_height);
         // TODO: set the current position correctly.
