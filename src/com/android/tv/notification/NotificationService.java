@@ -191,7 +191,7 @@ public class NotificationService extends Service {
 
         // TODO: Move some checking logic into TvRecommendation.
         String inputId = Utils.getInputIdForChannel(this, cr.getChannelUri());
-        if (!mTvInputManagerHelper.isAvailable(inputId)) {
+        if (TextUtils.isEmpty(inputId) || !mTvInputManagerHelper.isAvailable(inputId)) {
             return false;
         }
         TvInputInfo inputInfo = mTvInputManagerHelper.getTvInputInfo(inputId);
@@ -227,10 +227,12 @@ public class NotificationService extends Service {
             return false;
         }
         Bitmap posterArtBitmap = BitmapFactory.decodeStream(is);
+        is.close();
         if (posterArtBitmap == null) {
             Log.e(TAG, "Failed to decode logo image for " + posterArtUriStr);
             return false;
         }
+        // TODO: Consider what is needed when the logo is not loaded yet.
         Bitmap channelLogo = cr.getChannel().getLogo();
         Bitmap largeIconBitmap = (channelLogo == null) ? posterArtBitmap
                 : overlayChannelLogo(cr.getChannel().getLogo(), posterArtBitmap);
