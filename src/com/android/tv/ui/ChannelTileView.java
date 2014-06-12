@@ -41,6 +41,7 @@ import com.android.internal.util.Preconditions;
 import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
+import com.android.tv.util.BitmapUtils;
 import com.android.tv.util.Utils;
 
 import java.io.IOException;
@@ -147,7 +148,7 @@ public class ChannelTileView extends ShadowContainer
     }
 
     private void setProgramPosterArt(Bitmap bm) {
-        mProgramPosterArtView.setImageBitmap(getRoundedCornerBitmap(bm,
+        mProgramPosterArtView.setImageBitmap(BitmapUtils.getRoundedCornerBitmap(bm,
                 mRoundRadius, mPosterArtWidth, mPosterArtHeight));
         mProgramPosterArtView.setVisibility(VISIBLE);
         mChannelInfosLayout.setBackground(mBackgroundOnImage);
@@ -212,26 +213,5 @@ public class ChannelTileView extends ShadowContainer
             mProgramPosterArtView.setVisibility(INVISIBLE);
             mChannelInfosLayout.setBackground(mNormalBackgroud);
         }
-    }
-
-    private static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx, float targetWidth,
-            float targetHeight) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-
-        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.BLACK);
-
-        canvas.drawARGB(0, 0, 0, 0);
-        canvas.drawRoundRect(rectF, roundPx * bitmap.getWidth() / targetWidth,
-                roundPx * bitmap.getHeight() / targetHeight, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
     }
 }

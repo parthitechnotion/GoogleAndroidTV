@@ -87,4 +87,13 @@
     <dimen name="channel_banner_anchor_two_line_y">64dp</dimen>
     <dimen name="channel_banner_small_text_size">14sp</dimen>
     <dimen name="channel_banner_track_meta_text_size">8sp</dimen>
+
+    <!-- Recommendation cards in LeanbackLauncher dimensions -->
+    <dimen name="notif_card_img_height">176dp</dimen>
+    <dimen name="notif_card_img_min_width">120dp</dimen>
+    <dimen name="notif_card_img_max_width">250dp</dimen>
+    <dimen name="notif_ch_logo_max_width">64dp</dimen>
+    <dimen name="notif_ch_logo_max_height">44dp</dimen>
+    <dimen name="notif_ch_logo_padding_left">12dp</dimen>
+    <dimen name="notif_ch_logo_padding_bottom">12dp</dimen>
 </resources>
