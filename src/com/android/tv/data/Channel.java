@@ -333,7 +333,7 @@ public final class Channel {
             mPendingLoadLogoCallbacks.add(callback);
             if (!isLogoLoading()) {
                 mLoadLogoTask = new LoadLogoTask(context);
-                mLoadLogoTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                mLoadLogoTask.execute();
             }
         }
     }
