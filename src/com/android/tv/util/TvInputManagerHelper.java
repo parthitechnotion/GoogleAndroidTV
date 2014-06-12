@@ -99,10 +99,12 @@ public class TvInputManagerHelper {
             boolean available = mTvInputManager.getAvailability(inputId);
             mInputAvailabilityMap.put(inputId, available);
         }
-        for (String inputId : mInputAvailabilityMap.keySet()) {
+        Iterator<Map.Entry<String, Boolean>> iter = mInputAvailabilityMap.entrySet().iterator();
+        while (iter.hasNext()) {
+            String inputId = iter.next().getKey();
             if (!inputIds.contains(inputId)) {
                 mTvInputManager.unregisterListener(inputId, mInternalListener);
-                mInputAvailabilityMap.remove(inputId);
+                iter.remove();
             }
         }
         Assert.assertEquals(mInputAvailabilityMap.size(), mInputMap.size());
