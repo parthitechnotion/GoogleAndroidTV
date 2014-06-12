@@ -227,7 +227,11 @@ public class NotificationService extends Service {
             return false;
         }
         Bitmap posterArtBitmap = BitmapFactory.decodeStream(is);
-        is.close();
+        try {
+            is.close();
+        } catch (IOException e) {
+            Log.i(TAG, "Failed to close the stream: " + is, e);
+        }
         if (posterArtBitmap == null) {
             Log.e(TAG, "Failed to decode logo image for " + posterArtUriStr);
             return false;
