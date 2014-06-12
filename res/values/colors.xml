@@ -36,4 +36,6 @@
 
     <color name="option_item_background">#384248</color>
     <color name="option_item_focused_background">#5C6467</color>
+
+    <color name="recommendation_card_background">#0288D1</color>
 </resources>

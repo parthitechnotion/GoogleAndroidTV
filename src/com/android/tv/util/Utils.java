@@ -97,6 +97,8 @@ public class Utils {
         }
     }
 
+    private Utils() { /* cannot be instantiated */ }
+
     // TODO: Remove this and add inputId into TvProvider.
     public static String getInputIdForComponentName(ComponentName name) {
         return name.flattenToShortString();
