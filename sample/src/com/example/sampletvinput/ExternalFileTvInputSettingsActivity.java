@@ -17,8 +17,10 @@
 package com.example.sampletvinput;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
@@ -62,7 +64,9 @@ public class ExternalFileTvInputSettingsActivity extends Activity {
     }
 
     private int updateChannels() {
-        getContentResolver().delete(TvContract.Channels.CONTENT_URI, null, null);
+        Uri uri = TvContract.buildChannelsUriForInput(
+                new ComponentName(this, ExternalFileTvInputService.class), false);
+        getContentResolver().delete(uri, null, null);
         getContentResolver().delete(TvContract.Programs.CONTENT_URI, null, null);
         List<ChannelInfo> channels = ExternalFileTvInputService.parseSampleChannels();
         ChannelUtils.populateChannels(this, ExternalFileTvInputService.class.getName(), channels);
