@@ -85,6 +85,7 @@
     <dimen name="channel_banner_program_medium_margin_top">-6.5sp</dimen>
     <dimen name="channel_banner_anchor_one_line_y">44dp</dimen>
     <dimen name="channel_banner_anchor_two_line_y">64dp</dimen>
+    <dimen name="channel_name_max_width">100dp</dimen>
     <dimen name="channel_banner_small_text_size">14sp</dimen>
     <dimen name="channel_banner_track_meta_text_size">8sp</dimen>
 

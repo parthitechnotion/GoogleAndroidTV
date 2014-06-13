@@ -64,7 +64,7 @@
             android:paddingLeft="0dip"
             android:paddingRight="10dip"
             android:singleLine="true"
-            android:ellipsize="marquee"
+            android:ellipsize="end"
             android:marqueeRepeatLimit="1"
             android:textSize="@dimen/option_item_text_size"
             android:textColor="@color/side_panel_item_text" />

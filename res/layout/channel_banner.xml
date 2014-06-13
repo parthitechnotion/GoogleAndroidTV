@@ -84,6 +84,9 @@
         android:layout_marginBottom="-4sp"
         android:layout_alignBottom="@id/anchor"
         android:layout_toRightOf="@id/tvinput_logo"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:maxWidth="@dimen/channel_name_max_width"
         android:textColor="#EEEEEE"
         android:fontFamily="sans-serif-condensed"
         android:textSize="@dimen/channel_banner_small_text_size" />
