@@ -65,7 +65,7 @@
 
     <include layout="@layout/main_menu" />
 
-    <FrameLayout
+    <com.android.tv.ui.SidePanelContainer
         android:id="@+id/right_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
