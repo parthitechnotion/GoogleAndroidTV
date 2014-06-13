@@ -106,7 +106,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
         if (tag instanceof Channel) {
             mTvActivity.moveToChannel(((Channel) tag).getId());
             mClosingByItemSelected = true;
-            getFragmentManager().popBackStack();
+            mTvActivity.popFragmentBackStack();
         } else {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.right_panel, new SimpleGuideShowOnlyFragment());

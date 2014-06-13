@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 public class TvInputManagerHelper {
     private static final String TAG = "TvInputManagerHelper";
 

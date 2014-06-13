@@ -66,7 +66,7 @@ public class BaseOptionFragment extends BaseSideFragment {
         uncheckAllRadioButtons((ViewGroup) mMainView);
         radioButton.setChecked(true);
         mClosingByItemSelected = true;
-        getFragmentManager().popBackStack();
+        ((TvActivity) getActivity()).popFragmentBackStack();
     }
 
     @Override
