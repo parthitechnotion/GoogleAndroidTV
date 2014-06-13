@@ -24,6 +24,7 @@ import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
@@ -271,7 +272,8 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
             }
             float largeTextSize = getContext().getResources().getDimension(
                     R.dimen.channel_banner_program_large_text_size);
-            int estimatedLineCount = estimateLineCount(title, largeTextSize, width);
+            Typeface font = mProgramTextView.getTypeface();
+            int estimatedLineCount = estimateLineCount(title, font, largeTextSize, width);
             boolean oneline = true;
             if (estimatedLineCount > 1) {
                 updateTextView(
@@ -280,7 +282,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
                         R.dimen.channel_banner_program_medium_margin_top);
                 float mediumTextSize = getContext().getResources().getDimension(
                         R.dimen.channel_banner_program_medium_text_size);
-                if (estimateLineCount(title, mediumTextSize, width) > 1) {
+                if (estimateLineCount(title, font, mediumTextSize, width) > 1) {
                     oneline = false;
                 }
             } else {
@@ -339,14 +341,19 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         mProgrameDescriptionTextView.setVisibility(View.GONE);
     }
 
-    private int estimateLineCount(String str, float textSize, int width) {
+    private int estimateLineCount(String str, Typeface font, float textSize, int width) {
         if (width == 0) {
             return -1;
         }
-        Rect bounds = new Rect();
         Paint paint = new Paint();
+        paint.setTypeface(font);
         paint.setTextSize(textSize);
-        paint.getTextBounds(str, 0, str.length(), bounds);
-        return (bounds.width() + width - 1) / width;
+        // Add +1 to measured size, because number of lines becomes 2
+        // when measured size equals width.
+        return divideRoundUp((int) paint.measureText(str) + 1, width);
+    }
+
+    private int divideRoundUp(int x, int y) {
+        return (x + y - 1) / y;
     }
 }
