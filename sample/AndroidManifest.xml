@@ -25,7 +25,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application android:label="@string/sample_tv_input"
-            android:logo="@drawable/logo">
+            android:icon="@drawable/icon">
         <activity android:name=".SampleTvInputSettingsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
