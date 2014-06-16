@@ -21,6 +21,7 @@ import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.media.tv.TvContract;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -117,6 +118,32 @@ public class SimpleGuideFragment extends BaseSideFragment {
     }
 
     @Override
+    public void onCreatedChildView(View v) {
+        ((TextView) v.findViewById(R.id.resolution)).addOnLayoutChangeListener(
+                new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                            int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        calibrateResolutionTextViewPosition((ViewGroup) v.getParent(),
+                                (TextView) v);
+                    }
+                });
+    }
+
+    private void calibrateResolutionTextViewPosition(ViewGroup parent,
+            TextView resolutionTextView) {
+        if (resolutionTextView.getVisibility() == View.VISIBLE) {
+            Layout layout = resolutionTextView.getLayout();
+            if (layout.getLineCount() > 0
+                    && layout.getEllipsisCount(layout.getLineCount() - 1) > 0) {
+                resolutionTextView.setVisibility(View.GONE);
+                ((TextView) parent.findViewById(R.id.resolution_on_left_side)).setVisibility(
+                        View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
     public void onBindView(View v, int position, Object tag, boolean prevSelected) {
         final ImageView channelLogoView = (ImageView) v.findViewById(R.id.channel_logo);
         final TextView channelNumberView = (TextView) v.findViewById(R.id.channel_number);
@@ -126,6 +153,9 @@ public class SimpleGuideFragment extends BaseSideFragment {
         TextView channelNameView = (TextView) v.findViewById(R.id.channel_name);
         ProgressBar remainingTimeView = (ProgressBar) v.findViewById(R.id.remaining_time);
         TextView resolutionTextView = (TextView) v.findViewById(R.id.resolution);
+        TextView resolutionOnLeftSideTextView =
+                (TextView) v.findViewById(R.id.resolution_on_left_side);
+        resolutionOnLeftSideTextView.setVisibility(View.GONE);
         if (tag instanceof Channel) {
             Channel channel = (Channel) tag;
             if (!channel.isLogoLoaded()) {
@@ -192,6 +222,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
             if (!TextUtils.isEmpty(videoDefinitionLevel)) {
                 resolutionTextView.setVisibility(View.VISIBLE);
                 resolutionTextView.setText(videoDefinitionLevel);
+                resolutionOnLeftSideTextView.setText(videoDefinitionLevel);
             } else {
                 resolutionTextView.setVisibility(View.GONE);
             }

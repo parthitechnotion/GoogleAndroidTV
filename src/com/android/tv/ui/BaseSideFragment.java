@@ -99,6 +99,9 @@ public class BaseSideFragment extends Fragment {
     public void onItemSelected(View v, int position, Object tag) {
     }
 
+    public void onCreatedChildView(View v) {
+    }
+
     public void onBindView(View v, int position, Object tag, boolean prevSelected) {
     }
 
@@ -139,6 +142,7 @@ public class BaseSideFragment extends Fragment {
                     onItemFocusChanged(v, focusGained, position, mItemTags[position]);
                     }
             });
+            onCreatedChildView(v);
             return new MyViewHolder(v);
         }
 
