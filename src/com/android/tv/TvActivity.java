@@ -1025,8 +1025,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
-        if (mMainMenuView.getVisibility() == View.VISIBLE
-                && mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
+        if (mHideMainMenu.hasFocus() && mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
             mHideMainMenu.showAndHide();
         }
         if (mSidePanelContainer.getTag() == SIDE_FRAGMENT_TAG_SHOW) {
@@ -1171,6 +1170,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         private boolean mOnHideAnimation;
         private final Runnable mPreShowListener;
         private final Runnable mPostHideListener;
+        private boolean mHasFocusDuringHideAnimation;
 
         private HideRunnable(View view, long waitingTime) {
             this(view, waitingTime, null, null);
@@ -1189,8 +1189,14 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             startHideAnimation(false);
         }
 
+        private boolean hasFocus() {
+            return mView.getVisibility() == View.VISIBLE
+                    && (!mOnHideAnimation || mHasFocusDuringHideAnimation);
+        }
+
         private void startHideAnimation(boolean fastFadeOutRequired) {
             mOnHideAnimation = true;
+            mHasFocusDuringHideAnimation = !fastFadeOutRequired;
             Animation anim = AnimationUtils.loadAnimation(TvActivity.this,
                     android.R.anim.fade_out);
             anim.setInterpolator(AnimationUtils.loadInterpolator(TvActivity.this,
@@ -1221,6 +1227,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
         private void hideView() {
             mOnHideAnimation = false;
+            mHasFocusDuringHideAnimation = false;
             mView.setVisibility(View.GONE);
             if (mPostHideListener != null) {
                 mPostHideListener.run();
