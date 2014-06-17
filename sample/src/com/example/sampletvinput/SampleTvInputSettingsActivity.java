@@ -42,6 +42,7 @@ public class SampleTvInputSettingsActivity extends Activity {
         btn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                setResult(Activity.RESULT_OK);
                 finish();
             }
         });

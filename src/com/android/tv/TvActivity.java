@@ -119,6 +119,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private static final boolean USE_DEBUG_KEYS = true;
 
     private static final int REQUEST_START_SETUP_ACTIIVTY = 0;
+    private static final int REQUEST_START_SETTINGS_ACTIIVTY = 1;
 
     private static final String LEANBACK_SET_SHYNESS_BROADCAST =
             "com.android.mclauncher.action.SET_APP_SHYNESS";
@@ -142,6 +143,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private ChannelMap mChannelMap;
     private long mInitChannelId;
     private String mInitTvInputId;
+    private boolean mChildActivityCanceled;
 
     private TvInput mTvInputForSetup;
     private TvInputManagerHelper mTvInputManagerHelper;
@@ -517,7 +519,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (intent == null) {
             return false;
         }
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_START_SETTINGS_ACTIIVTY);
         return true;
     }
 
@@ -589,15 +591,19 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_START_SETUP_ACTIIVTY:
-                if (resultCode == Activity.RESULT_OK && mTvInputForSetup != null) {
-                    mInitTvInputId = mTvInputForSetup.getId();
-                }
-                break;
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_START_SETUP_ACTIIVTY:
+                    if (mTvInputForSetup != null) {
+                        mInitTvInputId = mTvInputForSetup.getId();
+                    }
+                    break;
 
-            default:
-                //TODO: Handle failure of setup.
+                default:
+                    //TODO: Handle failure of setup.
+            }
+        } else {
+            mChildActivityCanceled = true;
         }
         mTvInputForSetup = null;
     }
@@ -797,6 +803,10 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             }
         });
         updateChannelBanner(true);
+        if (mChildActivityCanceled) {
+            displayMainMenu(false);
+            mChildActivityCanceled = false;
+        }
         if (isShyModeSet()) {
             setShynessMode(false);
             // TODO: Set the shy mode to true when tune() fails.
