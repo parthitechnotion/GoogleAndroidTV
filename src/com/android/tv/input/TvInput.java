@@ -33,7 +33,7 @@ public abstract class TvInput {
             Runnable onChannelsLoadFinished);
 
     // TvContract related method
-    abstract public Uri buildChannelsUri();
+    abstract public Uri buildChannelsUri(String genre);
     abstract public String buildChannelsSortOrder();
 
     @Override

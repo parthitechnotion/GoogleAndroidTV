@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.android.tv.R;
 import com.android.tv.data.ChannelMap;
@@ -85,8 +86,11 @@ public class UnifiedTvInput extends TvInput {
     }
 
     @Override
-    public Uri buildChannelsUri() {
-        return TvContract.Channels.CONTENT_URI;
+    public Uri buildChannelsUri(String genre) {
+        if (genre == null) {
+            return TvContract.Channels.CONTENT_URI;
+        }
+        return TvContract.buildChannelsUriForCanonicalGenre(null, genre, true);
     }
 
     @Override

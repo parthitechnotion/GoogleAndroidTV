@@ -162,6 +162,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private int mDisplayMode;
     private SharedPreferences mSharedPreferences;
 
+    private SimpleGuideFragment mSimpleGuideFragment;
+
     static {
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(EditInputDialogFragment.DIALOG_TAG);
@@ -526,7 +528,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void showSimpleGuide(int initiator) {
-        showSideFragment(new SimpleGuideFragment(this, mChannelMap), initiator);
+        mSimpleGuideFragment = new SimpleGuideFragment(this, mChannelMap);
+        showSideFragment(mSimpleGuideFragment, initiator);
     }
 
     public void showInputPicker(int initiator) {
