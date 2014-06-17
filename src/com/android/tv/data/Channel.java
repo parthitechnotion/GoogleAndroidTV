@@ -362,15 +362,13 @@ public final class Channel {
 
         @Override
         public Bitmap doInBackground(Void... params) {
-            Log.v(TAG, "Load logo for " + Channel.this);
-
             InputStream is = null;
             try {
                 is = mContext.getContentResolver().openInputStream(
                         TvContract.buildChannelLogoUri(mId));
             } catch (FileNotFoundException e) {
                 // Logo may not exist.
-                Log.i(TAG, "Logo not found", e);
+                Log.i(TAG, "Logo not found for " + Channel.this);
                 return null;
             }
             Bitmap bitmap = BitmapFactory.decodeStream(is);
@@ -386,7 +384,7 @@ public final class Channel {
                 Log.w(TAG, "Load logo canceled for " + Channel.this);
                 return;
             }
-            Log.v(TAG, "Loaded logo for " + Channel.this + ": " + logo);
+            Log.i(TAG, "Loaded logo for " + Channel.this + ": " + logo);
             mLoadLogoTask = null;
             setLogo(logo);
         }
