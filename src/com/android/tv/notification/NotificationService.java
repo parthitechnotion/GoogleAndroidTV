@@ -42,6 +42,7 @@ import android.util.Log;
 import com.android.tv.R;
 import com.android.tv.data.Program;
 import com.android.tv.recommendation.SampleRecommender;
+import com.android.tv.recommendation.WatchedProgramRecommender;
 import com.android.tv.recommendation.TvRecommendation;
 import com.android.tv.recommendation.TvRecommendation.ChannelRecord;
 import com.android.tv.util.TvInputManagerHelper;
@@ -127,6 +128,7 @@ public class NotificationService extends Service {
         super.onCreate();
         mTvRecommendation = new TvRecommendation(this, mHandler, true);
         // TODO: implement proper recommenders and register them.
+        mTvRecommendation.registerTvRecommender(new WatchedProgramRecommender(this));
         mTvRecommendation.registerTvRecommender(new SampleRecommender(this));
         mNotificationManager = (NotificationManager) getSystemService(
                 Context.NOTIFICATION_SERVICE);
@@ -205,8 +207,8 @@ public class NotificationService extends Service {
             return false;
         }
         long programDurationMs = program.getEndTimeUtcMillis() - program.getStartTimeUtcMillis();
-        long programLeftTimsMs = System.currentTimeMillis() - program.getStartTimeUtcMillis();
-        int programProgress = (int) (programLeftTimsMs * 100 / programDurationMs);
+        long programLeftTimsMs = program.getEndTimeUtcMillis() - System.currentTimeMillis();
+        int programProgress = 100 - (int) (programLeftTimsMs * 100 / programDurationMs);
         String posterArtUriStr = program.getPosterArtUri();
         if (TextUtils.isEmpty(posterArtUriStr)) {
             return false;
