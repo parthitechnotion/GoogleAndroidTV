@@ -151,6 +151,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private long mPipChannelId;
     private boolean mDebugNonFullSizeScreen;
     private boolean mActivityResumed;
+    private boolean mSilenceRequired;
     private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
     private boolean mIsShy = true;
 
@@ -335,6 +336,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     protected void onResume() {
         super.onResume();
+        mActivityResumed = true;
+        mSilenceRequired = false;
         mTvInputManagerHelper.update();
         if (mTvInputManagerHelper.getTvInputSize() == 0) {
             Toast.makeText(this, R.string.no_input_device_found, Toast.LENGTH_SHORT).show();
@@ -362,7 +365,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 mPipView.setVisibility(View.VISIBLE);
             }
         }
-        mActivityResumed = true;
     }
 
     @Override
@@ -614,17 +616,28 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (mTvView.isPlaying()) {
             switch (mAudioFocusStatus) {
                 case AudioManager.AUDIOFOCUS_GAIN:
-                    mTvView.setStreamVolume(AUDIO_MAX_VOLUME);
-                    if (isShyModeSet()) {
-                        setShynessMode(false);
+                    if (!mSilenceRequired) {
+                        mTvView.setStreamVolume(AUDIO_MAX_VOLUME);
+                        if (isShyModeSet()) {
+                            setShynessMode(false);
+                        }
+                    } else {
+                        mTvView.setStreamVolume(AUDIO_MIN_VOLUME);
                     }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS:
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     mTvView.setStreamVolume(AUDIO_MIN_VOLUME);
+                    if (!mActivityResumed) {
+                        mSilenceRequired = true;
+                    }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    mTvView.setStreamVolume(AUDIO_DUCKING_VOLUME);
+                    if (!mSilenceRequired) {
+                        mTvView.setStreamVolume(AUDIO_DUCKING_VOLUME);
+                    } else {
+                        mTvView.setStreamVolume(AUDIO_MIN_VOLUME);
+                    }
                     break;
             }
         }
