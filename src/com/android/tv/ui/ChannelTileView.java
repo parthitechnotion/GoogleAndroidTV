@@ -19,13 +19,6 @@ package com.android.tv.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -45,6 +38,7 @@ import com.android.tv.util.BitmapUtils;
 import com.android.tv.util.Utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -170,11 +164,20 @@ public class ChannelTileView extends ShadowContainer
         String posterArtUri = program.getPosterArtUri();
         if (!TextUtils.isEmpty(posterArtUri)) {
             Bitmap bm = null;
+            InputStream is = null;
             try {
-                bm = BitmapFactory.decodeStream(getContext().getContentResolver().openInputStream(
-                        Uri.parse(posterArtUri)));
+                is = getContext().getContentResolver().openInputStream(Uri.parse(posterArtUri));
+                bm = BitmapFactory.decodeStream(is);
             } catch (IOException ie) {
                 // Ignore exception
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error in closing file", e);
+                    }
+                }
             }
 
             if (bm != null) {
