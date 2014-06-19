@@ -59,6 +59,7 @@ public class InputPickerFragment extends BaseOptionFragment {
         mIsFirstResume = true;
         mTvActivity = (TvActivity) getActivity();
         mInputManager = mTvActivity.getTvInputManagerHelper();
+        mInputManager.update();
         Collection<TvInputInfo> inputInfos = mInputManager.getTvInputInfos(false);
         int inputSize = inputInfos.size();
         Preconditions.checkState(inputSize > 0);
