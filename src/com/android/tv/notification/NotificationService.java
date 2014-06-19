@@ -41,8 +41,7 @@ import android.util.Log;
 
 import com.android.tv.R;
 import com.android.tv.data.Program;
-import com.android.tv.recommendation.SampleRecommender;
-import com.android.tv.recommendation.WatchedProgramRecommender;
+import com.android.tv.recommendation.RoutineWatchRecommender;
 import com.android.tv.recommendation.TvRecommendation;
 import com.android.tv.recommendation.TvRecommendation.ChannelRecord;
 import com.android.tv.util.TvInputManagerHelper;
@@ -127,9 +126,7 @@ public class NotificationService extends Service {
         if (DEBUG) Log.d(TAG, "onCreate");
         super.onCreate();
         mTvRecommendation = new TvRecommendation(this, mHandler, true);
-        // TODO: implement proper recommenders and register them.
-        mTvRecommendation.registerTvRecommender(new WatchedProgramRecommender(this));
-        mTvRecommendation.registerTvRecommender(new SampleRecommender(this));
+        mTvRecommendation.registerTvRecommender(new RoutineWatchRecommender(this));
         mNotificationManager = (NotificationManager) getSystemService(
                 Context.NOTIFICATION_SERVICE);
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
