@@ -102,8 +102,8 @@ public class InputPickerFragment extends BaseOptionFragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onDestroyView() {
+        super.onDestroyView();
         mInputManager.removeListener(mAvailabilityListener);
     }
 
