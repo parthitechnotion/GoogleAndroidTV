@@ -167,7 +167,8 @@ public class ChannelTileView extends ShadowContainer
             InputStream is = null;
             try {
                 is = getContext().getContentResolver().openInputStream(Uri.parse(posterArtUri));
-                bm = BitmapFactory.decodeStream(is);
+                bm = BitmapUtils.decodeSampledBitmapFromStream(is, (int) mPosterArtWidth,
+                        (int) mPosterArtHeight);
             } catch (IOException ie) {
                 // Ignore exception
             } finally {

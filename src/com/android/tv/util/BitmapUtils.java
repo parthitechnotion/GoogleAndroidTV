@@ -17,14 +17,16 @@
 package com.android.tv.util;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+
+import java.io.InputStream;
 
 public class BitmapUtils {
     private BitmapUtils() { /* cannot be instantiated */ }
@@ -66,5 +68,41 @@ public class BitmapUtils {
         Canvas canvas = new Canvas(result);
         canvas.drawBitmap(bm, null, rect, null);
         return result;
+    }
+
+    /*
+     * Decode large sized bitmap into required size.
+     */
+    public static Bitmap decodeSampledBitmapFromStream(InputStream is, int reqWidth,
+            int reqHeight) {
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(is, null, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeStream(is, null, options);
+    }
+
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth,
+            int reqHeight) {
+        // Raw height and width of image
+        int width = options.outWidth;
+        int height = options.outHeight;
+        int inSampleSize = 1;
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps either
+        // height and width larger than the requested height and width.
+        while (width > reqWidth || height > reqHeight) {
+            width >>= 1;
+            height >>= 1;
+            inSampleSize <<= 1;
+        }
+
+        return inSampleSize;
     }
 }
