@@ -87,6 +87,9 @@ public class NotificationService extends Service {
     private final HandlerThread mHandlerThread;
     private final Handler mHandler;
 
+    private final float mNotificationCardWidth;
+    private final float mNotificationCardHeight;
+
     public NotificationService() {
         mHandlerThread = new HandlerThread("tv notification");
         mHandlerThread.start();
@@ -119,6 +122,8 @@ public class NotificationService extends Service {
                 }
             }
         };
+        mNotificationCardWidth = getResources().getDimension(R.dimen.notif_card_img_max_width);
+        mNotificationCardHeight = getResources().getDimension(R.dimen.notif_card_img_height);
     }
 
     @Override
@@ -225,7 +230,9 @@ public class NotificationService extends Service {
         if (is == null) {
             return false;
         }
-        Bitmap posterArtBitmap = BitmapFactory.decodeStream(is);
+        // We doesn't trust TIS to provide us with proper sized image
+        Bitmap posterArtBitmap = BitmapUtils.decodeSampledBitmapFromStream(is,
+                (int) mNotificationCardWidth, (int) mNotificationCardHeight);
         try {
             is.close();
         } catch (IOException e) {
