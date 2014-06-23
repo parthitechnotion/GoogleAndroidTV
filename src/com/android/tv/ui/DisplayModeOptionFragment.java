@@ -85,6 +85,5 @@ public class DisplayModeOptionFragment extends BaseOptionFragment {
         mTvActivity.setDisplayMode(mAspectRatio, true);
         mLastStoredAspectRatio = mAspectRatio;
         super.onItemSelected(v, position, tag);
-        Toast.makeText(getActivity(), R.string.not_implemented_yet, Toast.LENGTH_SHORT).show();
     }
 }

@@ -813,6 +813,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             @Override
             public void onStreamInfoChanged(StreamInfo info) {
                 updateChannelBanner(false);
+                applyDisplayMode(info.getVideoWidth(), info.getVideoHeight());
             }
         });
         updateChannelBanner(true);
@@ -846,6 +847,50 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             mSidePanelContainer.setTag(SIDE_FRAGMENT_TAG_HIDE);
             mHideSideFragment.hideImmediately(withAnimation);
         }
+    }
+
+    private void applyDisplayMode(int videoWidth, int videoHeight) {
+        int decorViewWidth = getWindow().getDecorView().getWidth();
+        int decorViewHeight = getWindow().getDecorView().getHeight();
+        ViewGroup.LayoutParams layoutParams = mTvView.getLayoutParams();
+        int displayMode = mDisplayMode;
+        double decorViewRatio = 0;
+        double videoRatio = 0;
+        if (decorViewWidth <= 0 || decorViewHeight <= 0 || videoWidth <= 0 || videoHeight <=0) {
+            displayMode = DisplayMode.MODE_FULL;
+            Log.w(TAG, "Some resolution info is missing during applyDisplayMode. ("
+                    + "decorViewWidth=" + decorViewWidth + ", decorViewHeight=" + decorViewHeight
+                    + ", width=" + videoWidth + ", height=" + videoHeight + ")");
+        } else {
+            decorViewRatio = (double) decorViewWidth / decorViewHeight;
+            videoRatio = (double) videoWidth / videoHeight;
+        }
+        if (displayMode == DisplayMode.MODE_FULL) {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        } else if (displayMode == DisplayMode.MODE_ZOOM) {
+            if (videoRatio < decorViewRatio) {
+                // Y axis will be clipped.
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                layoutParams.height = (int) (decorViewWidth / videoRatio);
+            } else {
+                // X axis will be clipped.
+                layoutParams.width = (int) (decorViewHeight * videoRatio);
+                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            }
+        } else {
+            // MODE_NORMAL (default value)
+            if (videoRatio < decorViewRatio) {
+                // X axis has black area.
+                layoutParams.width = (int) (decorViewHeight * videoRatio);
+                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            } else {
+                // Y axis has black area.
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                layoutParams.height = (int) (decorViewWidth / videoRatio);
+            }
+        }
+        mTvView.setLayoutParams(layoutParams);
     }
 
     private void updateChannelBanner(final boolean showBanner) {
@@ -1179,7 +1224,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (storeInPreference) {
             mSharedPreferences.edit().putInt(TvSettings.PREF_DISPLAY_MODE, displayMode).apply();
         }
-        // TODO: change display mode
+        applyDisplayMode(mTvView.getVideoWidth(), mTvView.getVideoHeight());
     }
 
     public void restoreDisplayMode() {

@@ -57,7 +57,7 @@ public class LocalTvInputService extends BaseTvInputService {
     @Override
     public List<ChannelInfo> createSampleChannels() {
         List<ChannelInfo> list = new ArrayList<ChannelInfo>();
-        list.add(new ChannelInfo(CHANNEL_1_NUMBER, CHANNEL_1_NAME, null, 720, 480, 2, false,
+        list.add(new ChannelInfo(CHANNEL_1_NUMBER, CHANNEL_1_NAME, null, 640, 480, 2, false,
                 new ProgramInfo(PROGRAM_1_TITLE, null, PROGRAM_1_DESC, 0, 3600, null, RESOURCE_1)));
         list.add(new ChannelInfo(CHANNEL_2_NUMBER, CHANNEL_2_NAME, null, 1280, 720, 6, true,
                 new ProgramInfo(PROGRAM_2_TITLE, null, PROGRAM_2_DESC, 0, 3600, null, RESOURCE_2)));

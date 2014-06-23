@@ -24,9 +24,9 @@ public class DisplayMode {
 
     // The values should be synced with R.arrays.display_mode_label
     public static final int MODE_NORMAL = 0;
-    public static final int RATIO_FULL = 1;
-    public static final int RATIO_ZOOM = 2;
-    public static final int SIZE_OF_RATIO_TYPES = RATIO_ZOOM + 1;
+    public static final int MODE_FULL = 1;
+    public static final int MODE_ZOOM = 2;
+    public static final int SIZE_OF_RATIO_TYPES = MODE_ZOOM + 1;
 
     private DisplayMode() { }
 
