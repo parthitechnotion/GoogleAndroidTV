@@ -17,13 +17,9 @@
 package com.android.tv.ui;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ServiceInfo;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.tv.TvContract;
@@ -78,6 +74,17 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange, Uri uri) {
+            // TODO: This {@code uri} argument may be a program which is not related to this
+            // channel. Consider adding channel id as a parameter of program URI to avoid
+            // unnecessary update.
+            post(mProgramUpdateRunnable);
+        }
+    };
+
+    private final Runnable mProgramUpdateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            removeCallbacks(this);
             updateProgramInfo();
         }
     };
@@ -239,7 +246,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
                 getContext().getString(R.string.channel_banner_time_format), time).toString();
     }
 
-    public void updateProgramInfo() {
+    private void updateProgramInfo() {
         if (mCurrentChannelUri == null) {
             handleNoProgramInformation();
             return;
@@ -255,12 +262,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         if (!TextUtils.isEmpty(title)) {
             int width = mProgramTextView.getWidth();
             if (width == 0) {
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateProgramInfo();
-                    }
-                });
+                post(mProgramUpdateRunnable);
             }
             float largeTextSize = getContext().getResources().getDimension(
                     R.dimen.channel_banner_program_large_text_size);
