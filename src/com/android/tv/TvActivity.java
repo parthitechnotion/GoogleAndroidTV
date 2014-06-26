@@ -67,6 +67,7 @@ import com.android.tv.ui.ClosedCaptionOptionFragment;
 import com.android.tv.ui.EditChannelsFragment;
 import com.android.tv.ui.InputPickerFragment;
 import com.android.tv.ui.MainMenuView;
+import com.android.tv.ui.ChannelNumberView;
 import com.android.tv.ui.SidePanelContainer;
 import com.android.tv.ui.SimpleGuideFragment;
 import com.android.tv.ui.TunableTvView;
@@ -132,6 +133,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private LinearLayout mControlGuide;
     private MainMenuView mMainMenuView;
     private ChannelBannerView mChannelBanner;
+    private ChannelNumberView mChannelNumberView;
     private SidePanelContainer mSidePanelContainer;
     private HideRunnable mHideChannelBanner;
     private HideRunnable mHideControlGuide;
@@ -215,6 +217,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         mMainMenuView = (MainMenuView) findViewById(R.id.main_menu);
         mSidePanelContainer = (SidePanelContainer) findViewById(R.id.right_panel);
         mMainMenuView.setTvActivity(this);
+        mChannelNumberView = (ChannelNumberView) findViewById(R.id.channel_number_view);
+        mChannelNumberView.setTvActivity(this);
 
         // Initially hide the channel banner and the control guide.
         mChannelBanner.setVisibility(View.GONE);
@@ -771,6 +775,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             if (mTunePendding) {
                 tune();
             }
+            mChannelNumberView.setChannels(mChannelMap.getChannelList(false));
             mMainMenuView.setChannelMap(mChannelMap);
         }
     };
@@ -962,7 +967,13 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 return super.onKeyUp(keyCode, event);
             }
         }
-
+        if (mChannelNumberView.isShown()) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                mChannelNumberView.hide();
+                return true;
+            }
+            return mChannelNumberView.onKeyUp(keyCode, event);
+        }
         if (mHandler.hasMessages(MSG_START_TV_RETRY)) {
             // Ignore key events during startTv retry.
             return true;
@@ -986,6 +997,12 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     return true;
             }
         } else {
+            if (ChannelNumberView.isChannelNumberKey(keyCode)
+                    && keyCode != KeyEvent.KEYCODE_MINUS) {
+                mChannelNumberView.show();
+                mHideChannelBanner.hideImmediately(true);
+                return mChannelNumberView.onKeyUp(keyCode, event);
+            }
             switch (keyCode) {
                 case KeyEvent.KEYCODE_H:
                     showRecentlyWatchedDialog();
