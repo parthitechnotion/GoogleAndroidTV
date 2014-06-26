@@ -38,12 +38,21 @@ public class ExternalFileTvInputService extends BaseTvInputService {
     public static List<ChannelInfo> parseSampleChannels() {
         List<ChannelInfo> list = new ArrayList<ChannelInfo>();
         File file = new File(CHANNEL_XML_PATH);
+        FileInputStream is = null;
         try {
-            FileInputStream is = new FileInputStream(file);
+            is = new FileInputStream(file);
             list = ChannelXMLParser.parseChannelXML(is);
         } catch (XmlPullParserException | IOException e) {
             // TODO: Disable this service.
             Log.w(TAG, "failed to load channels.");
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Ignore exception.
+                }
+            }
         }
         return list;
     }
