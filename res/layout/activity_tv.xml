@@ -65,6 +65,15 @@
 
     <include layout="@layout/main_menu" />
 
+    <FrameLayout
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:layout_gravity="left|top"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="50dp">
+        <include layout="@layout/channel_number" />
+    </FrameLayout>
+
     <com.android.tv.ui.SidePanelContainer
         android:id="@+id/right_panel"
         android:layout_width="match_parent"
