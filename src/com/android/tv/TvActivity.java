@@ -759,6 +759,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             public void onStreamInfoChanged(StreamInfo info) {
                 // Do nothing.
             }
+
+            @Override
+            public void onChannelChanged(Uri channel) {
+                // Do nothing.
+            }
         });
         if (!success) {
             Log.w(TAG, "Fail to start the PIP");
@@ -827,6 +832,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             public void onStreamInfoChanged(StreamInfo info) {
                 updateChannelBanner(false);
                 applyDisplayMode(info.getVideoWidth(), info.getVideoHeight());
+            }
+
+            @Override
+            public void onChannelChanged(Uri channel) {
+                // TODO: update {@code mChannelMap} and the banner.
             }
         });
         updateChannelBanner(true);

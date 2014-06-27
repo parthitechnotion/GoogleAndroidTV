@@ -45,6 +45,7 @@ abstract public class BaseTvInputService extends TvInputService {
 
     protected List<ChannelInfo> mChannels;
     private boolean mAvailable = true;
+    private Uri mChannelUri;
 
     @Override
     public void onCreate() {
@@ -190,10 +191,7 @@ abstract public class BaseTvInputService extends TvInputService {
             return true;
         }
 
-        @Override
-        public boolean onTune(Uri channelUri) {
-            if (DEBUG) Log.d(TAG, "tune(" + channelUri + ")");
-
+        private boolean changeChannel(Uri channelUri) {
             final ChannelInfo channel = getChannelByUri(channelUri, false);
             if (!startPlayback(channel)) {
                 return false;
@@ -207,27 +205,6 @@ abstract public class BaseTvInputService extends TvInputService {
                     new AddProgramRunnable(channelUri, channel.mProgram),
                     DELAY_FOR_TESTING_IN_MILLIS);
             return true;
-        }
-
-        @Override
-        public boolean onKeyDown(int keyCode, KeyEvent event) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_M) {
-                mMute = !mMute;
-                if (mMute) {
-                    mPlayer.setVolume(0.0f, 0.0f);
-                } else {
-                    mPlayer.setVolume(mVolume, mVolume);
-                }
-                return true;
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_A) {
-                // It simulates availability changes such as HDMI cable plug-off/plug-in.
-                // The availability is toggled whenever 'a' key is dispatched from a TV app.
-                mAvailable = !mAvailable;
-                // TODO: Uncomment or remove when a new API design is locked down.
-                // setAvailable(mAvailable);
-                return true;
-            }
-            return false;
         }
 
         private boolean startPlayback(final ChannelInfo channel) {
@@ -276,8 +253,45 @@ abstract public class BaseTvInputService extends TvInputService {
             } catch (IllegalStateException e1) {
                 return false;
             }
-
             return true;
+        }
+
+        @Override
+        public boolean onTune(Uri channelUri) {
+            if (DEBUG) Log.d(TAG, "onTune(" + channelUri + ")");
+            return changeChannel(channelUri);
+        }
+
+        @Override
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_M) {
+                mMute = !mMute;
+                if (mMute) {
+                    mPlayer.setVolume(0.0f, 0.0f);
+                } else {
+                    mPlayer.setVolume(mVolume, mVolume);
+                }
+                return true;
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_A) {
+                // It simulates availability changes such as HDMI cable plug-off/plug-in.
+                // The availability is toggled whenever 'a' key is dispatched from a TV app.
+                mAvailable = !mAvailable;
+                // TODO: Uncomment or remove when a new API design is locked down.
+                // setAvailable(mAvailable);
+                return true;
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_C) {
+                // This simulates the case TV input changes the channel without tune request from
+                // TV app. e.g. Channel change from STB.
+                if (mChannelUri != null) {
+                    int index = mChannelMap.indexOfKey(ContentUris.parseId(mChannelUri));
+                    long nextChannelId = mChannelMap.keyAt((index + 1) % mChannelMap.size());
+                    Uri nextChannelUri = TvContract.buildChannelUri(nextChannelId);
+                    changeChannel(TvContract.buildChannelUri(nextChannelId));
+                    dispatchChannelRetuned(nextChannelUri);
+                }
+                return true;
+            }
+            return false;
         }
 
         private class AddProgramRunnable implements Runnable {

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvView;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -114,6 +115,18 @@ public class TunableTvView extends TvView implements StreamInfo {
                     mHasClosedCaption = hasClosedCaption;
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
+                    }
+                }
+
+                @Override
+                public void onChannelRetuned(String inputId, Uri channelUri) {
+                    if (DEBUG) {
+                        Log.d(TAG, "onChannelRetuned(inputId=" + inputId + ", channelUri="
+                                + channelUri + ")");
+                    }
+                    // TODO: update {@code mChannelId}.
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onChannelChanged(channelUri);
                     }
                 }
             };
@@ -249,6 +262,7 @@ public class TunableTvView extends TvView implements StreamInfo {
         void onTuned(boolean success, long channelId);
         void onUnexpectedStop(long channelId);
         void onStreamInfoChanged(StreamInfo info);
+        void onChannelChanged(Uri channel);
     }
 
     @Override
