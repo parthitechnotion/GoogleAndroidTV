@@ -25,6 +25,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.TrackInfo;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Programs;
+import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
@@ -216,11 +217,26 @@ abstract public class BaseTvInputService extends TvInputService {
 
         private boolean startPlayback(final ChannelInfo channel) {
             mPlayer.reset();
+            dispatchVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE);
             if (!setDataSource(mPlayer, channel)) {
                 if (DEBUG) Log.d(TAG, "Failed to set the data source");
                 return false;
             }
             try {
+                mPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                    @Override
+                    public boolean onInfo(MediaPlayer player, int what, int arg) {
+                        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+                            dispatchVideoUnavailable(
+                                    TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+                            return true;
+                        } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+                            dispatchVideoAvailable();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
                 mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer player) {
@@ -233,6 +249,7 @@ abstract public class BaseTvInputService extends TvInputService {
                             MediaPlayer.TrackInfo[] tracks = mPlayer.getTrackInfo();
                             setupTrackInfo(tracks, channel);
                             dispatchTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
+                            dispatchVideoAvailable();
                             mPlayer.start();
                         }
                     }
