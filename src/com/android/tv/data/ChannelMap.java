@@ -213,7 +213,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri uri = mInput.buildChannelsUri();
+        Uri uri = mInput.buildChannelsUri(null);
         String[] projection = {
                 TvContract.Channels._ID,
                 TvContract.Channels.COLUMN_DISPLAY_NUMBER,

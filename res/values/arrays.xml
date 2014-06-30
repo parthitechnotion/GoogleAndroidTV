@@ -22,15 +22,21 @@
         <item>Zoom</item>
     </string-array>
 
-    <!-- The show_only_label should be synced with src/com/android/tv/data/ShowOnlyItems.java -->
-    <string-array name="show_only_label">
+    <!-- The category strings to be displayed in the channel guide.
+         The show_only_label should be synced with src/com/android/tv/data/ShowOnlyItems.java -->
+    <string-array name="show_only_label" translatable="true">
         <item>All channels</item>
-        <item>Favorites</item>
+        <item>Family/Kids</item>
         <item>Sports</item>
-        <item>Kids</item>
+        <item>Shopping</item>
         <item>Movies</item>
-        <item>Reality &amp; games</item>
-        <item>News &amp; talks</item>
+        <item>Comedy</item>
+        <item>Travel</item>
+        <item>Drama</item>
+        <item>Education</item>
+        <item>Animal/Wildlife</item>
+        <item>News</item>
+        <item>Gaming</item>
     </string-array>
 
     <!-- The command strings which are displayed in the "Edit Channels" side panel -->

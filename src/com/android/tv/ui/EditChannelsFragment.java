@@ -183,7 +183,7 @@ public class EditChannelsFragment extends BaseSideFragment {
     }
 
     private void updateAllChannels(boolean browsable) {
-        Uri uri = mSelectedInput.buildChannelsUri();
+        Uri uri = mSelectedInput.buildChannelsUri(null);
         ContentValues values = new ContentValues();
         values.put(TvContract.Channels.COLUMN_BROWSABLE, browsable ? 1 : 0);
 

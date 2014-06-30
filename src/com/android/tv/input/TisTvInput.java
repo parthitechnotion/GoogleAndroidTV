@@ -24,6 +24,7 @@ import android.content.pm.ServiceInfo;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.android.tv.data.ChannelMap;
 import com.android.tv.util.TvInputManagerHelper;
@@ -81,10 +82,13 @@ public class TisTvInput extends TvInput {
     }
 
     @Override
-    public Uri buildChannelsUri() {
+    public Uri buildChannelsUri(String genre) {
         ServiceInfo info = mInputInfo.getServiceInfo();
         ComponentName name = new ComponentName(info.packageName, info.name);
-        return TvContract.buildChannelsUriForInput(name, false);
+        if (genre == null) {
+            return TvContract.buildChannelsUriForInput(name, false);
+        }
+        return TvContract.buildChannelsUriForCanonicalGenre(name, genre, true);
     }
 
     @Override

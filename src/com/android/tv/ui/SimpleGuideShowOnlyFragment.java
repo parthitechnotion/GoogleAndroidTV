@@ -22,35 +22,36 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
-import android.widget.Toast;
 
 import com.android.tv.R;
-import com.android.tv.data.ShowOnlyItems;
+import com.android.tv.TvActivity;
+import com.android.tv.data.GenreItems;
 
 public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
     private static final String TAG = "SimpleGuideShowOnlyFragment";
     private static final boolean DEBUG = true;
 
+    private SimpleGuideFragment mSimpleGuideFragment;
+
     private View mMainView;
     private int mFocusedItemPosition;
 
-    public SimpleGuideShowOnlyFragment() {
+    public SimpleGuideShowOnlyFragment(SimpleGuideFragment simpleGuideFragment,
+            String selectedGenre) {
         super();
+        mSimpleGuideFragment = simpleGuideFragment;
+        mFocusedItemPosition = GenreItems.getPosition(selectedGenre);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        Object[] items = new Object[ShowOnlyItems.SHOW_ONLY_ITEM_SIZE];
-        for (int i = 0; i < ShowOnlyItems.SHOW_ONLY_ITEM_SIZE; ++i) {
-            items[i] = ShowOnlyItems.getLabel(i, getActivity());
-        }
+        Object[] items = GenreItems.getItems(getActivity());
         initialize(getString(R.string.show_only_title), items,
                 R.layout.option_fragment, R.layout.show_only_item,
                 R.color.option_item_background, R.color.option_item_focused_background,
                 R.dimen.simple_guide_item_height);
-        // TODO: set the current position correctly.
-        mFocusedItemPosition = 0;
+        setPrevSelectedItemPosition(mFocusedItemPosition);
         mMainView = super.onCreateView(inflater, container, savedInstanceState);
         // This fragment is always added on top of SimpleGuideFragment. So we need to make
         // this fragment shadow invisible.
@@ -87,6 +88,8 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
         uncheckAllRadioButtons((ViewGroup) mMainView);
         radioButton.setChecked(true);
 
+        mSimpleGuideFragment.setGenreOnGuide(GenreItems.getCanonicalGenre(getActivity(),
+                (String) tag));
         getFragmentManager().popBackStack();
     }
 
@@ -100,9 +103,6 @@ public class SimpleGuideShowOnlyFragment extends BaseSideFragment {
             radioButton.setChecked(false);
         }
         radioButton.setText((String) tag);
-        // TODO: enable all items.
-        v.setEnabled(position == ShowOnlyItems.POSITION_ALL_CHANNELS);
-        radioButton.setEnabled(position == ShowOnlyItems.POSITION_ALL_CHANNELS);
     }
 
     private static void uncheckAllRadioButtons(ViewGroup parent) {

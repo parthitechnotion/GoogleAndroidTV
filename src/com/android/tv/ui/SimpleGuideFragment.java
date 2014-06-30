@@ -18,8 +18,10 @@ package com.android.tv.ui;
 
 import android.app.FragmentTransaction;
 import android.content.ContentUris;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.tv.TvContract;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -37,32 +39,56 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.Channel.LoadLogoCallback;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.data.Program;
-import com.android.tv.data.ShowOnlyItems;
+import com.android.tv.data.GenreItems;
 import com.android.tv.util.Utils;
 
 public class SimpleGuideFragment extends BaseSideFragment {
     private static final String TAG = "SimpleGuideFragment";
     private static final boolean DEBUG = true;
-    private static final int SHOW_ONLY_ITEM_DEFAULT_POSITION = ShowOnlyItems.POSITION_ALL_CHANNELS;
 
     private final TvActivity mTvActivity;
     private final ChannelMap mChannelMap;
     private int mCurPosition;
     private boolean mClosingByItemSelected;
     // TODO: user shared preference for this.
-    private final int mSelectedShowOnlyItemPosition;
+    private String mSelectedShowOnlyItem;
 
     public SimpleGuideFragment(TvActivity tvActivity, ChannelMap channelMap) {
-        super();
         mTvActivity = tvActivity;
         mChannelMap = channelMap;
-        mSelectedShowOnlyItemPosition = SHOW_ONLY_ITEM_DEFAULT_POSITION;
+        mSelectedShowOnlyItem = GenreItems.getCanonicalGenre(GenreItems.POSITION_ALL_CHANNELS);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        Channel[] channels = mChannelMap.getChannelList(true);
+        initialize();
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    private void initialize() {
+        Channel[] channels = new Channel[0];
+        if (mSelectedShowOnlyItem == null) { // All Channels.
+            channels = mChannelMap.getChannelList(true);
+        } else {
+            Uri uri = mTvActivity.getSelectedTvInput().buildChannelsUri(mSelectedShowOnlyItem);
+            Cursor c = null;
+            try {
+                c = mTvActivity.getContentResolver().query(uri, null, null, null, null);
+                if (c != null) {
+                    channels = new Channel[c.getCount()];
+                    int index = 0;
+                    while (c.moveToNext()) {
+                        channels[index++] = Channel.fromCursor(c);
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+        }
+
         Object[] itemTags = new Object[channels.length + 1];
         itemTags[0] = new Object(); // a dummy object for the show only menu.
         for (int i = 0; i < channels.length; ++i) {
@@ -73,9 +99,8 @@ public class SimpleGuideFragment extends BaseSideFragment {
                 R.layout.option_fragment, R.layout.simple_guide_item,
                 R.color.option_item_background, R.color.option_item_focused_background,
                 R.dimen.simple_guide_item_height);
-        mCurPosition = getCurrentChannelPosition();
+        mCurPosition = getCurrentChannelPosition(channels);
         setPrevSelectedItemPosition(mCurPosition);
-        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -110,7 +135,7 @@ public class SimpleGuideFragment extends BaseSideFragment {
             mTvActivity.popFragmentBackStack();
         } else {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.right_panel, new SimpleGuideShowOnlyFragment());
+            ft.add(R.id.right_panel, new SimpleGuideShowOnlyFragment(this, mSelectedShowOnlyItem));
             ft.addToBackStack(null);
             // TODO: add an animation.
             ft.commit();
@@ -232,15 +257,13 @@ public class SimpleGuideFragment extends BaseSideFragment {
             channelNumberAloneView.setVisibility(View.INVISIBLE);
             remainingTimeView.setVisibility(View.GONE);
             programTitleView.setText(getString(R.string.show_only_title));
-            channelNameView.setText(ShowOnlyItems.getLabel(
-                    mSelectedShowOnlyItemPosition, mTvActivity));
+            channelNameView.setText(GenreItems.getLabel(mTvActivity, mSelectedShowOnlyItem));
         }
     }
 
-    private int getCurrentChannelPosition() {
-        Channel[] channels = mChannelMap.getChannelList(true);
+    private int getCurrentChannelPosition(Channel[] channels) {
         long curChannelId = mChannelMap.getCurrentChannelId();
-        int curChannelPos = 1;
+        int curChannelPos = 0;
         for (int i = 0; i < channels.length; ++i) {
             if (channels[i].getId() == curChannelId) {
                 curChannelPos = i + 1;
@@ -248,5 +271,11 @@ public class SimpleGuideFragment extends BaseSideFragment {
             }
         }
         return curChannelPos;
+    }
+
+    public void setGenreOnGuide(String item) {
+        mSelectedShowOnlyItem = item;
+        initialize();
+        setSelectedPosition(mCurPosition);
     }
 }
