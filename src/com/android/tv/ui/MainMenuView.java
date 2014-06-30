@@ -311,6 +311,11 @@ public class MainMenuView extends FrameLayout implements View.OnClickListener,
                                     mTvActivity.togglePipView();
                                     break;
 
+                                case MenuAction.SELECT_PIP_LOCATION:
+                                    mTvActivity.showPipLocationOption(
+                                            BaseSideFragment.INITIATOR_MENU);
+                                    break;
+
                                 case MenuAction.EDIT_CHANNEL_LIST_TYPE:
                                     mTvActivity.showEditChannelsFragment(
                                             BaseSideFragment.INITIATOR_MENU);

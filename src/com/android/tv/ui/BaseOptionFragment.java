@@ -60,6 +60,12 @@ public class BaseOptionFragment extends BaseSideFragment {
                 R.dimen.option_item_height);
     }
 
+    public void initialize(String title, int itemLayoutResId, Object[] itemTags) {
+        super.initialize(title, itemTags, R.layout.option_fragment, itemLayoutResId,
+                R.color.option_item_background, R.color.option_item_focused_background,
+                R.dimen.option_item_height);
+    }
+
     @Override
     public void onItemSelected(View v, int position, Object tag) {
         RadioButton radioButton = (RadioButton) v.findViewById(R.id.option_item);
@@ -79,6 +85,8 @@ public class BaseOptionFragment extends BaseSideFragment {
         }
         if (tag instanceof String) {
             radioButton.setText((String) tag);
+        } else {
+            radioButton.setText("");
         }
     }
 
