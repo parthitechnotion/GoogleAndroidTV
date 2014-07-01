@@ -41,7 +41,7 @@ abstract public class BaseTvInputService extends TvInputService {
     private static final boolean DEBUG = true;
 
     private final LongSparseArray<ChannelInfo> mChannelMap = new LongSparseArray<ChannelInfo>();
-    private final Handler mProgramUpdateHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
     protected List<ChannelInfo> mChannels;
     private boolean mAvailable = true;
@@ -179,9 +179,8 @@ abstract public class BaseTvInputService extends TvInputService {
                             afd.getDeclaredLength());
                     afd.close();
                 }
+                // Android media player does not support looping for HLS.
                 if (program.mUrl == null || !program.mUrl.startsWith("http")) {
-                    // TODO: Android media player does not support looping for HLS. Find a way to
-                    //     loop every contents.
                     player.setLooping(true);
                 }
             } catch (IllegalArgumentException | IllegalStateException | IOException e) {
@@ -195,47 +194,15 @@ abstract public class BaseTvInputService extends TvInputService {
             if (DEBUG) Log.d(TAG, "tune(" + channelUri + ")");
 
             final ChannelInfo channel = getChannelByUri(channelUri, false);
-            mPlayer.reset();
-            if (!setDataSource(mPlayer, channel)) {
-                if (DEBUG) Log.d(TAG, "Failed to set the data source");
+            if (!startPlayback(channel)) {
                 return false;
             }
-            try {
-                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer player) {
-                        if (mPlayer != null && !mPlayer.isPlaying()) {
-                            int duration = mPlayer.getDuration();
-                            if (duration > 0) {
-                                long currentTimeMs = System.currentTimeMillis();
-                                mPlayer.seekTo((int) (currentTimeMs % duration));
-                            }
-                            mPlayer.start();
-                        }
-                    }
-                });
-                mPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                    @Override
-                    public void onVideoSizeChanged(MediaPlayer player, int width, int height) {
-                        if (mPlayer != null) {
-                            dispatchVideoStreamChanged(channel.mVideoWidth, channel.mVideoHeight,
-                                    false);
-                            dispatchAudioStreamChanged(channel.mAudioChannel);
-                            dispatchClosedCaptionStreamChanged(channel.mHasClosedCaption);
-                        }
-                    }
-                });
-                mPlayer.prepareAsync();
-            } catch (IllegalStateException e1) {
-                return false;
-            }
-
             // Create empty program information and insert it into the database.
             // Delay intentionally to see whether the updated program information dynamically
             // replaces the previous one on the channel banner (for testing). This is to simulate
             // the actual case where we get parsed program data only after tuning is done.
             final long DELAY_FOR_TESTING_IN_MILLIS = 1000; // 1 second
-            mProgramUpdateHandler.postDelayed(
+            mHandler.postDelayed(
                     new AddProgramRunnable(channelUri, channel.mProgram),
                     DELAY_FOR_TESTING_IN_MILLIS);
             return true;
@@ -260,6 +227,56 @@ abstract public class BaseTvInputService extends TvInputService {
                 return true;
             }
             return false;
+        }
+
+        private boolean startPlayback(final ChannelInfo channel) {
+            mPlayer.reset();
+            if (!setDataSource(mPlayer, channel)) {
+                if (DEBUG) Log.d(TAG, "Failed to set the data source");
+                return false;
+            }
+            try {
+                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer player) {
+                        if (mPlayer != null && !mPlayer.isPlaying()) {
+                            int duration = mPlayer.getDuration();
+                            if (duration > 0) {
+                                int seekPosition = (int) (System.currentTimeMillis() % duration);
+                                mPlayer.seekTo(seekPosition);
+                            }
+                            mPlayer.start();
+                        }
+                    }
+                });
+                mPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(MediaPlayer player, int width, int height) {
+                        if (mPlayer != null) {
+                            dispatchVideoStreamChanged(channel.mVideoWidth, channel.mVideoHeight,
+                                    false);
+                            dispatchAudioStreamChanged(channel.mAudioChannel);
+                            dispatchClosedCaptionStreamChanged(channel.mHasClosedCaption);
+                        }
+                    }
+                });
+                mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                startPlayback(channel);
+                            }
+                        });
+                    }
+                });
+                mPlayer.prepareAsync();
+            } catch (IllegalStateException e1) {
+                return false;
+            }
+
+            return true;
         }
 
         private class AddProgramRunnable implements Runnable {
