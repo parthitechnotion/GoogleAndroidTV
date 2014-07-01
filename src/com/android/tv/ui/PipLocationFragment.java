@@ -55,7 +55,7 @@ public class PipLocationFragment extends BaseOptionFragment {
         mLocationToItemPosition[TvSettings.PIP_LOCATION_TOP_LEFT] = 2;
         mLocationToItemPosition[TvSettings.PIP_LOCATION_BOTTOM_LEFT] = 3;
 
-        initialize(getString(R.string.closed_caption_option_title),
+        initialize(getString(R.string.pip_location_option_title),
                 R.layout.pip_location_item, mItem);
         return super.onCreateView(inflater, container, savedInstanceState);
     }

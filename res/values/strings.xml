@@ -116,6 +116,9 @@
     <!-- Option items for off -->
     <string name="option_item_off">Off</string>
 
+    <!-- Title of PIP location option. [CHAR LIMIT=16]-->
+    <string name="pip_location_option_title">PIP Location</string>
+
     <!-- Text displayed in a toast to tell the user to long-press BACK key to exit the application
          instead of the normal press. -->
     <string name="long_press_back">Long-press BACK key instead to exit.</string>
