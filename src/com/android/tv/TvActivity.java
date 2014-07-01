@@ -703,6 +703,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
 
         mMainMenuView.setChannelMap(null);
+        mChannelNumberView.setChannels(null);
         int result = mAudioManager.requestAudioFocus(TvActivity.this,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         mAudioFocusStatus = (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) ?
@@ -722,6 +723,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         if (mChannelMap != null) {
             mMainMenuView.setChannelMap(null);
+            mChannelNumberView.setChannels(null);
             mChannelMap.close();
             mChannelMap = null;
         }
@@ -786,7 +788,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             if (mTunePendding) {
                 tune();
             }
-            mChannelNumberView.setChannels(mChannelMap.getChannelList(false));
+
+            mChannelNumberView.setChannels(
+                    (mChannelMap == null) ? null : mChannelMap.getChannelList(false));
             mMainMenuView.setChannelMap(mChannelMap);
         }
     };
