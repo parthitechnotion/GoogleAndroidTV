@@ -39,6 +39,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.Gravity;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -68,6 +69,7 @@ import com.android.tv.ui.EditChannelsFragment;
 import com.android.tv.ui.InputPickerFragment;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.ChannelNumberView;
+import com.android.tv.ui.PipLocationFragment;
 import com.android.tv.ui.SidePanelContainer;
 import com.android.tv.ui.SimpleGuideFragment;
 import com.android.tv.ui.TunableTvView;
@@ -162,6 +164,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     private boolean mIsClosedCaptionEnabled;
     private int mDisplayMode;
+    private int mPipLocation;
     private SharedPreferences mSharedPreferences;
 
     private SimpleGuideFragment mSimpleGuideFragment;
@@ -312,6 +315,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         restoreClosedCaptionEnabled();
         restoreDisplayMode();
+        restorePipLocation();
         onNewIntent(getIntent());
     }
 
@@ -546,6 +550,10 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     public void showClosedCaptionOption(int initiator) {
         showSideFragment(new ClosedCaptionOptionFragment(), initiator);
+    }
+
+    public void showPipLocationOption(int initiator) {
+        showSideFragment(new PipLocationFragment(), initiator);
     }
 
     public void showSideFragment(Fragment f, int initiator) {
@@ -1250,6 +1258,36 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     public void restoreDisplayMode() {
         setDisplayMode(mSharedPreferences.getInt(TvSettings.PREF_DISPLAY_MODE,
                 DisplayMode.MODE_NORMAL), false);
+    }
+
+    // Returns a constant defined in TvSettings.
+    public int getPipLocation() {
+        return mPipLocation;
+    }
+
+    public void setPipLocation(int pipLocation, boolean storeInPreference) {
+        mPipLocation = pipLocation;
+        if (storeInPreference) {
+            mSharedPreferences.edit().putInt(TvSettings.PREF_PIP_LOCATION, pipLocation).apply();
+        }
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mPipView.getLayoutParams();
+        if (mPipLocation == TvSettings.PIP_LOCATION_TOP_LEFT) {
+            lp.gravity = Gravity.TOP | Gravity.LEFT;
+        } else if (mPipLocation == TvSettings.PIP_LOCATION_TOP_RIGHT) {
+            lp.gravity = Gravity.TOP | Gravity.RIGHT;
+        } else if (mPipLocation == TvSettings.PIP_LOCATION_BOTTOM_LEFT) {
+            lp.gravity = Gravity.BOTTOM | Gravity.LEFT;
+        } else if (mPipLocation == TvSettings.PIP_LOCATION_BOTTOM_RIGHT) {
+            lp.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+        } else {
+            throw new IllegalArgumentException("Invaild PIP location: " + pipLocation);
+        }
+        mPipView.setLayoutParams(lp);
+    }
+
+    public void restorePipLocation() {
+        setDisplayMode(mSharedPreferences.getInt(TvSettings.PREF_PIP_LOCATION,
+                TvSettings.PIP_LOCATION_BOTTOM_RIGHT), false);
     }
 
     private class HideRunnable implements Runnable {

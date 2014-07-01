@@ -54,6 +54,8 @@
     <string name="menu_select_input">TV Input</string>
     <!-- Toggle PIP [CHAR LIMIT=15] -->
     <string name="menu_toggle_pip">PIP</string>
+    <!-- Locate PIP [CHAR LIMIT=15] -->
+    <string name="menu_select_pip_location">Locate PIP</string>
     <!-- Source specific settings menu option [CHAR LIMIT=15] -->
     <string name="source_specific_setting">More</string>
 

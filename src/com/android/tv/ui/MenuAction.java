@@ -28,11 +28,10 @@ public class MenuAction {
     public static final int SELECT_DISPLAY_MODE = 1;
     public static final int SELECT_TV_INPUT_TYPE = 2;
     public static final int TOGGLE_PIP_TYPE = 3;
-
-    // TODO: UX is not ready.
-    public static final int EDIT_CHANNEL_LIST_TYPE = 4;
-    public static final int AUTO_SCAN_CHANNELS_TYPE = 5;
-    public static final int INPUT_SETTING_TYPE = 6;
+    public static final int SELECT_PIP_LOCATION = 4;
+    public static final int EDIT_CHANNEL_LIST_TYPE = 5;
+    public static final int AUTO_SCAN_CHANNELS_TYPE = 6;
+    public static final int INPUT_SETTING_TYPE = 7;
 
     public static final MenuAction SELECT_CLOSED_CAPTION_ACTION =
             new MenuAction(R.string.menu_closed_caption, SELECT_CLOSED_CAPTION,
@@ -46,6 +45,9 @@ public class MenuAction {
     public static final MenuAction TOGGLE_PIP_ACTION =
             new MenuAction(R.string.menu_toggle_pip, TOGGLE_PIP_TYPE,
                     R.drawable.ic_tvoption_pip);
+    public static final MenuAction SELECT_PIP_LOCATION_ACTION =
+            new MenuAction(R.string.menu_select_pip_location, SELECT_PIP_LOCATION,
+                    R.drawable.ic_tvoption_locate_pip);
     public static final MenuAction EDIT_CHANNEL_LIST_ACTION =
             new MenuAction(R.string.menu_edit_channels, EDIT_CHANNEL_LIST_TYPE,
                     R.drawable.ic_tvoptions_edit_channels);

@@ -28,4 +28,10 @@ public final class TvSettings {
     public static final String PREF_DISPLAY_INPUT_NAME = "display_input_name_";
     public static final String PREF_CLOSED_CAPTION_ENABLED = "is_cc_enabled";  // boolean value
     public static final String PREF_DISPLAY_MODE = "display_mode";  // int value
+    public static final String PREF_PIP_LOCATION = "pip_location";  // int value
+
+    public static final int PIP_LOCATION_TOP_LEFT = 0;
+    public static final int PIP_LOCATION_TOP_RIGHT = 1;
+    public static final int PIP_LOCATION_BOTTOM_LEFT = 2;
+    public static final int PIP_LOCATION_BOTTOM_RIGHT = 3;
 }
