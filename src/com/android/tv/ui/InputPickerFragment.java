@@ -45,14 +45,6 @@ public class InputPickerFragment extends BaseOptionFragment {
 
     private TvInputManagerHelper mInputManager;
 
-    private final TvInputManager.TvInputListener mAvailabilityListener =
-            new TvInputManager.TvInputListener() {
-                @Override
-                public void onAvailabilityChanged(String inputId, boolean isAvailable) {
-                    mAdapter.notifyDataSetChanged();
-                }
-            };
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -63,7 +55,6 @@ public class InputPickerFragment extends BaseOptionFragment {
         Collection<TvInputInfo> inputInfos = mInputManager.getTvInputInfos(false);
         int inputSize = inputInfos.size();
         Preconditions.checkState(inputSize > 0);
-        mInputManager.addListener(mAvailabilityListener);
         mSelectedInput = mTvActivity.getSelectedTvInput();
 
         Object[] items = new Object[inputSize + 1];
@@ -99,12 +90,6 @@ public class InputPickerFragment extends BaseOptionFragment {
             setPrevSelectedItemPosition(mInitialPosition);
             mIsFirstResume = false;
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mInputManager.removeListener(mAvailabilityListener);
     }
 
     @Override

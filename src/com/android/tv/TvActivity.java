@@ -130,7 +130,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     private static final HashSet<String> AVAILABLE_DIALOG_TAGS = new HashSet<String>();
 
-    private TvInputManager mTvInputManager;
     private TunableTvView mTvView;
     private LinearLayout mControlGuide;
     private MainMenuView mMainMenuView;
@@ -308,8 +307,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             }
         });
 
-        mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
-        mTvInputManagerHelper = new TvInputManagerHelper(mTvInputManager);
+        TvInputManager manager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
+        mTvInputManagerHelper = new TvInputManagerHelper(manager);
         mTvInputManagerHelper.start();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -472,6 +471,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     public void onInputPicked(TvInput input) {
         if (input.equals(getSelectedTvInput())) {
             // Nothing has changed thus nothing to do.
+            return;
+        }
+        if (!mTvInputManagerHelper.isAvailable(input.getId())) {
+            String message = String.format(getString(R.string.input_is_not_available));
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!input.hasChannel(false)) {
