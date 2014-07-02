@@ -19,8 +19,9 @@
     <string name="local_input_label">Sample Input 1: Overlay View Test</string>
     <string name="hls_input_label">Sample Input 2: HLS Streaming</string>
     <string name="external_input_label">Sample Input 3: External Files</string>
-    <string name="overlay_view_test">Overlay View Test</string>
+    <string name="overlay_view_test">Overlay View Test: press U to toggle the menu</string>
     <string name="webview_toggle_button">Toggle WebView</string>
+    <string name="overlay_view_close_button">Close OverlayView</string>
     <string name="update_channels_button">Update Channels</string>
     <string name="failed_to_load_channels">Failed to load channels from %s.</string>
 </resources>

@@ -1,10 +1,13 @@
 package com.android.tv.ui;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -18,8 +21,9 @@ public class TunableTvView extends TvView implements StreamInfo {
     private static final String TAG = "TunableTvView";
 
     private static final int DELAY_FOR_SURFACE_RELEASE = 300;
+    public static final String PERMISSION_RECEIVE_INPUT_EVENT =
+            "android.permission.RECEIVE_INPUT_EVENT";
 
-    private float mVolume;
     private long mChannelId = Channel.INVALID_ID;
     private TvInputManagerHelper mInputManagerHelper;
     private boolean mStarted;
@@ -31,6 +35,7 @@ public class TunableTvView extends TvView implements StreamInfo {
     private int mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
     private boolean mHasClosedCaption = false;
     private SurfaceView mSurface;
+    private boolean mCanReceiveInputEvent;
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
@@ -62,6 +67,7 @@ public class TunableTvView extends TvView implements StreamInfo {
                         long channelId = mChannelId;
                         mChannelId = Channel.INVALID_ID;
                         mInputInfo = null;
+                        mCanReceiveInputEvent = false;
                         if (mOnTuneListener != null) {
                             mOnTuneListener.onTuned(false, channelId);
                             mOnTuneListener = null;
@@ -71,6 +77,7 @@ public class TunableTvView extends TvView implements StreamInfo {
                         long channelId = mChannelId;
                         mChannelId = Channel.INVALID_ID;
                         mInputInfo = null;
+                        mCanReceiveInputEvent = false;
                         if (mOnTuneListener != null) {
                             mOnTuneListener.onUnexpectedStop(channelId);
                             mOnTuneListener = null;
@@ -147,6 +154,7 @@ public class TunableTvView extends TvView implements StreamInfo {
         reset();
         mChannelId = Channel.INVALID_ID;
         mInputInfo = null;
+        mCanReceiveInputEvent = false;
         mOnTuneListener = null;
     }
 
@@ -181,6 +189,9 @@ public class TunableTvView extends TvView implements StreamInfo {
                 e.printStackTrace();
             }
             mInputInfo = inputInfo;
+            mCanReceiveInputEvent = mContext.getPackageManager().checkPermission(
+                    PERMISSION_RECEIVE_INPUT_EVENT, mInputInfo.getComponent().getPackageName())
+                            == PackageManager.PERMISSION_GRANTED;
         }
         setTvInputListener(mListener);
         tune(mInputInfo.getId(), Utils.getChannelUri(mChannelId));
@@ -211,8 +222,27 @@ public class TunableTvView extends TvView implements StreamInfo {
         }
         if (DEBUG)
             Log.d(TAG, "setStreamVolume " + volume);
-        mVolume = volume;
         super.setStreamVolume(volume);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        return mCanReceiveInputEvent && super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        return mCanReceiveInputEvent && super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTrackballEvent(MotionEvent event) {
+        return mCanReceiveInputEvent && super.dispatchTrackballEvent(event);
+    }
+
+    @Override
+    public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        return mCanReceiveInputEvent && super.dispatchGenericMotionEvent(event);
     }
 
     public interface OnTuneListener {

@@ -54,6 +54,7 @@ abstract public class BaseTvInputService extends TvInputService {
         buildChannelMap();
         // TODO: Uncomment or remove when a new API design is locked down.
         // setAvailable(mAvailable);
+        setTheme(android.R.style.Theme_Holo_Light_NoActionBar);
     }
 
     @Override

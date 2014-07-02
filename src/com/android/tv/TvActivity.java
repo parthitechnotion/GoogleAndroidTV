@@ -60,7 +60,6 @@ import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
-import com.android.tv.notification.NotificationService;
 import com.android.tv.ui.DisplayModeOptionFragment;
 import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
@@ -86,6 +85,7 @@ import java.util.HashSet;
 public class TvActivity extends Activity implements AudioManager.OnAudioFocusChangeListener {
     // STOPSHIP: Turn debugging off
     private static final boolean DEBUG = true;
+    private static final boolean USE_DEBUG_KEYS = true;
     private static final String TAG = "TvActivity";
 
     private static final int MSG_START_TV_RETRY = 1;
@@ -105,21 +105,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private static final int SIDE_FRAGMENT_TAG_HIDE = 1;
     private static final int SIDE_FRAGMENT_TAG_RESET = 2;
 
-    // TODO: add more KEYCODEs to the white list.
-    private static final int[] KEYCODE_WHITELIST = {
-            KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_2, KeyEvent.KEYCODE_3,
-            KeyEvent.KEYCODE_4, KeyEvent.KEYCODE_5, KeyEvent.KEYCODE_6, KeyEvent.KEYCODE_7,
-            KeyEvent.KEYCODE_8, KeyEvent.KEYCODE_9, KeyEvent.KEYCODE_STAR, KeyEvent.KEYCODE_POUND,
-            KeyEvent.KEYCODE_M,
-    };
-    // TODO: this value should be able to be toggled in menu.
-    private static final boolean USE_KEYCODE_BLACKLIST = false;
     private static final int[] KEYCODE_BLACKLIST = {
-            KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_CHANNEL_UP, KeyEvent.KEYCODE_CHANNEL_DOWN,
-            KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_CTRL_LEFT, KeyEvent.KEYCODE_CTRL_RIGHT
+        KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_CHANNEL_UP, KeyEvent.KEYCODE_CHANNEL_DOWN,
     };
-    // STOPSHIP: debug keys are used only for testing.
-    private static final boolean USE_DEBUG_KEYS = true;
 
     private static final int REQUEST_START_SETUP_ACTIIVTY = 0;
     private static final int REQUEST_START_SETTINGS_ACTIIVTY = 1;
@@ -158,7 +146,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private boolean mDebugNonFullSizeScreen;
     private boolean mActivityResumed;
     private boolean mSilenceRequired;
-    private boolean mUseKeycodeBlacklist = USE_KEYCODE_BLACKLIST;
+    private boolean mUseKeycodeBlacklist;
     private boolean mIsShy = true;
 
     private boolean mIsClosedCaptionEnabled;
@@ -203,6 +191,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     KeyEvent keyEvent = (KeyEvent) event;
                     if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
                         return onKeyUp(keyEvent.getKeyCode(), keyEvent);
+                    } else if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                        return onKeyDown(keyEvent.getKeyCode(), keyEvent);
                     }
                 } else if (event instanceof MotionEvent) {
                     MotionEvent motionEvent = (MotionEvent) event;
@@ -579,8 +569,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (getFragmentManager().getBackStackEntryCount() > 1) {
             getFragmentManager().popBackStack();
         } else if (getFragmentManager().getBackStackEntryCount() == 1
-                && mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_RESET) {
-            if (mSidePanelContainer.getTag() == SIDE_FRAGMENT_TAG_SHOW) {
+                && (Integer) mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_RESET) {
+            if ((Integer) mSidePanelContainer.getTag() == SIDE_FRAGMENT_TAG_SHOW) {
                 mSidePanelContainer.setKeyDispatchable(false);
                 mSidePanelContainer.setTag(SIDE_FRAGMENT_TAG_HIDE);
                 mHideSideFragment.hideImmediately(true);
@@ -593,7 +583,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void onSideFragmentCanceled(int initiator) {
-        if (mSidePanelContainer.getTag() == SIDE_FRAGMENT_TAG_RESET) {
+        if ((Integer) mSidePanelContainer.getTag() == SIDE_FRAGMENT_TAG_RESET) {
             return;
         }
         if (initiator == BaseSideFragment.INITIATOR_MENU) {
@@ -632,22 +622,16 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (DEBUG) Log.d(TAG, "dispatchKeyEvent(" + event + ")");
-        int eventKeyCode = event.getKeyCode();
-        if (mUseKeycodeBlacklist) {
-            for (int keycode : KEYCODE_BLACKLIST) {
-                if (keycode == eventKeyCode) {
-                    return super.dispatchKeyEvent(event);
-                }
-            }
-            return dispatchKeyEventToSession(event);
-        } else {
-            for (int keycode : KEYCODE_WHITELIST) {
-                if (keycode == eventKeyCode) {
-                    return dispatchKeyEventToSession(event);
-                }
-            }
+        if (mMainMenuView.isShown() || getFragmentManager().getBackStackEntryCount() > 0) {
             return super.dispatchKeyEvent(event);
         }
+        int eventKeyCode = event.getKeyCode();
+        for (int keycode : KEYCODE_BLACKLIST) {
+            if (keycode == eventKeyCode) {
+                return super.dispatchKeyEvent(event);
+            }
+        }
+        return dispatchKeyEventToSession(event) || super.dispatchKeyEvent(event);
     }
 
     @Override
@@ -865,7 +849,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             mHideChannelBanner.hideImmediately(withAnimation);
         }
         if (hideSidePanel) {
-            if (mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
+            if ((Integer) mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
                 return;
             }
             mSidePanelContainer.setTag(SIDE_FRAGMENT_TAG_HIDE);
@@ -969,6 +953,29 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mMainMenuView.getVisibility() == View.VISIBLE
+                || getFragmentManager().getBackStackEntryCount() > 0) {
+            return super.onKeyDown(keyCode, event);
+        }
+        if (mChannelMap == null) {
+            return false;
+        }
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_CHANNEL_UP:
+            case KeyEvent.KEYCODE_DPAD_UP:
+                channelUp();
+                return true;
+
+            case KeyEvent.KEYCODE_CHANNEL_DOWN:
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                channelDown();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (getFragmentManager().getBackStackEntryCount() > 0) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -993,6 +1000,13 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             }
             return mChannelNumberView.onKeyUp(keyCode, event);
         }
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // When the event is from onUnhandledInputEvent, onBackPressed is not automatically
+            // called. Therefore, we need to explicitly call onBackPressed().
+            onBackPressed();
+            return true;
+        }
+
         if (mHandler.hasMessages(MSG_START_TV_RETRY)) {
             // Ignore key events during startTv retry.
             return true;
@@ -1030,16 +1044,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 case KeyEvent.KEYCODE_TV_INPUT:
                 case KeyEvent.KEYCODE_I:
                     showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
-                    return true;
-
-                case KeyEvent.KEYCODE_CHANNEL_UP:
-                case KeyEvent.KEYCODE_DPAD_UP:
-                    channelUp();
-                    return true;
-
-                case KeyEvent.KEYCODE_CHANNEL_DOWN:
-                case KeyEvent.KEYCODE_DPAD_DOWN:
-                    channelDown();
                     return true;
 
                 case KeyEvent.KEYCODE_DPAD_LEFT:
@@ -1129,10 +1133,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
-        if (mHideMainMenu.hasFocus() && mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
+        if (mHideMainMenu.hasFocus()
+                && (Integer) mSidePanelContainer.getTag() != SIDE_FRAGMENT_TAG_SHOW) {
             mHideMainMenu.showAndHide();
         }
-        if (mSidePanelContainer.getTag() == SIDE_FRAGMENT_TAG_SHOW) {
+        if ((Integer) mSidePanelContainer.getTag() == SIDE_FRAGMENT_TAG_SHOW) {
             mHideSideFragment.showAndHide();
         }
     }
