@@ -3,6 +3,7 @@ package com.android.tv.ui;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
+import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView;
 import android.net.Uri;
 import android.util.AttributeSet;
@@ -16,6 +17,8 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.StreamInfo;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
+
+import java.util.List;
 
 public class TunableTvView extends TvView implements StreamInfo {
     private static final boolean DEBUG = true;
@@ -87,38 +90,6 @@ public class TunableTvView extends TvView implements StreamInfo {
                 }
 
                 @Override
-                public void onVideoStreamChanged(String inputId, int width, int height,
-                        boolean interlaced) {
-                    if (DEBUG) {
-                        Log.d(TAG, "onVideoStreamChanged(inputId=" + inputId + ", width=" + width
-                                + ", height=" + height + ")");
-                    }
-                    mVideoWidth = width;
-                    mVideoHeight = height;
-                    mVideoFormat = Utils.getVideoDefinitionLevelFromSize(width, height);
-                    Utils.updateCurrentVideoResolution(getContext(), mChannelId, mVideoFormat);
-                    if (mOnTuneListener != null) {
-                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
-                    }
-                }
-
-                @Override
-                public void onAudioStreamChanged(String inputId, int channelCount) {
-                    mAudioChannelCount = channelCount;
-                    if (mOnTuneListener != null) {
-                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
-                    }
-                }
-
-                @Override
-                public void onClosedCaptionStreamChanged(String inputId, boolean hasClosedCaption) {
-                    mHasClosedCaption = hasClosedCaption;
-                    if (mOnTuneListener != null) {
-                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
-                    }
-                }
-
-                @Override
                 public void onChannelRetuned(String inputId, Uri channelUri) {
                     if (DEBUG) {
                         Log.d(TAG, "onChannelRetuned(inputId=" + inputId + ", channelUri="
@@ -127,6 +98,27 @@ public class TunableTvView extends TvView implements StreamInfo {
                     // TODO: update {@code mChannelId}.
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onChannelChanged(channelUri);
+                    }
+                }
+
+                @Override
+                public void onTrackInfoChanged(String inputId, List<TvTrackInfo> tracks) {
+                    for (TvTrackInfo track : tracks) {
+                        int type = track.getInt(TvTrackInfo.KEY_TYPE);
+                        boolean selected = track.getBoolean(TvTrackInfo.KEY_IS_SELECTED);
+                        if (type == TvTrackInfo.VALUE_TYPE_VIDEO && selected) {
+                            mVideoWidth = track.getInt(TvTrackInfo.KEY_WIDTH);
+                            mVideoHeight = track.getInt(TvTrackInfo.KEY_HEIGHT);
+                            mVideoFormat = Utils.getVideoDefinitionLevelFromSize(
+                                    mVideoWidth, mVideoHeight);
+                        } else if (type == TvTrackInfo.VALUE_TYPE_AUDIO && selected) {
+                            mAudioChannelCount = track.getInt(TvTrackInfo.KEY_CHANNEL_COUNT);
+                        } else if (type == TvTrackInfo.VALUE_TYPE_SUBTITLE) {
+                            mHasClosedCaption = true;
+                        }
+                    }
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
                     }
                 }
             };

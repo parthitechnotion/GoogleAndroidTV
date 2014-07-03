@@ -29,6 +29,7 @@ import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
+import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,23 +52,23 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.tv.data.DisplayMode;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
+import com.android.tv.data.DisplayMode;
 import com.android.tv.data.StreamInfo;
 import com.android.tv.dialog.EditInputDialogFragment;
 import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
-import com.android.tv.ui.DisplayModeOptionFragment;
 import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
+import com.android.tv.ui.ChannelNumberView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
+import com.android.tv.ui.DisplayModeOptionFragment;
 import com.android.tv.ui.EditChannelsFragment;
 import com.android.tv.ui.InputPickerFragment;
 import com.android.tv.ui.MainMenuView;
-import com.android.tv.ui.ChannelNumberView;
 import com.android.tv.ui.PipLocationFragment;
 import com.android.tv.ui.SidePanelContainer;
 import com.android.tv.ui.SimpleGuideFragment;
@@ -78,6 +79,7 @@ import com.android.tv.util.TvSettings;
 import com.android.tv.util.Utils;
 
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * The main activity for demonstrating TV app.
@@ -1098,6 +1100,22 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 }
                 case KeyEvent.KEYCODE_P: {
                     togglePipView();
+                    return true;
+                }
+                case KeyEvent.KEYCODE_S: {
+                    // For now, we just select the first subtitle track.
+                    // TODO: show audio/subtitle language options to user and handle the user's
+                    //     selection.
+                    List<TvTrackInfo> tracks = mTvView.getTracks();
+                    for (TvTrackInfo track : tracks) {
+                        Log.d(TAG, "lang - " + track.getString(TvTrackInfo.KEY_LANGUAGE));
+                        if (track.getInt(TvTrackInfo.KEY_TYPE) == TvTrackInfo.VALUE_TYPE_SUBTITLE
+                                && !track.getBoolean(TvTrackInfo.KEY_IS_SELECTED)) {
+                            Log.d(TAG, "selectTrack " + track);
+                            mTvView.selectTrack(track);
+                            break;
+                        }
+                    }
                     return true;
                 }
                 case KeyEvent.KEYCODE_CTRL_LEFT:
