@@ -37,17 +37,17 @@ public class TvInputManagerHelper {
     private static final String TAG = "TvInputManagerHelper";
 
     private final TvInputManager mTvInputManager;
-    private final Map<String, Boolean> mInputAvailabilityMap =
-            new HashMap<String, Boolean>();
+    private final Map<String, Integer> mInputStateMap =
+            new HashMap<String, Integer>();
     private final Map<String, TvInputInfo> mInputMap =
             new HashMap<String, TvInputInfo>();
     private final TvInputListener mInternalListener =
             new TvInputListener() {
                 @Override
-                public void onAvailabilityChanged(String inputId, boolean isAvailable) {
-                    mInputAvailabilityMap.put(inputId, Boolean.valueOf(isAvailable));
+                public void onInputStateChanged(String inputId, int state) {
+                    mInputStateMap.put(inputId, state);
                     for (TvInputListener listener : mListeners) {
-                        listener.onAvailabilityChanged(inputId, isAvailable);
+                        listener.onInputStateChanged(inputId, state);
                     }
                 }
             };
@@ -68,56 +68,34 @@ public class TvInputManagerHelper {
         if (inputs.size() < 1) {
             return;
         }
-        for (TvInputInfo input : inputs) {
-            String inputId = input.getId();
-            mTvInputManager.registerListener(inputId, mInternalListener, mHandler);
-            boolean available = mTvInputManager.getAvailability(inputId);
-            mInputAvailabilityMap.put(inputId, available);
-            mInputMap.put(inputId, input);
-        }
-        Assert.assertEquals(mInputAvailabilityMap.size(), mInputMap.size());
+        mTvInputManager.registerListener(mInternalListener, mHandler);
+        update();
     }
 
     // It updates newly installed or deleted TV input.
     // TODO: remove it when TIS package change can be notified from frameworks.
     public void update() {
         if (!mStarted) {
-            throw new IllegalStateException("AvailabilityManager doesn't started");
+            throw new IllegalStateException("TvInputManagerHelper didn't start yet");
         }
-        Set<String> inputIds = new HashSet<String>();
         mInputMap.clear();
+        mInputStateMap.clear();
         for (TvInputInfo input : mTvInputManager.getTvInputList()) {
-            inputIds.add(input.getId());
-            mInputMap.put(input.getId(), input);
+            String inputId = input.getId();
+            mInputMap.put(inputId, input);
+            int state = mTvInputManager.getInputState(inputId);
+            mInputStateMap.put(inputId, state);
         }
-        for (String inputId : inputIds) {
-            if (mInputAvailabilityMap.get(inputId) != null) {
-                continue;
-            }
-            mTvInputManager.registerListener(inputId, mInternalListener, mHandler);
-            boolean available = mTvInputManager.getAvailability(inputId);
-            mInputAvailabilityMap.put(inputId, available);
-        }
-        Iterator<Map.Entry<String, Boolean>> iter = mInputAvailabilityMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            String inputId = iter.next().getKey();
-            if (!inputIds.contains(inputId)) {
-                mTvInputManager.unregisterListener(inputId, mInternalListener);
-                iter.remove();
-            }
-        }
-        Assert.assertEquals(mInputAvailabilityMap.size(), mInputMap.size());
+        Assert.assertEquals(mInputStateMap.size(), mInputMap.size());
     }
 
     public void stop() {
         if (!mStarted) {
             return;
         }
+        mTvInputManager.unregisterListener(mInternalListener);
         mStarted = false;
-        for (String inputId : mInputAvailabilityMap.keySet()) {
-            mTvInputManager.unregisterListener(inputId, mInternalListener);
-        }
-        mInputAvailabilityMap.clear();
+        mInputStateMap.clear();
         mInputMap.clear();
     }
 
@@ -126,11 +104,11 @@ public class TvInputManagerHelper {
             return mInputMap.values();
         } else {
             ArrayList<TvInputInfo> list = new ArrayList<TvInputInfo>();
-            Iterator<Map.Entry<String, Boolean>> it =
-                    mInputAvailabilityMap.entrySet().iterator();
+            Iterator<Map.Entry<String, Integer>> it =
+                    mInputStateMap.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<String, Boolean> pair = it.next();
-                if (pair.getValue() == true) {
+                Map.Entry<String, Integer> pair = it.next();
+                if (pair.getValue() != TvInputManager.INPUT_STATE_DISCONNECTED) {
                     list.add(getTvInputInfo(pair.getKey()));
                 }
             }
@@ -140,7 +118,7 @@ public class TvInputManagerHelper {
 
     public TvInputInfo getTvInputInfo(String inputId) {
         if (!mStarted) {
-            throw new IllegalStateException("AvailabilityManager doesn't started");
+            throw new IllegalStateException("TvInputManagerHelper didn't start yet");
         }
         if (inputId == null) {
             return null;
@@ -154,27 +132,27 @@ public class TvInputManagerHelper {
     }
 
     public int getTvInputSize() {
-        return mInputAvailabilityMap.size();
+        return mInputStateMap.size();
     }
 
-    public boolean isAvailable(TvInputInfo inputInfo) {
-        return isAvailable(inputInfo.getId());
+    public int getInputState(TvInputInfo inputInfo) {
+        return getInputState(inputInfo.getId());
     }
 
-    public boolean isAvailable(String inputId) {
+    public int getInputState(String inputId) {
         if (!mStarted) {
             throw new IllegalStateException("AvailabilityManager doesn't started");
         }
-        Boolean available = mInputAvailabilityMap.get(inputId);
-        if (available == null) {
+        Integer state = mInputStateMap.get(inputId);
+        if (state == null) {
             update();
-            available = mInputAvailabilityMap.get(inputId);
-            if (available == null) {
-                Log.w(TAG, "isAvailable: no such input (id=" + inputId + ")");
-                return false;
+            state = mInputStateMap.get(inputId);
+            if (state == null) {
+                Log.w(TAG, "getInputState: no such input (id=" + inputId + ")");
+                return TvInputManager.INPUT_STATE_DISCONNECTED;
             }
         }
-        return available;
+        return state;
     }
 
     public void addListener(TvInputListener listener) {

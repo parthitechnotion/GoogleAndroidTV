@@ -27,7 +27,7 @@ public abstract class TvInput {
     abstract public String getDisplayName();
     abstract public Intent getIntentForSetupActivity();
     abstract public Intent getIntentForSettingsActivity();
-    abstract public boolean isAvailable();
+    abstract public int getInputState();
     abstract public boolean hasChannel(boolean browsableOnly);
     abstract public ChannelMap buildChannelMap(Activity activity, long initialChannelId,
             Runnable onChannelsLoadFinished);

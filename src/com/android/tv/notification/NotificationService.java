@@ -16,6 +16,8 @@
 
 package com.android.tv.notification;
 
+import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -198,7 +200,8 @@ public class NotificationService extends Service {
 
         // TODO: Move some checking logic into TvRecommendation.
         String inputId = Utils.getInputIdForChannel(this, cr.getChannelUri());
-        if (TextUtils.isEmpty(inputId) || !mTvInputManagerHelper.isAvailable(inputId)) {
+        if (TextUtils.isEmpty(inputId)
+                || mTvInputManagerHelper.getInputState(inputId) == INPUT_STATE_DISCONNECTED) {
             return false;
         }
         TvInputInfo inputInfo = mTvInputManagerHelper.getTvInputInfo(inputId);

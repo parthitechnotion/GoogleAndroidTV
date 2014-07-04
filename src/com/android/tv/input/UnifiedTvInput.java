@@ -16,6 +16,9 @@
 
 package com.android.tv.input;
 
+import static android.media.tv.TvInputManager.INPUT_STATE_CONNECTED;
+import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -63,8 +66,8 @@ public class UnifiedTvInput extends TvInput {
     }
 
     @Override
-    public boolean isAvailable() {
-        return hasChannel(false);
+    public int getInputState() {
+        return hasChannel(false) ? INPUT_STATE_CONNECTED : INPUT_STATE_DISCONNECTED;
     }
 
     @Override
