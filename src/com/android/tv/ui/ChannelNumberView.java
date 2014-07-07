@@ -42,9 +42,14 @@ public class ChannelNumberView extends LinearLayout {
     private static final int MSG_HIDE_VIEW = 0;
 
     private static final int HIDE_VIEW_DELAY_MS = 2000;
-    private static final int MAX_CHANNEL_NUMBER_DIGIT = 5;
-    private static final int MAX_MINOR_CHANNEL_NUMBER_DIGIT = 2;
-    private static final String CHANNEL_DELIMETER = "-";
+    private static final int MAX_CHANNEL_NUMBER_DIGIT = 4;
+    private static final int MAX_MINOR_CHANNEL_NUMBER_DIGIT = 3;
+    private static final String PRIMARY_CHANNEL_DELIMETER = "-";
+    private static final String[] CHANNEL_DELIMETERS = {"-", ".", " "};
+    private static final int[] CHANNEL_DELIMETER_KEYCODES = {
+        KeyEvent.KEYCODE_MINUS, KeyEvent.KEYCODE_NUMPAD_SUBTRACT, KeyEvent.KEYCODE_PERIOD,
+        KeyEvent.KEYCODE_NUMPAD_DOT, KeyEvent.KEYCODE_SPACE
+    };
 
     private TvActivity mTvActivity;
     private Channel[] mChannels;
@@ -102,7 +107,7 @@ public class ChannelNumberView extends LinearLayout {
             onNumberKeyUp(keyCode - KeyEvent.KEYCODE_0);
             return true;
         }
-        if (keyCode == KeyEvent.KEYCODE_MINUS) {
+        if (isChannelNumberDelimiterKey(keyCode)) {
             onDelimeterKeyUp();
             return true;
         }
@@ -135,8 +140,17 @@ public class ChannelNumberView extends LinearLayout {
         if (keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9) {
             return true;
         }
-        if (keyCode == KeyEvent.KEYCODE_MINUS) {
+        if (isChannelNumberDelimiterKey(keyCode)) {
             return true;
+        }
+        return false;
+    }
+
+    public static boolean isChannelNumberDelimiterKey(int keyCode) {
+        for (int i = 0; i < CHANNEL_DELIMETER_KEYCODES.length; ++i) {
+            if (CHANNEL_DELIMETER_KEYCODES[i] == keyCode) {
+                return true;
+            }
         }
         return false;
     }
@@ -225,7 +239,13 @@ public class ChannelNumberView extends LinearLayout {
 
     private static ChannelNumber parseChannelNumber(String number) {
         ChannelNumber ret = new ChannelNumber();
-        int indexOfDelimeter = number.indexOf(CHANNEL_DELIMETER);
+        int indexOfDelimeter = -1;
+        for (int i = 0; i < CHANNEL_DELIMETERS.length; ++i) {
+            indexOfDelimeter = number.indexOf(CHANNEL_DELIMETERS[i]);
+            if (indexOfDelimeter >= 0) {
+                break;
+            }
+        }
         if (indexOfDelimeter == 0 || indexOfDelimeter == number.length() - 1) {
             return null;
         }
@@ -262,7 +282,7 @@ public class ChannelNumberView extends LinearLayout {
 
         @Override
         public String toString() {
-            return "" + mMajor + (mHasDelimeter ? CHANNEL_DELIMETER + mMinor : "");
+            return "" + mMajor + (mHasDelimeter ? PRIMARY_CHANNEL_DELIMETER + mMinor : "");
         }
     }
 

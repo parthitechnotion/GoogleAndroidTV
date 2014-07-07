@@ -963,6 +963,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 || getFragmentManager().getBackStackEntryCount() > 0) {
             return super.onKeyDown(keyCode, event);
         }
+        if (mChannelNumberView.isShown()) {
+            return mChannelNumberView.onKeyDown(keyCode, event);
+        }
         if (mChannelMap == null) {
             return false;
         }
