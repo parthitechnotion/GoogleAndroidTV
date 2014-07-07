@@ -17,6 +17,7 @@
 package com.android.tv.data;
 
 import android.content.ContentValues;
+import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 
 /**
@@ -34,6 +35,7 @@ public final class Program {
     private String mVideoDefinitionLevel;
     private String mPosterArtUri;
     private String mThumbnailUri;
+    private TvContentRating[] mContentRatings;
 
     private Program() {
         // Do nothing.
@@ -93,6 +95,14 @@ public final class Program {
 
     public void setVideoDefinitionLevel(String videoDefinitionLevel) {
         mVideoDefinitionLevel = videoDefinitionLevel;
+    }
+
+    public TvContentRating[] getContentRatings() {
+        return mContentRatings;
+    }
+
+    public void setContentRatings(TvContentRating[] contentRatings) {
+        mContentRatings = contentRatings;
     }
 
     public String getPosterArtUri() {
@@ -208,6 +218,11 @@ public final class Program {
 
         public Builder setVideoDefinitionLevel(String videoDefinitionLevel) {
             mProgram.mVideoDefinitionLevel = videoDefinitionLevel;
+            return this;
+        }
+
+        public Builder setContentRatings(TvContentRating[] contentRatings) {
+            mProgram.mContentRatings = contentRatings;
             return this;
         }
 
