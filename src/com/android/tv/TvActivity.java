@@ -189,6 +189,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             public boolean onUnhandledInputEvent(InputEvent event) {
                 if (event instanceof KeyEvent) {
                     KeyEvent keyEvent = (KeyEvent) event;
+                    if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.isLongPress()) {
+                        if (onKeyLongPress(keyEvent.getKeyCode(), keyEvent)) {
+                            return true;
+                        }
+                    }
                     if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
                         return onKeyUp(keyEvent.getKeyCode(), keyEvent);
                     } else if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
