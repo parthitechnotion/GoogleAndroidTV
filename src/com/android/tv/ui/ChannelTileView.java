@@ -161,58 +161,25 @@ public class ChannelTileView extends ShadowContainer
         } else {
             mProgramNameView.setText(program.getTitle());
         }
+
         String posterArtUri = program.getPosterArtUri();
         if (!TextUtils.isEmpty(posterArtUri)) {
-            Bitmap bm = null;
-            InputStream is = null;
-            try {
-                is = getContext().getContentResolver().openInputStream(Uri.parse(posterArtUri));
-                bm = BitmapUtils.decodeSampledBitmapFromStream(is, (int) mPosterArtWidth,
-                        (int) mPosterArtHeight);
-            } catch (IOException ie) {
-                // Ignore exception
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error in closing file", e);
+            mProgramPosterArtView.setVisibility(INVISIBLE);
+            mChannelInfosLayout.setBackground(mNormalBackgroud);
+            new AsyncTask<String, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(String... params) {
+                    return BitmapUtils.decodeSampledBitmapFromUriString(getContext(), params[0],
+                            (int) mPosterArtWidth, (int) mPosterArtHeight);
+                }
+
+                @Override
+                protected void onPostExecute(Bitmap bm) {
+                    if (bm != null) {
+                        setProgramPosterArt(bm);
                     }
                 }
-            }
-
-            if (bm != null) {
-                setProgramPosterArt(bm);
-            } else {
-                mProgramPosterArtView.setVisibility(INVISIBLE);
-                mChannelInfosLayout.setBackground(mNormalBackgroud);
-                try {
-                    URL imageUrl = new URL(posterArtUri);
-                    AsyncTask<URL, Void, Bitmap> task = new AsyncTask<URL, Void, Bitmap>() {
-                        @Override
-                        protected Bitmap doInBackground(URL... params) {
-                            URL imageUrl = params[0];
-                            try {
-                                return BitmapFactory.decodeStream(imageUrl.openStream());
-                            } catch (IOException ie) {
-                                Log.w(TAG, "failed to read url: " + imageUrl, ie);
-                            }
-
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Bitmap bm) {
-                            if (bm != null) {
-                                setProgramPosterArt(bm);
-                            }
-                        }
-                    };
-                    task.execute(imageUrl);
-                } catch (IOException ie) {
-                    Log.w(TAG, "failed to read uri: " + posterArtUri, ie);
-                }
-            }
+            }.execute(posterArtUri);
         } else {
             mProgramPosterArtView.setVisibility(INVISIBLE);
             mChannelInfosLayout.setBackground(mNormalBackgroud);

@@ -16,6 +16,7 @@
 
 package com.android.tv.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -25,10 +26,22 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.net.Uri;
+import android.text.TextUtils;
+import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class BitmapUtils {
+    private static final String TAG = "BitmapUtils";
+
+    private static final int MARK_READ_LIMIT = 10 * 1024; // 10K
+
     private BitmapUtils() { /* cannot be instantiated */ }
 
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx, float targetWidth,
@@ -73,26 +86,77 @@ public class BitmapUtils {
     /*
      * Decode large sized bitmap into required size.
      */
+    public static Bitmap decodeSampledBitmapFromUriString(Context context, String uriString,
+            int reqWidth, int reqHeight) {
+        if (TextUtils.isEmpty(uriString)) {
+            return null;
+        }
+
+        InputStream is = null;
+        try {
+            is = getInputStream(context, uriString);
+            if (is == null) {
+                return null;
+            }
+
+            // We doesn't trust TIS to provide us with proper sized image
+            Bitmap bitmap = decodeSampledBitmapFromStream(is, reqWidth, reqHeight);
+            if (bitmap != null) {
+                return bitmap;
+            }
+
+            closeInputStream(is);
+            is = getInputStream(context, uriString);
+            if (is == null) {
+                return null;
+            }
+            return BitmapFactory.decodeStream(is);
+        } finally {
+            closeInputStream(is);
+        }
+    }
+
+    /*
+     * Decode large sized bitmap into required size.
+     * If it returns null, the InputStream should be closed and re-opened.
+     */
     public static Bitmap decodeSampledBitmapFromStream(InputStream is, int reqWidth,
             int reqHeight) {
+        // The input stream is read two times, so BufferedInputStream which supports marking should
+        // be used.
+        BufferedInputStream bis = new BufferedInputStream(is);
+        // 10K is the sufficient for the image header, because only the image header will be read
+        // at the first time.
+        bis.mark(MARK_READ_LIMIT);
+
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(is, null, options);
+        BitmapFactory.decodeStream(bis, null, options);
+
+        // Reset the input stream to read from the start.
+        try {
+            bis.reset();
+        } catch (IOException e) {
+            Log.i(TAG, "Failed to reset input stream.", e);
+            return null;
+        }
 
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeStream(is, null, options);
+        return BitmapFactory.decodeStream(bis, null, options);
     }
 
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth,
             int reqHeight) {
         // Raw height and width of image
-        int width = options.outWidth;
-        int height = options.outHeight;
+        // They are shifted right by one bit which causes an effect that inSampleSize is shifted
+        // left by one bit.
+        int width = options.outWidth >> 1;
+        int height = options.outHeight >> 1;
         int inSampleSize = 1;
 
         // Calculate the largest inSampleSize value that is a power of 2 and keeps either
@@ -104,5 +168,30 @@ public class BitmapUtils {
         }
 
         return inSampleSize;
+    }
+
+    private static InputStream getInputStream(Context context, String uriString) {
+        try {
+            return new URL(uriString).openStream();
+        } catch (MalformedURLException e) {
+            try {
+                return context.getContentResolver().openInputStream(Uri.parse(uriString));
+            } catch (FileNotFoundException ex) {
+                Log.i(TAG, "Unable to load uri: " + uriString);
+            }
+        } catch (IOException e) {
+            Log.i(TAG, "Failed to open stream: " + uriString);
+        }
+        return null;
+    }
+
+    private static void closeInputStream(InputStream is) {
+        if (is != null) {
+            try {
+                is.close();
+            } catch (IOException e) {
+                // Does nothing.
+            }
+        }
     }
 }
