@@ -32,6 +32,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.os.Handler;
@@ -44,6 +45,7 @@ import android.util.Log;
 import com.android.tv.R;
 import com.android.tv.data.Program;
 import com.android.tv.recommendation.RandomRecommender;
+import com.android.tv.recommendation.RoutineWatchRecommender;
 import com.android.tv.recommendation.TvRecommendation;
 import com.android.tv.recommendation.TvRecommendation.ChannelRecord;
 import com.android.tv.util.TvInputManagerHelper;
@@ -60,13 +62,18 @@ import java.net.URL;
  * A local service for notify recommendation at home launcher.
  */
 public class NotificationService extends Service {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final String TAG = "NotificationService";
 
     public static final String ACTION_SHOW_RECOMMENDATION =
             "com.android.tv.notification.ACTION_SHOW_RECOMMENDATION";
     public static final String ACTION_HIDE_RECOMMENDATION =
             "com.android.tv.notification.ACTION_HIDE_RECOMMENDATION";
+
+    private static final String TUNE_PARAMS_RECOMMENDATION_TYPE =
+            "com.android.tv.recommendation_type";
+    private static final String TYPE_RANDOM_RECOMMENDATION = "random";
+    private static final String TYPE_ROUTINE_WATCH_RECOMMENDATION = "routine_watch";
 
     private static final String NOTIFY_TAG = "tv_recommendation";
     // TODO: find out proper number of notifications and whether to make it dynamically
@@ -88,6 +95,7 @@ public class NotificationService extends Service {
     private NotificationManager mNotificationManager;
     private final HandlerThread mHandlerThread;
     private final Handler mHandler;
+    private final String mRecommendationType;
 
     private float mNotificationCardMaxWidth;
     private float mNotificationCardHeight;
@@ -124,6 +132,7 @@ public class NotificationService extends Service {
                 }
             }
         };
+        mRecommendationType = TYPE_RANDOM_RECOMMENDATION;
     }
 
     @Override
@@ -136,9 +145,15 @@ public class NotificationService extends Service {
                 R.dimen.notif_card_img_height);
 
         mTvRecommendation = new TvRecommendation(this, mHandler, true);
-        mTvRecommendation.registerTvRecommender(new RandomRecommender());
-        mNotificationManager = (NotificationManager) getSystemService(
-                Context.NOTIFICATION_SERVICE);
+        if (TYPE_RANDOM_RECOMMENDATION.equals(mRecommendationType)) {
+            mTvRecommendation.registerTvRecommender(new RandomRecommender());
+        } else if (TYPE_ROUTINE_WATCH_RECOMMENDATION.equals(mRecommendationType)) {
+            mTvRecommendation.registerTvRecommender(new RoutineWatchRecommender(this));
+        } else {
+            throw new IllegalStateException("Undefined recommendation type: "
+                    + mRecommendationType);
+        }
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
         mTvInputManagerHelper = new TvInputManagerHelper(mTvInputManager);
         mTvInputManagerHelper.start();
@@ -152,11 +167,11 @@ public class NotificationService extends Service {
             if (ACTION_SHOW_RECOMMENDATION.equals(action)) {
                 mHandler.removeMessages(MSG_SHOW_RECOMMENDATION);
                 mHandler.removeMessages(MSG_HIDE_RECOMMENDATION);
-                mHandler.obtainMessage(MSG_SHOW_RECOMMENDATION).sendToTarget();;
+                mHandler.obtainMessage(MSG_SHOW_RECOMMENDATION).sendToTarget();
             } else if (ACTION_HIDE_RECOMMENDATION.equals(action)) {
                 mHandler.removeMessages(MSG_SHOW_RECOMMENDATION);
                 mHandler.removeMessages(MSG_HIDE_RECOMMENDATION);
-                mHandler.obtainMessage(MSG_HIDE_RECOMMENDATION).sendToTarget();;
+                mHandler.obtainMessage(MSG_HIDE_RECOMMENDATION).sendToTarget();
             }
         }
         return START_STICKY;
@@ -196,6 +211,7 @@ public class NotificationService extends Service {
         if (DEBUG) Log.d(TAG, "sendNotification (" + cr.getChannel().getDisplayName()
                 + " notifyId=" + notifyId + ")");
         Intent intent = new Intent(Intent.ACTION_VIEW, cr.getChannelUri());
+        intent.putExtra(TUNE_PARAMS_RECOMMENDATION_TYPE, mRecommendationType);
         PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         // TODO: Move some checking logic into TvRecommendation.
@@ -216,7 +232,8 @@ public class NotificationService extends Service {
         }
         long programDurationMs = program.getEndTimeUtcMillis() - program.getStartTimeUtcMillis();
         long programLeftTimsMs = program.getEndTimeUtcMillis() - System.currentTimeMillis();
-        int programProgress = 100 - (int) (programLeftTimsMs * 100 / programDurationMs);
+        int programProgress = (programDurationMs <= 0) ? -1
+                : 100 - (int) (programLeftTimsMs * 100 / programDurationMs);
 
         // We doesn't trust TIS to provide us with proper sized image
         Bitmap posterArtBitmap = BitmapUtils.decodeSampledBitmapFromUriString(this,
@@ -239,7 +256,7 @@ public class NotificationService extends Service {
                 .setLargeIcon(largeIconBitmap)
                 .setSmallIcon(R.drawable.ic_launcher_s)
                 .setCategory(Notification.CATEGORY_RECOMMENDATION)
-                .setProgress(100, programProgress, false)
+                .setProgress((programProgress > 0) ? 100 : 0, programProgress, false)
                 .build();
         notification.color =
                 getResources().getColor(R.color.recommendation_card_background);
