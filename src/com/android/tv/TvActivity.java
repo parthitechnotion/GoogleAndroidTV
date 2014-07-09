@@ -468,7 +468,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             // Nothing has changed thus nothing to do.
             return;
         }
-        if (!mTvInputManagerHelper.isAvailable(input.getId())) {
+        if (!input.isAvailable()) {
             String message = String.format(getString(R.string.input_is_not_available));
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             return;

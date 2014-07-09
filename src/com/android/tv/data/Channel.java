@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -366,16 +367,24 @@ public final class Channel {
             try {
                 is = mContext.getContentResolver().openInputStream(
                         TvContract.buildChannelLogoUri(mId));
+                Bitmap bitmap = BitmapFactory.decodeStream(is);
+                if (bitmap == null) {
+                    Log.e(TAG, "Failed to decode logo image for " + Channel.this);
+                }
+                return bitmap;
             } catch (FileNotFoundException e) {
                 // Logo may not exist.
                 Log.i(TAG, "Logo not found for " + Channel.this);
                 return null;
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // Does nothing.
+                    }
+                }
             }
-            Bitmap bitmap = BitmapFactory.decodeStream(is);
-            if (bitmap == null) {
-                Log.e(TAG, "Failed to decode logo image for " + Channel.this);
-            }
-            return bitmap;
         }
 
         @Override
