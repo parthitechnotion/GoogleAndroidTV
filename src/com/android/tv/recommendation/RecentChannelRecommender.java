@@ -19,8 +19,10 @@ package com.android.tv.recommendation;
 import com.android.tv.recommendation.TvRecommendation.ChannelRecord;
 import com.android.tv.recommendation.TvRecommendation.TvRecommender;
 
+import java.util.concurrent.TimeUnit;
+
 public class RecentChannelRecommender extends TvRecommender {
-    private static final long MIN_WATCH_DURATION_MS = 7 * 60 * 1000; // 7 minutes
+    private static final long MIN_WATCH_DURATION_MS = TimeUnit.MINUTES.toMillis(7);
 
     private long mLastWatchLogUpdateTimeMs;
 

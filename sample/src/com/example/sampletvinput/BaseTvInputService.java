@@ -97,6 +97,9 @@ abstract public class BaseTvInputService extends TvInputService {
                 if (cursor != null && cursor.getCount() > 0) {
                     break;
                 }
+                if (cursor != null) {
+                    cursor.close();
+                }
                 if (DEBUG) Log.d(TAG, "Couldn't find the channel list. Inserting new channels...");
                 // Insert channels into the database. This needs to be done only for the first time.
                 ChannelUtils.populateChannels(this, this.getClass().getName(), mChannels);
