@@ -112,10 +112,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private static final int REQUEST_START_SETUP_ACTIIVTY = 0;
     private static final int REQUEST_START_SETTINGS_ACTIIVTY = 1;
 
-    private static final String LEANBACK_SET_SHYNESS_BROADCAST =
-            "com.android.mclauncher.action.SET_APP_SHYNESS";
-    private static final String LEANBACK_SHY_MODE_EXTRA = "shyMode";
-
     private static final HashSet<String> AVAILABLE_DIALOG_TAGS = new HashSet<String>();
 
     private TunableTvView mTvView;
@@ -1433,12 +1429,18 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     private void setShynessMode(boolean shyMode) {
         mIsShy = shyMode;
-        Intent intent = new Intent(LEANBACK_SET_SHYNESS_BROADCAST);
-        intent.putExtra(LEANBACK_SHY_MODE_EXTRA, shyMode);
-        sendBroadcast(intent);
+        setMediaPlaying(!shyMode);
     }
 
     private boolean isShyModeSet() {
         return mIsShy;
+    }
+
+    @Override
+    public void onStopMediaPlaying() {
+        mHandler.removeMessages(MSG_START_TV_RETRY);
+        stopTv();
+        stopPip();
+        super.onStopMediaPlaying();
     }
 }
