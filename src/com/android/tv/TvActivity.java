@@ -1313,7 +1313,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void restorePipLocation() {
-        setDisplayMode(mSharedPreferences.getInt(TvSettings.PREF_PIP_LOCATION,
+        setPipLocation(mSharedPreferences.getInt(TvSettings.PREF_PIP_LOCATION,
                 TvSettings.PIP_LOCATION_BOTTOM_RIGHT), false);
     }
 
