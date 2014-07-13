@@ -294,6 +294,11 @@ abstract public class BaseTvInputService extends TvInputService {
         }
 
         @Override
+        public void onSetCaptionEnabled(boolean enabled) {
+            if (DEBUG) Log.d(TAG, "onSetCaptionEnabled(" + enabled + ")");
+        }
+
+        @Override
         public boolean onSelectTrack(TvTrackInfo track) {
             Log.d(TAG, "onSelectTrack(" + track.getString(TvTrackInfo.KEY_TAG) + ")");
             if (mPlayer != null) {
