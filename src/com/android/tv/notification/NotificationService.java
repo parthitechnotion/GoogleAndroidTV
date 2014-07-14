@@ -87,8 +87,8 @@ public class NotificationService extends Service {
     private final HandlerThread mHandlerThread;
     private final Handler mHandler;
 
-    private final float mNotificationCardWidth;
-    private final float mNotificationCardHeight;
+    private float mNotificationCardMaxWidth;
+    private float mNotificationCardHeight;
 
     public NotificationService() {
         mHandlerThread = new HandlerThread("tv notification");
@@ -122,14 +122,17 @@ public class NotificationService extends Service {
                 }
             }
         };
-        mNotificationCardWidth = getResources().getDimension(R.dimen.notif_card_img_max_width);
-        mNotificationCardHeight = getResources().getDimension(R.dimen.notif_card_img_height);
     }
 
     @Override
     public void onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate");
         super.onCreate();
+        mNotificationCardMaxWidth = getResources().getDimensionPixelOffset(
+                R.dimen.notif_card_img_max_width);
+        mNotificationCardHeight = getResources().getDimensionPixelOffset(
+                R.dimen.notif_card_img_height);
+
         mTvRecommendation = new TvRecommendation(this, mHandler, true);
         mTvRecommendation.registerTvRecommender(new RoutineWatchRecommender(this));
         mNotificationManager = (NotificationManager) getSystemService(
@@ -211,37 +214,16 @@ public class NotificationService extends Service {
         long programDurationMs = program.getEndTimeUtcMillis() - program.getStartTimeUtcMillis();
         long programLeftTimsMs = program.getEndTimeUtcMillis() - System.currentTimeMillis();
         int programProgress = 100 - (int) (programLeftTimsMs * 100 / programDurationMs);
-        String posterArtUriStr = program.getPosterArtUri();
-        if (TextUtils.isEmpty(posterArtUriStr)) {
-            return false;
-        }
-        InputStream is = null;
-        try {
-            is = new URL(posterArtUriStr).openStream();
-        } catch (MalformedURLException e) {
-            try {
-                is = getContentResolver().openInputStream(Uri.parse(posterArtUriStr));
-            } catch (FileNotFoundException ex) {
-                Log.i(TAG, "Unable to load uri: " + posterArtUriStr);
-            }
-        } catch (IOException e) {
-            Log.i(TAG, "Failed to open stream: " + posterArtUriStr);
-        }
-        if (is == null) {
-            return false;
-        }
+
         // We doesn't trust TIS to provide us with proper sized image
-        Bitmap posterArtBitmap = BitmapUtils.decodeSampledBitmapFromStream(is,
-                (int) mNotificationCardWidth, (int) mNotificationCardHeight);
-        try {
-            is.close();
-        } catch (IOException e) {
-            Log.i(TAG, "Failed to close the stream: " + is, e);
-        }
+        Bitmap posterArtBitmap = BitmapUtils.decodeSampledBitmapFromUriString(this,
+                program.getPosterArtUri(), (int) mNotificationCardMaxWidth,
+                (int) mNotificationCardHeight);
         if (posterArtBitmap == null) {
-            Log.e(TAG, "Failed to decode logo image for " + posterArtUriStr);
+            Log.e(TAG, "Failed to decode logo image for " + program.getPosterArtUri());
             return false;
         }
+
         // TODO: Consider what is needed when the logo is not loaded yet.
         Bitmap channelLogo = cr.getChannel().getLogo();
         Bitmap largeIconBitmap = (channelLogo == null) ? posterArtBitmap
