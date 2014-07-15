@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExternalFileTvInputService extends BaseTvInputService {
-    private static String TAG = "ExternalFileTvInputService";
-    public static String CHANNEL_XML_PATH = "/sdcard/tvinput/channels.xml";
+    private static final String TAG = "ExternalFileTvInputService";
+    public static final String CHANNEL_XML_PATH = "/sdcard/tvinput/channels.xml";
+
+    private static List<ChannelInfo> sSampleChannels = null;
 
     @Override
     public List<ChannelInfo> createSampleChannels() {
@@ -36,24 +38,28 @@ public class ExternalFileTvInputService extends BaseTvInputService {
     }
 
     public static List<ChannelInfo> parseSampleChannels() {
-        List<ChannelInfo> list = new ArrayList<ChannelInfo>();
-        File file = new File(CHANNEL_XML_PATH);
-        FileInputStream is = null;
-        try {
-            is = new FileInputStream(file);
-            list = ChannelXMLParser.parseChannelXML(is);
-        } catch (XmlPullParserException | IOException e) {
-            // TODO: Disable this service.
-            Log.w(TAG, "failed to load channels.");
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // Ignore exception.
+        synchronized (ExternalFileTvInputService.class) {
+            if (sSampleChannels != null) {
+                return sSampleChannels;
+            }
+            File file = new File(CHANNEL_XML_PATH);
+            FileInputStream is = null;
+            try {
+                is = new FileInputStream(file);
+                sSampleChannels = ChannelXMLParser.parseChannelXML(is);
+            } catch (XmlPullParserException | IOException e) {
+                // TODO: Disable this service.
+                Log.w(TAG, "failed to load channels.");
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // Ignore exception.
+                    }
                 }
             }
+            return sSampleChannels;
         }
-        return list;
     }
 }

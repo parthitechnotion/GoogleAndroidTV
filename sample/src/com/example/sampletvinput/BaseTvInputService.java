@@ -50,7 +50,6 @@ abstract public class BaseTvInputService extends TvInputService {
     private final Handler mHandler = new Handler();
 
     protected List<ChannelInfo> mChannels;
-    private boolean mAvailable = true;
     private Uri mChannelUri;
 
     @Override
@@ -59,8 +58,6 @@ abstract public class BaseTvInputService extends TvInputService {
         super.onCreate();
 
         buildChannelMap();
-        // TODO: Uncomment or remove when a new API design is locked down.
-        // setAvailable(mAvailable);
         setTheme(android.R.style.Theme_Holo_Light_NoActionBar);
     }
 
@@ -85,6 +82,8 @@ abstract public class BaseTvInputService extends TvInputService {
                 TvContract.Channels._ID,
                 TvContract.Channels.COLUMN_DISPLAY_NUMBER
         };
+        // TODO: The app should write all channel information into DB and reconstruct channel map
+        // from it.
         mChannels = createSampleChannels();
         if (mChannels == null || mChannels.isEmpty()) {
             Log.w(TAG, "No channel list.");
@@ -92,18 +91,12 @@ abstract public class BaseTvInputService extends TvInputService {
         }
         Cursor cursor = null;
         try {
-            do {
-                cursor = getContentResolver().query(uri, projection, null, null, null);
-                if (cursor != null && cursor.getCount() > 0) {
-                    break;
-                }
-                if (cursor != null) {
-                    cursor.close();
-                }
-                if (DEBUG) Log.d(TAG, "Couldn't find the channel list. Inserting new channels...");
-                // Insert channels into the database. This needs to be done only for the first time.
-                ChannelUtils.populateChannels(this, this.getClass().getName(), mChannels);
-            } while (true);
+            cursor = getContentResolver().query(uri, projection, null, null, null);
+
+            if (cursor == null || cursor.getCount() == 0) {
+                Log.e(TAG, "Couldn't find the channel list.");
+                return;
+            }
 
             while (cursor.moveToNext()) {
                 long channelId = cursor.getLong(0);
@@ -290,13 +283,6 @@ abstract public class BaseTvInputService extends TvInputService {
                 } else {
                     mPlayer.setVolume(mVolume, mVolume);
                 }
-                return true;
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_A) {
-                // It simulates availability changes such as HDMI cable plug-off/plug-in.
-                // The availability is toggled whenever 'a' key is dispatched from a TV app.
-                mAvailable = !mAvailable;
-                // TODO: Uncomment or remove when a new API design is locked down.
-                // setAvailable(mAvailable);
                 return true;
             } else if (event.getKeyCode() == KeyEvent.KEYCODE_C) {
                 // This simulates the case TV input changes the channel without tune request from

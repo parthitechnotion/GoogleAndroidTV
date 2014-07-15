@@ -32,6 +32,8 @@ public class LocalTvInputService extends BaseTvInputService {
     private static final String TAG = "LocalTvInputService";
     private static final boolean DEBUG = true;
 
+    private static List<ChannelInfo> sSampleChannels = null;
+
     private static final String CHANNEL_1_NUMBER = "1-1";
     private static final String CHANNEL_2_NUMBER = "1-2";
     private static final String CHANNEL_1_NAME = "BUNNY(SD)";
@@ -55,14 +57,27 @@ public class LocalTvInputService extends BaseTvInputService {
         return impl;
     }
 
+    public static List<ChannelInfo> createSampleChannelsStatic() {
+        synchronized (LocalTvInputService.class) {
+            if (sSampleChannels != null) {
+                return sSampleChannels;
+            }
+            sSampleChannels = new ArrayList<ChannelInfo>();
+            sSampleChannels.add(
+                    new ChannelInfo(CHANNEL_1_NUMBER, CHANNEL_1_NAME, null, 640, 480, 2, false,
+                    new ProgramInfo(
+                            PROGRAM_1_TITLE, null, PROGRAM_1_DESC, 0, 3600, null, RESOURCE_1)));
+            sSampleChannels.add(
+                    new ChannelInfo(CHANNEL_2_NUMBER, CHANNEL_2_NAME, null, 1280, 720, 6, true,
+                    new ProgramInfo(
+                            PROGRAM_2_TITLE, null, PROGRAM_2_DESC, 0, 3600, null, RESOURCE_2)));
+            return sSampleChannels;
+        }
+    }
+
     @Override
     public List<ChannelInfo> createSampleChannels() {
-        List<ChannelInfo> list = new ArrayList<ChannelInfo>();
-        list.add(new ChannelInfo(CHANNEL_1_NUMBER, CHANNEL_1_NAME, null, 640, 480, 2, false,
-                new ProgramInfo(PROGRAM_1_TITLE, null, PROGRAM_1_DESC, 0, 3600, null, RESOURCE_1)));
-        list.add(new ChannelInfo(CHANNEL_2_NUMBER, CHANNEL_2_NAME, null, 1280, 720, 6, true,
-                new ProgramInfo(PROGRAM_2_TITLE, null, PROGRAM_2_DESC, 0, 3600, null, RESOURCE_2)));
-        return list;
+        return createSampleChannelsStatic();
     }
 
     class LocalTvInputSessionImpl extends BaseTvInputSessionImpl {

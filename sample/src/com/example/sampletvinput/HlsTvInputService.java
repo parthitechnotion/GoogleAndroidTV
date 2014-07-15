@@ -34,7 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HlsTvInputService extends BaseTvInputService {
-    private static String TAG = "HlsTvInputService";
+    private static final String TAG = "HlsTvInputService";
+
+    private static List<ChannelInfo> sSampleChannels = null;
 
     private NetworkStateReceiver mNetworkStateReceiver;
 
@@ -54,17 +56,26 @@ public class HlsTvInputService extends BaseTvInputService {
         }
     }
 
+    public static List<ChannelInfo> createSampleChannelsStatic(Context context) {
+        synchronized (HlsTvInputService.class) {
+            if (sSampleChannels != null) {
+                return sSampleChannels;
+            }
+            sSampleChannels = new ArrayList<ChannelInfo>();
+            try {
+                InputStream is = context.getResources().openRawResource(R.raw.hls_channels);
+                sSampleChannels = ChannelXMLParser.parseChannelXML(is);
+            } catch (XmlPullParserException | IOException e) {
+                // TODO: Disable this service.
+                Log.w(TAG, "failed to load channels.");
+            }
+            return sSampleChannels;
+        }
+    }
+
     @Override
     public List<ChannelInfo> createSampleChannels() {
-        List<ChannelInfo> list = new ArrayList<ChannelInfo>();
-        try {
-            InputStream is = getResources().openRawResource(R.raw.hls_channels);
-            list = ChannelXMLParser.parseChannelXML(is);
-        } catch (XmlPullParserException | IOException e) {
-            // TODO: Disable this service.
-            Log.w(TAG, "failed to load channels.");
-        }
-        return list;
+        return createSampleChannelsStatic(this);
     }
 
     private class NetworkStateReceiver extends BroadcastReceiver {
