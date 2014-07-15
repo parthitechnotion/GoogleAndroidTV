@@ -27,6 +27,12 @@
 
     <application android:label="@string/sample_tv_input"
             android:icon="@drawable/icon">
+        <activity android:name=".SampleTvInputSetupActivity"
+                  android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
         <activity android:name=".SampleTvInputSettingsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

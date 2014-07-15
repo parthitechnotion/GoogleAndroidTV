@@ -17,6 +17,7 @@
 package com.example.sampletvinput;
 
 import android.app.Activity;
+import android.media.tv.TvInputInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,8 +36,7 @@ public class SampleTvInputSettingsActivity extends Activity {
         layout.setOrientation(LinearLayout.VERTICAL);
         setContentView(layout);
 
-        // TODO: Remove the hard coded string.
-        String serviceName = getIntent().getStringExtra("serviceName");
+        String serviceName = getIntent().getStringExtra(TvInputInfo.EXTRA_SERVICE_NAME);
         Button btn = new Button(this);
         btn.setText("Settings of " + serviceName);
         btn.setOnClickListener(new OnClickListener() {
