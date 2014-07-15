@@ -20,7 +20,6 @@ import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
 
 import android.app.Activity;
 import android.app.LoaderManager;
-import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -38,7 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * The class that abstracts the channel information for each input service and provides convenient
+ * The class that abstracts the channel information for each input and provides convenient
  * methods to access it.
  */
 public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -58,7 +57,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mIndexDisplayNumber;
     private int mIndexDisplayName;
     private int mIndexPackageName;
-    private int mIndexServiceName;
+    private int mIndexInputId;
     private int mIndexBrowsable;
     private int mBrowsableChannelCount;
     private final Map<Long, Channel> mChannels = new LinkedHashMap<Long, Channel>();
@@ -221,7 +220,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
                 TvContract.Channels.COLUMN_DISPLAY_NUMBER,
                 TvContract.Channels.COLUMN_DISPLAY_NAME,
                 TvContract.Channels.COLUMN_PACKAGE_NAME,
-                TvContract.Channels.COLUMN_SERVICE_NAME,
+                TvContract.Channels.COLUMN_INPUT_ID,
                 TvContract.Channels.COLUMN_BROWSABLE };
         String sortOrder = mInput.buildChannelsSortOrder();
         return new CursorLoader(mActivity, uri, projection, null, null, sortOrder);
@@ -239,7 +238,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mIndexDisplayNumber = mCursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NUMBER);
         mIndexDisplayName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NAME);
         mIndexPackageName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_PACKAGE_NAME);
-        mIndexServiceName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_SERVICE_NAME);
+        mIndexInputId = mCursor.getColumnIndex(TvContract.Channels.COLUMN_INPUT_ID);
         mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
         mBrowsableChannelCount = 0;
         mChannels.clear();
@@ -250,7 +249,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
             do {
                 Channel channel = new Channel.Builder()
                         .setId(mCursor.getLong(mIndexId))
-                        .setServiceName(mCursor.getString(mIndexServiceName))
+                        .setInputId(mCursor.getString(mIndexInputId))
                         .setDisplayNumber(mCursor.getString(mIndexDisplayNumber))
                         .setDisplayName(mCursor.getString(mIndexDisplayName))
                         .setBrowsable(mCursor.getInt(mIndexBrowsable) == BROWSABLE)
@@ -304,9 +303,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     private String getInputId() {
-        ComponentName componentName = new ComponentName(mCursor.getString(mIndexPackageName),
-                mCursor.getString(mIndexServiceName));
-        return TvInputInfo.generateInputIdForComponentName(componentName);
+        return mCursor.getString(mIndexInputId);
     }
 
     private void checkCursor() {

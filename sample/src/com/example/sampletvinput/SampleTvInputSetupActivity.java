@@ -41,15 +41,17 @@ public class SampleTvInputSetupActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String serviceName = getIntent().getStringExtra(TvInputInfo.EXTRA_SERVICE_NAME);
-        createSampleChannels(serviceName);
+        String inputId = getIntent().getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
+        createSampleChannels(inputId);
         setResult(Activity.RESULT_OK);
         finish();
     }
 
-    private void createSampleChannels(String serviceName) {
+    private void createSampleChannels(String inputId) {
         List<ChannelInfo> channels = null;
         Class clazz = null;
+
+        String serviceName = Utils.getServiceNameFromInputId(this, inputId);
 
         if (serviceName.equals(LocalTvInputService.class.getName())) {
             channels = LocalTvInputService.createSampleChannelsStatic();
@@ -63,7 +65,7 @@ public class SampleTvInputSetupActivity extends Activity {
             return;
         }
 
-        Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, clazz), false);
+        Uri uri = TvContract.buildChannelsUriForInput(inputId, false);
         String[] projection = { TvContract.Channels._ID };
 
         Cursor cursor = null;
@@ -78,7 +80,7 @@ public class SampleTvInputSetupActivity extends Activity {
                 }
                 if (DEBUG) Log.d(TAG, "Couldn't find the channel list. Inserting new channels...");
                 // Insert channels into the database. This needs to be done only for the first time.
-                ChannelUtils.populateChannels(this, serviceName, channels);
+                ChannelUtils.populateChannels(this, inputId, channels);
             }
         } finally {
             if (cursor != null) {

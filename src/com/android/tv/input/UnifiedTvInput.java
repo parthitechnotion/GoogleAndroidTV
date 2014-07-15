@@ -98,7 +98,7 @@ public class UnifiedTvInput extends TvInput {
 
     @Override
     public String buildChannelsSortOrder() {
-        return Utils.CHANNEL_SORT_ORDER_BY_INPUT_NAME + ", "
+        return Utils.CHANNEL_SORT_ORDER_BY_INPUT_ID + ", "
                 + Utils.CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER;
     }
 }

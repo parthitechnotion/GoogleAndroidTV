@@ -16,7 +16,6 @@
 
 package com.android.tv.recommendation;
 
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -53,15 +52,14 @@ public class TvRecommendation {
     private static final int MATCH_CHANNEL = 1;
     private static final int MATCH_CHANNEL_ID = 2;
     private static final int MATCH_WATCHED_PROGRAM_ID = 3;
-    private static final int MATCH_INPUT_PACKAGE_SERVICE_CHANNEL = 4;
+    private static final int MATCH_INPUT_ID_CHANNEL = 4;
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(TvContract.AUTHORITY, "channel", MATCH_CHANNEL);
         sUriMatcher.addURI(TvContract.AUTHORITY, "channel/#", MATCH_CHANNEL_ID);
         sUriMatcher.addURI(TvContract.AUTHORITY, "watched_program/#", MATCH_WATCHED_PROGRAM_ID);
-        sUriMatcher.addURI(TvContract.AUTHORITY, "input/*/*/channel",
-                MATCH_INPUT_PACKAGE_SERVICE_CHANNEL);
+        sUriMatcher.addURI(TvContract.AUTHORITY, "input/*/channel", MATCH_INPUT_ID_CHANNEL);
     }
 
     private final List<TvRecommenderWrapper> mTvRecommenders;
@@ -145,19 +143,17 @@ public class TvRecommendation {
                             cursor.close();
                         }
                     }
-                } else if (match == MATCH_INPUT_PACKAGE_SERVICE_CHANNEL) {
-                    String packageName = TvContract.getPackageName(uri);
-                    String serviceName = TvContract.getServiceName(uri);
+                } else if (match == MATCH_INPUT_ID_CHANNEL) {
+                    String inputId = TvContract.getInputId(uri);
 
                     Set<Long> channelIdSet = new HashSet<Long>();
                     for (ChannelRecord cr : mChannelRecordMap.values()) {
-                        if (serviceName.equals(cr.mChannel.getServiceName())) {
+                        if (inputId.equals(cr.mChannel.getInputId())) {
                             channelIdSet.add(cr.mChannel.getId());
                         }
                     }
 
-                    Uri inputUri = TvContract.buildChannelsUriForInput(
-                            new ComponentName(packageName, serviceName), false);
+                    Uri inputUri = TvContract.buildChannelsUriForInput(inputId, false);
                     Cursor c = null;
                     try {
                         c = mContext.getContentResolver().query(inputUri, null, null, null, null);

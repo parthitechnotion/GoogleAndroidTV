@@ -25,6 +25,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.TrackInfo;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Programs;
+import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
@@ -57,6 +58,8 @@ abstract public class BaseTvInputService extends TvInputService {
         if (DEBUG) Log.d(TAG, "onCreate()");
         super.onCreate();
 
+        // TODO: Build channel map when the session is connected. At that point, we will come to
+        // know the input ID.
         buildChannelMap();
         setTheme(android.R.style.Theme_Holo_Light_NoActionBar);
     }
@@ -76,8 +79,8 @@ abstract public class BaseTvInputService extends TvInputService {
     abstract public List<ChannelInfo> createSampleChannels();
 
     private synchronized void buildChannelMap() {
-        Uri uri = TvContract.buildChannelsUriForInput(new ComponentName(this, this.getClass()),
-                false);
+        Uri uri = TvContract.buildChannelsUriForInput(Utils.getInputIdFromComponentName(this,
+                new ComponentName(this, this.getClass())), false);
         String[] projection = {
                 TvContract.Channels._ID,
                 TvContract.Channels.COLUMN_DISPLAY_NUMBER
