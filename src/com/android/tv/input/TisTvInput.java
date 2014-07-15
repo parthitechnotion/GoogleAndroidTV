@@ -65,8 +65,8 @@ public class TisTvInput extends TvInput {
     }
 
     @Override
-    public boolean isAvailable() {
-        return mInputManagerHelper.isAvailable(mId);
+    public int getInputState() {
+        return mInputManagerHelper.getInputState(mId);
     }
 
     @Override

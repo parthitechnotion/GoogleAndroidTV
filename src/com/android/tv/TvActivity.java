@@ -16,6 +16,8 @@
 
 package com.android.tv;
 
+import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
+
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -437,7 +439,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     private void startTvIfAvailableOrRetry(TvInput input, long channelId, int retryCount) {
-        if (!input.isAvailable()) {
+        if (input.getInputState() == INPUT_STATE_DISCONNECTED) {
             if (retryCount >= START_TV_MAX_RETRY) {
                 showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
                 return;
@@ -466,7 +468,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             // Nothing has changed thus nothing to do.
             return;
         }
-        if (!input.isAvailable()) {
+        if (input.getInputState() == INPUT_STATE_DISCONNECTED) {
             String message = String.format(getString(R.string.input_is_not_available));
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             return;

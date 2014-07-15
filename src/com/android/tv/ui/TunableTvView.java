@@ -1,5 +1,7 @@
 package com.android.tv.ui;
 
+import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
+
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
@@ -179,7 +181,8 @@ public class TunableTvView extends TvView implements StreamInfo {
         mHasClosedCaption = false;
         String inputId = Utils.getInputIdForChannel(getContext(), channelId);
         TvInputInfo inputInfo = mInputManagerHelper.getTvInputInfo(inputId);
-        if (inputInfo == null || !mInputManagerHelper.isAvailable(inputInfo)) {
+        if (inputInfo == null
+                || mInputManagerHelper.getInputState(inputInfo) == INPUT_STATE_DISCONNECTED) {
             return false;
         }
         mOnTuneListener = listener;

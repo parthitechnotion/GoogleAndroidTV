@@ -16,6 +16,8 @@
 
 package com.android.tv.data;
 
+import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
+
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.ComponentName;
@@ -159,7 +161,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         while(browsableChannelCount > 0 && (mCursor.moveToNext() || mCursor.moveToFirst())) {
             if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
                 --browsableChannelCount;
-                if (!mTvInputManagerHelper.isAvailable(getInputId())) {
+                if (mTvInputManagerHelper.getInputState(getInputId()) == INPUT_STATE_DISCONNECTED) {
                     continue;
                 }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
@@ -183,7 +185,7 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         while(browsableChannelCount > 0 && (mCursor.moveToPrevious() || mCursor.moveToLast())) {
             if (mCursor.getInt(mIndexBrowsable) == BROWSABLE || ignoreBrowsable) {
                 --browsableChannelCount;
-                if (!mTvInputManagerHelper.isAvailable(getInputId())) {
+                if (mTvInputManagerHelper.getInputState(getInputId()) == INPUT_STATE_DISCONNECTED) {
                     continue;
                 }
                 mCurrentChannelId = mCursor.getLong(mIndexId);
