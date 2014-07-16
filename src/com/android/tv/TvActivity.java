@@ -67,6 +67,7 @@ import com.android.tv.ui.BaseSideFragment;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ChannelNumberView;
 import com.android.tv.ui.ClosedCaptionOptionFragment;
+import com.android.tv.ui.DebugOptionFragment;
 import com.android.tv.ui.DisplayModeOptionFragment;
 import com.android.tv.ui.EditChannelsFragment;
 import com.android.tv.ui.InputPickerFragment;
@@ -80,6 +81,7 @@ import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.TvSettings;
 import com.android.tv.util.Utils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -553,6 +555,23 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     public void showPipLocationOption(int initiator) {
         showSideFragment(new PipLocationFragment(), initiator);
+    }
+
+    public void showDebugOptions(int initiator) {
+        showSideFragment(new DebugOptionFragment() {
+            @Override
+            protected List<Item> buildItems() {
+                List<Item> items = new ArrayList<>();
+                items.add(new ActionItem(getString(R.string.item_watch_history)) {
+                    @Override
+                    protected void onSelected() {
+                        super.onSelected();
+                        showRecentlyWatchedDialog();
+                    }
+                });
+                return items;
+            }
+        }, initiator);
     }
 
     public void showSideFragment(Fragment f, int initiator) {
@@ -1031,9 +1050,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         if (mChannelMap == null) {
             switch (keyCode) {
-                case KeyEvent.KEYCODE_H:
-                    showRecentlyWatchedDialog();
-                    return true;
                 case KeyEvent.KEYCODE_TV_INPUT:
                 case KeyEvent.KEYCODE_I:
                 case KeyEvent.KEYCODE_CHANNEL_UP:
@@ -1055,10 +1071,6 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 return mChannelNumberView.onKeyUp(keyCode, event);
             }
             switch (keyCode) {
-                case KeyEvent.KEYCODE_H:
-                    showRecentlyWatchedDialog();
-                    return true;
-
                 case KeyEvent.KEYCODE_TV_INPUT:
                 case KeyEvent.KEYCODE_I:
                     showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
@@ -1129,6 +1141,9 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     showDisplayModeOption(BaseSideFragment.INITIATOR_SHORTCUT_KEY);
                     return true;
                 }
+                case KeyEvent.KEYCODE_D:
+                    showDebugOptions(BaseSideFragment.INITIATOR_UNKNOWN);
+                    return true;
             }
         }
         return super.onKeyUp(keyCode, event);

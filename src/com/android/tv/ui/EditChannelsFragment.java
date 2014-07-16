@@ -192,7 +192,7 @@ public class EditChannelsFragment extends BaseSideFragment {
         for (Channel channel : mChannels) {
             channel.setBrowsable(browsable);
         }
-        mAdapter.notifyDataSetChanged();
+        notifyDataSetChanged();
 
         if (browsable) {
             mBrowsableChannelCount = mChannels.length;
