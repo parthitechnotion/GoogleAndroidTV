@@ -69,6 +69,7 @@ class Utils {
                 return info.getServiceInfo().name;
             }
         }
+        return null;
     }
 
     public static String getInputIdFromComponentName(Context context, ComponentName name) {
@@ -79,6 +80,7 @@ class Utils {
                 return info.getId();
             }
         }
+        return null;
     }
 
     private Utils() {}
