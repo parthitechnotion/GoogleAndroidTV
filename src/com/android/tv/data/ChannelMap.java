@@ -56,7 +56,6 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
     private int mIndexId;
     private int mIndexDisplayNumber;
     private int mIndexDisplayName;
-    private int mIndexPackageName;
     private int mIndexInputId;
     private int mIndexBrowsable;
     private int mBrowsableChannelCount;
@@ -237,7 +236,6 @@ public class ChannelMap implements LoaderManager.LoaderCallbacks<Cursor> {
         mIndexId = mCursor.getColumnIndex(TvContract.Channels._ID);
         mIndexDisplayNumber = mCursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NUMBER);
         mIndexDisplayName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NAME);
-        mIndexPackageName = mCursor.getColumnIndex(TvContract.Channels.COLUMN_PACKAGE_NAME);
         mIndexInputId = mCursor.getColumnIndex(TvContract.Channels.COLUMN_INPUT_ID);
         mIndexBrowsable = mCursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
         mBrowsableChannelCount = 0;

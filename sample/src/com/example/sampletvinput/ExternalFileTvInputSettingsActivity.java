@@ -70,7 +70,8 @@ public class ExternalFileTvInputSettingsActivity extends Activity {
         getContentResolver().delete(uri, null, null);
         getContentResolver().delete(TvContract.Programs.CONTENT_URI, null, null);
         List<ChannelInfo> channels = ExternalFileTvInputService.parseSampleChannels();
-        ChannelUtils.populateChannels(this, ExternalFileTvInputService.class.getName(), channels);
+        String inputId = getIntent().getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
+        ChannelUtils.populateChannels(this, inputId, channels);
         return channels.size();
     }
 }

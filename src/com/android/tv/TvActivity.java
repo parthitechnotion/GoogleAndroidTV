@@ -469,7 +469,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             return;
         }
         if (input.getInputState() == INPUT_STATE_DISCONNECTED) {
-            String message = String.format(getString(R.string.input_is_not_available));
+            String message = getString(R.string.input_is_not_available);
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             return;
         }
