@@ -14,9 +14,11 @@
      limitations under the License.
 -->
 
-<resources>
-    <style name="Theme.TV" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
-        <item name="android:colorAccent">@color/accent_color</item>
-        <item name="keypadViewStyle">@style/keypad_view_style</item>
-    </style>
-</resources>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners
+        android:radius="2dp" />
+    <solid
+        android:color="@color/keypad_background" />
+</shape>

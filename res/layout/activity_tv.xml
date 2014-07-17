@@ -80,4 +80,12 @@
         android:id="@+id/right_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.android.tv.ui.KeypadView
+        android:id="@+id/keypad"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:layout_gravity="left|bottom" />
 </FrameLayout>

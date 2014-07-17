@@ -15,8 +15,20 @@
 -->
 
 <resources>
-    <style name="Theme.TV" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
-        <item name="android:colorAccent">@color/accent_color</item>
-        <item name="keypadViewStyle">@style/keypad_view_style</item>
-    </style>
+    <item type="id" name="key_red" />
+    <item type="id" name="key_green" />
+    <item type="id" name="key_yellow" />
+    <item type="id" name="key_blue" />
+    <item type="id" name="key_1" />
+    <item type="id" name="key_2" />
+    <item type="id" name="key_3" />
+    <item type="id" name="key_4" />
+    <item type="id" name="key_5" />
+    <item type="id" name="key_6" />
+    <item type="id" name="key_7" />
+    <item type="id" name="key_8" />
+    <item type="id" name="key_9" />
+    <item type="id" name="key_l" />
+    <item type="id" name="key_0" />
+    <item type="id" name="key_r" />
 </resources>
