@@ -16,7 +16,6 @@
 
 package com.android.tv.util;
 
-import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -48,9 +47,7 @@ public class Utils {
     public static final String EXTRA_SERVICE_NAME = "serviceName";
     public static final String EXTRA_KEYCODE = "keycode";
 
-    public static final String CHANNEL_SORT_ORDER_BY_INPUT_NAME =
-            TvContract.Channels.COLUMN_PACKAGE_NAME + ", "
-            + TvContract.Channels.COLUMN_SERVICE_NAME;
+    public static final String CHANNEL_SORT_ORDER_BY_INPUT_ID = TvContract.Channels.COLUMN_INPUT_ID;
 
     public static final String CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER =
             "CAST(" + TvContract.Channels.COLUMN_DISPLAY_NUMBER + " AS INTEGER), "
@@ -99,11 +96,6 @@ public class Utils {
 
     private Utils() { /* cannot be instantiated */ }
 
-    // TODO: Remove this and add inputId into TvProvider.
-    public static String getInputIdForComponentName(ComponentName name) {
-        return name.flattenToShortString();
-    }
-
     public static Uri getChannelUri(long channelId) {
         return ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channelId);
     }
@@ -117,24 +109,22 @@ public class Utils {
     }
 
     public static String getInputIdForChannel(Context context, Uri channelUri) {
-        String[] projection = { TvContract.Channels.COLUMN_PACKAGE_NAME,
-                TvContract.Channels.COLUMN_SERVICE_NAME };
         if (channelUri == null) {
             return null;
         }
-        Cursor cursor = context.getContentResolver().query(
-                channelUri, projection, null, null, null);
-        if (cursor == null) {
-            return null;
+        String[] projection = { TvContract.Channels.COLUMN_INPUT_ID };
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(channelUri, projection, null, null, null);
+            if (cursor != null && cursor.moveToNext()) {
+                return cursor.getString(0);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        if (cursor.getCount() < 1) {
-            cursor.close();
-            return null;
-        }
-        cursor.moveToNext();
-        ComponentName componentName = new ComponentName(cursor.getString(0), cursor.getString(1));
-        cursor.close();
-        return getInputIdForComponentName(componentName);
+        return null;
     }
 
     public static void setLastWatchedChannelId(Context context, String inputId, String physInputId,
@@ -257,9 +247,7 @@ public class Utils {
     }
 
     public static boolean hasChannel(Context context, TvInputInfo name, boolean browsableOnly) {
-        ServiceInfo info = name.getServiceInfo();
-        ComponentName componentName = new ComponentName(info.packageName, info.name);
-        Uri uri = TvContract.buildChannelsUriForInput(componentName, browsableOnly);
+        Uri uri = TvContract.buildChannelsUriForInput(name.getId(), browsableOnly);
         String[] projection = { TvContract.Channels._ID };
         Cursor cursor = null;
         try {

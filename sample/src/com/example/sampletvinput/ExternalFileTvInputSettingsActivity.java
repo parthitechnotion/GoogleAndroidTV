@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
+import android.media.tv.TvInputInfo;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -64,8 +65,8 @@ public class ExternalFileTvInputSettingsActivity extends Activity {
     }
 
     private int updateChannels() {
-        Uri uri = TvContract.buildChannelsUriForInput(
-                new ComponentName(this, ExternalFileTvInputService.class), false);
+        Uri uri = TvContract.buildChannelsUriForInput(Utils.getInputIdFromComponentName(this,
+                new ComponentName(this, ExternalFileTvInputService.class)), false);
         getContentResolver().delete(uri, null, null);
         getContentResolver().delete(TvContract.Programs.CONTENT_URI, null, null);
         List<ChannelInfo> channels = ExternalFileTvInputService.parseSampleChannels();

@@ -42,7 +42,7 @@ public final class Channel {
     /** ID of this channel. Matches to BaseColumns._ID. */
     private long mId;
 
-    private String mServiceName;
+    private String mInputId;
     private int mType;
     private int mOriginalNetworkId;
     private int mTransportStreamId;
@@ -72,11 +72,11 @@ public final class Channel {
             channel.mId = INVALID_ID;
         }
 
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_SERVICE_NAME);
+        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_INPUT_ID);
         if (index >= 0) {
-            channel.mServiceName = cursor.getString(index);
+            channel.mInputId = cursor.getString(index);
         } else {
-            channel.mServiceName = "serviceName";
+            channel.mInputId = "inputId";
         }
 
         index = cursor.getColumnIndex(TvContract.Channels.COLUMN_TYPE);
@@ -145,8 +145,8 @@ public final class Channel {
         return mId;
     }
 
-    public String getServiceName() {
-        return mServiceName;
+    public String getInputId() {
+        return mInputId;
     }
 
     public int getType() {
@@ -191,7 +191,7 @@ public final class Channel {
 
     public ContentValues toContentValues() {
         ContentValues values = new ContentValues();
-        values.put(TvContract.Channels.COLUMN_SERVICE_NAME, mServiceName);
+        values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
         values.put(TvContract.Channels.COLUMN_TYPE, mType);
         values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, mTransportStreamId);
         values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, mDisplayNumber);
@@ -207,7 +207,7 @@ public final class Channel {
         return new StringBuilder()
                 .append("Channel{")
                 .append("id=").append(mId)
-                .append(", serviceName=").append(mServiceName)
+                .append(", inputId=").append(mInputId)
                 .append(", type=").append(mType)
                 .append(", originalNetworkId=").append(mOriginalNetworkId)
                 .append(", transportStreamId=").append(mTransportStreamId)
@@ -225,7 +225,7 @@ public final class Channel {
             return;
         }
         mId = other.mId;
-        mServiceName = other.mServiceName;
+        mInputId = other.mInputId;
         mType = other.mType;
         mTransportStreamId = other.mTransportStreamId;
         mOriginalNetworkId = other.mOriginalNetworkId;
@@ -243,7 +243,7 @@ public final class Channel {
             mChannel = new Channel();
             // Fill initial data.
             mChannel.mId = INVALID_ID;
-            mChannel.mServiceName = "serviceName";
+            mChannel.mInputId = "inputId";
             mChannel.mType = 0;
             mChannel.mTransportStreamId = 0;
             mChannel.mOriginalNetworkId = 0;
@@ -264,8 +264,8 @@ public final class Channel {
             return this;
         }
 
-        public Builder setServiceName(String serviceName) {
-            mChannel.mServiceName = serviceName;
+        public Builder setInputId(String inputId) {
+            mChannel.mInputId = inputId;
             return this;
         }
 

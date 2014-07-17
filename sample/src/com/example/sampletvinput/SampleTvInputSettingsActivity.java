@@ -36,7 +36,8 @@ public class SampleTvInputSettingsActivity extends Activity {
         layout.setOrientation(LinearLayout.VERTICAL);
         setContentView(layout);
 
-        String serviceName = getIntent().getStringExtra(TvInputInfo.EXTRA_SERVICE_NAME);
+        String inputId = getIntent().getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
+        String serviceName = Utils.getServiceNameFromInputId(this, inputId);
         Button btn = new Button(this);
         btn.setText("Settings of " + serviceName);
         btn.setOnClickListener(new OnClickListener() {

@@ -16,7 +16,11 @@
 
 package com.example.sampletvinput;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.ServiceInfo;
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
 import android.net.Uri;
 import android.util.Log;
 
@@ -55,6 +59,25 @@ class Utils {
         int len;
         while ((len = is.read(buffer)) != -1) {
             os.write(buffer, 0, len);
+        }
+    }
+
+    public static String getServiceNameFromInputId(Context context, String inputId) {
+        TvInputManager tim = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
+        for (TvInputInfo info : tim.getTvInputList()) {
+            if (info.getId().equals(inputId)) {
+                return info.getServiceInfo().name;
+            }
+        }
+    }
+
+    public static String getInputIdFromComponentName(Context context, ComponentName name) {
+        TvInputManager tim = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
+        for (TvInputInfo info : tim.getTvInputList()) {
+            ServiceInfo si = info.getServiceInfo();
+            if (new ComponentName(si.packageName, si.name).equals(name)) {
+                return info.getId();
+            }
         }
     }
 

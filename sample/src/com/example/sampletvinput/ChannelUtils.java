@@ -33,9 +33,9 @@ import java.util.Map;
 
 class ChannelUtils {
     public static void populateChannels(
-            Context context, String serviceName, List<ChannelInfo> channels) {
+            Context context, String inputId, List<ChannelInfo> channels) {
         ContentValues values = new ContentValues();
-        values.put(Channels.COLUMN_SERVICE_NAME, serviceName);
+        values.put(Channels.COLUMN_INPUT_ID, inputId);
         Map<Uri, String> logos = new HashMap<Uri, String>();
         for (ChannelInfo channel : channels) {
             values.put(Channels.COLUMN_DISPLAY_NUMBER, channel.mNumber);
