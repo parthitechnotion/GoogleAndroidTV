@@ -278,9 +278,8 @@ public class Utils {
 
     public static String getDisplayNameForInput(Context context, TvInputInfo info) {
         SharedPreferences preferences = getSharedPreferencesOfDisplayNameForInput(context);
-        PackageManager pm = context.getPackageManager();
         return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
-                info.loadLabel(pm).toString());
+                info.loadLabel(context).toString());
     }
 
     public static boolean hasActivity(Context context, TvInputInfo input, String action) {

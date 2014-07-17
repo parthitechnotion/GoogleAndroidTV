@@ -67,7 +67,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
             new LruCache<TvInputInfo, Drawable> (CACHE_SIZE) {
                 @Override
                 protected Drawable create(TvInputInfo info) {
-                    return info.loadIcon(getContext().getPackageManager());
+                    return info.loadIcon(getContext());
                 }
             };
 
