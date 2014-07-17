@@ -26,7 +26,6 @@ import android.media.MediaPlayer.TrackInfo;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Programs;
-import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
@@ -79,7 +78,7 @@ abstract public class BaseTvInputService extends TvInputService {
     }
 
     @Override
-    public TvInputService.Session onCreateSession(String inputId) {
+    public Session onCreateSession(String inputId) {
         if (DEBUG) Log.d(TAG, "onCreateSession(inputId=" + inputId + ")");
         return new BaseTvInputSessionImpl();
     }
