@@ -51,7 +51,8 @@ public class LocalTvInputService extends BaseTvInputService {
     private static final String WEBVIEW_SITE = "http://www.android.com";
 
     @Override
-    public TvInputService.Session onCreateSession() {
+    public TvInputService.Session onCreateSession(String inputId) {
+        if (DEBUG) Log.d(TAG, "onCreateSession(inputId=" + inputId + ")");
         TvInputService.Session impl = new LocalTvInputSessionImpl();
         impl.setOverlayViewEnabled(true);
         return impl;
