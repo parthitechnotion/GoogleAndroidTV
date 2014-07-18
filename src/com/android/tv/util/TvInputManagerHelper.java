@@ -18,7 +18,7 @@ package com.android.tv.util;
 
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
-import android.media.tv.TvInputManager.TvInputListener;
+import android.media.tv.TvInputManager.TvInputCallback;
 import android.os.Handler;
 import android.util.Log;
 
@@ -41,19 +41,19 @@ public class TvInputManagerHelper {
             new HashMap<String, Integer>();
     private final Map<String, TvInputInfo> mInputMap =
             new HashMap<String, TvInputInfo>();
-    private final TvInputListener mInternalListener =
-            new TvInputListener() {
+    private final TvInputCallback mInternalCallback =
+            new TvInputCallback() {
                 @Override
                 public void onInputStateChanged(String inputId, int state) {
                     mInputStateMap.put(inputId, state);
-                    for (TvInputListener listener : mListeners) {
+                    for (TvInputCallback listener : mCallbacks) {
                         listener.onInputStateChanged(inputId, state);
                     }
                 }
             };
     private final Handler mHandler = new Handler();
     private boolean mStarted;
-    private final HashSet<TvInputListener> mListeners = new HashSet<TvInputListener>();
+    private final HashSet<TvInputCallback> mCallbacks = new HashSet<TvInputCallback>();
 
     public TvInputManagerHelper(TvInputManager tvInputManager) {
         mTvInputManager = tvInputManager;
@@ -68,7 +68,7 @@ public class TvInputManagerHelper {
         if (inputs.size() < 1) {
             return;
         }
-        mTvInputManager.registerListener(mInternalListener, mHandler);
+        mTvInputManager.registerCallback(mInternalCallback, mHandler);
         update();
     }
 
@@ -93,7 +93,7 @@ public class TvInputManagerHelper {
         if (!mStarted) {
             return;
         }
-        mTvInputManager.unregisterListener(mInternalListener);
+        mTvInputManager.unregisterCallback(mInternalCallback);
         mStarted = false;
         mInputStateMap.clear();
         mInputMap.clear();
@@ -155,11 +155,11 @@ public class TvInputManagerHelper {
         return state;
     }
 
-    public void addListener(TvInputListener listener) {
-        mListeners.add(listener);
+    public void addCallback(TvInputCallback listener) {
+        mCallbacks.add(listener);
     }
 
-    public void removeListener(TvInputListener listener) {
-        mListeners.remove(listener);
+    public void removeCallback(TvInputCallback listener) {
+        mCallbacks.remove(listener);
     }
 }
