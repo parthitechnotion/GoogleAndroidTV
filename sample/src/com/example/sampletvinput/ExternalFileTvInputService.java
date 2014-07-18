@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ExternalFileTvInputService extends BaseTvInputService {
@@ -48,8 +49,8 @@ public class ExternalFileTvInputService extends BaseTvInputService {
                 is = new FileInputStream(file);
                 sSampleChannels = ChannelXMLParser.parseChannelXML(is);
             } catch (XmlPullParserException | IOException e) {
-                // TODO: Disable this service.
                 Log.w(TAG, "failed to load channels.");
+                sSampleChannels = Collections.emptyList();
             } finally {
                 if (is != null) {
                     try {
