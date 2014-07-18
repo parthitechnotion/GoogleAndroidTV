@@ -47,8 +47,6 @@ public class Utils {
     public static final String EXTRA_SERVICE_NAME = "serviceName";
     public static final String EXTRA_KEYCODE = "keycode";
 
-    public static final String CHANNEL_SORT_ORDER_BY_INPUT_ID = TvContract.Channels.COLUMN_INPUT_ID;
-
     public static final String CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER =
             "CAST(" + TvContract.Channels.COLUMN_DISPLAY_NUMBER + " AS INTEGER), "
             + "CAST(SUBSTR(LTRIM(" + TvContract.Channels.COLUMN_DISPLAY_NUMBER
