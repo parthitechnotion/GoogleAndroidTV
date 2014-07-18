@@ -209,7 +209,9 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         mChannelNameTextView.setText(displayName);
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
-        channelMap.getCurrentChannel().loadLogo(getContext(), this);
+        if (channelMap.getCurrentChannel() != null) {
+            channelMap.getCurrentChannel().loadLogo(getContext(), this);
+        }
 
         updateProgramInfo();
     }
