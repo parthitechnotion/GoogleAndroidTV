@@ -23,7 +23,6 @@ import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.TrackInfo;
-import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Programs;
 import android.media.tv.TvInputInfo;
@@ -173,11 +172,6 @@ abstract public class BaseTvInputService extends TvInputService {
             if (DEBUG) Log.d(TAG, "onSetStreamVolume(" + volume + ")");
             mVolume = volume;
             mPlayer.setVolume(volume, volume);
-        }
-
-        @Override
-        public void onContentUnblocked(TvContentRating rating) {
-            // Do nothing.
         }
 
         private boolean setDataSource(MediaPlayer player, ChannelInfo channel) {
