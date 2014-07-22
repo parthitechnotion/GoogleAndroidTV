@@ -15,5 +15,4 @@
 -->
 
 <tv-input xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="com.example.android.fakehardwaretvinput.SettingsActivity"
-    android:tvInputType="hdmi" />
+    android:settingsActivity="com.example.android.fakehardwaretvinput.SettingsActivity" />
