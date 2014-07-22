@@ -124,6 +124,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     private static final HashSet<String> AVAILABLE_DIALOG_TAGS = new HashSet<String>();
 
+    private View mContentView;
     private TunableTvView mTvView;
     private LinearLayout mControlGuide;
     private MainMenuView mMainMenuView;
@@ -190,6 +191,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_tv);
+        mContentView = findViewById(android.R.id.content);
         mTvView = (TunableTvView) findViewById(R.id.main_tv_view);
         mTvView.setOnUnhandledInputEventListener(new OnUnhandledInputEventListener() {
             @Override
@@ -716,8 +718,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (DEBUG) Log.d(TAG, "dispatchKeyEvent(" + event + ")");
-        if (mMainMenuView.isShown() || mKeypadView.wantKeys()
-                || getFragmentManager().getBackStackEntryCount() > 0) {
+        if (mContentView.hasFocusable() || getFragmentManager().getBackStackEntryCount() > 0) {
             return super.dispatchKeyEvent(event);
         }
         int eventKeyCode = event.getKeyCode();
