@@ -133,4 +133,8 @@
 
     <!-- The text used when there is no program title. -->
     <string name="channel_banner_no_title">No title</string>
+
+    <!--  Debug Options -->
+    <string name="menu_debug_options">Debug Options</string>
+    <string name="item_watch_history">Watch History</string>
 </resources>

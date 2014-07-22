@@ -42,7 +42,6 @@ public class BaseSideFragment extends Fragment {
     private TextView mTitleView;
     private VerticalGridView mOptionItemListView;
     private LayoutInflater mLayoutInflater;
-    protected final OptionItemAdapter mAdapter = new OptionItemAdapter();
     private Object[] mItemTags;
     private int mPrevSelectedItemPosition;
     private int mFragmentLayoutId;
@@ -57,7 +56,7 @@ public class BaseSideFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // initialize should be called before onCreateView.
-        Preconditions.checkState(mItemTags != null);
+        Preconditions.checkState(!TextUtils.isEmpty(mTitle));
         Bundle arg = getArguments();
         if (arg != null && arg.containsKey(KEY_INITIATOR)) {
             mInitiator = arg.getInt(KEY_INITIATOR);
@@ -78,7 +77,7 @@ public class BaseSideFragment extends Fragment {
             }
         });
 
-        mOptionItemListView.setAdapter(mAdapter);
+        mOptionItemListView.setAdapter(new OptionItemAdapter());
         mLayoutInflater = inflater;
         return fragView;
     }
@@ -87,9 +86,15 @@ public class BaseSideFragment extends Fragment {
         return mInitiator;
     }
 
+    public void notifyDataSetChanged() {
+        if (mOptionItemListView != null) {
+            mOptionItemListView.getAdapter().notifyDataSetChanged();
+        }
+    }
+
     public void setPrevSelectedItemPosition(int position) {
         mPrevSelectedItemPosition = position;
-        mAdapter.notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
@@ -121,7 +126,7 @@ public class BaseSideFragment extends Fragment {
         mItemBgColor = getActivity().getResources().getColor(itemBgColorResId);
         mItemFocusedBgColor = getActivity().getResources().getColor(itemFocusedBgColorResId);
         mItemHeight = getActivity().getResources().getDimensionPixelOffset(itemHeightResId);
-        mAdapter.notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     class OptionItemAdapter extends RecyclerView.Adapter<OptionItemAdapter.MyViewHolder> {
@@ -140,7 +145,7 @@ public class BaseSideFragment extends Fragment {
                 public void onFocusChange(View v, boolean focusGained) {
                     int position = (Integer) v.getTag(R.id.TAG_OPTION_ITEM_POSITOIN);
                     onItemFocusChanged(v, focusGained, position, mItemTags[position]);
-                    }
+                }
             });
             onCreatedChildView(v);
             return new MyViewHolder(v);
