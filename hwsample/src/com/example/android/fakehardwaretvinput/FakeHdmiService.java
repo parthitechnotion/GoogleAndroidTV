@@ -90,7 +90,8 @@ public class FakeHdmiService extends TvInputService {
                 PackageManager.GET_SERVICES | PackageManager.GET_META_DATA);
         TvInputInfo info = null;
         try {
-            info = TvInputInfo.createTvInputInfo(this, ri, hardwareInfo);
+            info = TvInputInfo.createTvInputInfo(this, ri, hardwareInfo,
+                    "HDMI " + hardwareInfo.getHdmiPortId(), null);
         } catch (XmlPullParserException | IOException e) {
             Log.e(TAG, "Error while creating TvInputInfo", e);
             return null;
