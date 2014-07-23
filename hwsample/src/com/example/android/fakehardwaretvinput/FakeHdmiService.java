@@ -58,7 +58,8 @@ public class FakeHdmiService extends TvInputService {
     private static final boolean DEBUG = true;
     private static final String TAG = FakeHdmiService.class.getSimpleName();
     private static final int PORT_MASK = 0xF000;
-    private static final int[] COLORS = { Color.RED, Color.GREEN, Color.BLUE };
+    private static final int[] COLORS = {
+          0xFF888888, 0xFF999999, 0xFFAAAAAA, 0xFFBBBBBB, 0xFFAAAAAA, 0xFF999999};
     private static final int[] ICONS = { R.drawable.fake_icon0, R.drawable.fake_icon1,
           R.drawable.fake_icon2, R.drawable.fake_icon3 };
 
