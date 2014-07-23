@@ -19,9 +19,11 @@ package com.example.sampletvinput;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ServiceInfo;
+import android.media.tv.TvContentRating;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import libcore.io.IoUtils;
@@ -81,6 +83,31 @@ class Utils {
             }
         }
         return null;
+    }
+
+    public static TvContentRating[] stringToContentRatings(String commaSeparatedRatings) {
+        if (TextUtils.isEmpty(commaSeparatedRatings)) {
+            return null;
+        }
+        String[] ratings = commaSeparatedRatings.split("\\s*,\\s*");
+        TvContentRating[] contentRatings = new TvContentRating[ratings.length];
+        for (int i = 0; i < contentRatings.length; ++i) {
+            contentRatings[i] = TvContentRating.unflattenFromString(ratings[i]);
+        }
+        return contentRatings;
+    }
+
+    public static String contentRatingsToString(TvContentRating[] contentRatings) {
+        if (contentRatings == null || contentRatings.length == 0) {
+            return null;
+        }
+        final String DELIMITER = ",";
+        StringBuilder ratings = new StringBuilder(contentRatings[0].flattenToString());
+        for (int i = 1; i < contentRatings.length; ++i) {
+            ratings.append(DELIMITER);
+            ratings.append(contentRatings[i].flattenToString());
+        }
+        return ratings.toString();
     }
 
     private Utils() {}

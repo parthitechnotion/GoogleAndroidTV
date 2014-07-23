@@ -16,6 +16,7 @@
 
 package com.example.sampletvinput;
 
+import android.media.tv.TvContentRating;
 import android.util.Log;
 import android.util.Xml;
 
@@ -53,6 +54,7 @@ public class ChannelXMLParser {
     private static final String ATTR_DURATION_SEC = "duration_sec";
     private static final String ATTR_VIDEO_URL = "video_url";
     private static final String ATTR_DESCRIPTION = "description";
+    private static final String ATTR_CONTENT_RATING = "content_rating";
 
     public static List<ChannelInfo> parseChannelXML(InputStream in)
             throws XmlPullParserException, IOException {
@@ -129,6 +131,7 @@ public class ChannelXMLParser {
         String videoUrl = null;
         String description = null;
         String posterArtUri = null;
+        String contentRatings = null;
         for (int i = 0; i < parser.getAttributeCount(); ++i) {
             String attr = parser.getAttributeName(i);
             String value = parser.getAttributeValue(i);
@@ -148,9 +151,11 @@ public class ChannelXMLParser {
                 videoUrl = value;
             } else if (ATTR_DESCRIPTION.equals(attr)) {
                 description = value;
+            } else if (ATTR_CONTENT_RATING.equals(attr)) {
+                contentRatings = value;
             }
         }
         return new ProgramInfo(title, posterArtUri, description, startTimeSec, durationSec,
-                videoUrl, 0);
+                Utils.stringToContentRatings(contentRatings), videoUrl, 0);
     }
 }
