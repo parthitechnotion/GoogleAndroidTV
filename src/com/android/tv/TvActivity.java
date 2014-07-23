@@ -32,6 +32,7 @@ import android.media.AudioManager;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvTrackInfo;
+import android.media.tv.TvView.OnUnhandledInputEventListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -189,8 +190,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_tv);
-        mTvView = (TunableTvView) findViewById(R.id.tv_view);
-        mTvView.setOnUnhandledInputEventListener(new TunableTvView.OnUnhandledInputEventListener() {
+        mTvView = (TunableTvView) findViewById(R.id.main_tv_view);
+        mTvView.setOnUnhandledInputEventListener(new OnUnhandledInputEventListener() {
             @Override
             public boolean onUnhandledInputEvent(InputEvent event) {
                 if (event instanceof KeyEvent) {
@@ -214,7 +215,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 return false;
             }
         });
-        mPipView = (TunableTvView) findViewById(R.id.pip_view);
+        mPipView = (TunableTvView) findViewById(R.id.pip_tv_view);
         mPipView.setPip(true);
 
         mControlGuide = (LinearLayout) findViewById(R.id.control_guide);
@@ -240,7 +241,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     @Override
                     public void run() {
                         if (mPipEnabled) {
-                            mPipView.setVisibility(View.INVISIBLE);
+                            mPipView.setVisibility(View.GONE);
                         }
                     }
                 },
@@ -385,7 +386,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     protected void onPause() {
         hideOverlays(true, true, true);
         if (mPipEnabled) {
-            mPipView.setVisibility(View.INVISIBLE);
+            mPipView.setVisibility(View.GONE);
         }
         mActivityResumed = false;
         super.onPause();
@@ -864,7 +865,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private void stopPip() {
         if (DEBUG) Log.d(TAG, "stopPip");
         if (mPipView.isPlaying()) {
-            mPipView.setVisibility(View.INVISIBLE);
+            mPipView.setVisibility(View.GONE);
             mPipView.stop();
         }
     }
