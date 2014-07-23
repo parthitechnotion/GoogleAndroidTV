@@ -23,6 +23,7 @@ import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.TrackInfo;
+import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Programs;
 import android.media.tv.TvInputInfo;
@@ -406,6 +407,8 @@ abstract public class BaseTvInputService extends TvInputService {
                 values.put(Programs.COLUMN_CHANNEL_ID, ContentUris.parseId(mChannelUri));
                 values.put(Programs.COLUMN_TITLE, mProgram.mTitle);
                 values.put(Programs.COLUMN_SHORT_DESCRIPTION, mProgram.mDescription);
+                values.put(Programs.COLUMN_CONTENT_RATING,
+                        Utils.contentRatingsToString(mProgram.mContentRatings));
                 if (!TextUtils.isEmpty(mProgram.mPosterArtUri)) {
                     values.put(Programs.COLUMN_POSTER_ART_URI, mProgram.mPosterArtUri);
                 }
@@ -473,16 +476,18 @@ abstract public class BaseTvInputService extends TvInputService {
         public final String mDescription;
         public final long mStartTimeSec;
         public final long mDurationSec;
+        public final TvContentRating[] mContentRatings;
         public final String mUrl;
         public final int mResourceId;
 
         public ProgramInfo(String title, String posterArtUri, String description, long startTimeSec,
-                long durationSec, String url, int resourceId) {
+                long durationSec, TvContentRating[] contentRatings, String url, int resourceId) {
             mTitle = title;
             mPosterArtUri = posterArtUri;
             mDescription = description;
             mStartTimeSec = startTimeSec;
             mDurationSec = durationSec;
+            mContentRatings = contentRatings;
             mUrl = url;
             mResourceId = resourceId;
         }

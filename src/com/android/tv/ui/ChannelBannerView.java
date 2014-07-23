@@ -23,6 +23,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.tv.TvContract;
+import android.media.tv.TvContentRating;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.os.Handler;
@@ -49,6 +50,8 @@ import com.android.tv.util.Utils;
  */
 public class ChannelBannerView extends RelativeLayout implements Channel.LoadLogoCallback {
     private static final int CACHE_SIZE = 10;
+    // TODO: Need to get UX design for how to show ratings in the channel banner.
+    private TextView mRatingTextView;
     private TextView mClosedCaptionTextView;
     private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
@@ -118,6 +121,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     protected void onFinishInflate() {
         super.onFinishInflate();
 
+        mRatingTextView = (TextView) findViewById(R.id.rating);
         mClosedCaptionTextView = (TextView) findViewById(R.id.closed_caption);
         mResolutionTextView = (TextView) findViewById(R.id.resolution);
         mAspectRatioTextView = (TextView) findViewById(R.id.aspect_ratio);
@@ -327,6 +331,12 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
             mProgrameDescriptionTextView.setText(program.getDescription());
         } else {
             mProgrameDescriptionTextView.setVisibility(View.GONE);
+        }
+        if (program.getContentRatings() != null) {
+            mRatingTextView.setText(Utils.contentRatingsToString(program.getContentRatings()));
+            mRatingTextView.setVisibility(View.VISIBLE);
+        } else {
+            mRatingTextView.setVisibility(View.GONE);
         }
     }
 

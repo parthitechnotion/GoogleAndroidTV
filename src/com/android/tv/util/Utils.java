@@ -24,8 +24,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
 import android.database.Cursor;
+import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
@@ -176,6 +176,7 @@ public class Utils {
                 TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
                 TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS,
                 TvContract_Programs_COLUMN_VIDEO_RESOLUTION,
+                TvContract.Programs.COLUMN_CONTENT_RATING,
                 TvContract.Programs.COLUMN_POSTER_ART_URI,
                 TvContract.Programs.COLUMN_THUMBNAIL_URI };
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
@@ -186,14 +187,16 @@ public class Utils {
         String posterArtUri = null;
         String thumbnailUri = null;
         String videoDefinitionLevel = "";
+        String contentRatings = "";
         if (cursor.moveToNext()) {
             title = cursor.getString(0);
             description = cursor.getString(1);
             startTime = cursor.getLong(2);
             endTime = cursor.getLong(3);
             videoDefinitionLevel = cursor.getString(4);
-            posterArtUri = cursor.getString(5);
-            thumbnailUri = cursor.getString(6);
+            contentRatings = cursor.getString(5);
+            posterArtUri = cursor.getString(6);
+            thumbnailUri = cursor.getString(7);
         }
         cursor.close();
 
@@ -204,6 +207,7 @@ public class Utils {
                 .setStartTimeUtcMillis(startTime)
                 .setEndTimeUtcMillis(endTime)
                 .setVideoDefinitionLevel(videoDefinitionLevel)
+                .setContentRatings(stringToContentRatings(contentRatings))
                 .setPosterArtUri(posterArtUri)
                 .setThumbnailUri(thumbnailUri).build();
     }
@@ -324,6 +328,31 @@ public class Utils {
                 return "7.1";
         }
         return "";
+    }
+
+    public static TvContentRating[] stringToContentRatings(String commaSeparatedRatings) {
+        if (TextUtils.isEmpty(commaSeparatedRatings)) {
+            return null;
+        }
+        String[] ratings = commaSeparatedRatings.split("\\s*,\\s*");
+        TvContentRating[] contentRatings = new TvContentRating[ratings.length];
+        for (int i = 0; i < contentRatings.length; ++i) {
+            contentRatings[i] = TvContentRating.unflattenFromString(ratings[i]);
+        }
+        return contentRatings;
+    }
+
+    public static String contentRatingsToString(TvContentRating[] contentRatings) {
+        if (contentRatings == null || contentRatings.length == 0) {
+            return null;
+        }
+        final String DELIMITER = ",";
+        StringBuilder ratings = new StringBuilder(contentRatings[0].flattenToString());
+        for (int i = 1; i < contentRatings.length; ++i) {
+            ratings.append(DELIMITER);
+            ratings.append(contentRatings[i].flattenToString());
+        }
+        return ratings.toString();
     }
 
     private static ActivityInfo getActivityInfo(Context context, TvInputInfo input, String action) {
