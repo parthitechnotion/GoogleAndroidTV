@@ -21,6 +21,7 @@ import android.content.pm.ResolveInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.hardware.hdmi.HdmiCecDeviceInfo;
 import android.hardware.hdmi.HdmiPortInfo;
@@ -43,6 +44,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -56,7 +58,9 @@ public class FakeHdmiService extends TvInputService {
     private static final boolean DEBUG = true;
     private static final String TAG = FakeHdmiService.class.getSimpleName();
     private static final int PORT_MASK = 0xF000;
-    private static final int[] COLORS = { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF };
+    private static final int[] COLORS = { Color.RED, Color.GREEN, Color.BLUE };
+    private static final int[] ICONS = { R.drawable.fake_icon0, R.drawable.fake_icon1,
+          R.drawable.fake_icon2, R.drawable.fake_icon3 };
 
     private ITvInputManager mManager = null;
     private IHdmiControlService mHdmiControlService = null;
@@ -67,6 +71,7 @@ public class FakeHdmiService extends TvInputService {
     // A map from port address to port ID.
     private SparseIntArray mPortIdMap = new SparseIntArray();
     private ResolveInfo mResolveInfo;
+    private final Random mRandom = new Random();
 
     private static class PortInfo {
         private final int mPortId;
@@ -201,7 +206,9 @@ public class FakeHdmiService extends TvInputService {
         TvInputInfo info = null;
         try {
             info = TvInputInfo.createTvInputInfo(this, mResolveInfo, cecDeviceInfo,
-                    parentInfo.getId(), cecDeviceInfo.getDisplayName(), null);
+                    parentInfo.getId(), cecDeviceInfo.getDisplayName(),
+                    Uri.parse("android.resource://" + getPackageName() + "/"
+                          + ICONS[mRandom.nextInt(ICONS.length)]));
         } catch (XmlPullParserException | IOException e) {
             Log.e(TAG, "Error while creating TvInputInfo", e);
             return null;
@@ -245,7 +252,7 @@ public class FakeHdmiService extends TvInputService {
                     if (mSurface != null) {
                         Canvas c = mSurface.lockCanvas(null);
                         c.drawColor(COLORS[mIndex]);
-                        c.drawText(mLabel, 0f, 0f, mTextPaint);
+                        c.drawText(mLabel, 100f, 200f, mTextPaint);
                         mSurface.unlockCanvasAndPost(c);
                     }
                 }
@@ -260,7 +267,8 @@ public class FakeHdmiService extends TvInputService {
         HdmiInputSessionImpl(TvInputInfo info) {
             mInfo = info;
             mLabel = info.loadLabel(FakeHdmiService.this).toString();
-            mTextPaint.setColor(0xFF000000);
+            mTextPaint.setColor(Color.BLACK);
+            mTextPaint.setTextSize(200);
             mHandler.post(mDrawTask);
         }
 
