@@ -36,6 +36,7 @@
         in the picture-in-piture mode from the current TV input, i.e. this input device is already
         selected. -->
     <string name="selected_picture_in_picture">(Selected/Picture-In-Picture)</string>
+    <string name="not_passthrough_input">It is not a passthrough TV input</string>
     <string name="no_input_device_found">No input device found</string>
     <string name="no_available_input_device">No input device is available</string>
     <string name="input_is_not_available">The TV input is not available. Please change the TV input.</string>
