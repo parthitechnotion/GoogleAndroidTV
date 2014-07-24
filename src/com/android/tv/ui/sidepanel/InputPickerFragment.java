@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv.ui;
-
-import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
+package com.android.tv.ui.sidepanel;
 
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
@@ -98,7 +96,7 @@ public class InputPickerFragment extends BaseOptionFragment {
     public void onBindView(View v, int position, Object tag, boolean prevSelected) {
         super.onBindView(v, position, tag, prevSelected);
         TvInput input = (TvInput) tag;
-        boolean available = input.getInputState() != INPUT_STATE_DISCONNECTED;
+        boolean available = input.getInputState() != TvInputManager.INPUT_STATE_DISCONNECTED;
         v.setEnabled(available);
         v.setClickable(available);
 

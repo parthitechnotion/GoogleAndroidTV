@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv.ui;
+package com.android.tv.ui.sidepanel;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 
 import com.android.tv.R;
-import com.android.tv.TvActivity;
 import com.android.tv.data.GenreItems;
 
 public class SimpleGuideShowOnlyFragment extends BaseSideFragment {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv.ui;
+package com.android.tv.ui.sidepanel;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;

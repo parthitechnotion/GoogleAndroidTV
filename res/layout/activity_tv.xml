@@ -76,7 +76,7 @@
         <include layout="@layout/channel_number" />
     </FrameLayout>
 
-    <com.android.tv.ui.SidePanelContainer
+    <com.android.tv.ui.sidepanel.SidePanelContainer
         android:id="@+id/right_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
