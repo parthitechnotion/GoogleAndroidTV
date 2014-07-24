@@ -37,6 +37,7 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelMap;
 import com.android.tv.recommendation.RecentChannelRecommender;
 import com.android.tv.recommendation.TvRecommendation;
+import com.android.tv.ui.sidepanel.BaseSideFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;

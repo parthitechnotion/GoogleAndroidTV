@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package com.android.tv.ui;
+package com.android.tv.ui.sidepanel;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.android.tv.R;
 import com.android.tv.TvActivity;
+import com.android.tv.data.DisplayMode;
 
-public class ClosedCaptionOptionFragment extends BaseOptionFragment {
-    private static final String TAG = "ClosedCaptionOptionFragment";
+public class DisplayModeOptionFragment extends BaseOptionFragment {
+    private static final String TAG = "AspectRatioOptionFragment";
     private static final boolean DEBUG = true;
-
-    private static final int CC_ON = 0;
-    private static final int CC_OFF = 1;
 
     private TvActivity mTvActivity;
     private boolean mIsFirstResume;
-    private boolean mLastStoredCcEnabled;
-    private boolean mCcEnabled;
+    private int mLastStoredAspectRatio;
+    private int mAspectRatio;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,11 +40,11 @@ public class ClosedCaptionOptionFragment extends BaseOptionFragment {
         mIsFirstResume = true;
         mTvActivity = (TvActivity) getActivity();
 
-        Object[] items = new Object[2];
-        items[0] = getString(R.string.option_item_on);
-        items[1] = getString(R.string.option_item_off);
-
-        initialize(getString(R.string.closed_caption_option_title), items);
+        Object[] items = new Object[DisplayMode.SIZE_OF_RATIO_TYPES];
+        for (int i = 0; i < DisplayMode.SIZE_OF_RATIO_TYPES; ++i) {
+            items[i] = DisplayMode.getLabel(i, getActivity());
+        }
+        initialize(getString(R.string.display_mode_option_title), items);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -55,9 +52,9 @@ public class ClosedCaptionOptionFragment extends BaseOptionFragment {
     public void onResume() {
         super.onResume();
         if (mIsFirstResume) {
-            mCcEnabled = mTvActivity.isClosedCaptionEnabled();
-            mLastStoredCcEnabled = mCcEnabled;
-            int initialPosition = mCcEnabled ? CC_ON : CC_OFF;
+            mAspectRatio = mTvActivity.getDisplayMode();
+            mLastStoredAspectRatio = mAspectRatio;
+            int initialPosition = mAspectRatio;
             setSelectedPosition(initialPosition);
             setPrevSelectedItemPosition(initialPosition);
             mIsFirstResume = false;
@@ -67,8 +64,8 @@ public class ClosedCaptionOptionFragment extends BaseOptionFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        if (mLastStoredCcEnabled != mCcEnabled) {
-            mTvActivity.restoreClosedCaptionEnabled();
+        if (mLastStoredAspectRatio != mAspectRatio) {
+            mTvActivity.restoreDisplayMode();
         }
     }
 
@@ -76,17 +73,16 @@ public class ClosedCaptionOptionFragment extends BaseOptionFragment {
     public void onItemFocusChanged(View v, boolean focusGained, int position, Object tag) {
         super.onItemFocusChanged(v, focusGained, position, tag);
         if (focusGained) {
-            mCcEnabled = (position == CC_ON);
-            mTvActivity.setClosedCaptionEnabled(mCcEnabled, false);
+            mAspectRatio = position;
+            mTvActivity.setDisplayMode(position, false);
         }
     }
 
     @Override
     public void onItemSelected(View v, int position, Object tag) {
-        mCcEnabled = (position == CC_ON);
-        mTvActivity.setClosedCaptionEnabled(mCcEnabled, true);
-        mLastStoredCcEnabled = mCcEnabled;
+        mAspectRatio = position;
+        mTvActivity.setDisplayMode(mAspectRatio, true);
+        mLastStoredAspectRatio = mAspectRatio;
         super.onItemSelected(v, position, tag);
-        Toast.makeText(getActivity(), R.string.not_implemented_yet, Toast.LENGTH_SHORT).show();
     }
 }

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.android.tv.ui;
+package com.android.tv.ui.sidepanel;
 
 import android.content.ContentValues;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v17.leanback.widget.VerticalGridView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
