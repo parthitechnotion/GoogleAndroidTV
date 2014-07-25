@@ -113,10 +113,15 @@
         android:indeterminate="false"
         android:max="100" />
 
-    <TextView android:id="@+id/rating"
+    <TextView android:id="@+id/video_status"
         style="@style/channel_banner_track_meta_text"
         android:layout_alignBottom="@id/anchor"
         android:layout_toRightOf="@id/remaining_time" />
+
+    <TextView android:id="@+id/rating"
+        style="@style/channel_banner_track_meta_text"
+        android:layout_alignBottom="@id/anchor"
+        android:layout_toRightOf="@id/video_status" />
 
     <TextView android:id="@+id/closed_caption"
         style="@style/channel_banner_track_meta_text"
