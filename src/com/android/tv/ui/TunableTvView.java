@@ -1,10 +1,9 @@
 package com.android.tv.ui;
 
-import static android.media.tv.TvInputManager.INPUT_STATE_DISCONNECTED;
-
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
 import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView;
 import android.net.Uri;
@@ -15,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.StreamInfo;
 import com.android.tv.util.TvInputManagerHelper;
@@ -40,6 +40,8 @@ public class TunableTvView extends TvView implements StreamInfo {
     private int mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
     private int mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
     private boolean mHasClosedCaption = false;
+    private boolean mIsVideoAvailable;
+    private int mVideoUnavailableReason;
     private SurfaceView mSurface;
     private boolean mCanReceiveInputEvent;
 
@@ -123,6 +125,23 @@ public class TunableTvView extends TvView implements StreamInfo {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
                     }
                 }
+
+                @Override
+                public void onVideoAvailable(String inputId) {
+                    mIsVideoAvailable = true;
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
+                    }
+                }
+
+                @Override
+                public void onVideoUnavailable(String inputId, int reason) {
+                    mIsVideoAvailable = false;
+                    mVideoUnavailableReason = reason;
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
+                    }
+                }
             };
 
     public TunableTvView(Context context) {
@@ -182,7 +201,8 @@ public class TunableTvView extends TvView implements StreamInfo {
         String inputId = Utils.getInputIdForChannel(getContext(), channelId);
         TvInputInfo inputInfo = mInputManagerHelper.getTvInputInfo(inputId);
         if (inputInfo == null
-                || mInputManagerHelper.getInputState(inputInfo) == INPUT_STATE_DISCONNECTED) {
+                || mInputManagerHelper.getInputState(inputInfo) ==
+                        TvInputManager.INPUT_STATE_DISCONNECTED) {
             return false;
         }
         mOnTuneListener = listener;
@@ -283,5 +303,15 @@ public class TunableTvView extends TvView implements StreamInfo {
     @Override
     public boolean hasClosedCaption() {
         return mHasClosedCaption;
+    }
+
+    @Override
+    public boolean isVideoAvailable() {
+        return mIsVideoAvailable;
+    }
+
+    @Override
+    public int getVideoUnavailableReason() {
+        return mVideoUnavailableReason;
     }
 }

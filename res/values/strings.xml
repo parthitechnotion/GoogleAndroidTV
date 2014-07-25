@@ -105,6 +105,12 @@
     <string name="channel_banner_time_format">h:mm a</string>
     <!-- Program time format string at the channel banner [DO NOT TRANSLATE] -->
     <string name="channel_banner_program_time_format">%1$s - %2$s</string>
+    <!-- Video unavailable message at the channel banner. Unknown reason [CHAR LIMIT=30] -->
+    <string name="channel_banner_video_unavailable_unknown">Video unavailable</string>
+    <!-- Video unavailable message at the channel banner. Weak or no signal. [CHAR LIMIT=30] -->
+    <string name="channel_banner_video_unavailable_weak_signal">Weak signal</string>
+    <!-- Video unavailable message at the channel banner. Buffering. [CHAR LIMIT=30] -->
+    <string name="channel_banner_video_unavailable_buffering">Buffering</string>
 
     <!-- Label of reset button. [CHAR LIMIT=20] -->
     <string name="reset">Reset</string>

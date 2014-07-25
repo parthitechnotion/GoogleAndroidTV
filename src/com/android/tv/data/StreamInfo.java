@@ -34,4 +34,6 @@ public interface StreamInfo {
     int getVideoDefinitionLevel();
     int getAudioChannelCount();
     boolean hasClosedCaption();
+    boolean isVideoAvailable();
+    int getVideoUnavailableReason();
 }

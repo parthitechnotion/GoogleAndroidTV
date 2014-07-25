@@ -22,9 +22,10 @@ import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.media.tv.TvContract;
 import android.media.tv.TvContentRating;
+import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -50,20 +51,21 @@ import com.android.tv.util.Utils;
  */
 public class ChannelBannerView extends RelativeLayout implements Channel.LoadLogoCallback {
     private static final int CACHE_SIZE = 10;
+    private TextView mChannelTextView;
+    private ImageView mChannelLogoImageView;
+    private TextView mProgramTextView;
+    private ImageView mTvInputLogoImageView;
+    private TextView mChannelNameTextView;
+    private TextView mProgramTimeTextView;
+    private ProgressBar mRemainingTimeView;
+    private TextView mVideoStatus;
     // TODO: Need to get UX design for how to show ratings in the channel banner.
     private TextView mRatingTextView;
     private TextView mClosedCaptionTextView;
-    private TextView mResolutionTextView;
     private TextView mAspectRatioTextView;
+    private TextView mResolutionTextView;
     private TextView mAudioChannelTextView;
-    private ProgressBar mRemainingTimeView;
     private TextView mProgrameDescriptionTextView;
-    private TextView mChannelTextView;
-    private TextView mChannelNameTextView;
-    private ImageView mTvInputLogoImageView;
-    private ImageView mChannelLogoImageView;
-    private TextView mProgramTextView;
-    private TextView mProgramTimeTextView;
     private View mAnchorView;
     private Uri mCurrentChannelUri;
     private final LruCache<TvInputInfo, Drawable> mChannelInfoLogoCache =
@@ -121,66 +123,26 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     protected void onFinishInflate() {
         super.onFinishInflate();
 
+        mChannelTextView = (TextView) findViewById(R.id.channel_text);
+        mChannelLogoImageView = (ImageView) findViewById(R.id.channel_logo);
+        mProgramTextView = (TextView) findViewById(R.id.program_text);
+        mTvInputLogoImageView = (ImageView) findViewById(R.id.tvinput_logo);
+        mChannelNameTextView = (TextView) findViewById(R.id.channel_name);
+        mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
+        mRemainingTimeView = (ProgressBar) findViewById(R.id.remaining_time);
+        mVideoStatus = (TextView) findViewById(R.id.video_status);
         mRatingTextView = (TextView) findViewById(R.id.rating);
         mClosedCaptionTextView = (TextView) findViewById(R.id.closed_caption);
-        mResolutionTextView = (TextView) findViewById(R.id.resolution);
         mAspectRatioTextView = (TextView) findViewById(R.id.aspect_ratio);
+        mResolutionTextView = (TextView) findViewById(R.id.resolution);
         mAudioChannelTextView = (TextView) findViewById(R.id.audio_channel);
-        mRemainingTimeView = (ProgressBar) findViewById(R.id.remaining_time);
-        mChannelTextView = (TextView) findViewById(R.id.channel_text);
-        mChannelNameTextView = (TextView) findViewById(R.id.channel_name);
-        mTvInputLogoImageView = (ImageView) findViewById(R.id.tvinput_logo);
-        mChannelLogoImageView = (ImageView) findViewById(R.id.channel_logo);
-        mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
-        mProgramTextView = (TextView) findViewById(R.id.program_text);
         mAnchorView = findViewById(R.id.anchor);
     }
 
     public void updateViews(ChannelMap channelMap, StreamInfo info) {
         if (channelMap == null || !channelMap.isLoadFinished()) {
             return;
-        }
-
-        TvInputInfo inputInfo = (info == null) ? null : info.getCurrentTvInputInfo();
-        Drawable tvInputLogo = (inputInfo == null) ? null : mChannelInfoLogoCache.get(inputInfo);
-        if (tvInputLogo != null) {
-            mTvInputLogoImageView.setVisibility(View.VISIBLE);
-            mTvInputLogoImageView.setImageDrawable(tvInputLogo);
-        } else {
-            mTvInputLogoImageView.setVisibility(View.GONE);
-        }
-
-        if (info.hasClosedCaption()) {
-            mClosedCaptionTextView.setVisibility(View.VISIBLE);
-            mClosedCaptionTextView.setText("CC");
-            mClosedCaptionTextView.setVisibility(View.VISIBLE);
-        } else {
-            mClosedCaptionTextView.setVisibility(View.GONE);
-        }
-        if (info.getVideoDefinitionLevel() != StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN) {
-            mResolutionTextView.setVisibility(View.VISIBLE);
-            mResolutionTextView.setText(Utils.getVideoDefinitionLevelString(
-                    info.getVideoDefinitionLevel()));
-            mResolutionTextView.setVisibility(View.VISIBLE);
-        } else {
-            mResolutionTextView.setVisibility(View.GONE);
-        }
-
-        String aspectRatio =
-                Utils.getAspectRatioString(info.getVideoWidth(), info.getVideoHeight());
-        if (!TextUtils.isEmpty(aspectRatio)) {
-            mAspectRatioTextView.setVisibility(View.VISIBLE);
-            mAspectRatioTextView.setText(aspectRatio);
-        } else {
-            mAspectRatioTextView.setVisibility(View.GONE);
-        }
-
-        if (!TextUtils.isEmpty(Utils.getAudioChannelString(info.getAudioChannelCount()))) {
-            mAudioChannelTextView.setVisibility(View.VISIBLE);
-            mAudioChannelTextView.setText(Utils.getAudioChannelString(info.getAudioChannelCount()));
-        } else {
-            mAudioChannelTextView.setVisibility(View.GONE);
         }
 
         String displayNumber = channelMap.getCurrentDisplayNumber();
@@ -206,11 +168,50 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         }
         mChannelTextView.setText(displayNumber);
 
+        TvInputInfo inputInfo = (info == null) ? null : info.getCurrentTvInputInfo();
+        Drawable tvInputLogo = (inputInfo == null) ? null : mChannelInfoLogoCache.get(inputInfo);
+        if (tvInputLogo != null) {
+            mTvInputLogoImageView.setVisibility(View.VISIBLE);
+            mTvInputLogoImageView.setImageDrawable(tvInputLogo);
+        } else {
+            mTvInputLogoImageView.setVisibility(View.GONE);
+        }
+
         String displayName = channelMap.getCurrentDisplayName();
         if (displayName == null) {
             displayName = "";
         }
         mChannelNameTextView.setText(displayName);
+
+        int resId = 0;
+        if (!info.isVideoAvailable()) {
+            switch (info.getVideoUnavailableReason()) {
+                case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE:
+                    // We don't need to tell we're tuning.
+                    break;
+                case TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL:
+                    resId = R.string.channel_banner_video_unavailable_weak_signal;
+                    break;
+                case TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING:
+                    resId = R.string.channel_banner_video_unavailable_buffering;
+                    break;
+                default:
+                    resId = R.string.channel_banner_video_unavailable_unknown;
+                    break;
+            }
+        }
+        updateText(mVideoStatus, (resId == 0) ? null : getContext().getString(resId));
+
+        updateText(mClosedCaptionTextView, info.hasClosedCaption() ? "CC" : "");
+
+        updateText(mAspectRatioTextView,
+                Utils.getAspectRatioString(info.getVideoWidth(), info.getVideoHeight()));
+
+        updateText(mResolutionTextView,
+                Utils.getVideoDefinitionLevelString(info.getVideoDefinitionLevel()));
+
+        updateText(mAudioChannelTextView,
+                Utils.getAudioChannelString(info.getAudioChannelCount()));
 
         mCurrentChannelUri = channelMap.getCurrentChannelUri();
         if (channelMap.getCurrentChannel() != null) {
@@ -218,6 +219,15 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         }
 
         updateProgramInfo();
+    }
+
+    private void updateText(TextView view, String text) {
+        if (TextUtils.isEmpty(text)) {
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+            view.setText(text);
+        }
     }
 
     private void updateTextView(TextView textView, int sizeRes, int marginTopRes) {
@@ -326,17 +336,14 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
             mProgramTimeTextView.setVisibility(View.GONE);
             mRemainingTimeView.setVisibility(View.GONE);
         }
+
+        updateText(mRatingTextView, Utils.contentRatingsToString(program.getContentRatings()));
+
         if (!TextUtils.isEmpty(program.getDescription())) {
             mProgrameDescriptionTextView.setVisibility(View.VISIBLE);
             mProgrameDescriptionTextView.setText(program.getDescription());
         } else {
             mProgrameDescriptionTextView.setVisibility(View.GONE);
-        }
-        if (program.getContentRatings() != null) {
-            mRatingTextView.setText(Utils.contentRatingsToString(program.getContentRatings()));
-            mRatingTextView.setVisibility(View.VISIBLE);
-        } else {
-            mRatingTextView.setVisibility(View.GONE);
         }
     }
 
