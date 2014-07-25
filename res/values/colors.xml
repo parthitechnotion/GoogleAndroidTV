@@ -38,4 +38,10 @@
     <color name="option_item_focused_background">#5C6467</color>
 
     <color name="recommendation_card_background">#0288D1</color>
+
+    <color name="keypad_background">#455a64</color>
+    <color name="key_red">#ff4336</color>
+    <color name="key_green">#0e9c57</color>
+    <color name="key_yellow">#ffbb00</color>
+    <color name="key_blue">#4184f3</color>
 </resources>

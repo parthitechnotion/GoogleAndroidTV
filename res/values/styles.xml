@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="channel_banner_track_meta_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">12dp</item>
@@ -27,5 +27,27 @@
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">#455A64</item>
         <item name="android:background">@drawable/track_meta_border</item>
+    </style>
+
+    <style name="keypad_view_style">
+        <item name="android:clipChildren">false</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:elevation">8dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">@drawable/keypad_background</item>
+    </style>
+
+    <style name="keypad_key_style">
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:scaleType">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">#eeeeee</item>
+        <item name="android:textSize">18sp</item>
     </style>
 </resources>

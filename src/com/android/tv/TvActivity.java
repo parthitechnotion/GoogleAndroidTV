@@ -65,6 +65,7 @@ import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
 import com.android.tv.ui.ChannelBannerView;
 import com.android.tv.ui.ChannelNumberView;
+import com.android.tv.ui.KeypadView;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
@@ -125,6 +126,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private MainMenuView mMainMenuView;
     private ChannelBannerView mChannelBanner;
     private ChannelNumberView mChannelNumberView;
+    private KeypadView mKeypadView;
     private SidePanelContainer mSidePanelContainer;
     private HideRunnable mHideChannelBanner;
     private HideRunnable mHideControlGuide;
@@ -220,6 +222,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         mMainMenuView.setTvActivity(this);
         mChannelNumberView = (ChannelNumberView) findViewById(R.id.channel_number_view);
         mChannelNumberView.setTvActivity(this);
+        mKeypadView = (KeypadView) findViewById(R.id.keypad);
 
         // Initially hide the channel banner and the control guide.
         mChannelBanner.setVisibility(View.GONE);
@@ -646,7 +649,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (DEBUG) Log.d(TAG, "dispatchKeyEvent(" + event + ")");
-        if (mMainMenuView.isShown() || getFragmentManager().getBackStackEntryCount() > 0) {
+        if (mMainMenuView.isShown() || mKeypadView.wantKeys()
+                || getFragmentManager().getBackStackEntryCount() > 0) {
             return super.dispatchKeyEvent(event);
         }
         int eventKeyCode = event.getKeyCode();
@@ -988,7 +992,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (mMainMenuView.getVisibility() == View.VISIBLE
+        if (mMainMenuView.getVisibility() == View.VISIBLE || mKeypadView.wantKeys()
                 || getFragmentManager().getBackStackEntryCount() > 0) {
             return super.onKeyDown(keyCode, event);
         }
@@ -1029,6 +1033,13 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             if (mMainMenuView.isShown()) {
                 return super.onKeyUp(keyCode, event);
             }
+        }
+        if (mKeypadView.wantKeys()) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                mKeypadView.setVisibility(View.GONE);
+                return true;
+            }
+            return super.onKeyUp(keyCode, event);
         }
         if (mChannelNumberView.isShown()) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -1141,8 +1152,14 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     showDisplayModeOption(BaseSideFragment.INITIATOR_SHORTCUT_KEY);
                     return true;
                 }
+
                 case KeyEvent.KEYCODE_D:
                     showDebugOptions(BaseSideFragment.INITIATOR_UNKNOWN);
+                    return true;
+
+                case KeyEvent.KEYCODE_K:
+                    mKeypadView.setVisibility(View.VISIBLE);
+                    mKeypadView.requestFocus();
                     return true;
             }
         }
@@ -1193,7 +1210,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mMainMenuView.getVisibility() != View.VISIBLE) {
+        if (mMainMenuView.getVisibility() != View.VISIBLE && !mKeypadView.wantKeys()) {
             mGestureDetector.onTouchEvent(event);
         }
         return super.onTouchEvent(event);
