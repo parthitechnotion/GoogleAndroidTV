@@ -115,17 +115,24 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
 
                 @Override
                 public void onTrackInfoChanged(String inputId, List<TvTrackInfo> tracks) {
-                    for (TvTrackInfo track : tracks) {
-                        int type = track.getInt(TvTrackInfo.KEY_TYPE);
-                        boolean selected = track.getBoolean(TvTrackInfo.KEY_IS_SELECTED);
-                        if (type == TvTrackInfo.VALUE_TYPE_VIDEO && selected) {
-                            mVideoWidth = track.getInt(TvTrackInfo.KEY_WIDTH);
-                            mVideoHeight = track.getInt(TvTrackInfo.KEY_HEIGHT);
+                    if (mOnTuneListener != null) {
+                        mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
+                    }
+                }
+
+                @Override
+                public void onTrackSelectionChanged(String inputId,
+                        List<TvTrackInfo> selectedTracks) {
+                    for (TvTrackInfo track : selectedTracks) {
+                        int type = track.getType();
+                        if (type == TvTrackInfo.TYPE_VIDEO) {
+                            mVideoWidth = track.getVideoWidth();
+                            mVideoHeight = track.getVideoHeight();
                             mVideoFormat = Utils.getVideoDefinitionLevelFromSize(
                                     mVideoWidth, mVideoHeight);
-                        } else if (type == TvTrackInfo.VALUE_TYPE_AUDIO && selected) {
-                            mAudioChannelCount = track.getInt(TvTrackInfo.KEY_CHANNEL_COUNT);
-                        } else if (type == TvTrackInfo.VALUE_TYPE_SUBTITLE) {
+                        } else if (type == TvTrackInfo.TYPE_AUDIO) {
+                            mAudioChannelCount = track.getAudioChannelCount();
+                        } else if (type == TvTrackInfo.TYPE_SUBTITLE) {
                             mHasClosedCaption = true;
                         }
                     }

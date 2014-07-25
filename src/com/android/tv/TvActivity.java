@@ -1201,9 +1201,8 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     //     selection.
                     List<TvTrackInfo> tracks = mTvView.getTracks();
                     for (TvTrackInfo track : tracks) {
-                        Log.d(TAG, "lang - " + track.getString(TvTrackInfo.KEY_LANGUAGE));
-                        if (track.getInt(TvTrackInfo.KEY_TYPE) == TvTrackInfo.VALUE_TYPE_SUBTITLE
-                                && !track.getBoolean(TvTrackInfo.KEY_IS_SELECTED)) {
+                        Log.d(TAG, "lang - " + track.getLanguage());
+                        if (track.getType() == TvTrackInfo.TYPE_SUBTITLE) {
                             Log.d(TAG, "selectTrack " + track);
                             mTvView.selectTrack(track);
                             break;
