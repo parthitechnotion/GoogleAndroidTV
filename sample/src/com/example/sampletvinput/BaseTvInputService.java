@@ -217,7 +217,7 @@ abstract public class BaseTvInputService extends TvInputService {
 
         private boolean startPlayback(final ChannelInfo channel) {
             mPlayer.reset();
-            dispatchVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE);
+            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE);
             if (!setDataSource(mPlayer, channel)) {
                 if (DEBUG) Log.d(TAG, "Failed to set the data source");
                 return false;
@@ -227,11 +227,11 @@ abstract public class BaseTvInputService extends TvInputService {
                     @Override
                     public boolean onInfo(MediaPlayer player, int what, int arg) {
                         if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-                            dispatchVideoUnavailable(
+                            notifyVideoUnavailable(
                                     TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
                             return true;
                         } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-                            dispatchVideoAvailable();
+                            notifyVideoAvailable();
                             return true;
                         }
                         return false;
@@ -248,8 +248,8 @@ abstract public class BaseTvInputService extends TvInputService {
                             }
                             MediaPlayer.TrackInfo[] tracks = mPlayer.getTrackInfo();
                             setupTrackInfo(tracks, channel);
-                            dispatchTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
-                            dispatchVideoAvailable();
+                            notifyTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
+                            notifyVideoAvailable();
                             mPlayer.start();
                         }
                     }
@@ -296,7 +296,7 @@ abstract public class BaseTvInputService extends TvInputService {
                     long nextChannelId = mChannelMap.keyAt((index + 1) % mChannelMap.size());
                     Uri nextChannelUri = TvContract.buildChannelUri(nextChannelId);
                     changeChannel(TvContract.buildChannelUri(nextChannelId));
-                    dispatchChannelRetuned(nextChannelUri);
+                    notifyChannelRetuned(nextChannelUri);
                 }
                 return true;
             }
@@ -331,7 +331,7 @@ abstract public class BaseTvInputService extends TvInputService {
                     mTracks.put(tag, new TvTrackInfo.Builder(track)
                             .putBoolean(TvTrackInfo.KEY_IS_SELECTED, true)
                             .build());
-                    dispatchTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
+                    notifyTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
                     return true;
                 }
             }
@@ -349,7 +349,7 @@ abstract public class BaseTvInputService extends TvInputService {
                     mTracks.put(tag, new TvTrackInfo.Builder(track)
                             .putBoolean(TvTrackInfo.KEY_IS_SELECTED, false)
                             .build());
-                    dispatchTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
+                    notifyTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
                     return true;
                 }
             }
