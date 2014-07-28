@@ -83,6 +83,8 @@ import com.android.tv.util.TvSettings;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -565,6 +567,12 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             @Override
             protected List<Item> buildItems() {
                 List<Item> items = new ArrayList<>();
+                items.add(new SubMenuItem(getString(R.string.item_tv_input), getFragmentManager()) {
+                    @Override
+                    protected List<Item> buildItems() {
+                        return getTvInputMenu();
+                    }
+                });
                 items.add(new ActionItem(getString(R.string.item_watch_history)) {
                     @Override
                     protected void onSelected() {
@@ -573,6 +581,64 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     }
                 });
                 return items;
+            }
+
+            private List<Item> getTvInputMenu() {
+                ArrayList<Item> items = new ArrayList<>();
+
+                items.add(new TvInputItem(
+                        new UnifiedTvInput(mTvInputManagerHelper, getActivity())));
+
+                mTvInputManagerHelper.update();
+                List<TvInputInfo> infos = new ArrayList<>(
+                        mTvInputManagerHelper.getTvInputInfos(false));
+                Collections.sort(infos, new Comparator<TvInputInfo>() {
+                    @Override
+                    public int compare(TvInputInfo lhs, TvInputInfo rhs) {
+                        String a = Utils.getDisplayNameForInput(getActivity(), lhs);
+                        String b = Utils.getDisplayNameForInput(getActivity(), rhs);
+                        return a.compareTo(b);
+                    }
+                });
+                for (TvInputInfo inputInfo : infos) {
+                    if (inputInfo.getType() == TvInputInfo.TYPE_TUNER) {
+                        items.add(new TvInputItem(
+                                new TisTvInput(mTvInputManagerHelper, inputInfo, getActivity())));
+                    }
+                }
+
+                TvInput selected = getSelectedTvInput();
+                if (selected == null) {
+                    ((TvInputItem) items.get(0)).setChecked(true);
+                } else {
+                    for (Item item : items) {
+                        if (((TvInputItem) item).getTvInput().equals(selected)) {
+                            ((TvInputItem) item).setChecked(true);
+                            break;
+                        }
+                    }
+                }
+
+                return items;
+            }
+
+            class TvInputItem extends RadioButtonItem {
+                private TvInput mTvInput;
+
+                private TvInputItem(TvInput tvInput) {
+                    super(tvInput.getDisplayName());
+                    mTvInput = tvInput;
+                }
+
+                public TvInput getTvInput() {
+                    return mTvInput;
+                }
+
+                @Override
+                protected void onSelected() {
+                    super.onSelected();
+                    onInputPicked(mTvInput);
+                }
             }
         }, initiator);
     }

@@ -143,6 +143,7 @@
 
     <!--  Debug Options -->
     <string name="menu_debug_options">Debug Options</string>
+    <string name="item_tv_input">TV Input</string>
     <string name="item_watch_history">Watch History</string>
 
     <!-- Keypad View -->
