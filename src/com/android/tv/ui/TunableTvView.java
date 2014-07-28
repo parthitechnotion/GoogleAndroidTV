@@ -6,6 +6,8 @@ import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView;
+import android.media.tv.TvView.OnUnhandledInputEventListener;
+import android.media.tv.TvView.TvInputListener;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,6 +15,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.android.tv.R;
 import com.android.tv.data.Channel;
@@ -22,7 +26,8 @@ import com.android.tv.util.Utils;
 
 import java.util.List;
 
-public class TunableTvView extends TvView implements StreamInfo {
+public class TunableTvView extends FrameLayout implements StreamInfo {
+    // STOPSHIP: Turn debugging off
     private static final boolean DEBUG = true;
     private static final String TAG = "TunableTvView";
 
@@ -30,6 +35,8 @@ public class TunableTvView extends TvView implements StreamInfo {
     public static final String PERMISSION_RECEIVE_INPUT_EVENT =
             "android.permission.RECEIVE_INPUT_EVENT";
 
+    private final TvView mTvView;
+    private final SurfaceView mSurfaceView;
     private long mChannelId = Channel.INVALID_ID;
     private TvInputManagerHelper mInputManagerHelper;
     private boolean mStarted;
@@ -42,8 +49,9 @@ public class TunableTvView extends TvView implements StreamInfo {
     private boolean mHasClosedCaption = false;
     private boolean mIsVideoAvailable;
     private int mVideoUnavailableReason;
-    private SurfaceView mSurface;
     private boolean mCanReceiveInputEvent;
+    private boolean mIsMuted;
+    private float mVolume;
 
     private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
@@ -129,6 +137,7 @@ public class TunableTvView extends TvView implements StreamInfo {
                 @Override
                 public void onVideoAvailable(String inputId) {
                     mIsVideoAvailable = true;
+                    unblock();
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
                     }
@@ -138,6 +147,7 @@ public class TunableTvView extends TvView implements StreamInfo {
                 public void onVideoUnavailable(String inputId, int reason) {
                     mIsVideoAvailable = false;
                     mVideoUnavailableReason = reason;
+                    block(reason);
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
                     }
@@ -145,7 +155,7 @@ public class TunableTvView extends TvView implements StreamInfo {
             };
 
     public TunableTvView(Context context) {
-        this(context, null, 0);
+        this(context, null);
     }
 
     public TunableTvView(Context context, AttributeSet attrs) {
@@ -153,15 +163,15 @@ public class TunableTvView extends TvView implements StreamInfo {
     }
 
     public TunableTvView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        for (int i = 0; i < getChildCount(); ++i) {
-            if (getChildAt(i) instanceof SurfaceView) {
-                mSurface = (SurfaceView) getChildAt(i);
-                mSurface.getHolder().addCallback(mSurfaceHolderCallback);
-                return;
-            }
-        }
-        throw new RuntimeException("TvView does not have SurfaceView.");
+        this(context, attrs, defStyleAttr, 0);
+    }
+
+    public TunableTvView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        inflate(getContext(), R.layout.tunable_tv_view, this);
+
+        mTvView = (TvView) findViewById(R.id.tv_view);
+        mSurfaceView = findSurfaceView(mTvView);
     }
 
     public void start(TvInputManagerHelper tvInputManagerHelper) {
@@ -177,7 +187,7 @@ public class TunableTvView extends TvView implements StreamInfo {
             return;
         }
         mStarted = false;
-        reset();
+        mTvView.reset();
         mChannelId = Channel.INVALID_ID;
         mInputInfo = null;
         mCanReceiveInputEvent = false;
@@ -208,7 +218,7 @@ public class TunableTvView extends TvView implements StreamInfo {
         mOnTuneListener = listener;
         mChannelId = channelId;
         if (!inputInfo.equals(mInputInfo)) {
-            reset();
+            mTvView.reset();
             // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
             // know when the surface is released at TIS, we don't need this hack.
             try {
@@ -217,12 +227,12 @@ public class TunableTvView extends TvView implements StreamInfo {
                 e.printStackTrace();
             }
             mInputInfo = inputInfo;
-            mCanReceiveInputEvent = mContext.getPackageManager().checkPermission(
+            mCanReceiveInputEvent = getContext().getPackageManager().checkPermission(
                     PERMISSION_RECEIVE_INPUT_EVENT, mInputInfo.getComponent().getPackageName())
                             == PackageManager.PERMISSION_GRANTED;
         }
-        setTvInputListener(mListener);
-        tune(mInputInfo.getId(), Utils.getChannelUri(mChannelId));
+        mTvView.setTvInputListener(mListener);
+        mTvView.tune(mInputInfo.getId(), Utils.getChannelUri(mChannelId));
         if (mOnTuneListener != null) {
             // TODO: Add a callback for tune complete and call onTuned when it was successful.
             mOnTuneListener.onTuned(true, mChannelId);
@@ -240,37 +250,38 @@ public class TunableTvView extends TvView implements StreamInfo {
     }
 
     public void setPip(boolean isPip) {
-        mSurface.setZOrderMediaOverlay(isPip);
+        mSurfaceView.setZOrderMediaOverlay(isPip);
     }
 
-    @Override
     public void setStreamVolume(float volume) {
         if (!mStarted) {
             throw new IllegalStateException("TvView isn't started");
         }
-        if (DEBUG)
-            Log.d(TAG, "setStreamVolume " + volume);
-        super.setStreamVolume(volume);
+        if (DEBUG) Log.d(TAG, "setStreamVolume " + volume);
+        mVolume = volume;
+        if (!mIsMuted) {
+            mTvView.setStreamVolume(volume);
+        }
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        return mCanReceiveInputEvent && super.dispatchKeyEvent(event);
+        return mCanReceiveInputEvent && mTvView.dispatchKeyEvent(event);
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        return mCanReceiveInputEvent && super.dispatchTouchEvent(event);
+        return mCanReceiveInputEvent && mTvView.dispatchTouchEvent(event);
     }
 
     @Override
     public boolean dispatchTrackballEvent(MotionEvent event) {
-        return mCanReceiveInputEvent && super.dispatchTrackballEvent(event);
+        return mCanReceiveInputEvent && mTvView.dispatchTrackballEvent(event);
     }
 
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
-        return mCanReceiveInputEvent && super.dispatchGenericMotionEvent(event);
+        return mCanReceiveInputEvent && mTvView.dispatchGenericMotionEvent(event);
     }
 
     public interface OnTuneListener {
@@ -313,5 +324,70 @@ public class TunableTvView extends TvView implements StreamInfo {
     @Override
     public int getVideoUnavailableReason() {
         return mVideoUnavailableReason;
+    }
+
+    public void setOnUnhandledInputEventListener(OnUnhandledInputEventListener listener) {
+        mTvView.setOnUnhandledInputEventListener(listener);
+    }
+
+    public List<TvTrackInfo> getTracks() {
+        return mTvView.getTracks();
+    }
+
+    public void selectTrack(TvTrackInfo track) {
+        mTvView.selectTrack(track);
+    }
+
+    private void block(int reason) {
+        hideBlock();
+        switch (reason) {
+            case TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN:
+            default:
+                findViewById(R.id.block_reason_unknown).setVisibility(VISIBLE);
+                break;
+            case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE:
+                findViewById(R.id.block_reason_tune).setVisibility(VISIBLE);
+                break;
+            case TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL:
+                findViewById(R.id.block_reason_weak_signal).setVisibility(VISIBLE);
+                break;
+            case TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING:
+                findViewById(R.id.block_reason_buffering).setVisibility(VISIBLE);
+                break;
+        }
+        mute();
+    }
+
+    private void unblock() {
+        hideBlock();
+        unmute();
+    }
+
+    private void mute() {
+        mIsMuted = true;
+        mTvView.setStreamVolume(0);
+    }
+
+    private void unmute() {
+        mIsMuted = false;
+        mTvView.setStreamVolume(mVolume);
+    }
+
+    private SurfaceView findSurfaceView(ViewGroup view) {
+        for (int i = 0; i < view.getChildCount(); ++i) {
+            if (view.getChildAt(i) instanceof SurfaceView) {
+                SurfaceView surfaceView = (SurfaceView) mTvView.getChildAt(i);
+                surfaceView.getHolder().addCallback(mSurfaceHolderCallback);
+                return surfaceView;
+            }
+        }
+        throw new RuntimeException("TvView does not have SurfaceView.");
+    }
+
+    private void hideBlock() {
+        findViewById(R.id.block_reason_unknown).setVisibility(GONE);
+        findViewById(R.id.block_reason_tune).setVisibility(GONE);
+        findViewById(R.id.block_reason_weak_signal).setVisibility(GONE);
+        findViewById(R.id.block_reason_buffering).setVisibility(GONE);
     }
 }
