@@ -24,7 +24,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.hardware.hdmi.HdmiCecDeviceInfo;
-import android.hardware.hdmi.HdmiPortInfo;
 import android.hardware.hdmi.IHdmiControlService;
 import android.media.tv.ITvInputManager;
 import android.media.tv.TvContentRating;
@@ -37,7 +36,6 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.util.Log;
 import android.util.SparseArray;
-import android.util.SparseIntArray;
 import android.view.Surface;
 
 import java.io.IOException;
@@ -57,7 +55,6 @@ import org.xmlpull.v1.XmlPullParserException;
 public class FakeHdmiService extends TvInputService {
     private static final boolean DEBUG = true;
     private static final String TAG = FakeHdmiService.class.getSimpleName();
-    private static final int PORT_MASK = 0xF000;
     private static final int[] COLORS = {
           0xFF888888, 0xFF999999, 0xFFAAAAAA, 0xFFBBBBBB, 0xFFAAAAAA, 0xFF999999};
     private static final int[] ICONS = { R.drawable.fake_icon0, R.drawable.fake_icon1,
@@ -69,8 +66,6 @@ public class FakeHdmiService extends TvInputService {
     private final SparseArray<String> mHardwareInputIdMap = new SparseArray<String>();
     private final SparseArray<String> mCecInputIdMap = new SparseArray<String>();
     private final Map<String, TvInputInfo> mInputMap = new HashMap<String, TvInputInfo>();
-    // A map from port address to port ID.
-    private SparseIntArray mPortIdMap = new SparseIntArray();
     private ResolveInfo mResolveInfo;
     private final Random mRandom = new Random();
 
@@ -97,15 +92,6 @@ public class FakeHdmiService extends TvInputService {
                 ServiceManager.getService(Context.TV_INPUT_SERVICE));
         mHdmiControlService = IHdmiControlService.Stub.asInterface(
                 ServiceManager.getService(Context.HDMI_CONTROL_SERVICE));
-        if (mHdmiControlService != null) {
-            try {
-                for (HdmiPortInfo portInfo : mHdmiControlService.getPortInfo()) {
-                    mPortIdMap.put(portInfo.getAddress(), portInfo.getId());
-                }
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error while calling getPortInfo().", e);
-            }
-        }
     }
 
     @Override
@@ -181,10 +167,6 @@ public class FakeHdmiService extends TvInputService {
         return -1;
     }
 
-    private int getHdmiPortId(HdmiCecDeviceInfo cecDeviceInfo) {
-        return mPortIdMap.get(cecDeviceInfo.getPhysicalAddress() & PORT_MASK, -1);
-    }
-
     @Override
     public TvInputInfo onHdmiCecDeviceAdded(HdmiCecDeviceInfo cecDeviceInfo) {
         int logicalAddress = cecDeviceInfo.getLogicalAddress();
@@ -192,7 +174,7 @@ public class FakeHdmiService extends TvInputService {
             Log.e(TAG, "Already created TvInputInfo for logicalAddress=" + logicalAddress);
             return null;
         }
-        int portId = getHdmiPortId(cecDeviceInfo);
+        int portId = cecDeviceInfo.getPortId();
         if (portId < 0) {
             Log.e(TAG, "Failed to get HDMI port for logicalAddress=" + logicalAddress);
             return null;
