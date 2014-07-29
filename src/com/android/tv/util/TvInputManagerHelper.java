@@ -19,6 +19,7 @@ package com.android.tv.util;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputManager.TvInputListener;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 
@@ -54,6 +55,7 @@ public class TvInputManagerHelper {
     private final Handler mHandler = new Handler();
     private boolean mStarted;
     private final HashSet<TvInputListener> mListeners = new HashSet<TvInputListener>();
+    private List<Uri> mTvContentRatingSystemXmls;
 
     public TvInputManagerHelper(TvInputManager tvInputManager) {
         mTvInputManager = tvInputManager;
@@ -87,6 +89,7 @@ public class TvInputManagerHelper {
             mInputStateMap.put(inputId, state);
         }
         Assert.assertEquals(mInputStateMap.size(), mInputMap.size());
+        mTvContentRatingSystemXmls = mTvInputManager.getTvContentRatingSystemXmls();
     }
 
     public void stop() {
@@ -153,6 +156,10 @@ public class TvInputManagerHelper {
             }
         }
         return state;
+    }
+
+    public List<Uri> getTvContentRatingSystemXmls() {
+        return mTvContentRatingSystemXmls;
     }
 
     public void addListener(TvInputListener listener) {
