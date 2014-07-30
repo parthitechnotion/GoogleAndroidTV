@@ -78,7 +78,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
             new TvInputListener() {
                 @Override
                 public void onError(String inputId, int errorCode) {
-                    if (errorCode == TvView.ERROR_BUSY) {
+                    if (errorCode == TvView.ERROR_INPUT_NOT_CONNECTED) {
                         Log.w(TAG, "Failed to bind an input");
                         long channelId = mChannelId;
                         mChannelId = Channel.INVALID_ID;
@@ -88,7 +88,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
                             mOnTuneListener.onTuned(false, channelId);
                             mOnTuneListener = null;
                         }
-                    } else if (errorCode == TvView.ERROR_TV_INPUT_DISCONNECTED) {
+                    } else if (errorCode == TvView.ERROR_INPUT_DISCONNECTED) {
                         Log.w(TAG, "Session is released by crash");
                         long channelId = mChannelId;
                         mChannelId = Channel.INVALID_ID;

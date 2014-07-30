@@ -217,7 +217,7 @@ abstract public class BaseTvInputService extends TvInputService {
 
         private boolean startPlayback(final ChannelInfo channel) {
             mPlayer.reset();
-            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE);
+            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
             if (!setDataSource(mPlayer, channel)) {
                 if (DEBUG) Log.d(TAG, "Failed to set the data source");
                 return false;
