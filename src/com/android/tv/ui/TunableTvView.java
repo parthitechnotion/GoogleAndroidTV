@@ -345,7 +345,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
             default:
                 findViewById(R.id.block_reason_unknown).setVisibility(VISIBLE);
                 break;
-            case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE:
+            case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING:
                 findViewById(R.id.block_reason_tune).setVisibility(VISIBLE);
                 break;
             case TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL:
