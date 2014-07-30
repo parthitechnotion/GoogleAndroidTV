@@ -186,7 +186,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         int resId = 0;
         if (!info.isVideoAvailable()) {
             switch (info.getVideoUnavailableReason()) {
-                case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNE:
+                case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING:
                     // We don't need to tell we're tuning.
                     break;
                 case TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL:
