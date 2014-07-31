@@ -59,6 +59,8 @@ abstract public class BaseTvInputService extends TvInputService {
     protected List<ChannelInfo> mChannels;
     private Uri mChannelUri;
 
+    private boolean mIsPlaying;
+
     @Override
     public void onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate()");
@@ -156,6 +158,21 @@ abstract public class BaseTvInputService extends TvInputService {
             mPlayer = new MediaPlayer();
             mVolume = 1.0f;
             mMute = false;
+
+            mPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                @Override
+                public boolean onInfo(MediaPlayer player, int what, int arg) {
+                    if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+                        notifyVideoUnavailable(
+                                TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+                        return true;
+                    } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+                        notifyVideoAvailable();
+                        return true;
+                    }
+                    return false;
+                }
+            });
         }
 
         @Override
@@ -221,6 +238,7 @@ abstract public class BaseTvInputService extends TvInputService {
         }
 
         private boolean startPlayback(final ChannelInfo channel) {
+            mIsPlaying = false;
             mPlayer.reset();
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
             if (!setDataSource(mPlayer, channel)) {
@@ -228,20 +246,6 @@ abstract public class BaseTvInputService extends TvInputService {
                 return false;
             }
             try {
-                mPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-                    @Override
-                    public boolean onInfo(MediaPlayer player, int what, int arg) {
-                        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-                            notifyVideoUnavailable(
-                                    TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
-                            return true;
-                        } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-                            notifyVideoAvailable();
-                            return true;
-                        }
-                        return false;
-                    }
-                });
                 mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer player) {
@@ -256,7 +260,12 @@ abstract public class BaseTvInputService extends TvInputService {
                             notifyTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
                             notifySelectedTracks();
                             notifyVideoAvailable();
-                            mPlayer.start();
+                            try {
+                                mPlayer.start();
+                                mIsPlaying = true;
+                            } catch (IllegalStateException e) {
+                                mIsPlaying = false;
+                            }
                         }
                     }
                 });
@@ -266,7 +275,10 @@ abstract public class BaseTvInputService extends TvInputService {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                startPlayback(channel);
+                                // Loop only if onPrepared has been called normally.
+                                if (mIsPlaying) {
+                                    startPlayback(channel);
+                                }
                             }
                         });
                     }
