@@ -82,6 +82,9 @@
 
     <!-- Edit channel list (enable/disable individual channels) -->
     <string name="edit_channels_title">Edit <xliff:g id="tv_input">%s</xliff:g> channels</string>
+    <string name="edit_channels_show_all">Show all</string>
+    <string name="edit_channels_hide_all">Hide all</string>
+
     <!-- Text displayed in edit channels activity when there aren't any channels in the TV input.
          [CHAR LIMIT=20] -->
     <string name="empty_channel_tvinput">No channels in the TV input.</string>

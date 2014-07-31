@@ -38,10 +38,4 @@
         <item>News</item>
         <item>Gaming</item>
     </string-array>
-
-    <!-- The command strings which are displayed in the "Edit Channels" side panel -->
-    <string-array name="edit_channels_actions" translatable="true">
-        <item>Show all</item>
-        <item>Hide all</item>
-    </string-array>
 </resources>

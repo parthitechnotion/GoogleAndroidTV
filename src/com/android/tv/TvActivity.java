@@ -70,15 +70,19 @@ import com.android.tv.ui.KeypadView;
 import com.android.tv.ui.MainMenuView;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
+import com.android.tv.ui.sidepanel.ActionItem;
 import com.android.tv.ui.sidepanel.BaseSideFragment;
-import com.android.tv.ui.sidepanel.ClosedCaptionOptionFragment;
-import com.android.tv.ui.sidepanel.DebugOptionFragment;
-import com.android.tv.ui.sidepanel.DisplayModeOptionFragment;
+import com.android.tv.ui.sidepanel.ClosedCaptionFragment;
+import com.android.tv.ui.sidepanel.DisplayModeFragment;
 import com.android.tv.ui.sidepanel.EditChannelsFragment;
 import com.android.tv.ui.sidepanel.InputPickerFragment;
+import com.android.tv.ui.sidepanel.Item;
 import com.android.tv.ui.sidepanel.PipLocationFragment;
+import com.android.tv.ui.sidepanel.RadioButtonItem;
+import com.android.tv.ui.sidepanel.SideFragment;
 import com.android.tv.ui.sidepanel.SidePanelContainer;
 import com.android.tv.ui.sidepanel.SimpleGuideFragment;
+import com.android.tv.ui.sidepanel.SubMenuItem;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.TvSettings;
 import com.android.tv.util.Utils;
@@ -554,11 +558,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void showDisplayModeOption(int initiator) {
-        showSideFragment(new DisplayModeOptionFragment(), initiator);
+        showSideFragment(new DisplayModeFragment(), initiator);
     }
 
     public void showClosedCaptionOption(int initiator) {
-        showSideFragment(new ClosedCaptionOptionFragment(), initiator);
+        showSideFragment(new ClosedCaptionFragment(), initiator);
     }
 
     public void showPipLocationOption(int initiator) {
@@ -566,13 +570,18 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void showDebugOptions(int initiator) {
-        showSideFragment(new DebugOptionFragment() {
+        showSideFragment(new SideFragment() {
             @Override
-            protected List<Item> buildItems() {
+            protected String getTitle() {
+                return getString(R.string.menu_debug_options);
+            }
+
+            @Override
+            protected List<Item> getItemList() {
                 List<Item> items = new ArrayList<>();
                 items.add(new SubMenuItem(getString(R.string.item_tv_input), getFragmentManager()) {
                     @Override
-                    protected List<Item> buildItems() {
+                    protected List<Item> getItemList() {
                         return getTvInputMenu();
                     }
                 });
@@ -1221,7 +1230,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 }
 
                 case KeyEvent.KEYCODE_D:
-                    showDebugOptions(BaseSideFragment.INITIATOR_UNKNOWN);
+                    showDebugOptions(BaseSideFragment.INITIATOR_SHORTCUT_KEY);
                     return true;
 
                 case KeyEvent.KEYCODE_K:
