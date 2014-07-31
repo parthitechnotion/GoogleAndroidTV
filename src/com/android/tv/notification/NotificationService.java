@@ -43,7 +43,7 @@ import android.util.Log;
 
 import com.android.tv.R;
 import com.android.tv.data.Program;
-import com.android.tv.recommendation.RoutineWatchRecommender;
+import com.android.tv.recommendation.RandomRecommender;
 import com.android.tv.recommendation.TvRecommendation;
 import com.android.tv.recommendation.TvRecommendation.ChannelRecord;
 import com.android.tv.util.TvInputManagerHelper;
@@ -136,7 +136,7 @@ public class NotificationService extends Service {
                 R.dimen.notif_card_img_height);
 
         mTvRecommendation = new TvRecommendation(this, mHandler, true);
-        mTvRecommendation.registerTvRecommender(new RoutineWatchRecommender(this));
+        mTvRecommendation.registerTvRecommender(new RandomRecommender());
         mNotificationManager = (NotificationManager) getSystemService(
                 Context.NOTIFICATION_SERVICE);
         mTvInputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
