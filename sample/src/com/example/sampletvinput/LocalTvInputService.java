@@ -65,21 +65,15 @@ public class LocalTvInputService extends BaseTvInputService {
                 return sSampleChannels;
             }
             sSampleChannels = new ArrayList<ChannelInfo>();
-            TvContentRating[] contentRatings = new TvContentRating[] {
-                    TvContentRating.unflattenFromString(TvContentRating.RATING_US_TV_G),
-                    TvContentRating.unflattenFromString(TvContentRating.RATING_KR_ALL)};
             sSampleChannels.add(
                     new ChannelInfo(CHANNEL_1_NUMBER, CHANNEL_1_NAME, null, 640, 480, 2, false,
                     new ProgramInfo(PROGRAM_1_TITLE, null, PROGRAM_1_DESC, 0, 3600,
-                            contentRatings, null, RESOURCE_1)));
+                            null, null, RESOURCE_1)));
 
-            contentRatings = new TvContentRating[] {
-                    new TvContentRating(TvContentRating.RATING_US_TV_MA,
-                            new String[] { TvContentRating.SUBRATING_US_S })};
             sSampleChannels.add(
                     new ChannelInfo(CHANNEL_2_NUMBER, CHANNEL_2_NAME, null, 1280, 720, 6, true,
                     new ProgramInfo(PROGRAM_2_TITLE, null, PROGRAM_2_DESC, 0, 3600,
-                            contentRatings, null, RESOURCE_2)));
+                            null, null, RESOURCE_2)));
             return sSampleChannels;
         }
     }
