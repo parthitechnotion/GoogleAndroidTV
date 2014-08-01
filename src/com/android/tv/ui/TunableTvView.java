@@ -9,6 +9,7 @@ import android.media.tv.TvView;
 import android.media.tv.TvView.OnUnhandledInputEventListener;
 import android.media.tv.TvView.TvInputListener;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -205,7 +206,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         return mStarted;
     }
 
-    public boolean tuneTo(long channelId, OnTuneListener listener) {
+    public boolean tuneTo(long channelId, Bundle params, OnTuneListener listener) {
         if (!mStarted) {
             throw new IllegalStateException("TvView isn't started");
         }
@@ -239,7 +240,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
                             == PackageManager.PERMISSION_GRANTED;
         }
         mTvView.setTvInputListener(mListener);
-        mTvView.tune(mInputInfo.getId(), Utils.getChannelUri(mChannelId));
+        mTvView.tune(mInputInfo.getId(), Utils.getChannelUri(mChannelId), params);
         if (mOnTuneListener != null) {
             // TODO: Add a callback for tune complete and call onTuned when it was successful.
             mOnTuneListener.onTuned(true, mChannelId);

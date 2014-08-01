@@ -122,10 +122,13 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     private static final int REQUEST_START_SETUP_ACTIIVTY = 0;
     private static final int REQUEST_START_SETTINGS_ACTIIVTY = 1;
 
+    private static final String KEY_INIT_CHANNEL_ID = "com.android.tv.init_channel_id";
+
     private static final HashSet<String> AVAILABLE_DIALOG_TAGS = new HashSet<String>();
 
     private View mContentView;
     private TunableTvView mTvView;
+    private Bundle mTuneParams;
     private LinearLayout mControlGuide;
     private MainMenuView mMainMenuView;
     private ChannelBannerView mChannelBanner;
@@ -340,6 +343,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             // In case the channel is given explicitly, use it.
             mInitChannelId = ContentUris.parseId(intent.getData());
+            mTuneParams = intent.getExtras();
+            if (mTuneParams == null) {
+                mTuneParams = new Bundle();
+            }
+            mTuneParams.putLong(KEY_INIT_CHANNEL_ID, mInitChannelId);
         } else {
             mInitChannelId = Channel.INVALID_ID;
         }
@@ -424,6 +432,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         if (TextUtils.isEmpty(inputId)) {
             // If the channel is invalid, try to use the last selected physical tv input.
             inputId = Utils.getLastSelectedPhysInputId(this);
+            channelId = Channel.INVALID_ID;
             if (TextUtils.isEmpty(inputId)) {
                 // If failed to determine the input for that channel, try a different input.
                 showInputPicker(BaseSideFragment.INITIATOR_UNKNOWN);
@@ -829,7 +838,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
         }
         if (DEBUG) Log.d(TAG, "startPip()");
         mPipView.start(mTvInputManagerHelper);
-        boolean success = mPipView.tuneTo(mPipChannelId, new OnTuneListener() {
+        boolean success = mPipView.tuneTo(mPipChannelId, null, new OnTuneListener() {
             @Override
             public void onUnexpectedStop(long channelId) {
                 Log.w(TAG, "The PIP is Unexpectedly stopped");
@@ -901,7 +910,14 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             return;
         }
 
-        mTvView.tuneTo(channelId, new OnTuneListener() {
+        if (mTuneParams != null) {
+            if (channelId == mTuneParams.getLong(KEY_INIT_CHANNEL_ID)) {
+                mTuneParams.remove(KEY_INIT_CHANNEL_ID);
+            } else {
+                mTuneParams = null;
+            }
+        }
+        mTvView.tuneTo(channelId, mTuneParams, new OnTuneListener() {
             @Override
             public void onUnexpectedStop(long channelId) {
                 stopTv();
@@ -930,6 +946,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 // TODO: update {@code mChannelMap} and the banner.
             }
         });
+        mTuneParams = null;
         updateChannelBanner(true);
         if (mChildActivityCanceled) {
             displayMainMenu(false);
@@ -1055,6 +1072,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     protected void onDestroy() {
         if (DEBUG) Log.d(TAG, "onDestroy()");
         mTvInputManagerHelper.stop();
+
         super.onDestroy();
     }
 
