@@ -14,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -25,14 +24,15 @@ import com.android.tv.data.StreamInfo;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TunableTvView extends FrameLayout implements StreamInfo {
     // STOPSHIP: Turn debugging off
     private static final boolean DEBUG = true;
     private static final String TAG = "TunableTvView";
 
-    private static final int DELAY_FOR_SURFACE_RELEASE = 300;
     public static final String PERMISSION_RECEIVE_INPUT_EVENT =
             "android.permission.RECEIVE_INPUT_EVENT";
 
@@ -53,27 +53,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
     private boolean mCanReceiveInputEvent;
     private boolean mIsMuted;
     private float mVolume;
-
-    private final SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
-        @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
-
-        @Override
-        public void surfaceCreated(SurfaceHolder holder) { }
-
-        @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
-            // know when the surface is released at TIS, we don't need this hack.
-            try {
-                if (DEBUG) Log.d(TAG, "Sleep to wait destroying a surface");
-                Thread.sleep(DELAY_FOR_SURFACE_RELEASE);
-                if (DEBUG) Log.d(TAG, "Wake up from sleeping");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    };
+    private final Map<Long, String> mChannelToInputMap = new HashMap<Long, String>();
 
     private final TvInputListener mListener =
             new TvInputListener() {
@@ -216,7 +196,12 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
         mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
         mHasClosedCaption = false;
-        String inputId = Utils.getInputIdForChannel(getContext(), channelId);
+        String inputId = null;
+        inputId = mChannelToInputMap.get(channelId);
+        if (inputId == null) {
+            inputId = Utils.getInputIdForChannel(getContext(), channelId);
+            mChannelToInputMap.put(channelId, inputId);
+        }
         TvInputInfo inputInfo = mInputManagerHelper.getTvInputInfo(inputId);
         if (inputInfo == null
                 || mInputManagerHelper.getInputState(inputInfo) ==
@@ -227,13 +212,6 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         mChannelId = channelId;
         if (!inputInfo.equals(mInputInfo)) {
             mTvView.reset();
-            // TODO: It is a hack to wait to release a surface at TIS. If there is a way to
-            // know when the surface is released at TIS, we don't need this hack.
-            try {
-                Thread.sleep(DELAY_FOR_SURFACE_RELEASE);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             mInputInfo = inputInfo;
             mCanReceiveInputEvent = getContext().getPackageManager().checkPermission(
                     PERMISSION_RECEIVE_INPUT_EVENT, mInputInfo.getComponent().getPackageName())
@@ -385,7 +363,6 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         for (int i = 0; i < view.getChildCount(); ++i) {
             if (view.getChildAt(i) instanceof SurfaceView) {
                 SurfaceView surfaceView = (SurfaceView) mTvView.getChildAt(i);
-                surfaceView.getHolder().addCallback(mSurfaceHolderCallback);
                 return surfaceView;
             }
         }
