@@ -888,7 +888,7 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
             }
 
             mChannelNumberView.setChannels(
-                    (mChannelMap == null) ? null : mChannelMap.getChannelList(false));
+                    (mChannelMap == null) ? null : mChannelMap.getChannelList(true));
             mMainMenuView.setChannelMap(mChannelMap);
         }
     };
