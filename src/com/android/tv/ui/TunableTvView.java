@@ -95,26 +95,51 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
                 }
 
                 @Override
-                public void onTrackInfoChanged(String inputId, List<TvTrackInfo> tracks) {
+                public void onTracksChanged(String inputId, List<TvTrackInfo> tracks) {
+                    mHasClosedCaption = false;
+                    for (TvTrackInfo track : tracks) {
+                        if (track.getType() == TvTrackInfo.TYPE_SUBTITLE) {
+                            mHasClosedCaption = true;
+                            break;
+                        }
+                    }
                     if (mOnTuneListener != null) {
                         mOnTuneListener.onStreamInfoChanged(TunableTvView.this);
                     }
                 }
 
                 @Override
-                public void onTrackSelectionChanged(String inputId,
-                        List<TvTrackInfo> selectedTracks) {
-                    for (TvTrackInfo track : selectedTracks) {
-                        int type = track.getType();
+                public void onTrackSelected(String inputId, int type, String trackId) {
+                    if (trackId == null) {
+                        // A track is unselected.
                         if (type == TvTrackInfo.TYPE_VIDEO) {
-                            mVideoWidth = track.getVideoWidth();
-                            mVideoHeight = track.getVideoHeight();
-                            mVideoFormat = Utils.getVideoDefinitionLevelFromSize(
-                                    mVideoWidth, mVideoHeight);
+                            mVideoWidth = 0;
+                            mVideoHeight = 0;
+                            mVideoFormat = StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
                         } else if (type == TvTrackInfo.TYPE_AUDIO) {
-                            mAudioChannelCount = track.getAudioChannelCount();
-                        } else if (type == TvTrackInfo.TYPE_SUBTITLE) {
-                            mHasClosedCaption = true;
+                            mAudioChannelCount = StreamInfo.AUDIO_CHANNEL_COUNT_UNKNOWN;
+                        }
+                    } else {
+                        List<TvTrackInfo> tracks = getTracks(type);
+                        boolean trackFound = false;
+                        if (tracks != null) {
+                            for (TvTrackInfo track : getTracks(type)) {
+                                if (track.getId().equals(trackId)) {
+                                    if (type == TvTrackInfo.TYPE_VIDEO) {
+                                        mVideoWidth = track.getVideoWidth();
+                                        mVideoHeight = track.getVideoHeight();
+                                        mVideoFormat = Utils.getVideoDefinitionLevelFromSize(
+                                                mVideoWidth, mVideoHeight);
+                                    } else if (type == TvTrackInfo.TYPE_AUDIO) {
+                                        mAudioChannelCount = track.getAudioChannelCount();
+                                    }
+                                    trackFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!trackFound) {
+                            Log.w(TAG, "Invalid track ID: " + trackId);
                         }
                     }
                     if (mOnTuneListener != null) {
@@ -316,12 +341,12 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         mTvView.setOnUnhandledInputEventListener(listener);
     }
 
-    public List<TvTrackInfo> getTracks() {
-        return mTvView.getTracks();
+    public List<TvTrackInfo> getTracks(int type) {
+        return mTvView.getTracks(type);
     }
 
-    public void selectTrack(TvTrackInfo track) {
-        mTvView.selectTrack(track);
+    public void selectTrack(int type, String trackId) {
+        mTvView.selectTrack(type, trackId);
     }
 
     private void block(int reason) {
