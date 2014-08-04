@@ -26,3 +26,9 @@ LOCAL_PRIVILEGED_MODULE := true
 LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_PACKAGE)
+
+ifeq ($(PRODUCT_IS_ATV),true)
+  ifneq ($(PRODUCT_IS_ATV_SDK),true)
+    $(call dist-for-goals,dist_files,$(LOCAL_BUILT_MODULE):FakeHardwareTvInput.apk)
+  endif
+endif
