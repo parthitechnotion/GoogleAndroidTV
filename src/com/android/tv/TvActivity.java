@@ -73,7 +73,9 @@ import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.ui.sidepanel.ActionItem;
 import com.android.tv.ui.sidepanel.BaseSideFragment;
 import com.android.tv.ui.sidepanel.ClosedCaptionFragment;
+import com.android.tv.ui.sidepanel.ClosedCaptionOptionFragment;
 import com.android.tv.ui.sidepanel.DisplayModeFragment;
+import com.android.tv.ui.sidepanel.DisplayModeOptionFragment;
 import com.android.tv.ui.sidepanel.EditChannelsFragment;
 import com.android.tv.ui.sidepanel.InputPickerFragment;
 import com.android.tv.ui.sidepanel.Item;
@@ -567,11 +569,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
     }
 
     public void showDisplayModeOption(int initiator) {
-        showSideFragment(new DisplayModeFragment(), initiator);
+        showSideFragment(new DisplayModeOptionFragment(), initiator);
     }
 
     public void showClosedCaptionOption(int initiator) {
-        showSideFragment(new ClosedCaptionFragment(), initiator);
+        showSideFragment(new ClosedCaptionOptionFragment(), initiator);
     }
 
     public void showPipLocationOption(int initiator) {
