@@ -253,16 +253,28 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                 new Runnable() {
                     @Override
                     public void run() {
-                        if (mPipEnabled && mActivityResumed) {
+                        if (mPipEnabled && mActivityResumed
+                                && getFragmentManager().getBackStackEntryCount() <= 0) {
                             mPipView.setVisibility(View.VISIBLE);
                         }
                     }
                 });
-        mHideSideFragment = new HideRunnable(mSidePanelContainer, DURATION_SHOW_SIDE_FRAGMENT, null,
+        mHideSideFragment = new HideRunnable(mSidePanelContainer, DURATION_SHOW_SIDE_FRAGMENT,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mPipEnabled) {
+                            mPipView.setVisibility(View.GONE);
+                        }
+                    }
+                },
                 new Runnable() {
                     @Override
                     public void run() {
                         resetSideFragment();
+                        if (mPipEnabled && mActivityResumed && !mMainMenuView.isShown()) {
+                            mPipView.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
 
