@@ -15,6 +15,7 @@
 -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/channel_tile_top" />
-    <corners android:radius="@dimen/channel_tile_round_radius" />
+    <solid android:color="@color/channel_tile_guide_bottom" />
+    <corners android:bottomLeftRadius="@dimen/channel_tile_round_radius"
+        android:bottomRightRadius="@dimen/channel_tile_round_radius"/>
 </shape>

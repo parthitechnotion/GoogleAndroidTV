@@ -99,13 +99,14 @@ public class ChannelTileView extends ShadowContainer
         setTag(MainMenuView.MenuTag.buildTag(mChannel));
 
         if (mChannel.getType() == R.integer.channel_type_guide) {
-            mChannelInfosLayout.setBackground(mNormalBackgroud);
+            mChannelInfosLayout.setBackgroundResource(R.drawable.channel_tile_guide_top);
             mChannelNumberView.setVisibility(INVISIBLE);
             mChannelNameView.setVisibility(INVISIBLE);
             mProgramPosterArtView.setVisibility(INVISIBLE);
             mChannelLogoView.setImageResource(R.drawable.ic_channel_guide);
             mChannelLogoView.setVisibility(VISIBLE);
             mProgramNameView.setText(R.string.menu_program_guide);
+            mProgramNameView.setBackgroundResource(R.drawable.channel_tile_guide_bottom);
         } else {
             mChannelNumberView.setText(mChannel.getDisplayNumber());
             mChannelNumberView.setVisibility(VISIBLE);
