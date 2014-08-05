@@ -8,3 +8,9 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_PROGUARD_ENABLED := disabled
 
 include $(BUILD_PACKAGE)
+
+ifeq ($(PRODUCT_IS_ATV),true)
+  ifneq ($(PRODUCT_IS_ATV_SDK),true)
+    $(call dist-for-goals,dist_files,$(LOCAL_BUILT_MODULE):SampleTvInput.apk)
+  endif
+endif
