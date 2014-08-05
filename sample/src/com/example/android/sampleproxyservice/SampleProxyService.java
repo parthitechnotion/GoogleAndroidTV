@@ -47,11 +47,15 @@ public class SampleProxyService extends TvInputService {
 
     @Override
     public Session onCreateSession(String inputId) {
-        return new SampleSession();
+        return new SampleSession(this);
     }
 
     private class SampleSession extends HardwareSession {
         private ExternalSettopBox mExternalSettopBox = ExternalSettopBox.getInstance();
+
+        public SampleSession(Context context) {
+            super(context);
+        }
 
         @Override
         public boolean onTune(Uri channel) {

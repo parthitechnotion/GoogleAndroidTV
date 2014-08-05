@@ -19,6 +19,7 @@ package com.example.sampletvinput;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
@@ -78,7 +79,7 @@ abstract public class BaseTvInputService extends TvInputService {
     @Override
     public Session onCreateSession(String inputId) {
         if (DEBUG) Log.d(TAG, "onCreateSession(inputId=" + inputId + ")");
-        return new BaseTvInputSessionImpl();
+        return new BaseTvInputSessionImpl(this);
     }
 
     abstract public List<ChannelInfo> createSampleChannels();
@@ -151,7 +152,8 @@ abstract public class BaseTvInputService extends TvInputService {
         private Map<String, TvTrackInfo> mTracks;
 
 
-        protected BaseTvInputSessionImpl() {
+        protected BaseTvInputSessionImpl(Context context) {
+            super(context);
             mPlayer = new MediaPlayer();
             mVolume = 1.0f;
             mMute = false;
