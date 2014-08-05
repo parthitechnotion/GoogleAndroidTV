@@ -17,80 +17,99 @@
 package com.android.tv.ui.sidepanel;
 
 import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RadioButton;
 
+import com.android.internal.util.Preconditions;
 import com.android.tv.R;
+import com.android.tv.TvActivity;
 import com.android.tv.input.TisTvInput;
 import com.android.tv.input.TvInput;
 import com.android.tv.input.UnifiedTvInput;
-import com.android.tv.util.Utils;
+import com.android.tv.util.TvInputManagerHelper;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
-public class InputPickerFragment extends SideFragment {
+public class InputPickerFragment extends BaseOptionFragment {
+    private TvInput mSelectedInput;
+
+    private TvActivity mTvActivity;
+    private boolean mIsFirstResume;
+    private int mInitialPosition;
+
+    private TvInputManagerHelper mInputManager;
+
     @Override
-    protected String getTitle() {
-        return getString(R.string.select_input_device);
-    }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        mIsFirstResume = true;
+        mTvActivity = (TvActivity) getActivity();
+        mInputManager = mTvActivity.getTvInputManagerHelper();
+        mInputManager.update();
+        Collection<TvInputInfo> inputInfos = mInputManager.getTvInputInfos(false);
+        int inputSize = inputInfos.size();
+        Preconditions.checkState(inputSize > 0);
+        mSelectedInput = mTvActivity.getSelectedTvInput();
 
-    @Override
-    protected List<Item> getItemList() {
-        ArrayList<Item> items = new ArrayList<>();
-
-        items.add(new TvInputItem(
-                new UnifiedTvInput(getTvActivity().getTvInputManagerHelper(), getActivity())));
-
-        getTvActivity().getTvInputManagerHelper().update();
-        List<TvInputInfo> infos = new ArrayList<>(
-                getTvActivity().getTvInputManagerHelper().getTvInputInfos(false));
-        Collections.sort(infos, new Comparator<TvInputInfo>() {
+        Object[] items = new Object[inputSize + 1];
+        // Unified TV input is always the first item.
+        items[0] = new UnifiedTvInput(mInputManager, getActivity());
+        int i = 1;
+        for (TvInputInfo inputInfo : inputInfos) {
+            items[i++] = new TisTvInput(mInputManager, inputInfo, mTvActivity);
+        }
+        Arrays.sort(items, 1, items.length, new Comparator<Object>() {
             @Override
-            public int compare(TvInputInfo lhs, TvInputInfo rhs) {
-                String a = Utils.getDisplayNameForInput(getActivity(), lhs);
-                String b = Utils.getDisplayNameForInput(getActivity(), rhs);
-                return a.compareTo(b);
+            public int compare(Object lhs, Object rhs) {
+                return ((TvInput) lhs).getDisplayName().compareTo(((TvInput) rhs).getDisplayName());
             }
         });
-        for (TvInputInfo inputInfo : infos) {
-            if (inputInfo.getType() == TvInputInfo.TYPE_TUNER) {
-                items.add(new TvInputItem(new TisTvInput(
-                        getTvActivity().getTvInputManagerHelper(), inputInfo, getActivity())));
+
+        mInitialPosition = 0;
+        for (i = 0; i < items.length; ++i) {
+            if (items[i].equals(mSelectedInput)) {
+                mInitialPosition = i;
+                break;
             }
         }
-
-        TvInput selected = getTvActivity().getSelectedTvInput();
-        if (selected == null) {
-            ((TvInputItem) items.get(0)).setChecked(true);
-        } else {
-            for (Item item : items) {
-                if (((TvInputItem) item).getTvInput().equals(selected)) {
-                    ((TvInputItem) item).setChecked(true);
-                    break;
-                }
-            }
-        }
-
-        return items;
+        initialize(getString(R.string.select_input_device), items);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    private class TvInputItem extends RadioButtonItem {
-        private TvInput mTvInput;
-
-        private TvInputItem(TvInput tvInput) {
-            super(tvInput.getDisplayName());
-            mTvInput = tvInput;
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mIsFirstResume) {
+            setSelectedPosition(mInitialPosition);
+            setPrevSelectedItemPosition(mInitialPosition);
+            mIsFirstResume = false;
         }
+    }
 
-        public TvInput getTvInput() {
-            return mTvInput;
-        }
+    @Override
+    public void onBindView(View v, int position, Object tag, boolean prevSelected) {
+        super.onBindView(v, position, tag, prevSelected);
+        TvInput input = (TvInput) tag;
+        boolean available = input.getInputState() != TvInputManager.INPUT_STATE_DISCONNECTED;
+        v.setEnabled(available);
+        v.setClickable(available);
 
-        @Override
-        protected void onSelected() {
-            super.onSelected();
-            getTvActivity().onInputPicked(mTvInput);
+        RadioButton radioButton = (RadioButton) v.findViewById(R.id.option_item);
+        radioButton.setEnabled(available);
+        radioButton.setText(input.getDisplayName());
+    }
+
+    @Override
+    public void onItemSelected(View v, int position, Object tag) {
+        if (!((TvInput) tag).equals(mSelectedInput)) {
+            mTvActivity.onInputPicked((TvInput) tag);
         }
+        super.onItemSelected(v, position, tag);
     }
 }

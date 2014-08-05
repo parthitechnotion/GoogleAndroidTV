@@ -16,63 +16,81 @@
 
 package com.android.tv.ui.sidepanel;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.view.Gravity;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.RadioButton;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.android.tv.R;
+import com.android.tv.TvActivity;
 import com.android.tv.util.TvSettings;
 
-import java.util.ArrayList;
-import java.util.List;
+public class PipLocationFragment extends BaseOptionFragment {
+    private static final String TAG = "PipLocationFragment";
+    private static final boolean DEBUG = true;
 
-public class PipLocationFragment extends SideFragment {
+    private TvActivity mTvActivity;
+    private boolean mIsFirstResume;
+    private int mPipLocation;
+    private final int[] mLocationToItemPosition = new int[4];
+    private final Object[] mItem  = new Integer[] {
+        TvSettings.PIP_LOCATION_BOTTOM_RIGHT,
+        TvSettings.PIP_LOCATION_TOP_RIGHT,
+        TvSettings.PIP_LOCATION_TOP_LEFT,
+        TvSettings.PIP_LOCATION_BOTTOM_LEFT,
+    };
+
     @Override
-    protected String getTitle() {
-        return getString(R.string.pip_location_option_title);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        mIsFirstResume = true;
+        mTvActivity = (TvActivity) getActivity();
+
+        mLocationToItemPosition[TvSettings.PIP_LOCATION_BOTTOM_RIGHT] = 0;
+        mLocationToItemPosition[TvSettings.PIP_LOCATION_TOP_RIGHT] = 1;
+        mLocationToItemPosition[TvSettings.PIP_LOCATION_TOP_LEFT] = 2;
+        mLocationToItemPosition[TvSettings.PIP_LOCATION_BOTTOM_LEFT] = 3;
+
+        initialize(getString(R.string.pip_location_option_title),
+                R.layout.pip_location_item, mItem);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
-    protected List<Item> getItemList() {
-        ArrayList<Item> items = new ArrayList<>();
-        items.add(new PipLocationRadio(
-                TvSettings.PIP_LOCATION_TOP_LEFT, R.drawable.ic_pip_loc_top_left));
-        items.add(new PipLocationRadio(
-                TvSettings.PIP_LOCATION_TOP_RIGHT, R.drawable.ic_pip_loc_top_right));
-        items.add(new PipLocationRadio(
-                TvSettings.PIP_LOCATION_BOTTOM_LEFT, R.drawable.ic_pip_loc_bottom_left));
-        items.add(new PipLocationRadio(
-                TvSettings.PIP_LOCATION_BOTTOM_RIGHT, R.drawable.ic_pip_loc_bottom_right));
-        return items;
+    public void onResume() {
+        super.onResume();
+        if (mIsFirstResume) {
+            mPipLocation = mTvActivity.getPipLocation();
+            int initialPosition = mLocationToItemPosition[mPipLocation];
+            setSelectedPosition(initialPosition);
+            setPrevSelectedItemPosition(initialPosition);
+            mIsFirstResume = false;
+        }
     }
 
-    private class PipLocationRadio extends RadioButtonItem {
-        int mLocation;
-        int mDrawable;
-
-        private PipLocationRadio(int location, int drawable) {
-            super(null);
-            mLocation = location;
-            mDrawable = drawable;
+    @Override
+    public void onBindView(View v, int position, Object tag, boolean prevSelected) {
+        super.onBindView(v, position, tag, prevSelected);
+        ImageView pipLocationImageView = (ImageView) v.findViewById(R.id.pip_location);
+        int location = (Integer) tag;
+        if (location == TvSettings.PIP_LOCATION_TOP_LEFT) {
+            pipLocationImageView.setImageResource(R.drawable.ic_pip_loc_top_left);
+        } else if (location == TvSettings.PIP_LOCATION_TOP_RIGHT) {
+            pipLocationImageView.setImageResource(R.drawable.ic_pip_loc_top_right);
+        } else if (location == TvSettings.PIP_LOCATION_BOTTOM_LEFT) {
+            pipLocationImageView.setImageResource(R.drawable.ic_pip_loc_bottom_left);
+        } else if (location == TvSettings.PIP_LOCATION_BOTTOM_RIGHT) {
+            pipLocationImageView.setImageResource(R.drawable.ic_pip_loc_bottom_right);
+        } else {
+            throw new IllegalArgumentException("Invaild PIP location: " + location);
         }
+    }
 
-        @Override
-        protected void bind(View view) {
-            super.bind(view);
-            RadioButton radioButton = (RadioButton) view.findViewById(R.id.radio_button);
-            BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(mDrawable);
-            drawable.setGravity(Gravity.CENTER);
-            drawable.setTargetDensity(Bitmap.DENSITY_NONE);
-            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-            radioButton.setCompoundDrawablesRelative(drawable, null, null, null);
-        }
-
-        @Override
-        protected void onSelected() {
-            super.onSelected();
-            getTvActivity().setPipLocation(mLocation, true);
-        }
+    @Override
+    public void onItemSelected(View v, int position, Object tag) {
+        int pipLocation = (Integer) tag;
+        mTvActivity.setPipLocation(pipLocation, true);
+        super.onItemSelected(v, position, tag);
     }
 }
