@@ -73,5 +73,31 @@
             <meta-data android:name="android.media.tv.input"
                 android:resource="@xml/externalfiletvinputservice" />
         </service>
+        <activity
+             android:name="com.example.android.sampleproxyservice.SampleProxySetupActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <service android:name="com.example.android.sampleproxyservice.FakeHdmiTvInputService"
+            android:permission="android.permission.BIND_TV_INPUT"
+            android:label="@string/fake_hdmi_input_label"
+            android:process=":remoteProxyTvInput">
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <meta-data android:name="android.media.tv.input"
+                android:resource="@xml/sampleproxyservice" />
+        </service>
+        <service android:name="com.example.android.sampleproxyservice.SampleProxyService"
+            android:permission="android.permission.BIND_TV_INPUT"
+            android:label="@string/proxy_input_label"
+            android:process=":remoteProxyTvInput">
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <meta-data android:name="android.media.tv.input"
+                android:resource="@xml/sampleproxyservice" />
+        </service>
     </application>
 </manifest>

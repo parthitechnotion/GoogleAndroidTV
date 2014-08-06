@@ -76,7 +76,7 @@ abstract public class BaseTvInputService extends TvInputService {
     }
 
     @Override
-    public TvInputService.Session onCreateSession(String inputId) {
+    public Session onCreateSession(String inputId) {
         if (DEBUG) Log.d(TAG, "onCreateSession(inputId=" + inputId + ")");
         return new BaseTvInputSessionImpl();
     }
