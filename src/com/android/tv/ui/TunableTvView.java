@@ -14,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -37,7 +36,6 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
             "android.permission.RECEIVE_INPUT_EVENT";
 
     private final TvView mTvView;
-    private final SurfaceView mSurfaceView;
     private long mChannelId = Channel.INVALID_ID;
     private TvInputManagerHelper mInputManagerHelper;
     private boolean mStarted;
@@ -184,7 +182,6 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         inflate(getContext(), R.layout.tunable_tv_view, this);
 
         mTvView = (TvView) findViewById(R.id.tv_view);
-        mSurfaceView = findSurfaceView(mTvView);
     }
 
     public void start(TvInputManagerHelper tvInputManagerHelper) {
@@ -261,7 +258,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
     }
 
     public void setPip(boolean isPip) {
-        mSurfaceView.setZOrderMediaOverlay(isPip);
+        mTvView.setZOrderOnTop(isPip);
     }
 
     public void setStreamVolume(float volume) {
@@ -382,16 +379,6 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
     private void unmute() {
         mIsMuted = false;
         mTvView.setStreamVolume(mVolume);
-    }
-
-    private SurfaceView findSurfaceView(ViewGroup view) {
-        for (int i = 0; i < view.getChildCount(); ++i) {
-            if (view.getChildAt(i) instanceof SurfaceView) {
-                SurfaceView surfaceView = (SurfaceView) mTvView.getChildAt(i);
-                return surfaceView;
-            }
-        }
-        throw new RuntimeException("TvView does not have SurfaceView.");
     }
 
     private void hideBlock() {
