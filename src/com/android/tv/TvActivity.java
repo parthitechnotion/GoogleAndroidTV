@@ -1228,14 +1228,11 @@ public class TvActivity extends Activity implements AudioManager.OnAudioFocusCha
                     // For now, we just select the first subtitle track.
                     // TODO: show audio/subtitle language options to user and handle the user's
                     //     selection.
-                    List<TvTrackInfo> tracks = mTvView.getTracks();
-                    for (TvTrackInfo track : tracks) {
-                        Log.d(TAG, "lang - " + track.getLanguage());
-                        if (track.getType() == TvTrackInfo.TYPE_SUBTITLE) {
-                            Log.d(TAG, "selectTrack " + track);
-                            mTvView.selectTrack(track);
-                            break;
-                        }
+                    List<TvTrackInfo> tracks = mTvView.getTracks(TvTrackInfo.TYPE_SUBTITLE);
+                    if (!tracks.isEmpty()) {
+                        Log.d(TAG, "lang - " + tracks.get(0).getLanguage());
+                        Log.d(TAG, "selectTrack " + tracks.get(0));
+                        mTvView.selectTrack(TvTrackInfo.TYPE_SUBTITLE, tracks.get(0).getId());
                     }
                     return true;
                 }

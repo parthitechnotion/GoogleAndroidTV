@@ -26,12 +26,10 @@ import android.media.MediaPlayer.TrackInfo;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Programs;
-import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,12 +46,11 @@ import java.util.Map;
 abstract public class BaseTvInputService extends TvInputService {
     private static final String TAG = "BaseTvInputService";
     private static final boolean DEBUG = true;
-    private static final String KEY_TRACK_ID = "track-id";
 
     private final LongSparseArray<ChannelInfo> mChannelMap = new LongSparseArray<ChannelInfo>();
-    private int mSelectedAudioTrack = -1;
-    private int mSelectedVideoTrack = -1;
-    private int mSelectedSubtitleTrack = -1;
+    private String mSelectedAudioTrack;
+    private String mSelectedVideoTrack;
+    private String mSelectedSubtitleTrack;
     private final Handler mHandler = new Handler();
 
     protected List<ChannelInfo> mChannels;
@@ -151,7 +148,7 @@ abstract public class BaseTvInputService extends TvInputService {
         private MediaPlayer mPlayer;
         private float mVolume;
         private boolean mMute;
-        private Map<Integer, TvTrackInfo> mTracks;
+        private Map<String, TvTrackInfo> mTracks;
 
 
         protected BaseTvInputSessionImpl() {
@@ -257,8 +254,6 @@ abstract public class BaseTvInputService extends TvInputService {
                             }
                             MediaPlayer.TrackInfo[] tracks = mPlayer.getTrackInfo();
                             setupTrackInfo(tracks, channel);
-                            notifyTrackInfoChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
-                            notifySelectedTracks();
                             notifyVideoAvailable();
                             try {
                                 mPlayer.start();
@@ -327,87 +322,63 @@ abstract public class BaseTvInputService extends TvInputService {
         }
 
         @Override
-        public boolean onSelectTrack(TvTrackInfo track) {
-            Log.d(TAG, "onSelectTrack(" + track.getExtra().getInt(KEY_TRACK_ID) + ")");
+        public boolean onSelectTrack(int type, String trackId) {
+            Log.d(TAG, "onSelectTrack(" + type + " ," + trackId + ")");
             if (mPlayer != null) {
-                if (track.getType() == TvTrackInfo.TYPE_SUBTITLE) {
+                if (type == TvTrackInfo.TYPE_SUBTITLE) {
                     // SelectTrack only works on subtitle tracks.
-                    mPlayer.selectTrack(track.getExtra().getInt(KEY_TRACK_ID));
-
-                    // Mark this track is selected.
-                    int id = track.getExtra().getInt(KEY_TRACK_ID);
-                    mSelectedSubtitleTrack = id;
-                    notifySelectedTracks();
+                    if (trackId == null) {
+                        if (mSelectedSubtitleTrack != null) {
+                            mPlayer.deselectTrack(Integer.parseInt(mSelectedSubtitleTrack));
+                        }
+                    } else {
+                        TvTrackInfo track = mTracks.get(trackId);
+                        if (track == null) {
+                            return false;
+                        }
+                        mPlayer.selectTrack(Integer.parseInt(trackId));
+                        mSelectedSubtitleTrack = trackId;
+                    }
+                    notifyTrackSelected(TvTrackInfo.TYPE_SUBTITLE, trackId);
                     return true;
                 }
             }
             return false;
-        }
-
-        @Override
-        public boolean onUnselectTrack(TvTrackInfo track) {
-            if (mPlayer != null) {
-                if (track.getType() == TvTrackInfo.TYPE_SUBTITLE) {
-                    // UnselectTrack only works on subtitle tracks.
-                    mPlayer.deselectTrack(track.getExtra().getInt(KEY_TRACK_ID));
-                    mSelectedSubtitleTrack = -1;
-                    notifySelectedTracks();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void notifySelectedTracks() {
-            List<TvTrackInfo> list = new ArrayList<TvTrackInfo>();
-            if (mSelectedAudioTrack != -1) {
-                list.add(mTracks.get(mSelectedAudioTrack));
-            }
-            if (mSelectedVideoTrack != -1) {
-                list.add(mTracks.get(mSelectedVideoTrack));
-            }
-            if (mSelectedSubtitleTrack != -1) {
-                list.add(mTracks.get(mSelectedSubtitleTrack));
-            }
-            notifyTrackSelectionChanged(list);
         }
 
         private void setupTrackInfo(MediaPlayer.TrackInfo[] infos, ChannelInfo channel) {
-            Map<Integer, TvTrackInfo> tracks = new HashMap<Integer, TvTrackInfo>();
+            Map<String, TvTrackInfo> tracks = new HashMap<String, TvTrackInfo>();
             // Add subtitle tracks from the real media.
             int i;
             for (i = 0; i < infos.length; ++i) {
                 if (infos[i].getTrackType() == TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT
                         || infos[i].getTrackType() == TrackInfo.MEDIA_TRACK_TYPE_SUBTITLE) {
-                    Bundle extra = new Bundle();
-                    extra.putInt(KEY_TRACK_ID, i);
-                    tracks.put(i, new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE)
+                    tracks.put(Integer.toString(i), new TvTrackInfo.Builder(
+                            TvTrackInfo.TYPE_SUBTITLE, Integer.toString(i))
                             .setLanguage("und".equals(infos[i].getLanguage()) ? null
                                     : infos[i].getLanguage())
-                            .setExtra(extra)
                             .build());
                 }
                 Log.d(TAG, "tracks " + i + " " + infos[i].getTrackType() + " "
                         + infos[i].getLanguage());
             }
             // Add predefine video and audio track.
-            Bundle extra = new Bundle();
-            extra.putInt(KEY_TRACK_ID, i++);
-            tracks.put(i, new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO)
+            mSelectedVideoTrack = Integer.toString(i++);
+            tracks.put(mSelectedVideoTrack, new TvTrackInfo.Builder(
+                    TvTrackInfo.TYPE_VIDEO, mSelectedVideoTrack)
                     .setVideoWidth(channel.mVideoWidth)
                     .setVideoHeight(channel.mVideoHeight)
-                    .setExtra(extra)
                     .build());
-            mSelectedVideoTrack = i;
-            extra = new Bundle();
-            extra.putInt(KEY_TRACK_ID, i++);
-            tracks.put(i, new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO)
+            mSelectedAudioTrack = Integer.toString(i++);
+            tracks.put(mSelectedAudioTrack, new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO,
+                    mSelectedAudioTrack)
                     .setAudioChannelCount(channel.mAudioChannel)
-                    .setExtra(extra)
                     .build());
-            mSelectedAudioTrack = i;
 
             mTracks = tracks;
+            notifyTracksChanged(new ArrayList<TvTrackInfo>(mTracks.values()));
+            notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, mSelectedVideoTrack);
+            notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, mSelectedAudioTrack);
         }
 
         private class AddProgramRunnable implements Runnable {
