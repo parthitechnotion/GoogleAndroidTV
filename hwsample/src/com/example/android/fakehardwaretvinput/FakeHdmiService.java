@@ -101,7 +101,7 @@ public class FakeHdmiService extends TvInputService {
             throw new IllegalArgumentException("Unknown inputId: " + inputId
                     + " ; this should not happen.");
         }
-        return new HdmiInputSessionImpl(info);
+        return new HdmiInputSessionImpl(info, this);
     }
 
     @Override
@@ -247,7 +247,8 @@ public class FakeHdmiService extends TvInputService {
             }
         };
 
-        HdmiInputSessionImpl(TvInputInfo info) {
+        HdmiInputSessionImpl(TvInputInfo info, Context context) {
+            super(context);
             mInfo = info;
             mLabel = info.loadLabel(FakeHdmiService.this).toString();
             mTextPaint.setColor(Color.BLACK);

@@ -16,6 +16,7 @@
 
 package com.example.android.sampleproxyservice;
 
+import android.content.Context;
 import android.media.tv.TvInputService;
 import android.net.Uri;
 import android.view.Surface;
@@ -28,10 +29,14 @@ public class FakeHdmiTvInputService extends TvInputService {
 
     @Override
     public Session onCreateSession(String inputId) {
-        return new FakeHdmiSession();
+        return new FakeHdmiSession(this);
     }
 
     private class FakeHdmiSession extends Session {
+        public FakeHdmiSession(Context context) {
+            super(context);
+        }
+
         @Override
         public void onRelease() {
         }

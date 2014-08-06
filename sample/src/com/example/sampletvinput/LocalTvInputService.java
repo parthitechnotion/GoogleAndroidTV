@@ -16,7 +16,7 @@
 
 package com.example.sampletvinput;
 
-import android.media.tv.TvContentRating;
+import android.content.Context;
 import android.media.tv.TvInputService;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -54,7 +54,7 @@ public class LocalTvInputService extends BaseTvInputService {
     @Override
     public Session onCreateSession(String inputId) {
         if (DEBUG) Log.d(TAG, "onCreateSession(inputId=" + inputId + ")");
-        TvInputService.Session impl = new LocalTvInputSessionImpl();
+        TvInputService.Session impl = new LocalTvInputSessionImpl(this);
         impl.setOverlayViewEnabled(true);
         return impl;
     }
@@ -87,6 +87,10 @@ public class LocalTvInputService extends BaseTvInputService {
         private WebView mWebView;
         private View mUiLayout;
         private boolean mUiVisible;
+
+        protected LocalTvInputSessionImpl(Context context) {
+            super(context);
+        }
 
         public void setUiVisibility(boolean visible) {
             if (mUiVisible == visible) {
