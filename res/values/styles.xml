@@ -1,53 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2014 The Android Open Source Project
-
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
+<!--
+  ~ Copyright (C) 2015 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="channel_banner_track_meta_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">12dp</item>
-        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
         <item name="android:gravity">center</item>
-        <item name="android:paddingLeft">4dp</item>
-        <item name="android:paddingRight">4dp</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingEnd">4dp</item>
         <item name="android:textSize">@dimen/channel_banner_track_meta_text_size</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">#455A64</item>
+        <item name="android:textAllCaps">true</item>
         <item name="android:background">@drawable/track_meta_border</item>
     </style>
 
-    <style name="keypad_view_style">
-        <item name="android:clipChildren">false</item>
-        <item name="android:clipToPadding">false</item>
-        <item name="android:elevation">8dp</item>
-        <item name="android:padding">16dp</item>
-        <item name="android:background">@drawable/keypad_background</item>
+    <style name="pin_dialog_animation" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/pin_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/pin_dialog_exit</item>
     </style>
 
-    <style name="keypad_key_style">
-        <item name="android:layout_width">32dp</item>
-        <item name="android:layout_height">32dp</item>
-        <item name="android:background">?android:attr/selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:focusableInTouchMode">true</item>
-        <item name="android:scaleType">center</item>
+    <style name="text_appearance_channel_banner_episode_title">
+        <item name="android:textColor">@color/channel_banner_episode_text_color</item>
+    </style>
+
+    <style name="pin_number_view">
+        <item name="android:layout_width">@dimen/pin_number_picker_text_view_width</item>
+        <item name="android:layout_height">@dimen/pin_number_picker_text_view_height</item>
         <item name="android:gravity">center</item>
-        <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:textColor">#eeeeee</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/pin_number_picker_text_size</item>
+        <item name="android:textColor">@color/pin_number_picker_text_color</item>
+        <item name="android:fontFamily">@string/light_font</item>
     </style>
 </resources>

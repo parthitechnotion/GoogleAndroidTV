@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,27 +22,27 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.android.tv.TvActivity;
+import com.android.tv.TvApplication;
 
 /**
  * Handles global keys.
  */
 public class GlobalKeyReceiver extends BroadcastReceiver {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String TAG = "GlobalKeyReceiver";
+    private static final String ACTION_GLOBAL_BUTTON = "android.intent.action.GLOBAL_BUTTON";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_GLOBAL_BUTTON.equals(intent.getAction())) {
+        if (ACTION_GLOBAL_BUTTON.equals(intent.getAction())) {
             KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            if (DEBUG)
-                Log.d(TAG, "onReceive: " + event);
+            if (DEBUG) Log.d(TAG, "onReceive: " + event);
             int keyCode = event.getKeyCode();
             int action = event.getAction();
-            if (keyCode == KeyEvent.KEYCODE_TV && action == KeyEvent.ACTION_DOWN) {
-                Intent newIntent = new Intent(context, TvActivity.class);
-                newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(newIntent);
+            if (keyCode == KeyEvent.KEYCODE_TV && action == KeyEvent.ACTION_UP) {
+                ((TvApplication) context.getApplicationContext()).handleTvKey();
+            } else if (keyCode == KeyEvent.KEYCODE_TV_INPUT && action == KeyEvent.ACTION_UP) {
+                ((TvApplication) context.getApplicationContext()).handleTvInputKey();
             }
         }
     }

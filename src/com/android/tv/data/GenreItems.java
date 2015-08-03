@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,10 @@ import android.media.tv.TvContract.Programs.Genres;
 import com.android.tv.R;
 
 public class GenreItems {
-    public static final int POSITION_ALL_CHANNELS = 0;
+    /**
+     * Genre ID indicating all channels.
+     */
+    public static final int ID_ALL_CHANNELS = 0;
 
     private static final String[] CANONICAL_GENRES = {
         null, // All channels
@@ -36,72 +39,59 @@ public class GenreItems {
         Genres.EDUCATION,
         Genres.ANIMAL_WILDLIFE,
         Genres.NEWS,
-        Genres.GAMING
+        Genres.GAMING,
+        Genres.ARTS,
+        Genres.ENTERTAINMENT,
+        Genres.LIFE_STYLE,
+        Genres.MUSIC,
+        Genres.PREMIER,
+        Genres.TECH_SCIENCE
     };
-
-    private static String[] sItems;
 
     private GenreItems() { }
 
-    public static final String[] getItems(Context context) {
-        if (sItems == null) {
-            sItems = context.getResources().getStringArray(R.array.show_only_label);
+    /**
+     * Returns array of all genre labels.
+     */
+    public static String[] getLabels(Context context) {
+        String[] items = context.getResources().getStringArray(R.array.genre_labels);
+        if (items.length != CANONICAL_GENRES.length) {
+            throw new IllegalArgumentException("Genre data mismatch");
         }
-        return sItems;
+        return items;
     }
 
-    public static final String getLabel(Context context, int item) {
-        return getItems(context)[item];
+    /**
+     * Returns the number of genres including all channels.
+     */
+    public static int getGenreCount() {
+        return CANONICAL_GENRES.length;
     }
 
-    public static final String getLabel(Context context, String canonicalGenre) {
+    /**
+     * Returns the canonical genre for the given id.
+     * If the id is invalid, {@code null} will be returned instead.
+     */
+    public static String getCanonicalGenre(int id) {
+        if (id < 0 || id >= CANONICAL_GENRES.length) {
+            return null;
+        }
+        return CANONICAL_GENRES[id];
+    }
+
+    /**
+     * Returns id for the given canonical genre.
+     * If the genre is invalid, {@link #ID_ALL_CHANNELS} will be returned instead.
+     */
+    public static int getId(String canonicalGenre) {
         if (canonicalGenre == null) {
-            return getItems(context)[POSITION_ALL_CHANNELS];
-        }
-
-        for (int i = 1; i < CANONICAL_GENRES.length; ++i) {
-            if (CANONICAL_GENRES[i].equals(canonicalGenre)) {
-                return getItems(context)[i];
-            }
-        }
-        return getItems(context)[POSITION_ALL_CHANNELS];
-    }
-
-    public static final String getCanonicalGenre(int item) {
-        return CANONICAL_GENRES[item];
-    }
-
-    public static final String getCanonicalGenre(Context context, String item) {
-        int index = 0;
-        for (String genre : getItems(context)) {
-            if (genre.equals(item)) {
-                return CANONICAL_GENRES[index];
-            }
-            ++index;
-        }
-        return null;
-    }
-
-    public static final int getPosition(Context context, String item) {
-        int index = 0;
-        for (String genre : getItems(context)) {
-            if (genre.equals(item)) {
-                return index;
-            }
-            ++index;
-        }
-        return POSITION_ALL_CHANNELS;
-    }
-
-    public static final int getPosition(String canonicalGenre) {
-        if (canonicalGenre == null) {
-            return POSITION_ALL_CHANNELS;
+            return ID_ALL_CHANNELS;
         }
         for (int i = 1; i < CANONICAL_GENRES.length; ++i) {
             if (CANONICAL_GENRES[i].equals(canonicalGenre)) {
                 return i;
             }
         }
-        return POSITION_ALL_CHANNELS;
+        return ID_ALL_CHANNELS;
     }
 }

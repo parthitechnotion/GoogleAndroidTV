@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,15 @@
 
 package com.android.tv.ui.sidepanel;
 
-import android.view.View;
-import android.widget.RadioButton;
-
 import com.android.tv.R;
 
-public class RadioButtonItem extends Item {
-    private final String mTitle;
-    private boolean mChecked;
-    private RadioButton mRadioButton;
-
+public class RadioButtonItem extends CompoundButtonItem {
     public RadioButtonItem(String title) {
-        mTitle = title;
+        super(title, null);
+    }
+
+    public RadioButtonItem(String title, String description) {
+        super(title, description);
     }
 
     @Override
@@ -36,32 +33,12 @@ public class RadioButtonItem extends Item {
     }
 
     @Override
-    protected void bind(View view) {
-        mRadioButton = (RadioButton) view.findViewById(R.id.radio_button);
-        mRadioButton.setText(mTitle);
-        mRadioButton.setChecked(mChecked);
-    }
-
-    @Override
-    protected void unbind() {
-        mRadioButton = null;
+    protected int getCompoundButtonId() {
+        return R.id.radio_button;
     }
 
     @Override
     protected void onSelected() {
         setChecked(true);
-    }
-
-    public void setChecked(boolean checked) {
-        if (mChecked != checked) {
-            mChecked = checked;
-            if (mRadioButton != null) {
-                mRadioButton.setChecked(mChecked);
-            }
-        }
-    }
-
-    public boolean getChecked() {
-        return mChecked;
     }
 }

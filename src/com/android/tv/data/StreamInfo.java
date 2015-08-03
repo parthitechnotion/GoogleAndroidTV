@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,19 @@ package com.android.tv.data;
 import android.media.tv.TvInputInfo;
 
 public interface StreamInfo {
-    public final int VIDEO_DEFINITION_LEVEL_UNKNOWN = 0;
-    public final int VIDEO_DEFINITION_LEVEL_SD = 1;
-    public final int VIDEO_DEFINITION_LEVEL_HD = 2;
-    public final int VIDEO_DEFINITION_LEVEL_FULL_HD = 3;
-    public final int VIDEO_DEFINITION_LEVEL_ULTRA_HD = 4;
+    int VIDEO_DEFINITION_LEVEL_UNKNOWN = 0;
+    int VIDEO_DEFINITION_LEVEL_SD = 1;
+    int VIDEO_DEFINITION_LEVEL_HD = 2;
+    int VIDEO_DEFINITION_LEVEL_FULL_HD = 3;
+    int VIDEO_DEFINITION_LEVEL_ULTRA_HD = 4;
 
-    public final int AUDIO_CHANNEL_COUNT_UNKNOWN = 0;
+    int AUDIO_CHANNEL_COUNT_UNKNOWN = 0;
 
-    TvInputInfo getCurrentTvInputInfo();
+    Channel getCurrentChannel();
 
     int getVideoWidth();
     int getVideoHeight();
+    float getVideoFrameRate();
     int getVideoDefinitionLevel();
     int getAudioChannelCount();
     boolean hasClosedCaption();

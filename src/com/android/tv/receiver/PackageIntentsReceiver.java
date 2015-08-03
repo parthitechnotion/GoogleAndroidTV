@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,56 +20,58 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
-import android.net.Uri;
 import android.os.Handler;
 
 import com.android.tv.TvActivity;
-import com.android.tv.util.TvSettings;
-import com.android.tv.util.Utils;
+import com.android.tv.util.SetupUtils;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A class for handling the broadcast intents from PackageManager.
  */
 public class PackageIntentsReceiver extends BroadcastReceiver {
-
     // Delay before checking TvInputManager's input list.
     // Sometimes TvInputManager's input list isn't updated yet when this receiver is called.
     // So we should check the list after some delay.
     private static final long TV_INPUT_UPDATE_DELAY_MS = 500;
 
     private TvInputManager mTvInputManager;
-    private SharedPreferences mPreferences;
     private final Handler mHandler = new Handler();
-    private Runnable mTvActivityUpdater;
-    private Runnable mDisplayInputNameCleaner;
+    private Runnable mOnPackageUpdatedRunnable;
+    private boolean mPermissionGranted;
 
     private void init(Context context) {
         mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
-        mPreferences = Utils.getSharedPreferencesOfDisplayNameForInput(context);
 
         final Context applicationContext = context.getApplicationContext();
-        mTvActivityUpdater = new Runnable() {
+        mOnPackageUpdatedRunnable = new Runnable() {
             @Override
             public void run() {
-                enableTvActivityWithinPackageManager(applicationContext,
-                        !mTvInputManager.getTvInputList().isEmpty());
+                List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
+                // Enable the MainActivity only if there is at least one tuner type input.
+                boolean enable = false;
+                for (TvInputInfo input : inputs) {
+                    if (input.getType() == TvInputInfo.TYPE_TUNER) {
+                        enable = true;
+                        break;
+                    }
+                }
+                enableTvActivityWithinPackageManager(applicationContext, enable);
+
+                SetupUtils.getInstance(applicationContext).onInputListUpdated(mTvInputManager);
             }
         };
 
-        mDisplayInputNameCleaner = new Runnable() {
-            @Override
-            public void run() {
-                cleanupUnusedDisplayInputName();
-            }
-        };
+        // Grant permission to already set up packages after the system has finished booting. (Note
+        // that the PackageIntentsReceiver filters the ACTION_BOOT_COMPLETED action.)
+        if (!mPermissionGranted) {
+            SetupUtils.grantEpgPermissionToSetUpPackages(applicationContext);
+            mPermissionGranted = true;
+        }
     }
 
     @Override
@@ -78,44 +80,8 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
             init(context);
         }
 
-        String action = intent.getAction();
-        if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-            Uri uri = intent.getData();
-            onPackageFullyRemoved(uri != null ? uri.getSchemeSpecificPart() : null);
-        }
-
-        mHandler.removeCallbacks(mTvActivityUpdater);
-        mHandler.postDelayed(mTvActivityUpdater, TV_INPUT_UPDATE_DELAY_MS);
-    }
-
-    private void onPackageFullyRemoved(String packageName) {
-        if (packageName == null || packageName.isEmpty()) {
-            return;
-        }
-
-        mHandler.removeCallbacks(mDisplayInputNameCleaner);
-        mHandler.postDelayed(mDisplayInputNameCleaner, TV_INPUT_UPDATE_DELAY_MS);
-    }
-
-    private void cleanupUnusedDisplayInputName() {
-        Set<String> keys = mPreferences.getAll().keySet();
-        HashSet<String> unusedKeys = new HashSet<String>(keys);
-        for (String key : keys) {
-            if (!key.startsWith(TvSettings.PREF_DISPLAY_INPUT_NAME)) {
-                unusedKeys.remove(key);
-            }
-        }
-        List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
-        for (TvInputInfo input : inputs) {
-            unusedKeys.remove(TvSettings.PREF_DISPLAY_INPUT_NAME + input.getId());
-        }
-        if (!unusedKeys.isEmpty()) {
-            SharedPreferences.Editor editor = mPreferences.edit();
-            for (String key : unusedKeys) {
-                editor.remove(key);
-            }
-            editor.commit();
-        }
+        mHandler.removeCallbacks(mOnPackageUpdatedRunnable);
+        mHandler.postDelayed(mOnPackageUpdatedRunnable, TV_INPUT_UPDATE_DELAY_MS);
     }
 
     private void enableTvActivityWithinPackageManager(Context context, boolean enable) {
@@ -125,7 +91,7 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
         int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
         if (pm.getComponentEnabledSetting(name) != newState) {
-            pm.setComponentEnabledSetting(name, newState, PackageManager.DONT_KILL_APP);
+            pm.setComponentEnabledSetting(name, newState, 0);
         }
     }
 }

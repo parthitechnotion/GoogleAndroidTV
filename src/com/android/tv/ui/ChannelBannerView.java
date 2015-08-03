@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,73 +16,151 @@
 
 package com.android.tv.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
-import android.media.tv.TvInputManager;
 import android.net.Uri;
 import android.os.Handler;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
+import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
-import android.util.LruCache;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.data.Channel;
-import com.android.tv.data.ChannelMap;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
+import com.android.tv.util.ImageCache;
+import com.android.tv.util.ImageLoader;
+import com.android.tv.util.ImageLoader.LoadTvInputLogoTask;
 import com.android.tv.util.Utils;
+
+import junit.framework.Assert;
+
+import java.util.Objects;
 
 /**
  * A view to render channel banner.
  */
-public class ChannelBannerView extends RelativeLayout implements Channel.LoadLogoCallback {
-    private static final int CACHE_SIZE = 10;
-    private TextView mChannelTextView;
+public class ChannelBannerView extends FrameLayout implements Channel.LoadImageCallback,
+        TvTransitionManager.TransitionLayout {
+
+    /**
+     * Show all information at the channel banner.
+     */
+    public static final int LOCK_NONE = 0;
+
+    /**
+     * Lock program details at the channel banner.
+     * This is used when a content is locked so we don't want to show program details
+     * including program description text and poster art.
+     */
+    public static final int LOCK_PROGRAM_DETAIL = 1;
+
+    /**
+     * Lock channel information at the channel banner.
+     * This is used when a channel is locked so we only want to show input information.
+     */
+    public static final int LOCK_CHANNEL_INFO = 2;
+
+    private static final String EMPTY_STRING = "";
+
+    private static Program sNoProgram;
+    private static Program sLockedChannelProgram;
+    private static String sClosedCaptionMark;
+
+    private final MainActivity mMainActivity;
+    private final Resources mResources;
+    private View mChannelView;
+
+    private TextView mChannelNumberTextView;
     private ImageView mChannelLogoImageView;
     private TextView mProgramTextView;
     private ImageView mTvInputLogoImageView;
     private TextView mChannelNameTextView;
     private TextView mProgramTimeTextView;
     private ProgressBar mRemainingTimeView;
-    private TextView mVideoStatus;
-    // TODO: Need to get UX design for how to show ratings in the channel banner.
-    private TextView mRatingTextView;
     private TextView mClosedCaptionTextView;
     private TextView mAspectRatioTextView;
     private TextView mResolutionTextView;
     private TextView mAudioChannelTextView;
-    private TextView mProgrameDescriptionTextView;
+    private TextView mProgramDescriptionTextView;
+    private String mProgramDescriptionText;
     private View mAnchorView;
-    private Uri mCurrentChannelUri;
-    private final LruCache<TvInputInfo, Drawable> mChannelInfoLogoCache =
-            new LruCache<TvInputInfo, Drawable> (CACHE_SIZE) {
-                @Override
-                protected Drawable create(TvInputInfo info) {
-                    return info.loadIcon(getContext());
-                }
-            };
+    private Channel mCurrentChannel;
+    private Program mLastUpdatedProgram;
+    private final Handler mHandler = new Handler();
 
-    private final ContentObserver mProgramUpdateObserver = new ContentObserver(new Handler()) {
+    private int mLockType;
+
+    private Animator mResizeAnimator;
+    private int mCurrentHeight;
+    private boolean mProgramInfoUpdatePendingByResizing;
+
+    private final Animator mProgramDescriptionFadeInAnimator;
+    private final Animator mProgramDescriptionFadeOutAnimator;
+
+    private final Runnable mHideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mCurrentHeight = 0;
+            mMainActivity.goToEmptyScene(true);
+        }
+    };
+    private final long mShowDurationMillis;
+    private final int mChannelLogoImageViewWidth;
+    private final int mChannelLogoImageViewHeight;
+    private final int mChannelLogoImageViewMarginStart;
+    private final int mProgramDescriptionTextViewWidth;
+    private final int mChannelBannerTextColor;
+    private final int mChannelBannerDimTextColor;
+    private final int mResizeAnimDuration;
+    private final Interpolator mResizeInterpolator;
+
+    private final AnimatorListenerAdapter mResizeAnimatorListener = new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationStart(Animator animator) {
+            mProgramInfoUpdatePendingByResizing = false;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+            mProgramDescriptionTextView.setAlpha(1f);
+            mResizeAnimator = null;
+            if (mProgramInfoUpdatePendingByResizing) {
+                mProgramInfoUpdatePendingByResizing = false;
+                updateProgramInfo(mLastUpdatedProgram);
+            }
+        }
+    };
+
+    private final ContentObserver mProgramUpdateObserver = new ContentObserver(mHandler) {
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             // TODO: This {@code uri} argument may be a program which is not related to this
             // channel. Consider adding channel id as a parameter of program URI to avoid
             // unnecessary update.
-            post(mProgramUpdateRunnable);
+            mHandler.post(mProgramUpdateRunnable);
         }
     };
 
@@ -90,7 +168,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
         @Override
         public void run() {
             removeCallbacks(this);
-            updateProgramInfo();
+            updateViews(null);
         }
     };
 
@@ -99,11 +177,52 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     }
 
     public ChannelBannerView(Context context, AttributeSet attrs) {
-        super(context, attrs, 0);
+        this(context, attrs, 0);
     }
 
     public ChannelBannerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mResources = getResources();
+
+        mMainActivity = (MainActivity) context;
+
+        mShowDurationMillis = mResources.getInteger(
+                R.integer.channel_banner_show_duration);
+        mChannelLogoImageViewWidth = mResources.getDimensionPixelSize(
+                R.dimen.channel_banner_channel_logo_width);
+        mChannelLogoImageViewHeight = mResources.getDimensionPixelSize(
+                R.dimen.channel_banner_channel_logo_height);
+        mChannelLogoImageViewMarginStart = mResources.getDimensionPixelSize(
+                R.dimen.channel_banner_channel_logo_margin_start);
+        mProgramDescriptionTextViewWidth = mResources.getDimensionPixelSize(
+                R.dimen.channel_banner_program_description_width);
+        mChannelBannerTextColor = mResources.getColor(R.color.channel_banner_text_color);
+        mChannelBannerDimTextColor = mResources.getColor(R.color.channel_banner_dim_text_color);
+        mResizeAnimDuration = mResources.getInteger(R.integer.channel_banner_fast_anim_duration);
+
+        mResizeInterpolator = AnimationUtils.loadInterpolator(context,
+                android.R.interpolator.linear_out_slow_in);
+
+        mProgramDescriptionFadeInAnimator = AnimatorInflater.loadAnimator(mMainActivity,
+                R.animator.channel_banner_program_description_fade_in);
+        mProgramDescriptionFadeOutAnimator = AnimatorInflater.loadAnimator(mMainActivity,
+                R.animator.channel_banner_program_description_fade_out);
+
+        if (sNoProgram == null) {
+            sNoProgram = new Program.Builder()
+                    .setTitle(context.getString(R.string.channel_banner_no_title))
+                    .setDescription(EMPTY_STRING)
+                    .build();
+        }
+        if (sLockedChannelProgram == null){
+            sLockedChannelProgram = new Program.Builder()
+                    .setTitle(context.getString(R.string.channel_banner_locked_channel_title))
+                    .setDescription(EMPTY_STRING)
+                    .build();
+        }
+        if (sClosedCaptionMark == null) {
+            sClosedCaptionMark = context.getString(R.string.closed_caption);
+        }
     }
 
     @Override
@@ -123,102 +242,189 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mChannelTextView = (TextView) findViewById(R.id.channel_text);
+        mChannelView = findViewById(R.id.channel_banner_view);
+
+        mChannelNumberTextView = (TextView) findViewById(R.id.channel_number);
         mChannelLogoImageView = (ImageView) findViewById(R.id.channel_logo);
         mProgramTextView = (TextView) findViewById(R.id.program_text);
         mTvInputLogoImageView = (ImageView) findViewById(R.id.tvinput_logo);
         mChannelNameTextView = (TextView) findViewById(R.id.channel_name);
         mProgramTimeTextView = (TextView) findViewById(R.id.program_time_text);
         mRemainingTimeView = (ProgressBar) findViewById(R.id.remaining_time);
-        mVideoStatus = (TextView) findViewById(R.id.video_status);
-        mRatingTextView = (TextView) findViewById(R.id.rating);
         mClosedCaptionTextView = (TextView) findViewById(R.id.closed_caption);
         mAspectRatioTextView = (TextView) findViewById(R.id.aspect_ratio);
         mResolutionTextView = (TextView) findViewById(R.id.resolution);
         mAudioChannelTextView = (TextView) findViewById(R.id.audio_channel);
-        mProgrameDescriptionTextView = (TextView) findViewById(R.id.program_description);
+        mProgramDescriptionTextView = (TextView) findViewById(R.id.program_description);
         mAnchorView = findViewById(R.id.anchor);
+
+        mProgramDescriptionFadeInAnimator.setTarget(mProgramDescriptionTextView);
+        mProgramDescriptionFadeOutAnimator.setTarget(mProgramDescriptionTextView);
+        mProgramDescriptionFadeOutAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                mProgramDescriptionTextView.setText(mProgramDescriptionText);
+            }
+        });
     }
 
-    public void updateViews(ChannelMap channelMap, StreamInfo info) {
-        if (channelMap == null || !channelMap.isLoadFinished()) {
+    @Override
+    public void onEnterAction(boolean fromEmptyScene) {
+        resetAnimationEffects();
+        if (fromEmptyScene) {
+            ViewUtils.setTransitionAlpha(mChannelView, 1f);
+        }
+        scheduleHide();
+    }
+
+    @Override
+    public void onExitAction() {
+        mCurrentHeight = 0;
+        cancelHide();
+    }
+
+    private void scheduleHide() {
+        cancelHide();
+        mHandler.postDelayed(mHideRunnable, mShowDurationMillis);
+    }
+
+    private void cancelHide() {
+        mHandler.removeCallbacks(mHideRunnable);
+    }
+
+    private void resetAnimationEffects() {
+        setAlpha(1f);
+        setScaleX(1f);
+        setScaleY(1f);
+        setTranslationX(0);
+        setTranslationY(0);
+    }
+
+    /**
+     * Set new lock type.
+     *
+     * @param lockType Any of LOCK_NONE, LOCK_PROGRAM_DETAIL, or LOCK_CHANNEL_INFO.
+     * @return {@code true} only if lock type is changed
+     * @throws IllegalArgumentException if lockType is invalid.
+     */
+    public boolean setLockType(int lockType) {
+        if (lockType != LOCK_NONE && lockType != LOCK_CHANNEL_INFO
+                && lockType != LOCK_PROGRAM_DETAIL) {
+            throw new IllegalArgumentException("No such lock type " + lockType);
+        }
+        if (mLockType != lockType) {
+            mLockType = lockType;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Update channel banner view.
+     * Note that this only updates the channel banner contents,
+     * and use onBeforeShow() or onAfterHide() for showing/hiding.
+     *
+     * @param info A StreamInfo that includes stream information.
+     * If it's {@code null}, only program information will be updated.
+     */
+    public void updateViews(StreamInfo info) {
+        resetAnimationEffects();
+        Channel channel = mMainActivity.getCurrentChannel();
+        if (!Objects.equals(mCurrentChannel, channel) && isShown()) {
+            scheduleHide();
+        }
+        mCurrentChannel = channel;
+        if (channel == null) {
+            mLastUpdatedProgram = null;
+            updateProgramInfo(null);
             return;
         }
+        mChannelView.setVisibility(VISIBLE);
+        if (info != null) {
+            // If the current channels between ChannelTuner and TvView are different,
+            // the stream information should not be seen.
+            updateStreamInfo(channel.equals(info.getCurrentChannel()) ? info : null);
+            updateChannelInfo();
+        }
+        updateProgramInfo(mMainActivity.getCurrentProgram());
+    }
 
-        String displayNumber = channelMap.getCurrentDisplayNumber();
+    private void updateStreamInfo(StreamInfo info) {
+        // Update stream information in a channel.
+        if (mLockType != LOCK_CHANNEL_INFO && info != null) {
+            updateText(mClosedCaptionTextView, info.hasClosedCaption() ? sClosedCaptionMark
+                    : EMPTY_STRING);
+            updateText(mAspectRatioTextView,
+                    Utils.getAspectRatioString(info.getVideoWidth(), info.getVideoHeight()));
+            updateText(mResolutionTextView,
+                    Utils.getVideoDefinitionLevelString(
+                            mMainActivity, info.getVideoDefinitionLevel()));
+            updateText(mAudioChannelTextView,
+                    Utils.getAudioChannelString(mMainActivity, info.getAudioChannelCount()));
+        } else {
+            // Channel change has been requested. But, StreamInfo hasn't been updated yet.
+            mClosedCaptionTextView.setVisibility(View.GONE);
+            mAspectRatioTextView.setVisibility(View.GONE);
+            mResolutionTextView.setVisibility(View.GONE);
+            mAudioChannelTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateChannelInfo() {
+        // Update static information for a channel.
+        String displayNumber = mCurrentChannel.getDisplayNumber();
         if (displayNumber == null) {
-            displayNumber = "";
+            displayNumber = EMPTY_STRING;
         }
 
         if (displayNumber.length() <= 3) {
             updateTextView(
-                    mChannelTextView,
-                    R.dimen.channel_banner_title_large_text_size,
-                    R.dimen.channel_banner_title_large_margin_top);
+                    mChannelNumberTextView,
+                    R.dimen.channel_banner_channel_number_large_text_size,
+                    R.dimen.channel_banner_channel_number_large_margin_top);
         } else if (displayNumber.length() <= 4) {
             updateTextView(
-                    mChannelTextView,
-                    R.dimen.channel_banner_title_medium_text_size,
-                    R.dimen.channel_banner_title_medium_margin_top);
+                    mChannelNumberTextView,
+                    R.dimen.channel_banner_channel_number_medium_text_size,
+                    R.dimen.channel_banner_channel_number_medium_margin_top);
         } else {
             updateTextView(
-                    mChannelTextView,
-                    R.dimen.channel_banner_title_small_text_size,
-                    R.dimen.channel_banner_title_small_margin_top);
+                    mChannelNumberTextView,
+                    R.dimen.channel_banner_channel_number_small_text_size,
+                    R.dimen.channel_banner_channel_number_small_margin_top);
         }
-        mChannelTextView.setText(displayNumber);
-
-        TvInputInfo inputInfo = (info == null) ? null : info.getCurrentTvInputInfo();
-        Drawable tvInputLogo = (inputInfo == null) ? null : mChannelInfoLogoCache.get(inputInfo);
-        if (tvInputLogo != null) {
-            mTvInputLogoImageView.setVisibility(View.VISIBLE);
-            mTvInputLogoImageView.setImageDrawable(tvInputLogo);
-        } else {
-            mTvInputLogoImageView.setVisibility(View.GONE);
-        }
-
-        String displayName = channelMap.getCurrentDisplayName();
+        mChannelNumberTextView.setText(displayNumber);
+        String displayName = mCurrentChannel.getDisplayName();
         if (displayName == null) {
-            displayName = "";
+            displayName = EMPTY_STRING;
         }
         mChannelNameTextView.setText(displayName);
 
-        int resId = 0;
-        if (!info.isVideoAvailable()) {
-            switch (info.getVideoUnavailableReason()) {
-                case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING:
-                    // We don't need to tell we're tuning.
-                    break;
-                case TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL:
-                    resId = R.string.channel_banner_video_unavailable_weak_signal;
-                    break;
-                case TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING:
-                    resId = R.string.channel_banner_video_unavailable_buffering;
-                    break;
-                default:
-                    resId = R.string.channel_banner_video_unavailable_unknown;
-                    break;
+        TvInputInfo info = mMainActivity.getTvInputManagerHelper().getTvInputInfo(
+                mCurrentChannel.getInputId());
+        if (info == null ||
+                !ImageLoader.loadBitmap(createTvInputLogoLoaderCallback(info),
+                        new LoadTvInputLogoTask(getContext(), ImageCache.getInstance(), info))) {
+            mTvInputLogoImageView.setVisibility(View.GONE);
+            mTvInputLogoImageView.setImageDrawable(null);
+        }
+        mChannelLogoImageView.setImageBitmap(null);
+        mChannelLogoImageView.setVisibility(View.GONE);
+        mCurrentChannel.loadBitmap(getContext(), Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO,
+                mChannelLogoImageViewWidth, mChannelLogoImageViewHeight, this);
+    }
+
+    private ImageLoader.ImageLoaderCallback createTvInputLogoLoaderCallback(
+            final TvInputInfo info) {
+        return new ImageLoader.ImageLoaderCallback() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap) {
+                if (bitmap != null && info.getId().equals(mCurrentChannel.getInputId())) {
+                    mTvInputLogoImageView.setVisibility(View.VISIBLE);
+                    mTvInputLogoImageView.setImageBitmap(bitmap);
+                }
             }
-        }
-        updateText(mVideoStatus, (resId == 0) ? null : getContext().getString(resId));
-
-        updateText(mClosedCaptionTextView, info.hasClosedCaption() ? "CC" : "");
-
-        updateText(mAspectRatioTextView,
-                Utils.getAspectRatioString(info.getVideoWidth(), info.getVideoHeight()));
-
-        updateText(mResolutionTextView,
-                Utils.getVideoDefinitionLevelString(info.getVideoDefinitionLevel()));
-
-        updateText(mAudioChannelTextView,
-                Utils.getAudioChannelString(info.getAudioChannelCount()));
-
-        mCurrentChannelUri = channelMap.getCurrentChannelUri();
-        if (channelMap.getCurrentChannel() != null) {
-            channelMap.getCurrentChannel().loadLogo(getContext(), this);
-        }
-
-        updateProgramInfo();
+        };
     }
 
     private void updateText(TextView view, String text) {
@@ -231,7 +437,7 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     }
 
     private void updateTextView(TextView textView, int sizeRes, int marginTopRes) {
-        float textSize = getContext().getResources().getDimension(sizeRes);
+        float textSize = mResources.getDimension(sizeRes);
         if (textView.getTextSize() != textSize) {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         }
@@ -239,8 +445,8 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     }
 
     private void updateTopMargin(View view, int marginTopRes) {
-        LayoutParams lp = (LayoutParams) view.getLayoutParams();
-        int topMargin = (int) getContext().getResources().getDimension(marginTopRes);
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) view.getLayoutParams();
+        int topMargin = (int) mResources.getDimension(marginTopRes);
         if (lp.topMargin != topMargin) {
             lp.topMargin = topMargin;
             view.setLayoutParams(lp);
@@ -248,125 +454,201 @@ public class ChannelBannerView extends RelativeLayout implements Channel.LoadLog
     }
 
     @Override
-    public void onLoadLogoFinished(Channel channel, Bitmap logo) {
+    public void onLoadImageFinished(Channel channel, int type, Bitmap logo) {
+        if (channel != mCurrentChannel) {
+            // The logo is obsolete.
+            return;
+        }
         if (logo == null) {
-            mChannelLogoImageView.setVisibility(View.GONE);
-        } else {
-            mChannelLogoImageView.setImageBitmap(logo);
-            mChannelLogoImageView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private String getFormattedTimeString(long time) {
-        return DateFormat.format(
-                getContext().getString(R.string.channel_banner_time_format), time).toString();
-    }
-
-    private void updateProgramInfo() {
-        if (mCurrentChannelUri == null) {
-            handleNoProgramInformation();
+            // Need to update the text size of the program text view depending on the channel logo.
+            updateProgramTextView(mLastUpdatedProgram);
             return;
         }
 
-        Program program = Utils.getCurrentProgram(getContext(), mCurrentChannelUri);
+        mChannelLogoImageView.setImageBitmap(logo);
+        mChannelLogoImageView.setVisibility(View.VISIBLE);
+        updateProgramTextView(mLastUpdatedProgram);
+
+        if (mResizeAnimator == null) {
+            String description = mProgramDescriptionTextView.getText().toString();
+            boolean needFadeAnimation = !description.equals(mProgramDescriptionText);
+            updateBannerHeight(needFadeAnimation);
+        } else {
+            mProgramInfoUpdatePendingByResizing = true;
+        }
+    }
+
+    private void updateProgramInfo(Program program) {
+        if (mLockType == LOCK_CHANNEL_INFO) {
+            program = sLockedChannelProgram;
+        } else if (!Program.isValid(program) || TextUtils.isEmpty(program.getTitle())) {
+            program = sNoProgram;
+        }
+
+        if (mLastUpdatedProgram == null
+                || !TextUtils.equals(program.getTitle(), mLastUpdatedProgram.getTitle())
+                || !TextUtils.equals(program.getEpisodeDisplayTitle(getContext()),
+                        mLastUpdatedProgram.getEpisodeDisplayTitle(getContext()))) {
+            updateProgramTextView(program);
+        }
+        updateProgramTimeInfo(program);
+
+        // When the program is changed, but the previous resize animation has not ended yet,
+        // cancel the animation.
+        boolean isProgramChanged = !Objects.equals(mLastUpdatedProgram, program);
+        if (mResizeAnimator != null && isProgramChanged) {
+            mLastUpdatedProgram = program;
+            mProgramInfoUpdatePendingByResizing = true;
+            mResizeAnimator.cancel();
+        } else if (mResizeAnimator == null) {
+            if (mLockType != LOCK_NONE || TextUtils.isEmpty(program.getDescription())) {
+                mProgramDescriptionTextView.setVisibility(GONE);
+                mProgramDescriptionText = "";
+            } else {
+                mProgramDescriptionTextView.setVisibility(VISIBLE);
+                mProgramDescriptionText = program.getDescription();
+            }
+            String description = mProgramDescriptionTextView.getText().toString();
+            boolean needFadeAnimation = isProgramChanged
+                    || !description.equals(mProgramDescriptionText);
+            updateBannerHeight(needFadeAnimation);
+        } else {
+            mProgramInfoUpdatePendingByResizing = true;
+        }
+        mLastUpdatedProgram = program;
+    }
+
+    private void updateProgramTextView(Program program) {
         if (program == null) {
-            handleNoProgramInformation();
             return;
         }
 
-        String title = program.getTitle();
-        if (!TextUtils.isEmpty(title)) {
-            int width = mProgramTextView.getWidth();
-            if (width == 0) {
-                post(mProgramUpdateRunnable);
-            }
-            float largeTextSize = getContext().getResources().getDimension(
-                    R.dimen.channel_banner_program_large_text_size);
-            Typeface font = mProgramTextView.getTypeface();
-            int estimatedLineCount = estimateLineCount(title, font, largeTextSize, width);
-            boolean oneline = true;
-            if (estimatedLineCount > 1) {
-                updateTextView(
-                        mProgramTextView,
-                        R.dimen.channel_banner_program_medium_text_size,
-                        R.dimen.channel_banner_program_medium_margin_top);
-                float mediumTextSize = getContext().getResources().getDimension(
-                        R.dimen.channel_banner_program_medium_text_size);
-                if (estimateLineCount(title, font, mediumTextSize, width) > 1) {
-                    oneline = false;
-                }
+        mProgramTextView.setVisibility(View.VISIBLE);
+        if (program == sLockedChannelProgram) {
+            mProgramTextView.setTextColor(mChannelBannerDimTextColor);
+        } else {
+            mProgramTextView.setTextColor(mChannelBannerTextColor);
+        }
+        updateTextView(mProgramTextView,
+                R.dimen.channel_banner_program_large_text_size,
+                R.dimen.channel_banner_program_large_margin_top);
+        if (TextUtils.isEmpty(program.getEpisodeTitle())) {
+            mProgramTextView.setText(program.getTitle());
+        } else {
+            String title = program.getTitle();
+            String episodeTitle = program.getEpisodeDisplayTitle(getContext());
+            String fullTitle = title + "  " + episodeTitle;
+
+            SpannableString text = new SpannableString(fullTitle);
+            text.setSpan(new TextAppearanceSpan(getContext(),
+                            R.style.text_appearance_channel_banner_episode_title),
+                    fullTitle.length() - episodeTitle.length(), fullTitle.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mProgramTextView.setText(text);
+        }
+        int width = mProgramDescriptionTextViewWidth
+                - ((mChannelLogoImageView.getVisibility() != View.VISIBLE)
+                ? 0 : mChannelLogoImageViewWidth + mChannelLogoImageViewMarginStart);
+        ViewGroup.LayoutParams lp = mProgramTextView.getLayoutParams();
+        lp.width = width;
+        mProgramTextView.setLayoutParams(lp);
+        mProgramTextView.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+
+        boolean oneline = (mProgramTextView.getLineCount() == 1);
+        if (!oneline) {
+            updateTextView(
+                    mProgramTextView,
+                    R.dimen.channel_banner_program_medium_text_size,
+                    R.dimen.channel_banner_program_medium_margin_top);
+            mProgramTextView.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+            oneline = (mProgramTextView.getLineCount() == 1);
+        }
+        updateTopMargin(mAnchorView, oneline
+                ? R.dimen.channel_banner_anchor_one_line_y
+                : R.dimen.channel_banner_anchor_two_line_y);
+    }
+
+    private void updateProgramTimeInfo(Program program) {
+        long startTime = program.getStartTimeUtcMillis();
+        long endTime = program.getEndTimeUtcMillis();
+        if (mLockType != LOCK_CHANNEL_INFO && startTime > 0 && endTime > startTime) {
+            mProgramTimeTextView.setVisibility(View.VISIBLE);
+            mRemainingTimeView.setVisibility(View.VISIBLE);
+
+            mProgramTimeTextView.setText(Utils.getDurationString(
+                    getContext(), startTime, endTime, true));
+
+            long currTime = mMainActivity.getCurrentPlayingPosition();
+            if (currTime <= startTime) {
+                mRemainingTimeView.setProgress(0);
+            } else if (currTime >= endTime) {
+                mRemainingTimeView.setProgress(100);
             } else {
-                updateTextView(
-                        mProgramTextView,
-                        R.dimen.channel_banner_program_large_text_size,
-                        R.dimen.channel_banner_program_large_margin_top);
-            }
-            updateTopMargin(mAnchorView, oneline
-                    ? R.dimen.channel_banner_anchor_one_line_y
-                    : R.dimen.channel_banner_anchor_two_line_y);
-            mProgramTextView.setText(title);
-
-            long startTime = program.getStartTimeUtcMillis();
-            long endTime = program.getEndTimeUtcMillis();
-            if (startTime > 0 && endTime > 0) {
-                mProgramTimeTextView.setVisibility(View.VISIBLE);
-                mRemainingTimeView.setVisibility(View.VISIBLE);
-
-                String startTimeText = getFormattedTimeString(startTime);
-                String endTimeText = getFormattedTimeString(endTime);
-
-                mProgramTimeTextView.setText(getContext().getString(
-                        R.string.channel_banner_program_time_format, startTimeText, endTimeText));
-
-                long currTime = System.currentTimeMillis();
-                if (currTime <= startTime) {
-                    mRemainingTimeView.setProgress(0);
-                } else if (currTime >= endTime) {
-                    mRemainingTimeView.setProgress(100);
-                } else {
-                    mRemainingTimeView.setProgress(
-                            (int) (100 *(currTime - startTime) / (endTime - startTime)));
-                }
-            } else {
-                mProgramTimeTextView.setVisibility(View.GONE);
-                mRemainingTimeView.setVisibility(View.GONE);
+                mRemainingTimeView.setProgress(
+                        (int) (100 * (currTime - startTime) / (endTime - startTime)));
             }
         } else {
-            mProgramTextView.setText(getContext().getString(R.string.channel_banner_no_title));
             mProgramTimeTextView.setVisibility(View.GONE);
             mRemainingTimeView.setVisibility(View.GONE);
         }
+    }
 
-        updateText(mRatingTextView, Utils.contentRatingsToString(program.getContentRatings()));
+    private void updateBannerHeight(boolean needFadeAnimation) {
+        Assert.assertNull(mResizeAnimator);
+        // Need to measure the layout height with the new description text.
+        CharSequence oldDescription = mProgramDescriptionTextView.getText();
+        mProgramDescriptionTextView.setText(mProgramDescriptionText);
+        measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        int targetHeight = getMeasuredHeight();
 
-        if (!TextUtils.isEmpty(program.getDescription())) {
-            mProgrameDescriptionTextView.setVisibility(View.VISIBLE);
-            mProgrameDescriptionTextView.setText(program.getDescription());
-        } else {
-            mProgrameDescriptionTextView.setVisibility(View.GONE);
+        if (mCurrentHeight == 0 || !isShown()) {
+            // Do not add the resize animation when the banner has not been shown before.
+            mCurrentHeight = targetHeight;
+            LayoutParams layoutParams = (LayoutParams) getLayoutParams();
+            if (targetHeight != layoutParams.height) {
+                layoutParams.height = targetHeight;
+                setLayoutParams(layoutParams);
+            }
+        } else if (mCurrentHeight != targetHeight || needFadeAnimation) {
+            // Restore description text for fade in/out animation.
+            if (needFadeAnimation) {
+                mProgramDescriptionTextView.setText(oldDescription);
+            }
+            mResizeAnimator = createResizeAnimator(targetHeight, needFadeAnimation);
+            mResizeAnimator.start();
         }
     }
 
-    private void handleNoProgramInformation() {
-        mProgramTextView.setText(getContext().getString(R.string.channel_banner_no_title));
-        mProgramTimeTextView.setVisibility(View.GONE);
-        mRemainingTimeView.setVisibility(View.GONE);
-        mProgrameDescriptionTextView.setVisibility(View.GONE);
-    }
+    private Animator createResizeAnimator(int targetHeight, boolean addFadeAnimation) {
+        final ValueAnimator heightAnimator = ValueAnimator.ofInt(mCurrentHeight, targetHeight);
+        heightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int value = (Integer) animation.getAnimatedValue();
+                LayoutParams layoutParams = (LayoutParams) ChannelBannerView.this.getLayoutParams();
+                if (value != layoutParams.height) {
+                    layoutParams.height = value;
+                    ChannelBannerView.this.setLayoutParams(layoutParams);
+                }
+                mCurrentHeight = value;
+            }
+        });
 
-    private int estimateLineCount(String str, Typeface font, float textSize, int width) {
-        if (width == 0) {
-            return -1;
+        heightAnimator.setDuration(mResizeAnimDuration);
+        heightAnimator.setInterpolator(mResizeInterpolator);
+
+        if (!addFadeAnimation) {
+            heightAnimator.addListener(mResizeAnimatorListener);
+            return heightAnimator;
         }
-        Paint paint = new Paint();
-        paint.setTypeface(font);
-        paint.setTextSize(textSize);
-        // Add +1 to measured size, because number of lines becomes 2
-        // when measured size equals width.
-        return divideRoundUp((int) paint.measureText(str) + 1, width);
-    }
 
-    private int divideRoundUp(int x, int y) {
-        return (x + y - 1) / y;
+        AnimatorSet fadeOutAndHeightAnimator = new AnimatorSet();
+        fadeOutAndHeightAnimator.playTogether(mProgramDescriptionFadeOutAnimator, heightAnimator);
+        AnimatorSet animator = new AnimatorSet();
+        animator.playSequentially(fadeOutAndHeightAnimator, mProgramDescriptionFadeInAnimator);
+        animator.addListener(mResizeAnimatorListener);
+        return animator;
     }
 }

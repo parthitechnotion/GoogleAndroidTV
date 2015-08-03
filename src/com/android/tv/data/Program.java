@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,67 @@
 
 package com.android.tv.data;
 
-import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
+import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.android.tv.R;
+import com.android.tv.util.ImageLoader;
+import com.android.tv.util.Utils;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * A convenience class to create and insert program information entries into the database.
  */
-public final class Program {
-    public static final long INVALID_ID = -1;
+public final class Program implements Comparable<Program> {
+    private static final boolean DEBUG = false;
+    private static final boolean DEBUG_DUMP_DESCRIPTION = false;
+    private static final String TAG = "Program";
+
+    public static final String[] PROJECTION = {
+        // Columns should match what is read in Program.fromCursor()
+        TvContract.Programs.COLUMN_CHANNEL_ID,
+        TvContract.Programs.COLUMN_TITLE,
+        TvContract.Programs.COLUMN_EPISODE_TITLE,
+        TvContract.Programs.COLUMN_SEASON_NUMBER,
+        TvContract.Programs.COLUMN_EPISODE_NUMBER,
+        TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
+        TvContract.Programs.COLUMN_POSTER_ART_URI,
+        TvContract.Programs.COLUMN_THUMBNAIL_URI,
+        TvContract.Programs.COLUMN_CANONICAL_GENRE,
+        TvContract.Programs.COLUMN_CONTENT_RATING,
+        TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
+        TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS,
+        TvContract.Programs.COLUMN_VIDEO_WIDTH,
+        TvContract.Programs.COLUMN_VIDEO_HEIGHT
+    };
 
     private long mChannelId;
     private String mTitle;
+    private String mEpisodeTitle;
+    private int mSeasonNumber;
+    private int mEpisodeNumber;
     private long mStartTimeUtcMillis;
     private long mEndTimeUtcMillis;
     private String mDescription;
-    private String mLongDescription;
-    private String mVideoDefinitionLevel;
+    private int mVideoWidth;
+    private int mVideoHeight;
     private String mPosterArtUri;
     private String mThumbnailUri;
+    private int[] mCanonicalGenreIds;
     private TvContentRating[] mContentRatings;
+
+    public interface LoadPosterArtCallback {
+        void onLoadPosterArtFinished(Program program, Bitmap posterArt);
+    }
 
     private Program() {
         // Do nothing.
@@ -45,110 +86,163 @@ public final class Program {
         return mChannelId;
     }
 
-    public void setChannelId(long channelId) {
-        mChannelId = channelId;
+    /**
+     * Returns {@code true} if this program is valid or {@code false} otherwise.
+     */
+    public boolean isValid() {
+        return mChannelId >= 0;
+    }
+
+    /**
+     * Returns {@code true} if the program is valid and {@code false} otherwise.
+     */
+    public static boolean isValid(Program program) {
+        return program != null && program.isValid();
     }
 
     public String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String title) {
-        mTitle = title;
+    public String getEpisodeTitle() {
+        return mEpisodeTitle;
+    }
+
+    public String getEpisodeDisplayTitle(Context context) {
+        if (mSeasonNumber > 0 && mEpisodeNumber > 0 && !TextUtils.isEmpty(mEpisodeTitle)) {
+            return String.format(context.getResources().getString(R.string.episode_format),
+                    mSeasonNumber, mEpisodeNumber, mEpisodeTitle);
+        }
+        return mEpisodeTitle;
     }
 
     public long getStartTimeUtcMillis() {
         return mStartTimeUtcMillis;
     }
 
-    public void setStartTimeUtcMillis(long startTimeUtcMillis) {
-        mStartTimeUtcMillis = startTimeUtcMillis;
-    }
-
     public long getEndTimeUtcMillis() {
         return mEndTimeUtcMillis;
     }
 
-    public void setEndTimeUtcMillis(long endTimeUtcMillis) {
-        mEndTimeUtcMillis = endTimeUtcMillis;
+    /**
+     * Returns the program duration.
+     */
+    public long getDurationMillis() {
+        return mEndTimeUtcMillis - mStartTimeUtcMillis;
     }
 
     public String getDescription() {
         return mDescription;
     }
 
-    public void setDescription(String description) {
-        mDescription = description;
+    public int getVideoWidth() {
+        return mVideoWidth;
     }
 
-    public String getLongDescription() {
-        return mLongDescription;
-    }
-
-    public void setLongDescription(String longDescription) {
-        mLongDescription = longDescription;
-    }
-
-    public String getVideoDefinitionLevel() {
-        return mVideoDefinitionLevel;
-    }
-
-    public void setVideoDefinitionLevel(String videoDefinitionLevel) {
-        mVideoDefinitionLevel = videoDefinitionLevel;
+    public int getVideoHeight() {
+        return mVideoHeight;
     }
 
     public TvContentRating[] getContentRatings() {
         return mContentRatings;
     }
 
-    public void setContentRatings(TvContentRating[] contentRatings) {
-        mContentRatings = contentRatings;
-    }
-
     public String getPosterArtUri() {
         return mPosterArtUri;
-    }
-
-    public void setPosterArtUri(String posterArtUri) {
-        mPosterArtUri = posterArtUri;
     }
 
     public String getThumbnailUri() {
         return mThumbnailUri;
     }
 
-    public void setThumbnailUri(String thumbnailUri) {
-        mThumbnailUri = thumbnailUri;
+    /**
+     * Returns array of canonical genres for this program.
+     * This is expected to be called rarely.
+     */
+    public String[] getCanonicalGenres() {
+        if (mCanonicalGenreIds == null) {
+            return null;
+        }
+        String[] genres = new String[mCanonicalGenreIds.length];
+        for (int i = 0; i < mCanonicalGenreIds.length; i++) {
+            genres[i] = GenreItems.getCanonicalGenre(mCanonicalGenreIds[i]);
+        }
+        return genres;
     }
 
-    public ContentValues toContentValues() {
-        ContentValues values = new ContentValues();
-        values.put(TvContract.Programs.COLUMN_CHANNEL_ID, mChannelId);
-        values.put(TvContract.Programs.COLUMN_TITLE, mTitle);
-        values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, mStartTimeUtcMillis);
-        values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, mEndTimeUtcMillis);
-        values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, mDescription);
-        values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, mLongDescription);
-        values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, mPosterArtUri);
-        values.put(TvContract.Programs.COLUMN_THUMBNAIL_URI, mThumbnailUri);
-        return values;
+    /**
+     * Returns if this program has the genre.
+     */
+    public boolean hasGenre(int genreId) {
+        if (genreId == GenreItems.ID_ALL_CHANNELS) {
+            return true;
+        }
+        if (mCanonicalGenreIds != null) {
+            for (int id : mCanonicalGenreIds) {
+                if (id == genreId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mChannelId, mStartTimeUtcMillis, mEndTimeUtcMillis,
+                mTitle, mEpisodeTitle, mDescription, mVideoWidth, mVideoHeight,
+                mPosterArtUri, mThumbnailUri, Arrays.hashCode(mContentRatings),
+                Arrays.hashCode(mCanonicalGenreIds), mSeasonNumber, mEpisodeNumber);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Program)) {
+            return false;
+        }
+        Program program = (Program) other;
+        return mChannelId == program.mChannelId
+                && mStartTimeUtcMillis == program.mStartTimeUtcMillis
+                && mEndTimeUtcMillis == program.mEndTimeUtcMillis
+                && Objects.equals(mTitle, program.mTitle)
+                && Objects.equals(mEpisodeTitle, program.mEpisodeTitle)
+                && Objects.equals(mDescription, program.mDescription)
+                && mVideoWidth == program.mVideoWidth
+                && mVideoHeight == program.mVideoHeight
+                && Objects.equals(mPosterArtUri, program.mPosterArtUri)
+                && Objects.equals(mThumbnailUri, program.mThumbnailUri)
+                && Arrays.equals(mContentRatings, program.mContentRatings)
+                && Arrays.equals(mCanonicalGenreIds, program.mCanonicalGenreIds)
+                && mSeasonNumber == program.mSeasonNumber
+                && mEpisodeNumber == program.mEpisodeNumber;
+    }
+
+    @Override
+    public int compareTo(@NonNull Program other) {
+        return Long.compare(mStartTimeUtcMillis, other.mStartTimeUtcMillis);
     }
 
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append("Program{")
-                .append(", channelId=").append(mChannelId)
+        StringBuilder builder = new StringBuilder();
+        builder.append("Program{")
+                .append("channelId=").append(mChannelId)
                 .append(", title=").append(mTitle)
-                .append(", startTimeUtcSec=").append(mStartTimeUtcMillis)
-                .append(", endTimeUtcSec=").append(mEndTimeUtcMillis)
-                .append(", description=").append(mDescription)
-                .append(", longDescription=").append(mLongDescription)
-                .append(", videoDefinitionLevel=").append(mVideoDefinitionLevel)
+                .append(", episodeTitle=").append(mEpisodeTitle)
+                .append(", seasonNumber=").append(mSeasonNumber)
+                .append(", episodeNumber=").append(mEpisodeNumber)
+                .append(", startTimeUtcSec=").append(Utils.toTimeString(mStartTimeUtcMillis))
+                .append(", endTimeUtcSec=").append(Utils.toTimeString(mEndTimeUtcMillis))
+                .append(", videoWidth=").append(mVideoWidth)
+                .append(", videoHeight=").append(mVideoHeight)
+                .append(", contentRatings=").append(Utils.contentRatingsToString(mContentRatings))
                 .append(", posterArtUri=").append(mPosterArtUri)
                 .append(", thumbnailUri=").append(mThumbnailUri)
-                .append("}")
-                .toString();
+                .append(", canonicalGenres=").append(Arrays.toString(mCanonicalGenreIds));
+        if (DEBUG_DUMP_DESCRIPTION) {
+            builder.append(", description=").append(mDescription);
+        }
+        return builder.append("}").toString();
     }
 
     public void copyFrom(Program other) {
@@ -158,13 +252,94 @@ public final class Program {
 
         mChannelId = other.mChannelId;
         mTitle = other.mTitle;
+        mEpisodeTitle = other.mEpisodeTitle;
+        mSeasonNumber = other.mSeasonNumber;
+        mEpisodeNumber = other.mEpisodeNumber;
         mStartTimeUtcMillis = other.mStartTimeUtcMillis;
         mEndTimeUtcMillis = other.mEndTimeUtcMillis;
         mDescription = other.mDescription;
-        mLongDescription = other.mLongDescription;
-        mVideoDefinitionLevel = other.mVideoDefinitionLevel;
+        mVideoWidth = other.mVideoWidth;
+        mVideoHeight = other.mVideoHeight;
         mPosterArtUri = other.mPosterArtUri;
         mThumbnailUri = other.mThumbnailUri;
+        mCanonicalGenreIds = other.mCanonicalGenreIds;
+        mContentRatings = other.mContentRatings;
+    }
+
+    public static Program fromCursor(Cursor cursor) {
+        // Columns read here should match Program.PROJECTION
+
+        Builder builder = new Builder();
+        int index = cursor.getColumnIndex(TvContract.Programs.COLUMN_CHANNEL_ID);
+        if (index >= 0) {
+            builder.setChannelId(cursor.getLong(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_TITLE);
+        if (index >= 0) {
+            builder.setTitle(cursor.getString(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_EPISODE_TITLE);
+        if (index >= 0) {
+            builder.setEpisodeTitle(cursor.getString(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_SEASON_NUMBER);
+        if(index >= 0) {
+            builder.setSeasonNumber(cursor.getInt(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_EPISODE_NUMBER);
+        if(index >= 0) {
+            builder.setEpisodeNumber(cursor.getInt(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_SHORT_DESCRIPTION);
+        if (index >= 0) {
+            builder.setDescription(cursor.getString(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_POSTER_ART_URI);
+        if (index >= 0) {
+            builder.setPosterArtUri(cursor.getString(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_THUMBNAIL_URI);
+        if (index >= 0) {
+            builder.setThumbnailUri(cursor.getString(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_CANONICAL_GENRE);
+        if (index >= 0) {
+            builder.setCanonicalGenres(cursor.getString(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_CONTENT_RATING);
+        if (index >= 0) {
+            builder.setContentRatings(Utils.stringToContentRatings(cursor.getString(index)));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS);
+        if (index >= 0) {
+            builder.setStartTimeUtcMillis(cursor.getLong(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS);
+        if (index >= 0) {
+            builder.setEndTimeUtcMillis(cursor.getLong(index));
+        }
+
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_VIDEO_WIDTH);
+        if (index >= 0) {
+            builder.setVideoWidth((int) cursor.getLong(index));
+        }
+        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_VIDEO_HEIGHT);
+        if (index >= 0) {
+            builder.setVideoHeight((int) cursor.getLong(index));
+        }
+
+        return builder.build();
     }
 
     public static final class Builder {
@@ -175,10 +350,11 @@ public final class Program {
             // Fill initial data.
             mProgram.mChannelId = Channel.INVALID_ID;
             mProgram.mTitle = "title";
+            mProgram.mSeasonNumber = -1;
+            mProgram.mEpisodeNumber = -1;
             mProgram.mStartTimeUtcMillis = -1;
             mProgram.mEndTimeUtcMillis = -1;
             mProgram.mDescription = "description";
-            mProgram.mLongDescription = "long_description";
         }
 
         public Builder(Program other) {
@@ -193,6 +369,21 @@ public final class Program {
 
         public Builder setTitle(String title) {
             mProgram.mTitle = title;
+            return this;
+        }
+
+        public Builder setEpisodeTitle(String episodeTitle) {
+            mProgram.mEpisodeTitle = episodeTitle;
+            return this;
+        }
+
+        public Builder setSeasonNumber(int seasonNumber) {
+            mProgram.mSeasonNumber = seasonNumber;
+            return this;
+        }
+
+        public Builder setEpisodeNumber(int episodeNumber) {
+            mProgram.mEpisodeNumber = episodeNumber;
             return this;
         }
 
@@ -211,13 +402,13 @@ public final class Program {
             return this;
         }
 
-        public Builder setLongDescription(String longDescription) {
-            mProgram.mLongDescription = longDescription;
+        public Builder setVideoWidth(int width) {
+            mProgram.mVideoWidth = width;
             return this;
         }
 
-        public Builder setVideoDefinitionLevel(String videoDefinitionLevel) {
-            mProgram.mVideoDefinitionLevel = videoDefinitionLevel;
+        public Builder setVideoHeight(int height) {
+            mProgram.mVideoHeight = height;
             return this;
         }
 
@@ -236,8 +427,70 @@ public final class Program {
             return this;
         }
 
-        public Program build() {
-            return mProgram;
+        public Builder setCanonicalGenres(String genres) {
+            if (TextUtils.isEmpty(genres)) {
+                return this;
+            }
+            String[] canonicalGenres = TvContract.Programs.Genres.decode(genres);
+            if (canonicalGenres.length > 0) {
+                int[] temp = new int[canonicalGenres.length];
+                int i = 0;
+                for (String canonicalGenre : canonicalGenres) {
+                    int genreId = GenreItems.getId(canonicalGenre);
+                    if (genreId == GenreItems.ID_ALL_CHANNELS) {
+                        // Skip if the genre is unknown.
+                        continue;
+                    }
+                    temp[i++] = genreId;
+                }
+                if (i < canonicalGenres.length) {
+                    temp = Arrays.copyOf(temp, i);
+                }
+                mProgram.mCanonicalGenreIds=temp;
+            }
+            return this;
         }
+
+        public Program build() {
+            Program program = new Program();
+            program.copyFrom(mProgram);
+            return program;
+        }
+    }
+
+    /**
+     * Prefetches the program poster art.<p>
+     */
+    @UiThread
+    public void prefetchPosterArt(Context context, int posterArtWidth, int posterArtHeight) {
+        if (mPosterArtUri == null) {
+            return;
+        }
+        ImageLoader.prefetchBitmap(context, mPosterArtUri, posterArtWidth, posterArtHeight);
+    }
+
+    /**
+     * Loads the program poster art and returns it via {@code callback}.<p>
+     * <p>
+     * Note that it may directly call {@code callback} if the program poster art already is loaded.
+     */
+    @UiThread
+    public void loadPosterArt(Context context, int posterArtWidth, int posterArtHeight,
+            final LoadPosterArtCallback callback) {
+        if (mPosterArtUri == null) {
+            return;
+        }
+        ImageLoader.loadBitmap(context, mPosterArtUri, posterArtWidth, posterArtHeight,
+                new ImageLoader.ImageLoaderCallback() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap) {
+                        if (DEBUG) {
+                            Log.i(TAG, "Loaded poster art for " + Program.this + ": " + bitmap);
+                        }
+                        if (callback != null) {
+                            callback.onLoadPosterArtFinished(Program.this, bitmap);
+                        }
+                    }
+                });
     }
 }

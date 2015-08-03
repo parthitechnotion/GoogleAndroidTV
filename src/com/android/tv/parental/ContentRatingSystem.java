@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,65 +16,94 @@
 
 package com.android.tv.parental;
 
-import android.net.Uri;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.media.tv.TvContentRating;
 import android.text.TextUtils;
 
+import com.android.tv.R;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 public class ContentRatingSystem {
-    private final static String TAG = "ContentRatingSystem";
+    /*
+     * A comparator that implements the display order of a group of content rating systems.
+     */
+    public static final Comparator<ContentRatingSystem> DISPLAY_NAME_COMPARATOR =
+            new Comparator<ContentRatingSystem>() {
+                @Override
+                public int compare(ContentRatingSystem s1, ContentRatingSystem s2) {
+                    String name1 = s1.getDisplayName();
+                    String name2 = s2.getDisplayName();
+                    return name1.compareTo(name2);
+                }
+            };
 
-    // Id of this content rating system. It should be unique in an XML file.
-    private String mId;
+    private static final String DELIMITER = "/";
+
+    // Name of this content rating system. It should be unique in an XML file.
+    private final String mName;
 
     // Domain of this content rating system. It's package name now.
-    private String mDomain;
+    private final String mDomain;
 
-    // Display name of this content rating system. (e.g. TV-PG)
-    private String mDisplayName;
+    // Title of this content rating system. (e.g. TV-PG)
+    private final String mTitle;
 
     // Description of this content rating system.
-    private String mDescription;
+    private final String mDescription;
 
     // Country code of this content rating system.
-    private String mCountry;
+    private final List<String> mCountries;
+
+    // Display name of this content rating system consisting of the associated country
+    // and its title. For example, "Canada (French)"
+    private final String mDisplayName;
 
     // Ordered list of main content ratings. UX should respect the order.
-    private List<Rating> mRatings;
+    private final List<Rating> mRatings;
 
     // Ordered list of sub content ratings. UX should respect the order.
-    private List<SubRating> mSubRatings;
+    private final List<SubRating> mSubRatings;
 
     // List of orders. This describes the automatic lock/unlock relationship between ratings.
     // For example, let say we have following order.
     //    <order>
-    //        <rating id="US_TVPG_Y" />
-    //        <rating id="US_TVPG_Y7" />
+    //        <rating android:name="US_TVPG_Y" />
+    //        <rating android:name="US_TVPG_Y7" />
     //    </order>
     // This means that locking US_TVPG_Y7 automatically locks US_TVPG_Y and
     // unlocking US_TVPG_Y automatically unlocks US_TVPG_Y7 from the UX.
     // An user can still unlock US_TVPG_Y while US_TVPG_Y7 is locked by manually.
-    private List<Order> mOrders;
+    private final List<Order> mOrders;
 
-    public String getId(){
-        return mId;
+    private final boolean mIsCustom;
+
+    public String getId() {
+        return mDomain + DELIMITER + mName;
+    }
+
+    public String getName(){
+        return mName;
     }
 
     public String getDomain() {
         return mDomain;
     }
 
-    public String getDisplayName(){
-        return mDisplayName;
+    public String getTitle(){
+        return mTitle;
     }
 
     public String getDescription(){
         return mDescription;
     }
 
-    public String getCountry(){
-        return mCountry;
+    public List<String> getCountries(){
+        return mCountries;
     }
 
     public List<Rating> getRatings(){
@@ -89,52 +118,97 @@ public class ContentRatingSystem {
         return mOrders;
     }
 
+    /**
+     * Returns the display name of the content rating system consisting of the associated country
+     * and its title. For example, "Canada (French)".
+     */
+    public String getDisplayName() {
+        return mDisplayName;
+    }
+
+    public boolean isCustom() {
+        return mIsCustom;
+    }
+
+    /**
+     * Returns true if the ratings is owned by this content rating system.
+     */
+    public boolean ownsRating(TvContentRating rating) {
+        return mDomain.equals(rating.getDomain()) && mName.equals(rating.getRatingSystem());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ContentRatingSystem) {
+            ContentRatingSystem other = (ContentRatingSystem) obj;
+            return this.mName.equals(other.mName) && this.mDomain.equals(other.mDomain);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * mName.hashCode() + mDomain.hashCode();
+    }
+
     private ContentRatingSystem(
-            String id, String domain, String displayName, String description, String country,
-            List<Rating> ratings, List<SubRating> subRatings, List<Order> orders) {
-        mId = id;
+            String name, String domain, String title, String description, List<String> countries,
+            String displayName, List<Rating> ratings, List<SubRating> subRatings,
+            List<Order> orders, boolean isCustom) {
+        mName = name;
         mDomain = domain;
-        mDisplayName = displayName;
+        mTitle = title;
         mDescription = description;
-        mCountry = country;
+        mCountries = countries;
+        mDisplayName = displayName;
         mRatings = ratings;
         mSubRatings = subRatings;
         mOrders = orders;
+        mIsCustom = isCustom;
     }
 
     public static class Builder {
-        private String mId;
+        private final Context mContext;
+        private String mName;
         private String mDomain;
-        private String mDisplayName;
+        private String mTitle;
         private String mDescription;
-        private String mCountry;
-        private List<Rating.Builder> mRatingBuilders = new ArrayList<Rating.Builder>();
-        private List<SubRating.Builder> mSubRatingBuilders = new ArrayList<SubRating.Builder>();
-        private List<Order.Builder> mOrderBuilders = new ArrayList<Order.Builder>();
+        private List<String> mCountries;
+        private final List<Rating.Builder> mRatingBuilders = new ArrayList<>();
+        private final List<SubRating.Builder> mSubRatingBuilders = new ArrayList<>();
+        private final List<Order.Builder> mOrderBuilders = new ArrayList<>();
+        private boolean mIsCustom;
 
-        public void setId(String id) {
-            mId = id;
+        public Builder(Context context) {
+            mContext = context;
+        }
+
+        public void setName(String name) {
+            mName = name;
         }
 
         public void setDomain(String domain) {
             mDomain = domain;
         }
 
-        public void setDisplayName(String displayName) {
-            mDisplayName = displayName;
+        public void setTitle(String title) {
+            mTitle = title;
         }
 
         public void setDescription(String description) {
             mDescription = description;
         }
 
-        public void setCountry(String country) {
-            mCountry = country;
+        public void addCountry(String country) {
+            if (mCountries == null) {
+                mCountries = new ArrayList<>();
+            }
+            mCountries.add(new Locale("", country).getCountry());
         }
 
         public void addRatingBuilder(Rating.Builder ratingBuilder) {
             // To provide easy access to the SubRatings in it,
-            // Rating has reference to SubRating, not Id of it.
+            // Rating has reference to SubRating, not Name of it.
             // (Note that Rating/SubRating is ordered list so we cannot use Map)
             // To do so, we need to have list of all SubRatings which might not be available
             // at this moment. Keep builders here and build it with SubRatings later.
@@ -148,22 +222,48 @@ public class ContentRatingSystem {
 
         public void addOrderBuilder(Order.Builder orderBuilder) {
             // To provide easy access to the Ratings in it,
-            // Order has reference to Rating, not Id of it.
+            // Order has reference to Rating, not Name of it.
             // (Note that Rating/SubRating is ordered list so we cannot use Map)
             // To do so, we need to have list of all Rating which might not be available
             // at this moment. Keep builders here and build it with Ratings later.
             mOrderBuilders.add(orderBuilder);
         }
 
+        public void setIsCustom(boolean isCustom) {
+            mIsCustom = isCustom;
+        }
+
         public ContentRatingSystem build() {
-            if (TextUtils.isEmpty(mId)) {
-                throw new IllegalArgumentException("Id cannot be empty");
+            if (TextUtils.isEmpty(mName)) {
+                throw new IllegalArgumentException("Name cannot be empty");
             }
             if (TextUtils.isEmpty(mDomain)) {
                 throw new IllegalArgumentException("Domain cannot be empty");
             }
 
-            List<SubRating> subRatings = new ArrayList<SubRating>();
+            StringBuilder sb = new StringBuilder();
+            if (mCountries != null) {
+                if (mCountries.size() == 1) {
+                    sb.append(new Locale("", mCountries.get(0)).getDisplayCountry());
+                } else if (mCountries.size() > 1) {
+                    Locale locale = Locale.getDefault();
+                    if (mCountries.contains(locale.getCountry())) {
+                        // Shows the country name instead of "Other countries" if the current
+                        // country is one of the countries this rating system applies to.
+                        sb.append(locale.getDisplayCountry());
+                    } else {
+                        sb.append(mContext.getString(R.string.other_countries));
+                    }
+                }
+            }
+            if (!TextUtils.isEmpty(mTitle)) {
+                sb.append(" (");
+                sb.append(mTitle);
+                sb.append(")");
+            }
+            String displayName = sb.toString();
+
+            List<SubRating> subRatings = new ArrayList<>();
             if (mSubRatingBuilders != null) {
                 for (SubRating.Builder builder : mSubRatingBuilders) {
                     subRatings.add(builder.build());
@@ -173,217 +273,214 @@ public class ContentRatingSystem {
             if (mRatingBuilders.size() <= 0) {
                 throw new IllegalArgumentException("Rating isn't available.");
             }
-            List<Rating> ratings = new ArrayList<Rating>();
-            if (mRatingBuilders != null) {
-                // Map string ID to object.
-                for (Rating.Builder builder : mRatingBuilders) {
-                    ratings.add(builder.build(subRatings));
-                }
+            List<Rating> ratings = new ArrayList<>();
+            // Map string ID to object.
+            for (Rating.Builder builder : mRatingBuilders) {
+                ratings.add(builder.build(subRatings));
+            }
 
-                // Sanity check.
-                for (SubRating subRating : subRatings) {
-                    boolean used = false;
-                    for (Rating rating : ratings) {
-                        if (rating.getSubRatings().contains(subRating)) {
-                            used = true;
-                            break;
-                        }
+            // Sanity check.
+            for (SubRating subRating : subRatings) {
+                boolean used = false;
+                for (Rating rating : ratings) {
+                    if (rating.getSubRatings().contains(subRating)) {
+                        used = true;
+                        break;
                     }
-                    if (!used) {
-                        throw new IllegalArgumentException("Subrating " + subRating.getId() +
-                            " isn't used by any rating");
-                    }
+                }
+                if (!used) {
+                    throw new IllegalArgumentException("Subrating " + subRating.getName() +
+                        " isn't used by any rating");
                 }
             }
 
-            List<Order> orders = new ArrayList<Order>();
+            List<Order> orders = new ArrayList<>();
             if (mOrderBuilders != null) {
                 for (Order.Builder builder : mOrderBuilders) {
                     orders.add(builder.build(ratings));
                 }
             }
 
-            return new ContentRatingSystem(mId, mDomain, mDisplayName, mDescription, mCountry,
-                    ratings, subRatings, orders);
+            return new ContentRatingSystem(mName, mDomain, mTitle, mDescription, mCountries,
+                    displayName, ratings, subRatings, orders, mIsCustom);
         }
     }
 
     public static class Rating {
-        private String mId;
-        private String mDisplayName;
-        private String mDescription;
-        private Uri mIconUri;
-        private int mAgeHint;
-        private List<SubRating> mSubRatings;
+        private final String mName;
+        private final String mTitle;
+        private final String mDescription;
+        private final Drawable mIcon;
+        private final int mContentAgeHint;
+        private final List<SubRating> mSubRatings;
 
-        public String getId() {
-            return mId;
+        public String getName() {
+            return mName;
         }
 
-        public String getDisplayName() {
-            return mDisplayName;
+        public String getTitle() {
+            return mTitle;
         }
 
         public String getDescription() {
             return mDescription;
         }
 
-        public Uri getIconUri() {
-            return mIconUri;
+        public Drawable getIcon() {
+            return mIcon;
         }
 
         public int getAgeHint() {
-            return mAgeHint;
+            return mContentAgeHint;
         }
 
         public List<SubRating> getSubRatings() {
             return mSubRatings;
         }
 
-        private Rating(String id, String displayName, String description, Uri iconUri,
-                int ageHint, List<SubRating> subRatings) {
-            mId = id;
-            mDisplayName = displayName;
+        private Rating(String name, String title, String description, Drawable icon,
+                int contentAgeHint, List<SubRating> subRatings) {
+            mName = name;
+            mTitle = title;
             mDescription = description;
-            mIconUri = iconUri;
-            mAgeHint = ageHint;
+            mIcon = icon;
+            mContentAgeHint = contentAgeHint;
             mSubRatings = subRatings;
         }
 
         public static class Builder {
-            private String mId;
-            private String mDisplayName;
+            private String mName;
+            private String mTitle;
             private String mDescription;
-            private Uri mIconUri;
-            private Integer mAgeHint;
-            private List<String> mSubRatingIds = new ArrayList<String>();
+            private Drawable mIcon;
+            private int mContentAgeHint = -1;
+            private final List<String> mSubRatingNames = new ArrayList<>();
 
             public Builder() {
             }
 
-            public void setId(String id) {
-                mId = id;
+            public void setName(String name) {
+                mName = name;
             }
 
-            public void setDisplayName(String displayName) {
-                mDisplayName = displayName;
+            public void setTitle(String title) {
+                mTitle = title;
             }
 
             public void setDescription(String description) {
                 mDescription = description;
             }
 
-            public void setIconUri(Uri iconUri) {
-                mIconUri = iconUri;
+            public void setIcon(Drawable icon) {
+                mIcon = icon;
             }
 
-            public void setAgeHint(int ageHint) {
-                mAgeHint = (mAgeHint == null) ? new Integer(ageHint) : (Integer) ageHint;
+            public void setContentAgeHint(int contentAgeHint) {
+                mContentAgeHint = contentAgeHint;
             }
 
-            public void addSubRatingId(String subRatingId) {
-                mSubRatingIds.add(subRatingId);
+            public void addSubRatingName(String subRatingName) {
+                mSubRatingNames.add(subRatingName);
             }
 
             private Rating build(List<SubRating> allDefinedSubRatings) {
-                if (TextUtils.isEmpty(mId)) {
-                    throw new IllegalArgumentException("A rating should have non-empty id");
+                if (TextUtils.isEmpty(mName)) {
+                    throw new IllegalArgumentException("A rating should have non-empty name");
                 }
-                if (allDefinedSubRatings == null && mSubRatingIds.size() > 0) {
-                    throw new IllegalArgumentException("Invalid subrating for rating " +
-                            mId);
+                if (allDefinedSubRatings == null && mSubRatingNames.size() > 0) {
+                    throw new IllegalArgumentException("Invalid subrating for rating " + mName);
                 }
-                if (mAgeHint == null || mAgeHint < 0) {
-                    throw new IllegalArgumentException("Rating " + mId + " should define " +
-                        "non-negative ageHint");
+                if (mContentAgeHint < 0) {
+                    throw new IllegalArgumentException("Rating " + mName + " should define " +
+                        "non-negative contentAgeHint");
                 }
 
-                List<SubRating> subRatings = new ArrayList<SubRating>();
-                for (String subRatingId : mSubRatingIds) {
+                List<SubRating> subRatings = new ArrayList<>();
+                for (String subRatingId : mSubRatingNames) {
                     boolean found = false;
                     for (SubRating subRating : allDefinedSubRatings) {
-                        if (subRatingId.equals(subRating.getId())) {
+                        if (subRatingId.equals(subRating.getName())) {
                             found = true;
                             subRatings.add(subRating);
                             break;
                         }
                     }
                     if (!found) {
-                        throw new IllegalArgumentException("Unknown subrating Id " + subRatingId +
-                                " in rating " + mId);
+                        throw new IllegalArgumentException("Unknown subrating name " + subRatingId +
+                                " in rating " + mName);
                     }
                 }
                 return new Rating(
-                        mId, mDisplayName, mDescription, mIconUri, (int) mAgeHint, subRatings);
+                        mName, mTitle, mDescription, mIcon, mContentAgeHint, subRatings);
             }
         }
     }
 
     public static class SubRating {
-        private String mId;
-        private String mDisplayName;
-        private String mDescription;
-        private Uri mIconUri;
+        private final String mName;
+        private final String mTitle;
+        private final String mDescription;
+        private final Drawable mIcon;
 
-        public String getId() {
-            return mId;
+        public String getName() {
+            return mName;
         }
 
-        public String getDisplayName() {
-            return mDisplayName;
+        public String getTitle() {
+            return mTitle;
         }
 
         public String getDescription() {
             return mDescription;
         }
 
-        public Uri getIconUri() {
-            return mIconUri;
+        public Drawable getIcon() {
+            return mIcon;
         }
 
-        private SubRating(String id, String displayName, String description, Uri iconUri) {
-            mId = id;
-            mDisplayName = displayName;
+        private SubRating(String name, String title, String description, Drawable icon) {
+            mName = name;
+            mTitle = title;
             mDescription = description;
-            mIconUri = iconUri;
+            mIcon = icon;
         }
 
         public static class Builder {
-            private String mId;
-            private String mDisplayName;
+            private String mName;
+            private String mTitle;
             private String mDescription;
-            private Uri mIconUri;
+            private Drawable mIcon;
 
             public Builder() {
             }
 
-            public void setId(String id) {
-                mId = id;
+            public void setName(String name) {
+                mName = name;
             }
 
-            public void setDisplayName(String displayName) {
-                mDisplayName = displayName;
+            public void setTitle(String title) {
+                mTitle = title;
             }
 
             public void setDescription(String description) {
                 mDescription = description;
             }
 
-            public void setIconUri(Uri iconUri) {
-                mIconUri = iconUri;
+            public void setIcon(Drawable icon) {
+                mIcon = icon;
             }
 
             private SubRating build() {
-                if (TextUtils.isEmpty(mId)) {
-                    throw new IllegalArgumentException("A subrating should have non-empty id");
+                if (TextUtils.isEmpty(mName)) {
+                    throw new IllegalArgumentException("A subrating should have non-empty name");
                 }
-                return new SubRating(mId, mDisplayName, mDescription, mIconUri);
+                return new SubRating(mName, mTitle, mDescription, mIcon);
             }
         }
     }
 
     public static class Order {
-        private List<Rating> mRatingOrder;
+        private final List<Rating> mRatingOrder;
 
         public List<Rating> getRatingOrder() {
             return mRatingOrder;
@@ -394,17 +491,17 @@ public class ContentRatingSystem {
         }
 
         public static class Builder {
-            private final List<String> mRatingIds = new ArrayList<String>();
+            private final List<String> mRatingNames = new ArrayList<>();
 
             public Builder() {
             }
 
             private Order build(List<Rating> ratings) {
-                List<Rating> ratingOrder = new ArrayList<Rating>();
-                for (String ratingId : mRatingIds) {
+                List<Rating> ratingOrder = new ArrayList<>();
+                for (String ratingName : mRatingNames) {
                     boolean found = false;
                     for (Rating rating : ratings) {
-                        if (ratingId.equals(rating.getId())) {
+                        if (ratingName.equals(rating.getName())) {
                             found = true;
                             ratingOrder.add(rating);
                             break;
@@ -412,16 +509,16 @@ public class ContentRatingSystem {
                     }
 
                     if (!found) {
-                        throw new IllegalArgumentException("Unknown rating " + ratingId +
-                                " in order tag");
+                        throw new IllegalArgumentException("Unknown rating " + ratingName +
+                                " in rating-order tag");
                     }
                 }
 
                 return new Order(ratingOrder);
             }
 
-            public void addRatingId(String ratingId) {
-                mRatingIds.add(ratingId);
+            public void addRatingName(String name) {
+                mRatingNames.add(name);
             }
         }
     }

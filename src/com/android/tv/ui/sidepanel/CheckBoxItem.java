@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,51 @@
 
 package com.android.tv.ui.sidepanel;
 
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.tv.R;
 
-public class CheckBoxItem extends Item {
-    private final String mTitle;
-    private boolean mChecked;
-    private CheckBox mCheckBox;
+public class CheckBoxItem extends CompoundButtonItem {
+    private final boolean mLayoutForLargeDescription;
 
     public CheckBoxItem(String title) {
-        mTitle = title;
+        this(title, null);
+    }
+
+    public CheckBoxItem(String title, String description) {
+        this(title, description, false);
+    }
+
+    public CheckBoxItem(String title, String description, boolean layoutForLargeDescription) {
+        super(title, description);
+        mLayoutForLargeDescription = layoutForLargeDescription;
+    }
+
+    @Override
+    protected void onBind(View view) {
+        super.onBind(view);
+        if (mLayoutForLargeDescription) {
+            CompoundButton checkBox = (CompoundButton) view.findViewById(getCompoundButtonId());
+            LinearLayout.LayoutParams lp =
+                    (LinearLayout.LayoutParams) checkBox.getLayoutParams();
+            lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+            lp.topMargin = view.getResources().getDimensionPixelOffset(
+                    R.dimen.option_item_check_box_margin_top);
+            checkBox.setLayoutParams(lp);
+
+            TypedValue outValue = new TypedValue();
+            view.getResources().getValue(R.dimen.option_item_check_box_line_spacing_multiplier,
+                    outValue, true);
+
+            TextView descriptionTextView = (TextView) view.findViewById(getDescriptionViewId());
+            descriptionTextView.setMaxLines(Integer.MAX_VALUE);
+            descriptionTextView.setLineSpacing(0, outValue.getFloat());
+        }
     }
 
     @Override
@@ -36,32 +69,12 @@ public class CheckBoxItem extends Item {
     }
 
     @Override
-    protected void bind(View view) {
-        mCheckBox = (CheckBox) view.findViewById(R.id.check_box);
-        mCheckBox.setText(mTitle);
-        mCheckBox.setChecked(mChecked);
-    }
-
-    @Override
-    protected void unbind() {
-        mCheckBox = null;
+    protected int getCompoundButtonId() {
+        return R.id.check_box;
     }
 
     @Override
     protected void onSelected() {
-        setChecked(!mChecked);
-    }
-
-    public void setChecked(boolean checked) {
-        if (mChecked != checked) {
-            mChecked = checked;
-            if (mCheckBox != null) {
-                mCheckBox.setChecked(mChecked);
-            }
-        }
-    }
-
-    public boolean getChecked() {
-        return mChecked;
+        setChecked(!isChecked());
     }
 }

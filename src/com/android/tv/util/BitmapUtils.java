@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,59 +16,53 @@
 
 package com.android.tv.util;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class BitmapUtils {
     private static final String TAG = "BitmapUtils";
+    private static final boolean DEBUG = false;
 
-    private static final int MARK_READ_LIMIT = 10 * 1024; // 10K
+    // The value of 64K, for MARK_READ_LIMIT, is chosen to be eight times the default buffer size
+    // of BufferedInputStream (8K) allowing it to double its buffers three times. Also it is a
+    // fairly reasonable value, not using too much memory and being large enough for most cases.
+    private static final int MARK_READ_LIMIT = 64 * 1024;  // 64K
+
+    private static final int CONNECTION_TIMEOUT_MS_FOR_URLCONNECTION = 3000;  // 3 sec
+    private static final int READ_TIMEOUT_MS_FOR_URLCONNECTION = 10000;  // 10 sec
 
     private BitmapUtils() { /* cannot be instantiated */ }
 
-    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx, float targetWidth,
-            float targetHeight) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-
-        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.BLACK);
-
-        canvas.drawARGB(0, 0, 0, 0);
-        canvas.drawRoundRect(rectF, roundPx * bitmap.getWidth() / targetWidth,
-                roundPx * bitmap.getHeight() / targetHeight, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
+    public static Bitmap scaleBitmap(Bitmap bm, int maxWidth, int maxHeight) {
+        Bitmap result;
+        Rect rect = calculateNewSize(bm, maxWidth, maxHeight);
+        result = Bitmap.createBitmap(rect.right, rect.bottom, bm.getConfig());
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(bm, null, rect, null);
+        return result;
     }
 
-    public static Bitmap scaleBitmap(Bitmap bm, int maxWidth, int maxHeight) {
+    private static Rect calculateNewSize(Bitmap bm, int maxWidth, int maxHeight) {
         final double ratio = maxHeight / (double) maxWidth;
         final double bmRatio = bm.getHeight() / (double) bm.getWidth();
-        Bitmap result = null;
         Rect rect = new Rect();
         if (ratio > bmRatio) {
             rect.right = maxWidth;
@@ -77,121 +71,196 @@ public class BitmapUtils {
             rect.right = Math.round((float) bm.getWidth() * maxHeight / bm.getHeight());
             rect.bottom = maxHeight;
         }
-        result = Bitmap.createBitmap(rect.right, rect.bottom, bm.getConfig());
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(bm, null, rect, null);
-        return result;
+        return rect;
     }
 
-    /*
-     * Decode large sized bitmap into required size.
+    public static ScaledBitmapInfo createScaledBitmapInfo(String id, Bitmap bm, int maxWidth,
+            int maxHeight) {
+        return new ScaledBitmapInfo(id, scaleBitmap(bm, maxWidth, maxHeight),
+                calculateInSampleSize(bm.getWidth(), bm.getHeight(), maxWidth, maxHeight));
+    }
+
+    /**
+     * Decode large sized bitmap into requested size.
      */
-    public static Bitmap decodeSampledBitmapFromUriString(Context context, String uriString,
-            int reqWidth, int reqHeight) {
+    public static ScaledBitmapInfo decodeSampledBitmapFromUriString(Context context,
+            String uriString, int reqWidth, int reqHeight) {
         if (TextUtils.isEmpty(uriString)) {
             return null;
         }
 
-        InputStream is = null;
+        InputStream inputStream = null;
         try {
-            is = getInputStream(context, uriString);
-            if (is == null) {
+            inputStream = new BufferedInputStream(getInputStream(context, uriString));
+            inputStream.mark(MARK_READ_LIMIT);
+
+            // Check the bitmap dimensions.
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(inputStream, null, options);
+
+            // Rewind the stream in order to restart bitmap decoding.
+            try {
+                inputStream.reset();
+            } catch (IOException e) {
+                if (DEBUG) {
+                    Log.i(TAG, "Failed to rewind stream: " + uriString, e);
+                }
+
+                // Failed to rewind the stream, try to reopen it.
+                close(inputStream);
+                inputStream = getInputStream(context, uriString);
+            }
+
+            // Decode the bitmap possibly resizing it.
+            options.inJustDecodeBounds = false;
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            if (bitmap == null) {
                 return null;
             }
-
-            // We doesn't trust TIS to provide us with proper sized image
-            Bitmap bitmap = decodeSampledBitmapFromStream(is, reqWidth, reqHeight);
-            if (bitmap != null) {
-                return bitmap;
-            }
-
-            closeInputStream(is);
-            is = getInputStream(context, uriString);
-            if (is == null) {
-                return null;
-            }
-            return BitmapFactory.decodeStream(is);
-        } finally {
-            closeInputStream(is);
-        }
-    }
-
-    /*
-     * Decode large sized bitmap into required size.
-     * If it returns null, the InputStream should be closed and re-opened.
-     */
-    public static Bitmap decodeSampledBitmapFromStream(InputStream is, int reqWidth,
-            int reqHeight) {
-        // The input stream is read two times, so BufferedInputStream which supports marking should
-        // be used.
-        BufferedInputStream bis = new BufferedInputStream(is);
-        // 10K is the sufficient for the image header, because only the image header will be read
-        // at the first time.
-        bis.mark(MARK_READ_LIMIT);
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(bis, null, options);
-
-        // Reset the input stream to read from the start.
-        try {
-            bis.reset();
+            return new ScaledBitmapInfo(uriString, bitmap, options.inSampleSize);
         } catch (IOException e) {
-            Log.i(TAG, "Failed to reset input stream.", e);
+            if (DEBUG) {
+                // It can happens in normal cases like when a channel doesn't have any logo.
+                Log.w(TAG, "Failed to open stream: " + uriString, e);
+            }
             return null;
+        } catch (SQLiteException e) {
+            Log.e(TAG, "Failed to open stream: " + uriString, e);
+            return null;
+        } finally {
+            close(inputStream);
         }
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeStream(bis, null, options);
     }
 
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth,
             int reqHeight) {
-        // Raw height and width of image
-        // They are shifted right by one bit which causes an effect that inSampleSize is shifted
-        // left by one bit.
-        int width = options.outWidth >> 1;
-        int height = options.outHeight >> 1;
-        int inSampleSize = 1;
-
-        // Calculate the largest inSampleSize value that is a power of 2 and keeps either
-        // height and width larger than the requested height and width.
-        while (width > reqWidth || height > reqHeight) {
-            width >>= 1;
-            height >>= 1;
-            inSampleSize <<= 1;
-        }
-
-        return inSampleSize;
+        return calculateInSampleSize(options.outWidth, options.outHeight, reqWidth, reqHeight);
     }
 
-    private static InputStream getInputStream(Context context, String uriString) {
-        try {
-            return new URL(uriString).openStream();
-        } catch (MalformedURLException e) {
-            try {
-                return context.getContentResolver().openInputStream(Uri.parse(uriString));
-            } catch (FileNotFoundException ex) {
-                Log.i(TAG, "Unable to load uri: " + uriString);
-            }
-        } catch (IOException e) {
-            Log.i(TAG, "Failed to open stream: " + uriString);
-        }
-        return null;
+    private static int calculateInSampleSize(int width, int height, int reqWidth, int reqHeight) {
+        // Calculates the largest inSampleSize that, is a power of two and, keeps either width or
+        // height larger or equal to the requested width and height.
+        int ratio = Math.max(width / reqWidth, height / reqHeight);
+        return Math.max(1, Integer.highestOneBit(ratio));
     }
 
-    private static void closeInputStream(InputStream is) {
-        if (is != null) {
+    private static InputStream getInputStream(Context context, String uriString)
+            throws IOException {
+        Uri uri = Uri.parse(uriString).normalizeScheme();
+        if (isContentResolverUri(uri)) {
+            return context.getContentResolver().openInputStream(uri);
+        } else {
+            // TODO We should disconnect() the URLConnection in order to allow connection reuse.
+            URLConnection urlConnection = new URL(uriString).openConnection();
+            urlConnection.setConnectTimeout(CONNECTION_TIMEOUT_MS_FOR_URLCONNECTION);
+            urlConnection.setReadTimeout(READ_TIMEOUT_MS_FOR_URLCONNECTION);
+            return urlConnection.getInputStream();
+        }
+    }
+
+    private static boolean isContentResolverUri(Uri uri) {
+        String scheme = uri.getScheme();
+        return ContentResolver.SCHEME_CONTENT.equals(scheme)
+                || ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme)
+                || ContentResolver.SCHEME_FILE.equals(scheme);
+    }
+
+    private static void close(Closeable closeable) {
+        if (closeable != null) {
             try {
-                is.close();
+                closeable.close();
             } catch (IOException e) {
-                // Does nothing.
+                // Log and continue.
+                Log.w(TAG,"Error closing " + closeable, e);
             }
+        }
+    }
+
+    /**
+     * A wrapper class which contains the loaded bitmap and the scaling information.
+     */
+    public static class ScaledBitmapInfo {
+        /**
+         * The id of  bitmap,  usually this is the URI of the original.
+         */
+        @NonNull
+        public final String id;
+
+        /**
+         * The loaded bitmap object.
+         */
+        @NonNull
+        public final Bitmap bitmap;
+
+        /**
+         * The scaling factor to the original bitmap. It should be an positive integer.
+         *
+         * @see android.graphics.BitmapFactory.Options#inSampleSize
+         */
+        public final int inSampleSize;
+
+        /**
+         * A constructor.
+         *
+         * @param bitmap The loaded bitmap object.
+         * @param inSampleSize The sampling size.
+         *        See {@link android.graphics.BitmapFactory.Options#inSampleSize}
+         */
+        public ScaledBitmapInfo(@NonNull String id, @NonNull Bitmap bitmap, int inSampleSize) {
+            this.id = id;
+            this.bitmap = bitmap;
+            this.inSampleSize = inSampleSize;
+        }
+
+        /**
+         * Checks if the bitmap needs to be reloaded. The scaling is performed by power 2.
+         * The bitmap can be reloaded only if the required width or height is greater then or equal
+         * to the existing bitmap.
+         * If the full sized bitmap is already loaded, returns {@code false}.
+         *
+         * @see android.graphics.BitmapFactory.Options#inSampleSize
+         */
+        public boolean needToReload(int reqWidth, int reqHeight) {
+            if (inSampleSize <= 1) {
+                if (DEBUG) Log.d(TAG, "Reload not required " + this + " already full size.");
+                return false;
+            }
+            Rect size = calculateNewSize(this.bitmap, reqWidth, reqHeight);
+            boolean reload = (size.right >= bitmap.getWidth() * 2
+                    || size.bottom >= bitmap.getHeight() * 2);
+            if (DEBUG) {
+                Log.d(TAG, "needToReload(" + reqWidth + ", " + reqHeight + ")=" + reload
+                        + " becuase the new size would be " + size + " for " + this);
+            }
+            return reload;
+        }
+
+        /**
+         * Returns {@code true} if a request the size of {@code other} would need a reload.
+         */
+        public boolean needToReload(ScaledBitmapInfo other){
+            return needToReload(other.bitmap.getWidth(), other.bitmap.getHeight());
+        }
+
+        @Override
+        public String toString() {
+            return "ScaledBitmapInfo[" + id + "](in=" + inSampleSize + ", w=" + bitmap.getWidth()
+                    + ", h=" + bitmap.getHeight() + ")";
+        }
+    }
+
+    /**
+     * Applies a color filter to the {@code drawable}. The color filter is made with the given
+     * {@code color} and {@link android.graphics.PorterDuff.Mode#SRC_ATOP}.
+     *
+     * @see Drawable#setColorFilter
+     */
+    public static void setColorFilterToDrawable(int color, Drawable drawable) {
+        if (drawable != null) {
+            drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         }
     }
 }

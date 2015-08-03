@@ -1,58 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2014 The Android Open Source Project
-
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
+<!--
+  ~ Copyright (C) 2015 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.tv"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    package="com.android.tv" xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GLOBAL_SEARCH" tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ALL_EPG_DATA" />
-    <uses-permission android:name="android.permission.READ_EPG_DATA" />
-    <uses-permission android:name="android.permission.WRITE_EPG_DATA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.MODIFY_PARENTAL_CONTROLS" />
+    <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA" />
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+    <uses-permission android:name="com.android.providers.tv.permission.ACCESS_ALL_EPG_DATA" />
+    <uses-permission android:name="com.android.providers.tv.permission.ACCESS_WATCHED_PROGRAMS" />
 
-    <!-- Receives input events from TV app. -->
-    <permission android:name="android.permission.RECEIVE_INPUT_EVENT"
+    <!-- Permissions/feature for USB tuner -->
+    <uses-permission android:name="android.permission.DVB_DEVICE" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
+
+    <!-- Limit only for Android TV -->
+    <uses-feature android:name="android.software.leanback" android:required="true" />
+    <uses-feature android:name="android.software.live_tv" android:required="true" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+
+    <!-- Receives input events from the TV app. -->
+    <permission android:name="com.android.tv.permission.RECEIVE_INPUT_EVENT"
         android:protectionLevel="signatureOrSystem"
         android:label="@string/permlab_receiveInputEvent"
-        android:description="@string/permdesc_receiveInputEvent" />
+        android:description="@string/permdesc_receiveInputEvent" tools:ignore="SignatureOrSystemPermissions"/>
+    <uses-sdk android:targetSdkVersion="23" android:minSdkVersion="21"/>
 
-    <application android:label="@string/tv_app"
+    <application android:label="@string/app_name"
+        android:name=".TvApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:banner="@drawable/banner"
+        android:supportsRtl="true"
         android:theme="@style/Theme.TV">
-        <activity android:name="com.android.tv.TvActivity"
-            android:configChanges="keyboard|keyboardHidden"
-            android:screenOrientation="landscape"
-            android:launchMode="singleTask" >
+        <activity android:name="com.android.tv.TvActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name="com.android.tv.MainActivity"
+            android:configChanges="keyboard|keyboardHidden"
+            android:screenOrientation="landscape"
+            android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.item/channel"
-                    android:scheme="content"
-                    android:host="android.media.tv"
-                    android:pathPrefix="/channel" />
+                <data android:mimeType="vnd.android.cursor.item/channel" />
+                <data android:mimeType="vnd.android.cursor.dir/channel" />
+                <data android:mimeType="vnd.android.cursor.item/program" />
+                <data android:mimeType="vnd.android.cursor.dir/program" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -62,27 +80,18 @@
                 android:resource="@xml/searchable" />
         </activity>
 
-        <activity android:name="com.android.tv.PassthroughTvActivity"
-            android:configChanges="keyboard|keyboardHidden"
-            android:screenOrientation="landscape"
-            android:launchMode="singleTask" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.item/channel"
-                    android:scheme="content"
-                    android:host="android.media.tv"
-                    android:pathPrefix="/input" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".LauncherActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <provider android:name="com.android.tv.search.LocalSearchProvider"
             android:authorities="com.android.tv.search"
             android:exported="true"
-            android:enabled="true">
+            android:enabled="true" tools:ignore="ExportedContentProvider">
+            <meta-data android:name="SupportedSwitchActionType" android:value="CHANNEL|TVINPUT" />
         </provider>
 
-        <service android:name="com.android.tv.notification.NotificationService" />
+        <service android:name="com.android.tv.recommendation.NotificationService"
+             android:exported="false" />
 
         <receiver android:name="com.android.tv.receiver.NotificationReceiver">
             <intent-filter>
@@ -92,6 +101,8 @@
         <receiver android:name="com.android.tv.receiver.PackageIntentsReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <!-- PACKAGE_CHANGED for package enabled/disabled notification-->
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <data android:scheme="package"/>
             </intent-filter>
@@ -103,6 +114,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.GLOBAL_BUTTON" />
             </intent-filter>
+
+            <!-- Not directly related to GlobalKeyReceiver but needed to be able to provide our
+                content rating definitions to the system service. -->
+            <intent-filter>
+                <action android:name="android.media.tv.action.QUERY_CONTENT_RATING_SYSTEMS" />
+            </intent-filter>
+            <meta-data android:name="android.media.tv.metadata.CONTENT_RATING_SYSTEMS"
+                    android:resource="@xml/tv_content_rating_systems" />
         </receiver>
+
     </application>
 </manifest>

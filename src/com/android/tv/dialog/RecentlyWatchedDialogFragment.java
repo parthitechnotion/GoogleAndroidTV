@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.android.tv.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -31,20 +30,29 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.android.tv.MainActivity;
 import com.android.tv.R;
+import com.android.tv.data.Channel;
+import com.android.tv.data.ChannelDataManager;
 
 /**
  * Displays the watch history
  */
-public class RecentlyWatchedDialogFragment extends DialogFragment implements
+public class RecentlyWatchedDialogFragment extends SafeDismissDialogFragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
-    public static final String DIALOG_TAG = RecentlyWatchedDialogFragment.class.getName();
+    public static final String DIALOG_TAG = RecentlyWatchedDialogFragment.class.getSimpleName();
+
+    private static final String EMPTY_STRING = "";
+    private static final String TRACKER_LABEL = "Recently watched history";
 
     private SimpleCursorAdapter mAdapter;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         getLoaderManager().initLoader(0, null, this);
+
+        final ChannelDataManager dataChannelManager =
+                ((MainActivity) getActivity()).getChannelDataManager();
 
         String[] from = {
                 TvContract.WatchedPrograms._ID,
@@ -63,8 +71,19 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 String name = cursor.getColumnName(columnIndex);
                 if (TvContract.WatchedPrograms.COLUMN_CHANNEL_ID.equals(name)) {
-                    long channleId = cursor.getLong(columnIndex);
-                    ((TextView) view).setText(String.valueOf(channleId));
+                    long channelId = cursor.getLong(columnIndex);
+                    ((TextView) view).setText(String.valueOf(channelId));
+                    // Update display number
+                    String displayNumber;
+                    Channel channel = dataChannelManager.getChannel(channelId);
+                    if (channel == null) {
+                        displayNumber = EMPTY_STRING;
+                    } else {
+                        displayNumber = channel.getDisplayNumber();
+                    }
+                    TextView displayNumberView = ((TextView) ((View) view.getParent())
+                            .findViewById(R.id.watched_program_channel_display_number));
+                    displayNumberView.setText(displayNumber);
                     return true;
                 } else if (TvContract.WatchedPrograms.COLUMN_WATCH_START_TIME_UTC_MILLIS.equals(
                         name)) {
@@ -92,6 +111,11 @@ public class RecentlyWatchedDialogFragment extends DialogFragment implements
         if (mAdapter != null) {
             mAdapter.changeCursor(null);
         }
+    }
+
+    @Override
+    public String getTrackerLabel() {
+        return TRACKER_LABEL;
     }
 
     @Override

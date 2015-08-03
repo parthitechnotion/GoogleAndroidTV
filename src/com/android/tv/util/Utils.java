@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,62 +16,79 @@
 
 package com.android.tv.util;
 
-import android.content.ContentUris;
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
+import android.media.tv.TvContract.Channels;
 import android.media.tv.TvInputInfo;
+import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
-import android.util.Base64;
+import android.text.format.DateUtils;
+import android.util.Log;
+import android.view.View;
 
+import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A class that includes convenience methods for accessing TvProvider database.
  */
 public class Utils {
-    public static final String SERVICE_INTERFACE = "android.media.tv.TvInputService";
-    public static final String EXTRA_SERVICE_NAME = "serviceName";
-    public static final String EXTRA_KEYCODE = "keycode";
+    private static final String TAG = "Utils";
+    private static final boolean DEBUG = false;
 
-    public static final String CHANNEL_SORT_ORDER_BY_DISPLAY_NUMBER =
-            "CAST(" + TvContract.Channels.COLUMN_DISPLAY_NUMBER + " AS INTEGER), "
-            + "CAST(SUBSTR(LTRIM(" + TvContract.Channels.COLUMN_DISPLAY_NUMBER
-            + ",'0123456789'),2) AS INTEGER)";
+    public static final String EXTRA_KEY_KEYCODE = "keycode";
+    public static final String EXTRA_KEY_ACTION = "action";
+    public static final String EXTRA_ACTION_SHOW_TV_INPUT ="show_tv_input";
+    public static final String EXTRA_KEY_FROM_LAUNCHER = "from_launcher";
 
-    // preferences stored in the default preference.
-    private static final String PREF_KEY_LAST_SELECTED_TV_INPUT = "last_selected_tv_input";
-    private static final String PREF_KEY_LAST_SELECTED_PHYS_TV_INPUT =
-            "last_selected_phys_tv_input";
+    // Query parameter in the intent of starting MainActivity.
+    public static final String PARAM_SOURCE = "source";
 
-    private static final String PREFIX_PREF_NAME = "com.android.tv.";
-    // preferences stored in the preference of a specific tv input.
+    private static final String PATH_CHANNEL = "channel";
+    private static final String PATH_PROGRAM = "program";
+
     private static final String PREF_KEY_LAST_WATCHED_CHANNEL_ID = "last_watched_channel_id";
+    private static final String PREF_KEY_LAST_WATCHED_CHANNEL_ID_FOR_INPUT =
+            "last_watched_channel_id_for_input_";
+    private static final String PREF_KEY_LAST_WATCHED_CHANNEL_URI = "last_watched_channel_uri";
 
-    // STOPSHIP: Use the one defined in the contract class instead.
-    private static final String TvContract_Programs_COLUMN_VIDEO_RESOLUTION = "video_resolution";
+    private static final int VIDEO_SD_WIDTH = 704;
+    private static final int VIDEO_SD_HEIGHT = 480;
+    private static final int VIDEO_HD_WIDTH = 1280;
+    private static final int VIDEO_HD_HEIGHT = 720;
+    private static final int VIDEO_FULL_HD_WIDTH = 1920;
+    private static final int VIDEO_FULL_HD_HEIGHT = 1080;
+    private static final int VIDEO_ULTRA_HD_WIDTH = 2048;
+    private static final int VIDEO_ULTRA_HD_HEIGHT = 1536;
 
-    private static int VIDEO_SD_WIDTH = 704;
-    private static int VIDEO_SD_HEIGHT = 480;
-    private static int VIDEO_HD_WIDTH = 1280;
-    private static int VIDEO_HD_HEIGHT = 720;
-    private static int VIDEO_FULL_HD_WIDTH = 1920;
-    private static int VIDEO_FULL_HD_HEIGHT = 1080;
-    private static int VIDEO_ULTRA_HD_WIDTH = 2048;
-    private static int VIDEO_ULTRA_HD_HEIGHT = 1536;
+    private static final int AUDIO_CHANNEL_NONE = 0;
+    private static final int AUDIO_CHANNEL_MONO = 1;
+    private static final int AUDIO_CHANNEL_STEREO = 2;
+    private static final int AUDIO_CHANNEL_SURROUND_6 = 6;
+    private static final int AUDIO_CHANNEL_SURROUND_8 = 8;
 
     private enum AspectRatio {
         ASPECT_RATIO_4_3(4, 3),
@@ -87,193 +104,205 @@ public class Utils {
         }
 
         @Override
+        @SuppressLint("DefaultLocale")
         public String toString() {
             return String.format("%d:%d", width, height);
         }
     }
 
-    private Utils() { /* cannot be instantiated */ }
+    private Utils() {
+    }
 
-    public static Uri getChannelUri(long channelId) {
-        return ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channelId);
+    public static String buildSelectionForIds(String idName, List<Long> ids) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(idName).append(" in (")
+                .append(ids.get(0));
+        for (int i = 1; i < ids.size(); ++i) {
+            sb.append(",").append(ids.get(i));
+        }
+        sb.append(")");
+        return sb.toString();
     }
 
     public static String getInputIdForChannel(Context context, long channelId) {
         if (channelId == Channel.INVALID_ID) {
             return null;
         }
-        Uri channelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, channelId);
-        return getInputIdForChannel(context, channelUri);
-    }
-
-    public static String getInputIdForChannel(Context context, Uri channelUri) {
-        if (channelUri == null) {
-            return null;
-        }
-        String[] projection = { TvContract.Channels.COLUMN_INPUT_ID };
-        Cursor cursor = null;
-        try {
-            cursor = context.getContentResolver().query(channelUri, projection, null, null, null);
+        Uri channelUri = TvContract.buildChannelUri(channelId);
+        String[] projection = {TvContract.Channels.COLUMN_INPUT_ID};
+        try (Cursor cursor = context.getContentResolver()
+                .query(channelUri, projection, null, null, null)) {
             if (cursor != null && cursor.moveToNext()) {
-                return cursor.getString(0);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
+                return Utils.intern(cursor.getString(0));
             }
         }
         return null;
     }
 
-    public static void setLastWatchedChannelId(Context context, String inputId, String physInputId,
-            long channelId) {
-        if (TextUtils.isEmpty(inputId)) {
-            throw new IllegalArgumentException("inputId cannot be empty");
+    public static void setLastWatchedChannel(Context context, Channel channel) {
+        if (channel == null) {
+            Log.e(TAG, "setLastWatchedChannel: channel cannot be null");
+            return;
         }
-        context.getSharedPreferences(getPreferenceName(inputId), Context.MODE_PRIVATE).edit()
-                .putLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, channelId).apply();
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putString(PREF_KEY_LAST_SELECTED_TV_INPUT, inputId).apply();
-        PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putString(PREF_KEY_LAST_SELECTED_PHYS_TV_INPUT, physInputId).apply();
+                .putString(PREF_KEY_LAST_WATCHED_CHANNEL_URI, channel.getUri().toString()).apply();
+        if (!channel.isPassthrough()) {
+            long channelId = channel.getId();
+            if (channel.getId() < 0) {
+                throw new IllegalArgumentException("channelId should be equal to or larger than 0");
+            }
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, channelId).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID_FOR_INPUT + channel.getInputId(),
+                            channelId).apply();
+        }
     }
 
     public static long getLastWatchedChannelId(Context context) {
-        String inputId = getLastSelectedInputId(context);
-        if (inputId == null) {
-            return Channel.INVALID_ID;
-        }
-        return getLastWatchedChannelId(context, inputId);
-    }
-
-    public static long getLastWatchedChannelId(Context context, String inputId) {
-        if (TextUtils.isEmpty(inputId)) {
-            throw new IllegalArgumentException("inputId cannot be empty");
-        }
-        return context.getSharedPreferences(getPreferenceName(inputId),
-                Context.MODE_PRIVATE).getLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, Channel.INVALID_ID);
-    }
-
-    public static String getLastSelectedInputId(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(PREF_KEY_LAST_SELECTED_TV_INPUT, null);
+                .getLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, Channel.INVALID_ID);
     }
 
-    public static String getLastSelectedPhysInputId(Context context) {
+    public static long getLastWatchedChannelIdForInput(Context context, String inputId) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(PREF_KEY_LAST_SELECTED_PHYS_TV_INPUT, null);
+                .getLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID_FOR_INPUT + inputId, Channel.INVALID_ID);
     }
 
-    public static Program getCurrentProgram(Context context, Uri channelUri) {
-        if (channelUri == null) {
+    public static String getLastWatchedChannelUri(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_KEY_LAST_WATCHED_CHANNEL_URI, null);
+    }
+
+    /**
+     * Returns {@code true}, if {@code uri} specifies an input, which is usually generated
+     * from {@link TvContract#buildChannelsUriForInput}.
+     */
+    public static boolean isChannelUriForInput(Uri uri) {
+        return isTvUri(uri) && PATH_CHANNEL.equals(uri.getPathSegments().get(0))
+                && !TextUtils.isEmpty(uri.getQueryParameter("input"));
+    }
+
+    /**
+     * Returns {@code true}, if {@code uri} is a channel URI for a specific channel. It is copied
+     * from the hidden method TvContract.isChannelUri.
+     */
+    public static boolean isChannelUriForOneChannel(Uri uri) {
+        return isChannelUriForTunerInput(uri) || TvContract.isChannelUriForPassthroughInput(uri);
+    }
+
+    /**
+     * Returns {@code true}, if {@code uri} is a channel URI for a tuner input. It is copied from
+     * the hidden method TvContract.isChannelUriForTunerInput.
+     */
+    public static boolean isChannelUriForTunerInput(Uri uri) {
+        return isTvUri(uri) && isTwoSegmentUriStartingWith(uri, PATH_CHANNEL);
+    }
+
+    private static boolean isTvUri(Uri uri) {
+        return uri != null && ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())
+                && TvContract.AUTHORITY.equals(uri.getAuthority());
+    }
+
+    private static boolean isTwoSegmentUriStartingWith(Uri uri, String pathSegment) {
+        List<String> pathSegments = uri.getPathSegments();
+        return pathSegments.size() == 2 && pathSegment.equals(pathSegments.get(0));
+    }
+
+    /**
+     * Returns {@code true}, if {@code uri} is a programs URI.
+     */
+    public static boolean isProgramsUri(Uri uri) {
+        return isTvUri(uri) && PATH_PROGRAM.equals(uri.getPathSegments().get(0));
+    }
+
+    /**
+     * Gets the info of the program on particular time.
+     */
+    public static Program getProgramAt(Context context, long channelId, long timeMs) {
+        if (channelId == Channel.INVALID_ID) {
+            Log.e(TAG, "getCurrentProgramAt - channelId is invalid");
             return null;
         }
-        long time = System.currentTimeMillis();
-        Uri uri = TvContract.buildProgramsUriForChannel(channelUri, time, time);
-        String[] projection = {
-                TvContract.Programs.COLUMN_TITLE,
-                TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
-                TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
-                TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS,
-                TvContract_Programs_COLUMN_VIDEO_RESOLUTION,
-                TvContract.Programs.COLUMN_CONTENT_RATING,
-                TvContract.Programs.COLUMN_POSTER_ART_URI,
-                TvContract.Programs.COLUMN_THUMBNAIL_URI };
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        String title = null;
-        String description = null;
-        long startTime = -1;
-        long endTime = -1;
-        String posterArtUri = null;
-        String thumbnailUri = null;
-        String videoDefinitionLevel = "";
-        String contentRatings = "";
-        if (cursor.moveToNext()) {
-            title = cursor.getString(0);
-            description = cursor.getString(1);
-            startTime = cursor.getLong(2);
-            endTime = cursor.getLong(3);
-            videoDefinitionLevel = cursor.getString(4);
-            contentRatings = cursor.getString(5);
-            posterArtUri = cursor.getString(6);
-            thumbnailUri = cursor.getString(7);
-        }
-        cursor.close();
-
-        // TODO: Consider providing the entire data if needed.
-        return new Program.Builder()
-                .setTitle(title)
-                .setDescription(description)
-                .setStartTimeUtcMillis(startTime)
-                .setEndTimeUtcMillis(endTime)
-                .setVideoDefinitionLevel(videoDefinitionLevel)
-                .setContentRatings(stringToContentRatings(contentRatings))
-                .setPosterArtUri(posterArtUri)
-                .setThumbnailUri(thumbnailUri).build();
-    }
-
-    public static void updateCurrentVideoResolution(Context context, Long channelId, int format) {
-        if (channelId == Channel.INVALID_ID) {
-            return;
-        }
-        Uri channelUri = TvContract.buildChannelUri(channelId);
-        long time = System.currentTimeMillis();
-        Uri uri = TvContract.buildProgramsUriForChannel(channelUri, time, time);
-        Cursor cursor = null;
-        String[] projection = { TvContract.Programs._ID };
-        long programId = Program.INVALID_ID;
-        try {
-            cursor = context.getContentResolver().query(uri, projection, null, null, null);
-            if (cursor == null || !cursor.moveToNext()) {
-                return;
-            }
-            programId = cursor.getLong(0);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
+        if (context.getMainLooper().getThread().equals(Thread.currentThread())) {
+            String message = "getCurrentProgramAt called on main thread";
+            if (DEBUG) {
+                // Generating a stack trace can be expensive, only do it in debug mode.
+                Log.w(TAG, message, new IllegalStateException(message));
+            } else {
+                Log.w(TAG, message);
             }
         }
-
-        String videoResolution = getVideoDefinitionLevelString(format);
-        if (TextUtils.isEmpty(videoResolution)) {
-            return;
-        }
-        Uri programUri = TvContract.buildProgramUri(programId);
-        ContentValues values = new ContentValues();
-        values.put(TvContract_Programs_COLUMN_VIDEO_RESOLUTION, videoResolution);
-        context.getContentResolver().update(programUri, values, null, null);
-    }
-
-    public static boolean hasChannel(Context context, TvInputInfo name) {
-        return hasChannel(context, name, true);
-    }
-
-    public static boolean hasChannel(Context context, TvInputInfo name, boolean browsableOnly) {
-        Uri uri = TvContract.buildChannelsUriForInput(name.getId(), browsableOnly);
-        String[] projection = { TvContract.Channels._ID };
-        Cursor cursor = null;
-        try {
-            cursor = context.getContentResolver().query(uri, projection, null, null, null);
-            return cursor != null && cursor.getCount() > 0;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
+        Uri uri = TvContract.buildProgramsUriForChannel(TvContract.buildChannelUri(channelId),
+                timeMs, timeMs);
+        try (Cursor cursor = context.getContentResolver().query(uri, Program.PROJECTION,
+                null, null, null)) {
+            if (cursor != null && cursor.moveToNext()) {
+                return Program.fromCursor(cursor);
             }
         }
+        return null;
     }
 
-    public static SharedPreferences getSharedPreferencesOfDisplayNameForInput(Context context) {
-        return context.getSharedPreferences(TvSettings.PREFS_FILE, Context.MODE_PRIVATE);
+    /**
+     * Gets the info of the current program.
+     */
+    public static Program getCurrentProgram(Context context, long channelId) {
+        return getProgramAt(context, channelId, System.currentTimeMillis());
     }
 
-    public static String getDisplayNameForInput(Context context, TvInputInfo info) {
-        SharedPreferences preferences = getSharedPreferencesOfDisplayNameForInput(context);
-        return preferences.getString(TvSettings.PREF_DISPLAY_INPUT_NAME + info.getId(),
-                info.loadLabel(context).toString());
+    /**
+     * Returns duration string according to the date & time format.
+     * If {@code startUtcMillis} and {@code endUtcMills} are equal,
+     * formatted time will be returned instead.
+     *
+     * @param startUtcMillis start of duration in millis. Should be less than {code endUtcMillis}.
+     * @param endUtcMillis end of duration in millis. Should be larger than {@code startUtcMillis}.
+     * @param useShortFormat {@code true} if abbreviation is needed to save space.
+     *                       In that case, date will be omitted if duration starts from today
+     *                       and is less than a day. If it's necessary,
+     *                       {@link DateUtils#FORMAT_NUMERIC_DATE} is used otherwise.
+     */
+    public static String getDurationString(
+            Context context, long startUtcMillis, long endUtcMillis, boolean useShortFormat) {
+        return getDurationString(context, System.currentTimeMillis(),
+                startUtcMillis, endUtcMillis, useShortFormat, 0);
     }
 
-    public static boolean hasActivity(Context context, TvInputInfo input, String action) {
-        return getActivityInfo(context, input, action) != null;
+    @VisibleForTesting
+    static String getDurationString(Context context, long baseMillis,
+            long startUtcMillis, long endUtcMillis, boolean useShortFormat, int flag) {
+        flag |= DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_TIME
+                | ((useShortFormat) ? DateUtils.FORMAT_NUMERIC_DATE : 0);
+        if (!isInGivenDay(baseMillis, startUtcMillis)) {
+            flag |= DateUtils.FORMAT_SHOW_DATE;
+        }
+        if (startUtcMillis != endUtcMillis && useShortFormat) {
+            // Do special handling for 12:00 AM when checking if it's in the given day.
+            // If it's start, it's considered as beginning of the day. (e.g. 12:00 AM - 12:30 AM)
+            // If it's end, it's considered as end of the day (e.g. 11:00 PM - 12:00 AM)
+            if (!isInGivenDay(startUtcMillis, endUtcMillis - 1)
+                    && endUtcMillis - startUtcMillis < TimeUnit.HOURS.toMillis(11)) {
+                // Do not show date for short format.
+                // Extracting a day is needed because {@link DateUtils@formatDateRange}
+                // adds date if the duration covers multiple days.
+                return DateUtils.formatDateRange(context,
+                        startUtcMillis, endUtcMillis - TimeUnit.DAYS.toMillis(1), flag);
+            }
+        }
+        return DateUtils.formatDateRange(context, startUtcMillis, endUtcMillis, flag);
+    }
+
+    @VisibleForTesting
+    public static boolean isInGivenDay(long dayToMatchInMillis, long subjectTimeInMillis) {
+        final long DAY_IN_MS = TimeUnit.DAYS.toMillis(1);
+        TimeZone timeZone = Calendar.getInstance().getTimeZone();
+        long offset = timeZone.getRawOffset();
+        if (timeZone.inDaylightTime(new Date(dayToMatchInMillis))) {
+            offset += timeZone.getDSTSavings();
+        }
+        return Utils.floorTime(dayToMatchInMillis + offset, DAY_IN_MS)
+                == Utils.floorTime(subjectTimeInMillis + offset, DAY_IN_MS);
     }
 
     public static String getAspectRatioString(int width, int height) {
@@ -302,32 +331,101 @@ public class Utils {
         return StreamInfo.VIDEO_DEFINITION_LEVEL_UNKNOWN;
     }
 
-    public static String getVideoDefinitionLevelString(int videoFormat) {
+    public static String getVideoDefinitionLevelString(Context context, int videoFormat) {
         switch (videoFormat) {
             case StreamInfo.VIDEO_DEFINITION_LEVEL_ULTRA_HD:
-                return "Ultra HD";
+                return context.getResources().getString(
+                        R.string.video_definition_level_ultra_hd);
             case StreamInfo.VIDEO_DEFINITION_LEVEL_FULL_HD:
-                return "Full HD";
+                return context.getResources().getString(
+                        R.string.video_definition_level_full_hd);
             case StreamInfo.VIDEO_DEFINITION_LEVEL_HD:
-                return "HD";
+                return context.getResources().getString(R.string.video_definition_level_hd);
             case StreamInfo.VIDEO_DEFINITION_LEVEL_SD:
-                return "SD";
+                return context.getResources().getString(R.string.video_definition_level_sd);
         }
         return "";
     }
 
-    public static String getAudioChannelString(int channelCount) {
+    public static String getAudioChannelString(Context context, int channelCount) {
         switch (channelCount) {
             case 1:
-                return "MONO";
+                return context.getResources().getString(R.string.audio_channel_mono);
             case 2:
-                return "STEREO";
+                return context.getResources().getString(R.string.audio_channel_stereo);
             case 6:
-                return "5.1";
+                return context.getResources().getString(R.string.audio_channel_5_1);
             case 8:
-                return "7.1";
+                return context.getResources().getString(R.string.audio_channel_7_1);
         }
         return "";
+    }
+
+    public static boolean needToShowSampleRate(Context context, List<TvTrackInfo> tracks) {
+        Set<String> multiAudioStrings = new HashSet<>();
+        for (TvTrackInfo track : tracks) {
+            String multiAudioString = getMultiAudioString(context, track, false);
+            if (multiAudioStrings.contains(multiAudioString)) {
+                return true;
+            }
+            multiAudioStrings.add(multiAudioString);
+        }
+        return false;
+    }
+
+    public static String getMultiAudioString(Context context, TvTrackInfo track,
+            boolean showSampleRate) {
+        if (track.getType() != TvTrackInfo.TYPE_AUDIO) {
+            throw new IllegalArgumentException("Not an audio track: " + track);
+        }
+        String language = context.getString(R.string.default_language);
+        if (track.getLanguage() != null) {
+            language = new Locale(track.getLanguage()).getDisplayName();
+        }
+
+        StringBuilder metadata = new StringBuilder();
+        switch (track.getAudioChannelCount()) {
+            case AUDIO_CHANNEL_NONE:
+                break;
+            case AUDIO_CHANNEL_MONO:
+                metadata.append(context.getString(R.string.multi_audio_channel_mono));
+                break;
+            case AUDIO_CHANNEL_STEREO:
+                metadata.append(context.getString(R.string.multi_audio_channel_stereo));
+                break;
+            case AUDIO_CHANNEL_SURROUND_6:
+                metadata.append(context.getString(R.string.multi_audio_channel_surround_6));
+                break;
+            case AUDIO_CHANNEL_SURROUND_8:
+                metadata.append(context.getString(R.string.multi_audio_channel_surround_8));
+                break;
+            default:
+                metadata.append(context.getString(R.string.multi_audio_channel_suffix,
+                        track.getAudioChannelCount()));
+                break;
+        }
+        if (showSampleRate) {
+            int sampleRate = track.getAudioSampleRate();
+            if (sampleRate > 0) {
+                if (metadata.length() > 0) {
+                    metadata.append(", ");
+                }
+                int integerPart = sampleRate / 1000;
+                int tenths = (sampleRate % 1000) / 100;
+                metadata.append(integerPart);
+                if (tenths != 0) {
+                    metadata.append(".");
+                    metadata.append(tenths);
+                }
+                metadata.append("kHz");
+            }
+        }
+
+        if (metadata.length() == 0) {
+            return language;
+        }
+        return context.getString(R.string.multi_audio_display_string_with_channel, language,
+                metadata.toString());
     }
 
     public static TvContentRating[] stringToContentRatings(String commaSeparatedRatings) {
@@ -335,11 +433,16 @@ public class Utils {
             return null;
         }
         String[] ratings = commaSeparatedRatings.split("\\s*,\\s*");
-        TvContentRating[] contentRatings = new TvContentRating[ratings.length];
-        for (int i = 0; i < contentRatings.length; ++i) {
-            contentRatings[i] = TvContentRating.unflattenFromString(ratings[i]);
+        List<TvContentRating> contentRatings = new ArrayList<>();
+        for (String rating : ratings) {
+            try {
+                contentRatings.add(TvContentRating.unflattenFromString(rating));
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Can't parse the content rating: '" + rating + "'", e);
+            }
         }
-        return contentRatings;
+        return contentRatings.size() == 0 ?
+                null : contentRatings.toArray(new TvContentRating[contentRatings.size()]);
     }
 
     public static String contentRatingsToString(TvContentRating[] contentRatings) {
@@ -355,26 +458,90 @@ public class Utils {
         return ratings.toString();
     }
 
-    private static ActivityInfo getActivityInfo(Context context, TvInputInfo input, String action) {
+    public static boolean isEqualLanguage(String lang1, String lang2) {
+        if (lang1 == null) {
+            return lang2 == null;
+        } else if (lang2 == null) {
+            return false;
+        }
+        try {
+            return TextUtils.equals(
+                    new Locale(lang1).getISO3Language(), new Locale(lang2).getISO3Language());
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    public static boolean isIntentAvailable(Context context, Intent intent) {
+       return context.getPackageManager().queryIntentActivities(
+               intent, PackageManager.MATCH_DEFAULT_ONLY).size() > 0;
+    }
+
+    /**
+     * Returns the label for a given input. Returns the custom label, if any.
+     */
+    public static String loadLabel(Context context, TvInputInfo input) {
         if (input == null) {
             return null;
         }
-
-        List<ResolveInfo> infos = context.getPackageManager().queryIntentActivities(
-                new Intent(action), PackageManager.GET_ACTIVITIES);
-        if (infos == null) {
-            return null;
+        CharSequence customLabel = input.loadCustomLabel(context);
+        String label = (customLabel == null) ? null : customLabel.toString();
+        if (TextUtils.isEmpty(label)) {
+            label = input.loadLabel(context).toString();
         }
-
-        for (ResolveInfo info : infos) {
-            if (info.activityInfo.packageName.equals(input.getServiceInfo().packageName)) {
-                return info.activityInfo;
-            }
-        }
-        return null;
+        return label;
     }
 
-    private static String getPreferenceName(String inputId) {
-        return PREFIX_PREF_NAME + Base64.encodeToString(inputId.getBytes(), Base64.URL_SAFE);
+    /**
+     * Enable all channels synchronously.
+     */
+    public static void enableAllChannels(Context context) {
+        ContentValues values = new ContentValues();
+        values.put(Channels.COLUMN_BROWSABLE, 1);
+        context.getContentResolver().update(Channels.CONTENT_URI, values, null, null);
+    }
+
+    /**
+     * Converts time in milliseconds to a String.
+     */
+    public static String toTimeString(long timeMillis) {
+        return new Date(timeMillis).toString();
+    }
+
+    /**
+     * Returns a {@link String} object which contains the layout information of the {@code view}.
+     */
+    public static String toRectString(View view) {
+        return "{"
+                + "l=" + view.getLeft()
+                + ",r=" + view.getRight()
+                + ",t=" + view.getTop()
+                + ",b=" + view.getBottom()
+                + ",w=" + view.getWidth()
+                + ",h=" + view.getHeight() + "}";
+    }
+
+    /**
+     * Floors time to the given {@code timeUnit}. For example, if time is 5:32:11 and timeUnit is
+     * one hour (60 * 60 * 1000), then the output will be 5:00:00.
+     */
+    public static long floorTime(long timeMs, long timeUnit) {
+        return timeMs - (timeMs % timeUnit);
+    }
+
+    /**
+     * Ceils time to the given {@code timeUnit}. For example, if time is 5:32:11 and timeUnit is
+     * one hour (60 * 60 * 1000), then the output will be 6:00:00.
+     */
+    public static long ceilTime(long timeMs, long timeUnit) {
+        return timeMs + timeUnit - (timeMs % timeUnit);
+    }
+
+    /**
+     * Returns an {@link String#intern() interned} string or null if the input is null.
+     */
+    @Nullable
+    public static String intern(@Nullable String string) {
+        return string == null ? null : string.intern();
     }
 }

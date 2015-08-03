@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,66 +16,36 @@
 
 package com.android.tv.ui.sidepanel;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.view.View;
-import android.widget.TextView;
 
-import com.android.tv.R;
+public abstract class SubMenuItem extends ActionItem {
+    private final SideFragmentManager mSideFragmentManager;
 
-import java.util.List;
-
-public class SubMenuItem extends Item {
-    private final String mTitle;
-    private final FragmentManager mFragmentManager;
-    private TextView mTitleView;
-
-    public SubMenuItem(String title, FragmentManager fragmentManager) {
-        mTitle = title;
-        mFragmentManager = fragmentManager;
+    public SubMenuItem(String title, SideFragmentManager fragmentManager) {
+        this(title, null, 0, fragmentManager);
     }
 
-    @Override
-    protected int getResourceId() {
-        return R.layout.option_item_sub_menu;
+    public SubMenuItem(String title, String description, SideFragmentManager fragmentManager) {
+        this(title, description, 0, fragmentManager);
     }
 
-    @Override
-    protected void bind(View view) {
-        mTitleView = (TextView) view.findViewById(R.id.title);
-        mTitleView.setText(mTitle);
+    public SubMenuItem(String title, int iconId, SideFragmentManager fragmentManager) {
+        this(title, null, iconId, fragmentManager);
     }
 
-    @Override
-    protected void unbind() {
-        mTitleView = null;
+    public SubMenuItem(String title, String description, int iconId,
+            SideFragmentManager fragmentManager) {
+        super(title, description, iconId);
+        mSideFragmentManager = fragmentManager;
     }
 
     @Override
     protected void onSelected() {
-        mFragmentManager
-            .beginTransaction()
-            .add(R.id.right_panel, new SideFragment() {
-                @Override
-                protected String getTitle() {
-                    return SubMenuItem.this.getTitle();
-                }
-
-                @Override
-                protected List<Item> getItemList() {
-                    return SubMenuItem.this.getItemList();
-                }
-            })
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            .addToBackStack(null)
-            .commit();
+        launchFragment();
     }
 
-    protected String getTitle() {
-        return mTitle;
+    protected void launchFragment() {
+        mSideFragmentManager.show(getFragment());
     }
 
-    protected List<Item> getItemList() {
-        return null;
-    }
+    protected abstract SideFragment getFragment();
 }
