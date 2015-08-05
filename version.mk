@@ -57,8 +57,9 @@ code_version_major := $(shell echo $$(($(base_version_major)+3)))
 
 git_commit_count := $(shell git --git-dir $(LOCAL_PATH)/.git rev-list --since=$(base_version_since) --no-merges --count HEAD)
 git_commit_count_usb := $(shell git --git-dir $(LOCAL_PATH)/../UsbTunerTvInput/.git rev-list --since=$(base_version_since) --no-merges --count HEAD)
-code_version_build := $(shell printf "%03d" $$(($(git_commit_count)+$(git_commit_count_usb))))
-
+#code_version_build := $(shell printf "%03d" $$(($(git_commit_count)+$(git_commit_count_usb))))
+# TODO  http://b/22930520 version.mk sometimes goes backwards
+code_version_build := 570
 
 #####################################################
 #####################################################

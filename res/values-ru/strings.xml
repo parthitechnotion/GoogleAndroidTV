@@ -29,8 +29,8 @@
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"Воспроизведение/пауза"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"Перемотать вперед"</string>
     <string name="play_controls_description_fast_rewind" msgid="953488122681015803">"Перемотать назад"</string>
-    <string name="play_controls_description_skip_next" msgid="1603587562124694592">"Далее"</string>
-    <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"Назад"</string>
+    <string name="play_controls_description_skip_next" msgid="1603587562124694592">"Следующий"</string>
+    <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"Предыдущий"</string>
     <string name="channels_item_program_guide" msgid="2889807207930678418">"Телегид"</string>
     <string name="channels_item_setup" msgid="6557412175737379022">"Доступны новые каналы"</string>
     <string name="channels_item_app_link_no_app_link" msgid="1884830234777824408">"Ссылка не найдена"</string>

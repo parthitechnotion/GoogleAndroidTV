@@ -20,7 +20,6 @@ import static com.android.tv.testing.uihelper.Constants.FOCUSED_VIEW;
 import static com.android.tv.testing.uihelper.Constants.MENU;
 import static com.android.tv.testing.uihelper.UiDeviceAsserts.assertWaitForCondition;
 
-import android.os.Build;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiObject2;
@@ -34,7 +33,7 @@ import com.android.tv.testing.uihelper.DialogHelper;
 import com.android.tv.testing.uihelper.SidePanelHelper;
 
 @SmallTest
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.MNC)
+@SdkSuppress(minSdkVersion = 23)
 public class PlayControlsRowViewTest extends LiveChannelsTestCase {
     private static final int BUTTON_INDEX_PLAY_PAUSE = 2;
 

@@ -45,7 +45,7 @@ public final class TvCommonConstants {
     /**
      * A flag whether this platform is after MNC Preview or not.
      */
-    public static final boolean IS_MNC_OR_HIGHER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.MNC;
+    public static final boolean IS_MNC_OR_HIGHER = Build.VERSION.SDK_INT >= 23;
 
     /**
      * A flag whether this platform supports time shifting API or not.

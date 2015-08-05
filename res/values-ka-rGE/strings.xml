@@ -28,7 +28,7 @@
     <string name="play_controls_unavailable" msgid="8900698593131693148">"ამ არხისთვის არ არის ხელმისაწვდომი ჩართვის კონტროლი"</string>
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"დაკვრა ან პაუზა"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"წინ გადახვევა"</string>
-    <string name="play_controls_description_fast_rewind" msgid="953488122681015803">"გადახვევა"</string>
+    <string name="play_controls_description_fast_rewind" msgid="953488122681015803">"უკან გადახვევა"</string>
     <string name="play_controls_description_skip_next" msgid="1603587562124694592">"შემდეგი"</string>
     <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"წინა"</string>
     <string name="channels_item_program_guide" msgid="2889807207930678418">"პროგ. სახელმძღვანელო"</string>
