@@ -17,7 +17,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" msgid="1379381957730211484">"Live Channels"</string>
     <string name="audio_channel_mono" msgid="8812941280022167428">"mono"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"stereo"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Controlli riproduzione"</string>
@@ -159,7 +158,7 @@
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Canale bloccato"</string>
     <string name="episode_format" msgid="4881195874563241096">"Stag. <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Punt. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
     <string name="setup_title" msgid="7268875010986705651">"Fonti canale"</string>
-    <string name="setup_description" msgid="8728423605912915099">"Configura Live Channels dalle fonti disponibili. L\'operazione potrebbe richiedere diversi minuti a seconda della fonte del canale."</string>
+    <string name="setup_description" msgid="8728423605912915099">"Configura Live TV dalle fonti disponibili. L\'operazione potrebbe richiedere diversi minuti a seconda della fonte del canale."</string>
     <string name="setup_done_button_label" msgid="3488134953528237729">"Fine"</string>
   <plurals name="setup_input_channels">
     <item quantity="one" msgid="7847402892516958129">"%1$d canale disponibile"</item>
@@ -174,7 +173,7 @@
     <string name="msg_no_specific_input" msgid="2688885987104249852">"Impossibile trovare l\'ingresso TV"</string>
     <string name="msg_no_pip_support" msgid="161508628996629445">"Funzione PIP non supportata"</string>
     <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"Nessun ingresso disponibile per visualizzazione PIP"</string>
-    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"Tipo di sintonizzatore non adatto. Avvia l\'app Live Channels per l\'ingresso TV di tipo sintonizzatore."</string>
+    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"Tipo di sintonizzatore non adatto. Avvia l\'app Live TV per l\'ingresso TV di tipo sintonizzatore."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"Sintonizzazione non riuscita"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"Nessuna app trovata per gestire questa azione."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"Tutti i canali di origine sono nascosti.\nSeleziona almeno un canale da guardare."</string>

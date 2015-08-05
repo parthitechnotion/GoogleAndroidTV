@@ -11,7 +11,7 @@ import android.support.test.uiautomator.Until;
 import junit.framework.Assert;
 
 /**
- * Helper for testing the Live Channels Application.
+ * Helper for testing the Live TV Application.
  */
 public class LiveChannelsUiDeviceHelper extends BaseUiDeviceHelper {
     private static final int APPLICATION_START_TIMEOUT_MSEC = 500;

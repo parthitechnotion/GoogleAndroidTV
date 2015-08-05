@@ -17,7 +17,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" msgid="1379381957730211484">"Live Channels"</string>
     <string name="audio_channel_mono" msgid="8812941280022167428">"Mono"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"Stereo"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Wiedergabesteuerung"</string>
@@ -172,7 +171,7 @@
     <string name="msg_no_specific_input" msgid="2688885987104249852">"TV-Eingang konnte nicht gefunden werden."</string>
     <string name="msg_no_pip_support" msgid="161508628996629445">"PIP wird nicht unterstützt."</string>
     <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"Es ist kein Eingang für die PIP-Anzeige verfügbar."</string>
-    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"Tunertyp ungeeignet, bitte Live Channels App für TV-Eingang des Tunertyps starten"</string>
+    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"Tunertyp ungeeignet, bitte Live TV App für TV-Eingang des Tunertyps starten"</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"Fehler beim Einstellen"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"Für diese Aktion wurde keine App gefunden."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"Alle Quellkanäle sind ausgeblendet.\nWählen Sie mindestens einen Kanal aus, den Sie anschauen möchten."</string>

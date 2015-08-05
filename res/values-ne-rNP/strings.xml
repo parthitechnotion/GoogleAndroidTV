@@ -17,7 +17,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" msgid="1379381957730211484">"लाइभ च्यानलहरू"</string>
     <string name="audio_channel_mono" msgid="8812941280022167428">"मोनो"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"स्टेरियो"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"प्ले नियन्त्रणहरु"</string>
@@ -172,7 +171,7 @@
     <string name="msg_no_specific_input" msgid="2688885987104249852">"टिभी स्रोत भेटिएन लागेन"</string>
     <string name="msg_no_pip_support" msgid="161508628996629445">"PIP समर्थित छैन"</string>
     <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"PIP सँग देखाउन सकिने कुनै स्रोत उपलब्ध छैन।"</string>
-    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ट्यूनर प्रकार अनुपयुक्त। कृपया ट्यूनर प्रकार टिभी स्रोतको लागि Live Channels को अनुप्रयोग सुरु गर्नुहोस।"</string>
+    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ट्यूनर प्रकार अनुपयुक्त। कृपया ट्यूनर प्रकार टिभी स्रोतको लागि Live TV को अनुप्रयोग सुरु गर्नुहोस।"</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"ट्युन गर्न असफल"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"यो कार्य सम्हाल्न कुनै पनि अनुप्रयोग भेटिएन।"</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"सबै स्रोत च्यानलहरू लुकेको छन्। \n हेर्नको लागि कम्तिमा एक च्यानल चयन गर्नुहोस्।"</string>

@@ -27,14 +27,14 @@
     <string name="option_item_divider_font" translatable="false">@string/condensed_font</string>
 
     <!-- Name of application [CHAR LIMIT=NONE] -->
-    <string name="app_name">Live Channels</string>
+    <string name="app_name">Live TV</string>
 
     <!-- Title of an application permission, listed so the user can choose
         whether they want to allow the application to do this. -->
-    <string name="permlab_receiveInputEvent" translatable="false">receive input events from Live Channels app</string>
+    <string name="permlab_receiveInputEvent" translatable="false">receive input events from Live TV app</string>
     <!-- Description of an application permission, listed so the user can choose
         whether they want to allow the application to do this. -->
-    <string name="permdesc_receiveInputEvent" translatable="false">Allows the app to receive input events from Live Channels app</string>
+    <string name="permdesc_receiveInputEvent" translatable="false">Allows the app to receive input events from Live TV app</string>
 
     <!-- Program information, mainly used for channel banner and program guide. -->
     <eat-comment />
@@ -118,7 +118,7 @@
     <string name="options_item_channel_sources">Channel setup</string>
     <!-- Label of "Parental controls" item in the TV option row. [CHAR LIMIT=17] -->
     <string name="options_item_parental_controls">Parental controls</string>
-    <!-- Label of "About the Live Channels application" item in the TV option row. [CHAR LIMIT=17] -->
+    <!-- Label of "About the Live TV application" item in the TV option row. [CHAR LIMIT=17] -->
     <string name="options_item_about">About</string>
 
     <!-- Label of "Source" item in the PIP option row. The item enables the user to select
@@ -270,10 +270,10 @@
     <!-- Message when a channel item is clicked for channel auto-scan, but the input doesn't
          have auto-scan function. [CHAR LIMIT=NONE] -->
     <string name="msg_no_setup_activity">The input doesn\'t support auto-scan</string>
-    <!-- Error message when Live Channels app cannnot launch auto-scan activity due to the wrong information
+    <!-- Error message when Live TV app cannnot launch auto-scan activity due to the wrong information
          from the input. [CHAR LIMIT=NONE] -->
     <string name="msg_unable_to_start_setup_activity">Unable to start auto-scan for \'<xliff:g id="tv_input" example="Built-in Tuner">%s</xliff:g>\'</string>
-    <!-- Error message when Live Channels app cannnot launch the system-wide preferences for closed captions. [CHAR LIMIT=NONE] -->
+    <!-- Error message when Live TV app cannnot launch the system-wide preferences for closed captions. [CHAR LIMIT=NONE] -->
     <string name="msg_unable_to_start_system_captioning_settings">Unable to start the system-wide preferences for closed captions.</string>
     <!-- Message after some channels are added. [CHAR LIMIT=NONE] -->
     <plurals name="msg_channel_added">
@@ -396,7 +396,7 @@
 
     <!--  menu for "About" option -->
     <eat-comment />
-    <!--  Title of "About the Live Channels application" option. [CHAR LIMIT=30] -->
+    <!--  Title of "About the Live TV application" option. [CHAR LIMIT=30] -->
     <string name="side_panel_title_about">About</string>
     <!-- Menu item to show licenses for open source code used in the app [CHAR LIMIT=35] -->
     <string name="about_menu_licenses">Open source licenses</string>
@@ -469,7 +469,7 @@
          the source video through to the display and don't provide ability to tune to a specific
          channel unless the user directly controls the external source device (e.g. game console,
          DVD player, settop box, etc) that is connected to the TV. [CHAR LIMIT=NONE] -->
-    <string name="msg_not_passthrough_input">Tuner type not suitable. Please launch Live Channels app for tuner type TV input.</string>
+    <string name="msg_not_passthrough_input">Tuner type not suitable. Please launch Live TV app for tuner type TV input.</string>
     <!-- Error message when tune is failed. [CHAR LIMIT=NONE] -->
     <string name="msg_tune_failed">Tune failed</string>
     <!-- Error message when the user attempts an action (select TIS setup-activity, app-link,

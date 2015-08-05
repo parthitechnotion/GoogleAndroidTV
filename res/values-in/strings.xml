@@ -17,7 +17,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" msgid="1379381957730211484">"Saluran Siaran Langsung"</string>
     <string name="audio_channel_mono" msgid="8812941280022167428">"mono"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"stereo"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Kontrol pemutar"</string>

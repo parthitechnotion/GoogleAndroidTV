@@ -54,7 +54,7 @@ public class TvApplication extends Application {
             Log.w(TAG, "Unable to get version name.", e);
             versionName = "";
         }
-        if (DEBUG) Log.d(TAG, "Starting Live Channels " + versionName);
+        if (DEBUG) Log.d(TAG, "Starting Live TV " + versionName);
     }
 
     public Tracker getTracker() {

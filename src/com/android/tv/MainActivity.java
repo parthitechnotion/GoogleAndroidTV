@@ -120,7 +120,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The main activity for the Live Channels app.
+ * The main activity for the Live TV app.
  */
 public class MainActivity extends Activity implements AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "MainActivity";

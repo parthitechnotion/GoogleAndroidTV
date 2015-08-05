@@ -131,7 +131,7 @@ public class PlayControlsRowViewTest extends LiveChannelsTestCase {
         mDevice.pressKeyCode(KeyEvent.KEYCODE_MEDIA_PAUSE);
         mMenuHelper.assertWaitForMenu();
         assertButtonHasFocus(BUTTON_INDEX_PLAY_PAUSE);
-        // Press HOME twice to visit the home screen and return to Live Channels.
+        // Press HOME twice to visit the home screen and return to Live TV.
         mDevice.pressHome();
         // Wait until home screen is shown.
         mDevice.waitForIdle();

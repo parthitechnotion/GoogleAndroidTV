@@ -17,7 +17,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" msgid="1379381957730211484">"Live Channels"</string>
     <string name="audio_channel_mono" msgid="8812941280022167428">"मोनो"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"स्टीरियो"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"चलाने के नियंत्रण"</string>
@@ -172,7 +171,7 @@
     <string name="msg_no_specific_input" msgid="2688885987104249852">"टीवी इनपुट नहीं मिल पा रहा है"</string>
     <string name="msg_no_pip_support" msgid="161508628996629445">"PIP समर्थित नहीं है"</string>
     <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"कोई उपलब्ध इनपुट नहीं है जिसे PIP के साथ दिखाया जा सके"</string>
-    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ट्यूनर प्रकार उपयुक्‍त नहीं है. कृपया ट्यूनर प्रकार टीवी इनपुट के लिए Live Channels ऐप लॉन्‍च करें."</string>
+    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ट्यूनर प्रकार उपयुक्‍त नहीं है. कृपया ट्यूनर प्रकार टीवी इनपुट के लिए Live TV ऐप लॉन्‍च करें."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"ट्यून विफल रहा"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"यह कार्रवाई प्रबंधित करने के लिए कोई ऐप नहीं मिला."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"सभी स्रोत चैनल छिपे हुए हैं.\nदेखने के लिए कम से कम कोई एक चैनल चुनें."</string>
