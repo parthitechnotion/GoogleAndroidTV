@@ -68,7 +68,11 @@ public class SelectInputView extends VerticalGridView implements
             if (mSelectedInput == null
                     || TextUtils.equals(mSelectedInput.getId(), mCurrentInputId)
                     || (!mSelectedInput.isPassthroughInput() && mCurrentInputId == null)) {
-                mMainActivity.goToEmptyScene(true);
+                mMainActivity.getOverlayManager().hideOverlays(
+                        TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
                 return;
             }
             // TODO: pass english label to tracker http://b/22355024

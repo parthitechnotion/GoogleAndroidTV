@@ -18,6 +18,8 @@ package com.android.tv.data;
 import static android.media.tv.TvContract.Programs.Genres.COMEDY;
 import static android.media.tv.TvContract.Programs.Genres.FAMILY_KIDS;
 
+import android.test.suitebuilder.annotation.SmallTest;
+
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 /**
  * Tests for {@link Program}.
  */
+@SmallTest
 public class ProgramTest extends TestCase {
 
     private static final int NOT_FOUND_GENRE = 987;

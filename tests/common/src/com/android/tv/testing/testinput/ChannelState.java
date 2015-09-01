@@ -30,19 +30,19 @@ public class ChannelState {
     /**
      * The video track a channel has by default.
      */
-    public static TvTrackInfo DEFAULT_VIDEO_TRACK = Constants.FHD1080P50_VIDEO_TRACK;
+    public static final TvTrackInfo DEFAULT_VIDEO_TRACK = Constants.FHD1080P50_VIDEO_TRACK;
     /**
      * The video track a channel has by default.
      */
-    public static TvTrackInfo DEFAULT_AUDIO_TRACK = Constants.EN_STEREO_AUDIO_TRACK;
+    public static final TvTrackInfo DEFAULT_AUDIO_TRACK = Constants.EN_STEREO_AUDIO_TRACK;
     /**
-     * The channel is "tuned" and video availale.
+     * The channel is "tuned" and video available.
      *
      * @see #getTuneStatus()
      */
-    public static int TUNE_STATUS_VIDEO_AVAILABLE = -2;
+    public static final int TUNE_STATUS_VIDEO_AVAILABLE = -2;
 
-    private static int CHANNEL_VERSION_DEFAULT = 1;
+    private static final int CHANNEL_VERSION_DEFAULT = 1;
     /**
      * Default ChannelState with version @{value #CHANNEL_VERSION_DEFAULT} and default {@link
      * ChannelStateData}.

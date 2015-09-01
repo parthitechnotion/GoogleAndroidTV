@@ -35,9 +35,9 @@ import java.util.List;
  *
  * <pre>{@code
  * new ComparableTester<String>()
- *     .addEquivelentGroup("Hello", "HELLO")
- *     .addEquivelentGroup("World", "wORLD")
- *     .addEquivelentGroup("ZEBRA")
+ *     .addEquivalentGroup("Hello", "HELLO")
+ *     .addEquivalentGroup("World", "wORLD")
+ *     .addEquivalentGroup("ZEBRA")
  *     .test();
  * }
  * </pre>
@@ -49,7 +49,7 @@ public class ComparableTester<T extends Comparable<T>> {
     private final List<List<T>> listOfGroups = new ArrayList<>();
 
     @SafeVarargs
-    public final ComparableTester<T> addEquivelentGroup(T... items) {
+    public final ComparableTester<T> addEquivalentGroup(T... items) {
         listOfGroups.add(Arrays.asList(items));
         return this;
     }

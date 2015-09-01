@@ -52,7 +52,6 @@ public abstract class SafeDismissDialogFragment extends DialogFragment
         if (mDismissPending) {
             mDismissPending = false;
             dismiss();
-            return;
         }
     }
 

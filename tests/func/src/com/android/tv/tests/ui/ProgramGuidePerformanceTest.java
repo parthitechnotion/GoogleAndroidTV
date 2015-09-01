@@ -36,7 +36,7 @@ public class ProgramGuidePerformanceTest extends LiveChannelsTestCase {
     public void testShowMenu() {
         mLiveChannelsHelper.assertAppStarted();
         mMenuHelper.showMenu();
-        mMenuHelper.assertNavigateToMenuItem(mMenuHelper.getMenuTitleChannelsResId(),
+        mMenuHelper.assertNavigateToMenuItem(R.string.menu_title_channels,
                 R.string.channels_item_program_guide);
         //TODO: build a simple performance framework like JankTest
         long start = SystemClock.elapsedRealtime();

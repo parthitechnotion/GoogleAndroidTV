@@ -28,7 +28,7 @@ import com.android.tv.R;
 import com.android.tv.TimeShiftManager;
 import com.android.tv.TimeShiftManager.TimeShiftActionId;
 import com.android.tv.data.Program;
-import com.android.tv.menu.MenuView.MenuShowReason;
+import com.android.tv.menu.Menu.MenuShowReason;
 
 public class PlayControlsRowView extends MenuRowView {
     // Dimensions
@@ -36,7 +36,6 @@ public class PlayControlsRowView extends MenuRowView {
     private final int mTimeTextLeftMargin;
     private final int mTimelineWidth;
     // Views
-    private View mTitleView;
     private View mBackgroundView;
     private View mTimeIndicator;
     private TextView mTimeText;
@@ -91,7 +90,6 @@ public class PlayControlsRowView extends MenuRowView {
         super.onFinishInflate();
         // Clip the ViewGroup(body) to the rounded rectangle of outline.
         findViewById(R.id.body).setClipToOutline(true);
-        mTitleView = findViewById(R.id.title);
         mBackgroundView = findViewById(R.id.background);
         mTimeIndicator = findViewById(R.id.time_indicator);
         mTimeText = (TextView) findViewById(R.id.time_text);
@@ -159,18 +157,6 @@ public class PlayControlsRowView extends MenuRowView {
                 }
             }
         });
-        changeFocusableForDescendents(false);
-    }
-
-    private void changeFocusableForDescendents(boolean focusable) {
-        setFocusable(focusable);
-        setDescendantFocusability(focusable ? FOCUS_AFTER_DESCENDANTS : FOCUS_BLOCK_DESCENDANTS);
-    }
-
-    private void setRowEnable(boolean enable) {
-        setEnabled(enable);
-        changeFocusableForDescendents(enable);
-        mTitleView.setVisibility(enable ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void initializeButton(PlayControlsButton button, int imageResId,
@@ -250,11 +236,11 @@ public class PlayControlsRowView extends MenuRowView {
 
     private void onAvailabilityChanged() {
         if (mTimeShiftManager.isAvailable()) {
-            setRowEnable(true);
+            setEnabled(true);
             initializeTimeline();
             mBackgroundView.setEnabled(true);
         } else {
-            setRowEnable(false);
+            setEnabled(false);
             mBackgroundView.setEnabled(false);
         }
         updateAll();
@@ -269,31 +255,21 @@ public class PlayControlsRowView extends MenuRowView {
     private void updateMenuVisibility() {
         boolean keepMenuVisible =
                 mTimeShiftManager.isAvailable() && !mTimeShiftManager.isNormalPlaying();
-        getMenuView().setKeepVisible(keepMenuVisible);
+        getMenu().setKeepVisible(keepMenuVisible);
     }
 
     @Override
-    public void updateView(boolean withAnimation) {
-        super.updateView(withAnimation);
+    public void onSelected(boolean showTitle) {
+        super.onSelected(showTitle);
         updateAll();
         postHideRippleAnimation();
-    }
-
-    @Override
-    protected float getTitleScaleSelected() {
-        return 1.0f;
-    }
-
-    @Override
-    protected float getTitleAlphaSelected() {
-        return 0.0f;
     }
 
     @Override
     public void initialize(@MenuShowReason int reason) {
         super.initialize(reason);
         switch (reason) {
-            case MenuView.REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS:
+            case Menu.REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS:
                 if (mTimeShiftManager.isActionEnabled(
                         TimeShiftManager.TIME_SHIFT_ACTION_ID_JUMP_TO_PREVIOUS)) {
                     setInitialFocusView(mJumpPreviousButton);
@@ -301,7 +277,7 @@ public class PlayControlsRowView extends MenuRowView {
                     setInitialFocusView(mPlayPauseButton);
                 }
                 break;
-            case MenuView.REASON_PLAY_CONTROLS_REWIND:
+            case Menu.REASON_PLAY_CONTROLS_REWIND:
                 if (mTimeShiftManager.isActionEnabled(
                         TimeShiftManager.TIME_SHIFT_ACTION_ID_REWIND)) {
                     setInitialFocusView(mRewindButton);
@@ -309,7 +285,7 @@ public class PlayControlsRowView extends MenuRowView {
                     setInitialFocusView(mPlayPauseButton);
                 }
                 break;
-            case MenuView.REASON_PLAY_CONTROLS_FAST_FORWARD:
+            case Menu.REASON_PLAY_CONTROLS_FAST_FORWARD:
                 if (mTimeShiftManager.isActionEnabled(
                         TimeShiftManager.TIME_SHIFT_ACTION_ID_FAST_FORWARD)) {
                     setInitialFocusView(mFastForwardButton);
@@ -317,7 +293,7 @@ public class PlayControlsRowView extends MenuRowView {
                     setInitialFocusView(mPlayPauseButton);
                 }
                 break;
-            case MenuView.REASON_PLAY_CONTROLS_JUMP_TO_NEXT:
+            case Menu.REASON_PLAY_CONTROLS_JUMP_TO_NEXT:
                 if (mTimeShiftManager.isActionEnabled(
                         TimeShiftManager.TIME_SHIFT_ACTION_ID_JUMP_TO_NEXT)) {
                     setInitialFocusView(mJumpNextButton);
@@ -325,9 +301,9 @@ public class PlayControlsRowView extends MenuRowView {
                     setInitialFocusView(mPlayPauseButton);
                 }
                 break;
-            case MenuView.REASON_PLAY_CONTROLS_PLAY_PAUSE:
-            case MenuView.REASON_PLAY_CONTROLS_PLAY:
-            case MenuView.REASON_PLAY_CONTROLS_PAUSE:
+            case Menu.REASON_PLAY_CONTROLS_PLAY_PAUSE:
+            case Menu.REASON_PLAY_CONTROLS_PLAY:
+            case Menu.REASON_PLAY_CONTROLS_PAUSE:
             default:
                 setInitialFocusView(mPlayPauseButton);
                 break;

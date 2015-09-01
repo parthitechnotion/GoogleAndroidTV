@@ -87,9 +87,9 @@ public class LauncherActivity extends Activity {
         // We should launch the new activity in onCreate rather than in onStart.
         // That's because it is not guaranteed that onStart is called only once.
         Intent intent = getIntent().getParcelableExtra(EXTRA_INTENT);
-        boolean requstResult = getIntent().getBooleanExtra(EXTRA_REQUEST_RESULT, false);
+        boolean requestResult = getIntent().getBooleanExtra(EXTRA_REQUEST_RESULT, false);
         try {
-            if (requstResult) {
+            if (requestResult) {
                 startActivityForResult(intent, REQUEST_START_ACTIVITY);
             } else {
                 startActivity(intent);

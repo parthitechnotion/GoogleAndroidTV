@@ -31,13 +31,17 @@ import android.media.tv.TvInputInfo;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseLongArray;
 import android.view.View;
 
 import com.android.tv.R;
+import com.android.tv.TvApplication;
+import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.util.BitmapUtils;
@@ -59,8 +63,13 @@ public class NotificationService extends Service implements Recommender.Listener
     public static final String ACTION_HIDE_RECOMMENDATION =
             "com.android.tv.notification.ACTION_HIDE_RECOMMENDATION";
 
-    private static final String TUNE_PARAMS_RECOMMENDATION_TYPE =
+    /**
+     * Recommendation intent has an extra data for the recommendation type. It'll be also
+     * sent to a TV input as a tune parameter.
+     */
+    public static final String TUNE_PARAMS_RECOMMENDATION_TYPE =
             "com.android.tv.recommendation_type";
+
     private static final String TYPE_RANDOM_RECOMMENDATION = "random";
     private static final String TYPE_ROUTINE_WATCH_RECOMMENDATION = "routine_watch";
     private static final String TYPE_ROUTINE_WATCH_AND_FAVORITE_CHANNEL_RECOMMENDATION =
@@ -132,64 +141,50 @@ public class NotificationService extends Service implements Recommender.Listener
                 getResources().getDimensionPixelOffset(R.dimen.notif_ch_logo_padding_bottom);
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mTvInputManagerHelper = new TvInputManagerHelper(this);
-        mTvInputManagerHelper.start();
-
+        mTvInputManagerHelper = ((TvApplication) getApplicationContext()).getTvInputManagerHelper();
         mHandlerThread = new HandlerThread("tv notification");
         mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case MSG_INITIALIZE_RECOMMENDER: {
-                        mRecommender = new Recommender(
-                                NotificationService.this, NotificationService.this, true);
-                        if (TYPE_RANDOM_RECOMMENDATION.equals(mRecommendationType)) {
-                            mRecommender.registerEvaluator(new RandomEvaluator());
-                        } else if (TYPE_ROUTINE_WATCH_RECOMMENDATION.equals(mRecommendationType)) {
-                            mRecommender.registerEvaluator(new RoutineWatchEvaluator());
-                        } else if (TYPE_ROUTINE_WATCH_AND_FAVORITE_CHANNEL_RECOMMENDATION.equals(
-                                mRecommendationType)) {
-                            mRecommender.registerEvaluator(
-                                    new FavoriteChannelEvaluator(), 0.5, 0.5);
-                            mRecommender.registerEvaluator(new RoutineWatchEvaluator(), 1.0, 1.0);
-                        } else {
-                            throw new IllegalStateException("Undefined recommendation type: "
-                                    + mRecommendationType);
-                        }
-                    }
-                    case MSG_SHOW_RECOMMENDATION: {
-                        if (!mRecommender.isReady()) {
-                            mShowRecommendationAfterRecommenderReady = true;
-                        } else {
-                            showRecommendation();
-                        }
-                        break;
-                    }
-                    case MSG_UPDATE_RECOMMENDATION: {
-                        int notificationId = msg.arg1;
-                        Channel channel = ((Channel) msg.obj);
-                        if (mNotificationChannels[notificationId] == Channel.INVALID_ID
-                                || !sendNotification(channel.getId(), notificationId)) {
-                            changeRecommendation(notificationId);
-                        }
-                        break;
-                    }
-                    case MSG_HIDE_RECOMMENDATION: {
-                        if (!mRecommender.isReady()) {
-                            mShowRecommendationAfterRecommenderReady = false;
-                        } else {
-                            hideAllRecommendation();
-                        }
-                        break;
-                    }
-                    default: {
-                        super.handleMessage(msg);
-                    }
-                }
-            }
-        };
+        mHandler = new NotificationHandler(mHandlerThread.getLooper(), this);
         mHandler.sendEmptyMessage(MSG_INITIALIZE_RECOMMENDER);
+    }
+
+    private void handleInitializeRecommender() {
+        mRecommender = new Recommender(NotificationService.this, NotificationService.this, true);
+        if (TYPE_RANDOM_RECOMMENDATION.equals(mRecommendationType)) {
+            mRecommender.registerEvaluator(new RandomEvaluator());
+        } else if (TYPE_ROUTINE_WATCH_RECOMMENDATION.equals(mRecommendationType)) {
+            mRecommender.registerEvaluator(new RoutineWatchEvaluator());
+        } else if (TYPE_ROUTINE_WATCH_AND_FAVORITE_CHANNEL_RECOMMENDATION
+                .equals(mRecommendationType)) {
+            mRecommender.registerEvaluator(new FavoriteChannelEvaluator(), 0.5, 0.5);
+            mRecommender.registerEvaluator(new RoutineWatchEvaluator(), 1.0, 1.0);
+        } else {
+            throw new IllegalStateException(
+                    "Undefined recommendation type: " + mRecommendationType);
+        }
+    }
+
+    private void handleShowRecommendation() {
+        if (!mRecommender.isReady()) {
+            mShowRecommendationAfterRecommenderReady = true;
+        } else {
+            showRecommendation();
+        }
+    }
+
+    private void handleUpdateRecommendation(int notificationId, Channel channel) {
+        if (mNotificationChannels[notificationId] == Channel.INVALID_ID || !sendNotification(
+                channel.getId(), notificationId)) {
+            changeRecommendation(notificationId);
+        }
+    }
+
+    private void handleHideRecommendation() {
+        if (!mRecommender.isReady()) {
+            mShowRecommendationAfterRecommenderReady = false;
+        } else {
+            hideAllRecommendation();
+        }
     }
 
     @Override
@@ -455,5 +450,38 @@ public class NotificationService extends Service implements Recommender.Listener
             }
         }
         return -1;
+    }
+
+    private static class NotificationHandler extends WeakHandler<NotificationService> {
+        public NotificationHandler(@NonNull Looper looper, NotificationService ref) {
+            super(looper, ref);
+        }
+
+        @Override
+        public void handleMessage(Message msg, @NonNull NotificationService notificationService) {
+            switch (msg.what) {
+                case MSG_INITIALIZE_RECOMMENDER: {
+                    notificationService.handleInitializeRecommender();
+                    break;
+                }
+                case MSG_SHOW_RECOMMENDATION: {
+                    notificationService.handleShowRecommendation();
+                    break;
+                }
+                case MSG_UPDATE_RECOMMENDATION: {
+                    int notificationId = msg.arg1;
+                    Channel channel = ((Channel) msg.obj);
+                    notificationService.handleUpdateRecommendation(notificationId, channel);
+                    break;
+                }
+                case MSG_HIDE_RECOMMENDATION: {
+                    notificationService.handleHideRecommendation();
+                    break;
+                }
+                default: {
+                    super.handleMessage(msg);
+                }
+            }
+        }
     }
 }

@@ -37,6 +37,7 @@ import com.android.tv.util.FakeClock;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -257,17 +258,18 @@ public class ProgramDataManagerTest extends AndroidTestCase {
         private final int index;
         private final long startTimeMs;
         private final ProgramInfo programInfo;
+
         public ProgramInfoWrapper(int index, long startTimeMs, ProgramInfo programInfo) {
             this.index = index;
             this.startTimeMs = startTimeMs;
             this.programInfo = programInfo;
         }
     }
-    
+
     // This implements the minimal methods in content resolver
     // and detailed assumptions are written in each method.
     private class FakeContentProvider extends MockContentProvider {
-        private SparseArray<List<ProgramInfoWrapper>> mProgramInfoList = new SparseArray<>();
+        private final SparseArray<List<ProgramInfoWrapper>> mProgramInfoList = new SparseArray<>();
 
         /**
          * Constructor for FakeContentProvider
@@ -304,14 +306,8 @@ public class ProgramDataManagerTest extends AndroidTestCase {
             if (DEBUG) {
                 Log.d(TAG, "dump query");
                 Log.d(TAG, "  uri=" + uri);
-                if (projection == null || projection.length == 0) {
-                    Log.d(TAG, "  projection=" + projection);
-                } else {
-                    for (int i = 0; i < projection.length; i++) {
-                        Log.d(TAG, "  projection=" + projection[i]);
-                    }
-                }
-                Log.d(TAG,"  selection=" + selection);
+                Log.d(TAG, "  projection=" + Arrays.toString(projection));
+                Log.d(TAG, "  selection=" + selection);
             }
             long startTimeMs = Long.parseLong(uri.getQueryParameter(PARAM_START_TIME));
             long endTimeMs = Long.parseLong(uri.getQueryParameter(PARAM_END_TIME));
@@ -368,7 +364,7 @@ public class ProgramDataManagerTest extends AndroidTestCase {
     }
 
     private class FakeCursor extends MockCursor {
-        private String[] ALL_COLUMNS =  {
+        private final String[] ALL_COLUMNS =  {
                 TvContract.Programs.COLUMN_CHANNEL_ID,
                 TvContract.Programs.COLUMN_TITLE,
                 TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
@@ -409,9 +405,9 @@ public class ProgramDataManagerTest extends AndroidTestCase {
             mChannelId = channelId;
             mProgramPosition = -1;
             if (DEBUG) {
-                Log.d(TAG, "FakeCursor(columns=" + columns + ", channelId=" + channelId
-                        + ", startTimeMs=" + startTimeMs + ", endTimeMs=" + endTimeMs
-                        + ") has mCount=" + mCount);
+                Log.d(TAG, "FakeCursor(columns=" + Arrays.toString(columns)
+                        + ", channelId=" + channelId + ", startTimeMs=" + startTimeMs
+                        + ", endTimeMs=" + endTimeMs + ") has mCount=" + mCount);
             }
         }
 
@@ -519,7 +515,7 @@ public class ProgramDataManagerTest extends AndroidTestCase {
 
     private class TestProgramDataManagerOnCurrentProgramUpdatedListener implements
             OnCurrentProgramUpdatedListener {
-        public CountDownLatch currentProgramUpdatedLatch = new CountDownLatch(1);
+        public final CountDownLatch currentProgramUpdatedLatch = new CountDownLatch(1);
         public long updatedChannelId = -1;
         public Program updatedProgram = null;
 

@@ -19,6 +19,7 @@ package com.android.tv.util;
 import static com.android.tv.util.BitmapUtils.createScaledBitmapInfo;
 
 import android.graphics.Bitmap;
+import android.test.suitebuilder.annotation.MediumTest;
 
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
 
@@ -27,8 +28,8 @@ import junit.framework.TestCase;
 /**
  * Tests for {@link ImageCache}.
  */
+@MediumTest
 public class ImageCacheTest extends TestCase {
-
     private static final Bitmap ORIG = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565);
 
     private static final String KEY = "same";

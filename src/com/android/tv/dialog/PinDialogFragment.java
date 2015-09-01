@@ -120,8 +120,8 @@ public class PinDialogFragment extends SafeDismissDialogFragment {
         setStyle(STYLE_NO_TITLE, 0);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mDisablePinUntil = TvSettings.getDisablePinUntil(getActivity());
-        if (ActivityManager.isRunningInTestHarness()) {
-            // Skip PIN dialog half the time.
+        if (ActivityManager.isUserAMonkey()) {
+            // Skip PIN dialog half the time for monkeys
             if (Math.random() < 0.5) {
                 exit(PIN_DIALOG_RESULT_SUCCESS);
             }

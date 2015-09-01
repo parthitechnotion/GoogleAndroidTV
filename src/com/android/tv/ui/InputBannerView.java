@@ -34,7 +34,11 @@ public class InputBannerView extends LinearLayout implements TvTransitionManager
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
-            ((MainActivity) getContext()).goToEmptyScene(true);
+            ((MainActivity) getContext()).getOverlayManager().hideOverlays(
+                    TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
         }
     };
 

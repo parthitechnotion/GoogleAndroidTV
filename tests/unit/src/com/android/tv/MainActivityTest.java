@@ -51,6 +51,7 @@ public class MainActivityTest extends BaseMainActivityTestCase {
     public void testShowProgramGuide() throws Throwable {
         tuneToChannel(TvTestInputConstants.CH_2);
         showProgramGuide();
+        getInstrumentation().waitForIdleSync();
         assertChannelBannerShown(false);
         assertProgramGuide(true);
     }
@@ -70,8 +71,8 @@ public class MainActivityTest extends BaseMainActivityTestCase {
         assertEquals("Channel Name", displayName, channelNameView.getText());
     }
 
-    private View assertProgramGuide(boolean isShown) {
-        return assertViewIsShown("Program Guide", R.id.program_guide, isShown);
+    private void assertProgramGuide(boolean isShown) {
+        assertViewIsShown("Program Guide", R.id.program_guide, isShown);
     }
 
     private ChannelBannerView assertChannelBannerShown(boolean isShown) {

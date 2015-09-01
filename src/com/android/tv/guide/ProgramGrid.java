@@ -16,11 +16,16 @@
 
 package com.android.tv.guide;
 
+import com.android.tv.R;
+import com.android.tv.ui.OnRepeatedKeyInterceptListener;
+
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -69,12 +74,17 @@ public class ProgramGrid extends VerticalGridView {
     private int mFocusRangeLeft;
     private int mFocusRangeRight;
 
+    private final int mRowHeight;
+    private final int mDetailHeight;
+    private final int mSelectionRow;  // Row that is focused
+
     private View mLastFocusedView;
     private final Rect mTempRect = new Rect();
 
     private boolean mKeepCurrentProgram;
 
     private ChildFocusListener mChildFocusListener;
+    private OnRepeatedKeyInterceptListener mOnRepeatedKeyInterceptListener;
 
     interface ChildFocusListener {
         /**
@@ -103,6 +113,13 @@ public class ProgramGrid extends VerticalGridView {
         // E.g. when scrolling horizontally we would have to update rows above and below the current
         // view port even though they are not visible.
         setItemViewCacheSize(0);
+
+        Resources res = context.getResources();
+        mRowHeight = res.getDimensionPixelSize(R.dimen.program_guide_table_item_row_height);
+        mDetailHeight = res.getDimensionPixelSize(R.dimen.program_guide_table_detail_height);
+        mSelectionRow = res.getInteger(R.integer.program_guide_selection_row);
+        mOnRepeatedKeyInterceptListener = new OnRepeatedKeyInterceptListener(this);
+        setOnKeyInterceptListener(mOnRepeatedKeyInterceptListener);
     }
 
     /**
@@ -324,6 +341,25 @@ public class ProgramGrid extends VerticalGridView {
             }
         }
         return super.onRequestFocusInDescendants(direction, previouslyFocusedRect);
+    }
+
+    @Override
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        // It is required to properly handle OnRepeatedKeyInterceptListener. If the focused
+        // item's are at the almost end of screen, focus change to the next item doesn't work.
+        // It restricts that a focus item's position cannot be too far from the desired position.
+        View focusedView = findFocus();
+        if (focusedView != null && mOnRepeatedKeyInterceptListener.isFocusAccelerated()) {
+            int[] location = new int[2];
+            getLocationOnScreen(location);
+            int[] focusedLocation = new int[2];
+            focusedView.getLocationOnScreen(focusedLocation);
+            int y = focusedLocation[1] - location[1];
+            int minY = (mSelectionRow - 1) * mRowHeight;
+            if (y < minY) scrollBy(0, y - minY);
+            int maxY = (mSelectionRow + 1) * mRowHeight + mDetailHeight;
+            if (y > maxY) scrollBy(0, y - maxY);
+        }
     }
 
     private static void findFocusables(View v, ArrayList<View> outFocusable) {

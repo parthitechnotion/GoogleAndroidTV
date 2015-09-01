@@ -99,6 +99,11 @@ public class TvViewUiManager {
     private MarginLayoutParams mOldTvViewFrame;
     private ObjectAnimator mBackgroundAnimator;
     private int mBackgroundColor;
+    private int mAppliedDisplayedMode = DisplayMode.MODE_NOT_DEFINED;
+    private int mAppliedVideoWidth;
+    private int mAppliedVideoHeight;
+    private int mAppliedTvViewStartMargin;
+    private int mAppliedTvViewEndMargin;
 
     public TvViewUiManager(Context context, TunableTvView tvView, TunableTvView pipView,
             FrameLayout contentView, TvOptionsManager tvOptionManager) {
@@ -442,7 +447,7 @@ public class TvViewUiManager {
                 mBackgroundAnimator.setInterpolator(mFastOutLinearIn);
                 mBackgroundAnimator.start();
             }
-            // In the 'else'case (TV activity is getting out of the shrunken tv view mode and will
+            // In the 'else' case (TV activity is getting out of the shrunken tv view mode and will
             // have a pillar box), we keep the background color and don't show the animation.
         } else {
             mContentView.setBackgroundColor(color);
@@ -698,6 +703,19 @@ public class TvViewUiManager {
     }
 
     private void applyDisplayMode(int videoWidth, int videoHeight, boolean animate) {
+        if (mAppliedDisplayedMode == mDisplayMode
+                && mAppliedVideoWidth == videoWidth
+                && mAppliedVideoHeight == videoHeight
+                && mAppliedTvViewStartMargin == mTvViewStartMargin
+                && mAppliedTvViewEndMargin == mTvViewEndMargin) {
+            return;
+        } else {
+            mAppliedDisplayedMode = mDisplayMode;
+            mAppliedVideoHeight = videoHeight;
+            mAppliedVideoWidth = videoWidth;
+            mAppliedTvViewStartMargin = mTvViewStartMargin;
+            mAppliedTvViewEndMargin = mTvViewEndMargin;
+        }
         int availableAreaWidth = mScreenWidth - mTvViewStartMargin - mTvViewEndMargin;
         int availableAreaHeight = availableAreaWidth * mScreenHeight / mScreenWidth;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(0, 0,

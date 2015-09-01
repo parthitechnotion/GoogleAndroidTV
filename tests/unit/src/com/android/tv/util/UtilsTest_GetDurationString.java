@@ -17,10 +17,8 @@ package com.android.tv.util;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
-
 import android.text.format.DateUtils;
 
-import java.lang.Exception;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;

@@ -23,6 +23,7 @@ import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -208,11 +209,11 @@ public class ChannelLogoFetcher {
                     }
                     // Find the candidate names. If the channel name is CNN-HD, then find CNNHD
                     // and CNN. Or if the channel name is KQED+, then find KQED.
-                    String[] splittedNames = channelName.split(NAME_SEPARATOR_FOR_DB);
-                    if (splittedNames.length > 1) {
+                    String[] splitNames = channelName.split(NAME_SEPARATOR_FOR_DB);
+                    if (splitNames.length > 1) {
                         StringBuilder sb = new StringBuilder();
-                        for (String splittedName : splittedNames) {
-                            sb.append(splittedName);
+                        for (String splitName : splitNames) {
+                            sb.append(splitName);
                         }
                         logoUri = channelNameLogoUriMap.get(sb.toString());
                         if (DEBUG && TextUtils.isEmpty(logoUri)) {
@@ -220,10 +221,10 @@ public class ChannelLogoFetcher {
                         }
                     }
                     if (TextUtils.isEmpty(logoUri)
-                            && splittedNames[0].length() != channelName.length()) {
-                        logoUri = channelNameLogoUriMap.get(splittedNames[0]);
+                            && splitNames[0].length() != channelName.length()) {
+                        logoUri = channelNameLogoUriMap.get(splitNames[0]);
                         if (DEBUG && TextUtils.isEmpty(logoUri)) {
-                            Log.d(TAG, "Can't find a logo URI for channel '" + splittedNames[0]
+                            Log.d(TAG, "Can't find a logo URI for channel '" + splitNames[0]
                                     + "'");
                         }
                     }
@@ -262,6 +263,7 @@ public class ChannelLogoFetcher {
             return null;
         }
 
+        @WorkerThread
         private Map<String, String> readTmsFile(Context context, String fileName)
                 throws IOException {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -295,9 +297,9 @@ public class ChannelLogoFetcher {
                 // Find the candidate names.
                 // If the name is like "W05AAD (W05AA-D)", then split the names into "W05AAD" and
                 // "W05AA-D"
-                String[] splittedNames = channelName.split(NAME_SEPARATOR_FOR_TMS);
-                if (splittedNames.length > 1) {
-                    for (String name : splittedNames) {
+                String[] splitNames = channelName.split(NAME_SEPARATOR_FOR_TMS);
+                if (splitNames.length > 1) {
+                    for (String name : splitNames) {
                         name = name.trim();
                         if (channelNameLogoUriMap.get(name) == null) {
                             channelNameLogoUriMap.put(name, logoUri);

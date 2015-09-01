@@ -47,7 +47,7 @@ public class TestTvInputService extends TvInputService {
     private static final String TAG = "TestTvInputServices";
     private static final int REFRESH_DELAY_MS = 1000 / 5;
     private static final boolean DEBUG = false;
-    private TestInputControl mBackend = TestInputControl.getInstance();
+    private final TestInputControl mBackend = TestInputControl.getInstance();
 
     public static String buildInputId(Context context) {
         return TvContract.buildInputId(new ComponentName(context, TestTvInputService.class));

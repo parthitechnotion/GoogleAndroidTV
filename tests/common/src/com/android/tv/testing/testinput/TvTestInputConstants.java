@@ -28,7 +28,7 @@ public final class TvTestInputConstants {
      * <p> By convention Channel 1 should not be changed.  Test often start by tuning to this
      * channel.
      */
-    public static final ChannelInfo CH_1 = ChannelInfo.create(null, 1);
+    public static final ChannelInfo CH_1_DEFAULT_DONT_MODIFY = ChannelInfo.create(null, 1);
     /**
      * Channel 2.
      *

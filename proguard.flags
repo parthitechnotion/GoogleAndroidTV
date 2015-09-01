@@ -14,6 +14,36 @@
 # limitations under the License.
 #
 
+# Following libraries contain references to newer platform versions.
+# Don't warn about those in case this app is linking against an older
+# platform version.  We know about them, and they are safe.
+-dontwarn android.support.**
+-dontwarn com.ibm.icu.**
+-dontwarn com.google.android.exoplayer.**
+-dontwarn com.google.android.usbtuner.**
+-dontwarn com.google.android.tv.dvr.**
+
+# This is due to legacy API katniss is referencing. Seems safe.
+-dontwarn com.google.android.volley.**
+-dontwarn com.google.android.common.**
+
+# Keep the methods called from native code.
+-keepclasseswithmembers class com.google.android.usbtuner.UsbTunerInterface {
+    int openDvbFrontEndFd();
+    int openDvbDemuxFd();
+    int openDvbDvrFd();
+}
+-keepclasseswithmembers class com.google.android.usbtuner.*DataSource {
+    int readAt(long, byte[], int, int);
+    long getSize();
+    void close();
+}
+# For software AC3 decoding
+-keepclasseswithmembers class com.google.android.ssplayer.sink.FFmpegAc3Decoder {
+    long mNativeContext;
+    void decodeDone(java.nio.ByteBuffer, long);
+}
+
 # For tests
 -keep @android.support.annotation.VisibleForTesting class *
 -keepclasseswithmembers class * {

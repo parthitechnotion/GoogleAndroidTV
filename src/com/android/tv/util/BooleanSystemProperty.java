@@ -24,8 +24,13 @@ import java.util.List;
 
 /**
  * Lazy loaded boolean system property.
- * <p>
- * Set with  <code>adb shell setprop <em>key</em> <em>value</em></code> where value is
+ *
+ * <p>Set with  <code>adb shell setprop <em>key</em> <em>value</em></code> where:
+ * Values 'n', 'no', '0', 'false' or 'off' are considered false.
+ * Values 'y', 'yes', '1', 'true' or 'on' are considered true.
+ * (case sensitive). See <a href=
+ * "https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/os/SystemProperties.java"
+ * >android.os.SystemProperties.getBoolean</a>.
  */
 public final class BooleanSystemProperty {
     private final static String TAG = "BooleanSystemProperty";

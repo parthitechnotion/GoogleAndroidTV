@@ -20,8 +20,7 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"मोनो"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"स्टीरियो"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"चलाने के नियंत्रण"</string>
-    <string name="menu_title_channels" msgid="1949045451672990132">"चैनल"</string>
-    <string name="menu_title_channels_legacy" msgid="700324464656729334">"हाल ही के चैनल"</string>
+    <string name="menu_title_channels" msgid="1801845517674690003">"हाल ही के चैनल"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"टीवी विकल्प"</string>
     <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP विकल्‍प"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"इस चैनल के लिए चलाने के नियंत्रण अनुपलब्‍ध हैं"</string>

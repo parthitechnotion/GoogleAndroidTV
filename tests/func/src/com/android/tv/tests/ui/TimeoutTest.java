@@ -20,7 +20,6 @@ import static com.android.tv.testing.uihelper.UiDeviceAsserts.assertWaitForCondi
 
 import android.support.test.uiautomator.Until;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.test.suitebuilder.annotation.Suppress;
 
 import com.android.tv.R;
 import com.android.tv.testing.uihelper.Constants;
@@ -31,7 +30,6 @@ import com.android.tv.testing.uihelper.Constants;
  * <b>WARNING</b> some of these timeouts are 60 seconds. These tests will take a long time
  * complete.
  */
-@Suppress // TODO: b/20111741
 @LargeTest
 public class TimeoutTest extends LiveChannelsTestCase {
 

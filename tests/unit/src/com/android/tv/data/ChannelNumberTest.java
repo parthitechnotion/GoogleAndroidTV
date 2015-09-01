@@ -54,15 +54,17 @@ public class ChannelNumberTest extends TestCase {
      */
     public void testCompareTo() {
         new ComparableTester<ChannelNumber>()
-                .addEquivelentGroup(parseChannelNumber("1"), parseChannelNumber("1"))
-                .addEquivelentGroup(parseChannelNumber("2"))
-                .addEquivelentGroup(parseChannelNumber("2 1"), parseChannelNumber("2.1"),
+                .addEquivalentGroup(parseChannelNumber("1"), parseChannelNumber("1"))
+                .addEquivalentGroup(parseChannelNumber("2"))
+                .addEquivalentGroup(parseChannelNumber("2 1"), parseChannelNumber("2.1"),
                         parseChannelNumber("2-1"))
-                .addEquivelentGroup(parseChannelNumber("2-2"))
-                .addEquivelentGroup(parseChannelNumber("2-10"))
-                .addEquivelentGroup(parseChannelNumber("3"))
-                .addEquivelentGroup(parseChannelNumber("10"))
-                .addEquivelentGroup(parseChannelNumber("100"))
+                .addEquivalentGroup(parseChannelNumber("2-2"))
+                .addEquivalentGroup(parseChannelNumber("2-10"))
+                .addEquivalentGroup(parseChannelNumber("3"))
+                .addEquivalentGroup(parseChannelNumber("4"), parseChannelNumber("4 0"),
+                        parseChannelNumber("4.0"), parseChannelNumber("4-0"))
+                .addEquivalentGroup(parseChannelNumber("10"))
+                .addEquivalentGroup(parseChannelNumber("100"))
                 .test();
     }
 
@@ -70,7 +72,7 @@ public class ChannelNumberTest extends TestCase {
      * Test method for {@link ChannelNumber#compare(java.lang.String, java.lang.String)}.
      */
     public void testCompare() {
-        // Only need to test nulls, the reset is tested by testComparteTo
+        // Only need to test nulls, the reset is tested by testCompareTo
         assertEquals("compareTo(null,null)", 0, ChannelNumber.compare(null, null));
         assertEquals("compareTo(1,1)", 0, ChannelNumber.compare("1", "1"));
         assertEquals("compareTo(null,1)<0", true, ChannelNumber.compare(null, "1") < 0);

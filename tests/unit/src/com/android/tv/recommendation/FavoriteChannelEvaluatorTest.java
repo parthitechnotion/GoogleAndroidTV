@@ -16,12 +16,15 @@
 
 package com.android.tv.recommendation;
 
+import android.test.suitebuilder.annotation.SmallTest;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Unit tests for {@link FavoriteChannelEvaluator}.
  */
+@SmallTest
 public class FavoriteChannelEvaluatorTest extends EvaluatorTestCase<FavoriteChannelEvaluator> {
     private static final int DEFAULT_NUMBER_OF_CHANNELS = 4;
     private static final long DEFAULT_WATCH_START_TIME_MS =
@@ -30,6 +33,7 @@ public class FavoriteChannelEvaluatorTest extends EvaluatorTestCase<FavoriteChan
             System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
     private static final long DEFAULT_MAX_WATCH_DURATION_MS = TimeUnit.HOURS.toMillis(1);
 
+    @Override
     public FavoriteChannelEvaluator createEvaluator() {
         return new FavoriteChannelEvaluator();
     }

@@ -16,13 +16,14 @@
 
 package com.android.tv.ui;
 
-import android.animation.Animator;
 import android.animation.TimeInterpolator;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
@@ -32,18 +33,18 @@ import com.android.tv.dialog.FullscreenDialogFragment;
 
 public class FullscreenDialogView extends FrameLayout
         implements FullscreenDialogFragment.DialogView {
+    private static final String TAG = "FullscreenDialogView";
+    private static final boolean DEBUG = false;
+
     private static final int FADE_IN_DURATION_MS = 400;
-    private static final int FADE_OUT_DURATION_MS = 300;
+    private static final int FADE_OUT_DURATION_MS = 250;
     private static final int TRANSITION_INTERVAL_MS = 300;
 
     private MainActivity mActivity;
     private Dialog mDialog;
     private boolean mSkipEnterAlphaAnimation;
     private boolean mSkipExitAlphaAnimation;
-    private boolean mUseTranslationAnimation;
 
-    private final int mEnterTranslationX;
-    private final int mExitTranslationX;
     private final TimeInterpolator mLinearOutSlowIn;
     private final TimeInterpolator mFastOutLinearIn;
 
@@ -57,18 +58,18 @@ public class FullscreenDialogView extends FrameLayout
 
     public FullscreenDialogView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mEnterTranslationX = context.getResources().getInteger(
-                R.integer.fullscreen_dialog_enter_translation_x);
-        mExitTranslationX = context.getResources().getInteger(
-                R.integer.fullscreen_dialog_exit_translation_x);
         mLinearOutSlowIn = AnimationUtils.loadInterpolator(context,
                 android.R.interpolator.linear_out_slow_in);
         mFastOutLinearIn = AnimationUtils.loadInterpolator(context,
                 android.R.interpolator.fast_out_linear_in);
-    }
-
-    public void setTransitionAnimationEnabled(boolean enable) {
-        mUseTranslationAnimation = enable;
+        getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        startEnterAnimation();
+                    }
+                });
     }
 
     protected MainActivity getActivity() {
@@ -106,12 +107,6 @@ public class FullscreenDialogView extends FrameLayout
     @Override
     public void onDestroy() { }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        startEnterAnimation();
-    }
-
     /**
      * Transitions to another view inside the host {@link Dialog}.
      */
@@ -133,70 +128,45 @@ public class FullscreenDialogView extends FrameLayout
         });
     }
 
+    /**
+     * Called when an enter animation starts. Sub-view specific animation can be implemented.
+     */
+    protected void onStartEnterAnimation(TimeInterpolator interpolator, long duration) {
+    }
+
+    /**
+     * Called when an exit animation starts. Sub-view specific animation can be implemented.
+     */
+    protected void onStartExitAnimation(TimeInterpolator interpolator, long duration,
+            Runnable onAnimationEnded) {
+    }
+
     private void startEnterAnimation() {
-        View v = findViewById(R.id.container);
-        if (mUseTranslationAnimation) {
-            v.setTranslationX(mEnterTranslationX);
-            v.animate()
-                    .translationX(0)
-                    .setInterpolator(mLinearOutSlowIn)
-                    .setDuration(FADE_IN_DURATION_MS)
-                    .setListener(new HardwareLayerAnimatorListenerAdapter(this))
-                    .start();
-        }
+        if (DEBUG) Log.d(TAG, "start an enter animation");
+        View backgroundView = findViewById(R.id.background);
         if (!mSkipEnterAlphaAnimation) {
-            setAlpha(0);
-            animate()
+            backgroundView.setAlpha(0);
+            backgroundView.animate()
                     .alpha(1.0f)
                     .setInterpolator(mLinearOutSlowIn)
                     .setDuration(FADE_IN_DURATION_MS)
-                    .setListener(new HardwareLayerAnimatorListenerAdapter(this))
-                    .start();
-        } else {
-            v.setAlpha(0);
-            v.animate()
-                    .alpha(1.0f)
-                    .setInterpolator(mLinearOutSlowIn)
-                    .setDuration(FADE_IN_DURATION_MS)
-                    .setListener(new HardwareLayerAnimatorListenerAdapter(this))
+                    .withLayer()
                     .start();
         }
+        onStartEnterAnimation(mLinearOutSlowIn, FADE_IN_DURATION_MS);
     }
 
     private void startExitAnimation(final Runnable onAnimationEnded) {
-        View v = findViewById(R.id.container);
-        if (mUseTranslationAnimation) {
-            v.animate()
-                    .translationX(mExitTranslationX)
-                    .setInterpolator(mFastOutLinearIn)
-                    .setDuration(FADE_OUT_DURATION_MS)
-                    .setListener(new HardwareLayerAnimatorListenerAdapter(this))
-                    .start();
-        }
+        if (DEBUG) Log.d(TAG, "start an exit animation");
+        View backgroundView = findViewById(R.id.background);
         if (!mSkipExitAlphaAnimation) {
-            animate()
+            backgroundView.animate()
                     .alpha(0.0f)
                     .setInterpolator(mFastOutLinearIn)
                     .setDuration(FADE_OUT_DURATION_MS)
-                    .setListener(new HardwareLayerAnimatorListenerAdapter(this) {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            onAnimationEnded.run();
-                        }
-                    })
-                    .start();
-        } else {
-            v.animate()
-                    .alpha(0.0f)
-                    .setInterpolator(mFastOutLinearIn)
-                    .setDuration(FADE_OUT_DURATION_MS)
-                    .setListener(new HardwareLayerAnimatorListenerAdapter(this) {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            onAnimationEnded.run();
-                        }
-                    })
+                    .withLayer()
                     .start();
         }
+        onStartExitAnimation(mFastOutLinearIn, FADE_OUT_DURATION_MS, onAnimationEnded);
     }
 }

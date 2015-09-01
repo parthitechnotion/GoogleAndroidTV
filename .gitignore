@@ -1,3 +1,8 @@
+BuildConfig.java
+# Samples
+samples/SampleTvInput/
+
+# Eclipse
 bin/
 gen/
 obj/
@@ -6,3 +11,10 @@ obj/
 .project
 .classpath
 project.properties
+
+# Intellij
+out/
+.idea/
+*.iml
+*.iws
+build/

@@ -79,7 +79,11 @@ public class KeypadChannelSwitchView extends LinearLayout implements
                 mMainActivity.tuneToChannel(mSelectedChannel);
                 mTracker.sendChannelNumberItemChosenByTimeout();
             } else {
-                mMainActivity.goToEmptyScene(true);
+                mMainActivity.getOverlayManager().hideOverlays(
+                        TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
             }
         }
     };

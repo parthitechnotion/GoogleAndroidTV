@@ -26,5 +26,5 @@ public interface HasTrackerLabel {
     /**
      * Returns the label.
      */
-    public String getTrackerLabel();
+    String getTrackerLabel();
 }

@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.UiThread;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
@@ -73,7 +74,7 @@ public final class Channel {
     private static final String INVALID_PACKAGE_NAME = "packageName";
 
     private static final String[] PROJECTION_BASE = {
-        // Columns should match what is read in Channel.fromCursor()
+        // Columns must match what is read in Channel.fromCursor()
         TvContract.Channels._ID,
         TvContract.Channels.COLUMN_PACKAGE_NAME,
         TvContract.Channels.COLUMN_INPUT_ID,
@@ -99,7 +100,7 @@ public final class Channel {
     public static final String[] PROJECTION = createProjection();
 
     private static String[] createProjection() {
-        if (TvCommonConstants.IS_MNC_OR_HIGHER) {
+        if (Build.VERSION.SDK_INT >= 23) {
             ArrayList<String> temp = new ArrayList<>(
                     PROJECTION_BASE.length + PROJECTION_ADDED_IN_MNC.length);
             temp.addAll(Arrays.asList(PROJECTION_BASE));
@@ -108,6 +109,36 @@ public final class Channel {
         } else {
             return PROJECTION_BASE;
         }
+    }
+
+    /**
+     * Creates {@code Channel} object from cursor.
+     *
+     * <p>The query that created the cursor MUST use {@link #PROJECTION}
+     *
+     */
+    public static Channel fromCursor(Cursor cursor) {
+        // Columns read must match the order of {@link #PROJECTION}
+        Channel channel = new Channel();
+        int index = 0;
+        channel.mId = cursor.getLong(index++);
+        channel.mPackageName = Utils.intern(cursor.getString(index++));
+        channel.mInputId = Utils.intern(cursor.getString(index++));
+        channel.mType = Utils.intern(cursor.getString(index++));
+        channel.mDisplayNumber = cursor.getString(index++);
+        channel.mDisplayName = cursor.getString(index++);
+        channel.mDescription = cursor.getString(index++);
+        channel.mVideoFormat = Utils.intern(cursor.getString(index++));
+        channel.mBrowsable = cursor.getInt(index++) == 1;
+        channel.mLocked = cursor.getInt(index++) == 1;
+        if (Build.VERSION.SDK_INT >= 23) {
+            channel.mAppLinkText = cursor.getString(index++);
+            channel.mAppLinkColor = cursor.getInt(index++);
+            channel.mAppLinkIconUri = cursor.getString(index++);
+            channel.mAppLinkPosterArtUri = cursor.getString(index++);
+            channel.mAppLinkIntentUri = cursor.getString(index++);
+        }
+        return channel;
     }
 
     /** ID of this channel. Matches to BaseColumns._ID. */
@@ -133,105 +164,6 @@ public final class Channel {
 
     public interface LoadImageCallback {
         void onLoadImageFinished(Channel channel, int type, Bitmap logo);
-    }
-
-    /**
-     * Creates {@code Channel} object from cursor.
-     * Suppress using this outside of ChannelDataManager
-     * so Channels could be managed by ChannelDataManager.
-     */
-    public static Channel fromCursor(Cursor cursor) {
-        // Columns read here should match Channel.PROJECTION
-
-        Channel channel = new Channel();
-        int index = cursor.getColumnIndex(TvContract.Channels._ID);
-        if (index >= 0) {
-            channel.mId = cursor.getLong(index);
-        } else {
-            channel.mId = INVALID_ID;
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_PACKAGE_NAME);
-        if (index >= 0) {
-            channel.mPackageName = Utils.intern(cursor.getString(index));
-        } else {
-            channel.mPackageName = INVALID_PACKAGE_NAME;
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_INPUT_ID);
-        if (index >= 0) {
-            channel.mInputId = Utils.intern(cursor.getString(index));
-        } else {
-            channel.mInputId = "inputId";
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_TYPE);
-        if (index >= 0) {
-            channel.mType = Utils.intern(cursor.getString(index));
-        } else {
-            channel.mType = "type";
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NUMBER);
-        if (index >= 0) {
-            channel.mDisplayNumber = cursor.getString(index);
-        } else {
-            channel.mDisplayNumber = "0";
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DISPLAY_NAME);
-        if (index >= 0) {
-            channel.mDisplayName = cursor.getString(index);
-        } else {
-            channel.mDisplayName = "name";
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_DESCRIPTION);
-        if (index >= 0) {
-            channel.mDescription = cursor.getString(index);
-        } else {
-            channel.mDescription = "description";
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_VIDEO_FORMAT);
-        if (index >= 0) {
-            channel.mVideoFormat = Utils.intern(cursor.getString(index));
-        } else {
-            channel.mVideoFormat = "";
-        }
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_BROWSABLE);
-        channel.mBrowsable = index < 0 || cursor.getInt(index) == 1;
-
-        index = cursor.getColumnIndex(TvContract.Channels.COLUMN_LOCKED);
-        channel.mLocked = index < 0 || cursor.getInt(index) == 1;
-        if (TvCommonConstants.IS_MNC_OR_HIGHER) {
-            index = cursor.getColumnIndex(TvContract.Channels.COLUMN_APP_LINK_TEXT);
-            if (index >= 0) {
-                channel.mAppLinkText = cursor.getString(index);
-            }
-
-            index = cursor.getColumnIndex(TvContract.Channels.COLUMN_APP_LINK_COLOR);
-            if (index >= 0) {
-                channel.mAppLinkColor = cursor.getInt(index);
-            }
-
-            index = cursor.getColumnIndex(TvContract.Channels.COLUMN_APP_LINK_ICON_URI);
-            if (index >= 0) {
-                channel.mAppLinkIconUri = cursor.getString(index);
-            }
-
-            index = cursor.getColumnIndex(TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI);
-            if (index >= 0) {
-                channel.mAppLinkPosterArtUri = cursor.getString(index);
-            }
-
-            index = cursor.getColumnIndex(TvContract.Channels.COLUMN_APP_LINK_INTENT_URI);
-            if (index >= 0) {
-                channel.mAppLinkIntentUri = cursor.getString(index);
-            }
-        }
-        return channel;
     }
 
     private Channel() {
@@ -270,6 +202,7 @@ public final class Channel {
         return mDisplayName;
     }
 
+    @VisibleForTesting
     public String getDescription() {
         return mDescription;
     }
@@ -491,6 +424,7 @@ public final class Channel {
             return this;
         }
 
+        @VisibleForTesting
         public Builder setDescription(String description) {
             mChannel.mDescription = description;
             return this;
@@ -621,7 +555,7 @@ public final class Channel {
         PackageManager pm = context.getPackageManager();
         if (!TextUtils.isEmpty(mAppLinkText) && !TextUtils.isEmpty(mAppLinkIntentUri)) {
             try {
-                Intent intent = Intent.parseUri(mAppLinkIntentUri, 0);
+                Intent intent = Intent.parseUri(mAppLinkIntentUri, Intent.URI_INTENT_SCHEME);
                 if (intent.resolveActivityInfo(pm, 0) != null) {
                     mAppLinkIntent = intent;
                     mAppLinkIntent.putExtra(TvCommonConstants.EXTRA_APP_LINK_CHANNEL_URI,
@@ -673,35 +607,36 @@ public final class Channel {
 
         @Override
         public int compare(Channel lhs, Channel rhs) {
-            if (Objects.equals(lhs.getInputId(), rhs.getInputId())) {
-                // Compare the channel numbers if both channels belong to the same input.
-                int compare = ChannelNumber.compare(lhs.getDisplayNumber(), rhs.getDisplayNumber());
-                if (mDetectDuplicatesEnabled && compare == 0) {
-                    Log.w(TAG, "Duplicate channels detected! - \""
-                            + lhs.getDisplayNumber() + " " + lhs.getDisplayName() + "\" and \""
-                            + rhs.getDisplayNumber() + " " + rhs.getDisplayName() + "\"");
-                }
-                return compare;
-            } else {
-                // Put channels from OEM/SOC inputs first.
-                boolean lhsIsPartner = mInputManager.isPartnerInput(lhs.getInputId());
-                boolean rhsIsPartner = mInputManager.isPartnerInput(rhs.getInputId());
-                if (lhsIsPartner != rhsIsPartner) {
-                    return lhsIsPartner ? -1 : 1;
-                }
-
-                // Otherwise, compare the input labels.
-                String lhsLabel = getInputLabelForChannel(lhs);
-                String rhsLabel = getInputLabelForChannel(rhs);
-                if (lhsLabel == null && rhsLabel != null) {
-                    return 1;
-                } else if (lhsLabel != null && rhsLabel == null) {
-                    return -1;
-                } else if (lhsLabel == null /* && rhsLabel == null */) {
-                    return 0;
-                }
-                return lhsLabel.compareTo(rhsLabel);
+            if (lhs == rhs) {
+                return 0;
             }
+            // Put channels from OEM/SOC inputs first.
+            boolean lhsIsPartner = mInputManager.isPartnerInput(lhs.getInputId());
+            boolean rhsIsPartner = mInputManager.isPartnerInput(rhs.getInputId());
+            if (lhsIsPartner != rhsIsPartner) {
+                return lhsIsPartner ? -1 : 1;
+            }
+            // Compare the input labels.
+            String lhsLabel = getInputLabelForChannel(lhs);
+            String rhsLabel = getInputLabelForChannel(rhs);
+            int result = lhsLabel == null ? (rhsLabel == null ? 0 : 1) : rhsLabel == null ? -1
+                    : lhsLabel.compareTo(rhsLabel);
+            if (result != 0) {
+                return result;
+            }
+            // Compare the input IDs. The input IDs cannot be null.
+            result = lhs.getInputId().compareTo(rhs.getInputId());
+            if (result != 0) {
+                return result;
+            }
+            // Compare the channel numbers if both channels belong to the same input.
+            result = ChannelNumber.compare(lhs.getDisplayNumber(), rhs.getDisplayNumber());
+            if (mDetectDuplicatesEnabled && result == 0) {
+                Log.w(TAG, "Duplicate channels detected! - \""
+                        + lhs.getDisplayNumber() + " " + lhs.getDisplayName() + "\" and \""
+                        + rhs.getDisplayNumber() + " " + rhs.getDisplayName() + "\"");
+            }
+            return result;
         }
 
         @VisibleForTesting

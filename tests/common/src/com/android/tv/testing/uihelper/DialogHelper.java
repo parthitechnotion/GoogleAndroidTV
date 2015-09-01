@@ -26,9 +26,6 @@ import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.Until;
 
 import com.android.tv.R;
-import com.android.tv.testing.uihelper.BaseUiDeviceHelper;
-import com.android.tv.testing.uihelper.ByResource;
-import com.android.tv.testing.uihelper.Constants;
 
 /**
  * Helper for testing {@link DialogFragment}s.

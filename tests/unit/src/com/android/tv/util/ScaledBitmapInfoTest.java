@@ -2,14 +2,15 @@ package com.android.tv.util;
 
 import android.graphics.Bitmap;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
 
 /**
  * Tests for {@link ScaledBitmapInfo}.
  */
+@SmallTest
 public class ScaledBitmapInfoTest extends AndroidTestCase {
-
     private static final Bitmap B80x100 = Bitmap.createBitmap(80, 100, Bitmap.Config.RGB_565);
     private static final Bitmap B960x1440 = Bitmap.createBitmap(960, 1440, Bitmap.Config.RGB_565);
 

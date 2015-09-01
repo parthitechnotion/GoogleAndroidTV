@@ -233,7 +233,7 @@ public class BitmapUtils {
                     || size.bottom >= bitmap.getHeight() * 2);
             if (DEBUG) {
                 Log.d(TAG, "needToReload(" + reqWidth + ", " + reqHeight + ")=" + reload
-                        + " becuase the new size would be " + size + " for " + this);
+                        + " because the new size would be " + size + " for " + this);
             }
             return reload;
         }

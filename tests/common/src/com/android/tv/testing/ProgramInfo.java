@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public final class ProgramInfo {
@@ -70,8 +71,8 @@ public final class ProgramInfo {
     private static long DURATIONS_SUM_MS;
     static {
         DURATIONS_SUM_MS = 0;
-        for (int i = 0; i < DURATIONS_MS.length; i++) {
-            DURATIONS_SUM_MS += DURATIONS_MS[i];
+        for (long duration : DURATIONS_MS) {
+            DURATIONS_SUM_MS += duration;
         }
     }
 
@@ -210,6 +211,32 @@ public final class ProgramInfo {
         return "ProgramInfo{title=" + title
                 + ", episode=" + episode
                 + ", durationMs=" + durationMs + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ProgramInfo that = (ProgramInfo) o;
+        return Objects.equals(seasonNumber, that.seasonNumber) &&
+                Objects.equals(episodeNumber, that.episodeNumber) &&
+                Objects.equals(durationMs, that.durationMs) &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(episode, that.episode) &&
+                Objects.equals(posterArtUri, that.posterArtUri) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(genre, that.genre) &&
+                Objects.equals(contentRatings, that.contentRatings) &&
+                Objects.equals(resourceUri, that.resourceUri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, episode, seasonNumber, episodeNumber);
     }
 
     public static class Builder {

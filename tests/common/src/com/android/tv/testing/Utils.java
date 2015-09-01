@@ -16,7 +16,6 @@
 
 package com.android.tv.testing;
 
-import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -26,13 +25,19 @@ import android.media.tv.TvContentRating;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.net.Uri;
-import android.os.Build;
 import android.text.TextUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * An utility class for testing.
+ *
+ * <p>This class is also used to check whether TV app is running in tests or not.
+ *
+ * @see com.android.tv.util.Utils#isRunningInTest
+ */
 public class Utils {
     public static String getUriStringForResource(Context context, int resId) {
         if (resId == 0) {

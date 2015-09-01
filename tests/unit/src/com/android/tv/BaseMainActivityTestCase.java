@@ -25,6 +25,7 @@ import com.android.tv.testing.ChannelInfo;
 import com.android.tv.testing.testinput.ChannelStateData;
 import com.android.tv.testing.testinput.TestInputControlConnection;
 import com.android.tv.testing.testinput.TestInputControlUtils;
+import com.android.tv.testing.testinput.TvTestInputConstants;
 
 import java.util.List;
 
@@ -117,6 +118,11 @@ public abstract class BaseMainActivityTestCase
      * @param channel the channel to tune to
      */
     protected void updateThenTune(ChannelStateData data, ChannelInfo channel) {
+        if (channel.equals(TvTestInputConstants.CH_1_DEFAULT_DONT_MODIFY)) {
+            throw new IllegalArgumentException(
+                    "By convention " + TvTestInputConstants.CH_1_DEFAULT_DONT_MODIFY.name
+                            + " should not be modified.");
+        }
         mConnection.updateChannelState(channel, data);
         tuneToChannel(channel);
     }

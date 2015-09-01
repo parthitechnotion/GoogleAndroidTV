@@ -86,7 +86,7 @@ public class RecommendationUtils {
     }
 
     public static class ChannelRecordSortedMapHelper extends TreeMap<Long, ChannelRecord> {
-        private Context mContext;
+        private final Context mContext;
         private Recommender mRecommender;
         private Random mRandom = createTestRandom();
 

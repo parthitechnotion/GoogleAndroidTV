@@ -20,8 +20,7 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"单声道"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"立体声"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"播放控件"</string>
-    <string name="menu_title_channels" msgid="1949045451672990132">"频道"</string>
-    <string name="menu_title_channels_legacy" msgid="700324464656729334">"最近观看的频道"</string>
+    <string name="menu_title_channels" msgid="1801845517674690003">"最近观看的频道"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"电视选项"</string>
     <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP 选项"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"此频道无法使用播放控件"</string>

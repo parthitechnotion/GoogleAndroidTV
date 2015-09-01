@@ -36,6 +36,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.android.tv.analytics.StubTracker;
 import com.android.tv.testing.ChannelInfo;
 import com.android.tv.testing.Constants;
 import com.android.tv.util.TvInputManagerHelper;
@@ -44,6 +45,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -83,8 +85,8 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         mContentResolver.addProvider(TvContract.AUTHORITY, mContentProvider);
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
-        mChannelDataManager = new ChannelDataManager(
-                getContext(), mockHelper, mContentResolver, mHandlerThread.getLooper());
+        mChannelDataManager = new ChannelDataManager(getContext(), mockHelper, new StubTracker(),
+                mContentResolver, mHandlerThread.getLooper());
         mListener = new TestChannelDataManagerListener();
         mChannelDataManager.addListener(mListener);
 
@@ -171,7 +173,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     public void testBrowsable() throws Exception {
         startAndWaitForComplete();
 
-        // Test if all channels are browable
+        // Test if all channels are browsable
         List<Channel> channelList = new ArrayList<>(mChannelDataManager.getChannelList());
         List<Channel> browsableChannelList = mChannelDataManager.getBrowsableChannelList();
         for (Channel browsableChannel : browsableChannelList) {
@@ -276,7 +278,8 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         ChannelInfo testChannelInfo = ChannelInfo.create(getContext(), (int) testChannelId);
         testChannelId = Constants.UNIT_TEST_CHANNEL_COUNT + 1;
         mContentProvider.simulateInsert(testChannelInfo);
-        assertTrue(mListener.channeListUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(
+                mListener.channelListUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
         assertEquals(Constants.UNIT_TEST_CHANNEL_COUNT + 1, mChannelDataManager.getChannelCount());
 
         // Test channel update
@@ -286,9 +289,10 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         mChannelDataManager.addChannelListener(testChannelId, channelListener);
         String newName = testChannelInfo.name + "_test";
         mContentProvider.simulateUpdate(testChannelId, newName);
-        assertTrue(mListener.channeListUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
-        assertTrue(channelListener.channelChangedLatch.await(
-                WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(
+                mListener.channelListUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(
+                channelListener.channelChangedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
         assertEquals(0, channelListener.removedChannels.size());
         assertEquals(1, channelListener.updatedChannels.size());
         Channel updatedChannel = channelListener.updatedChannels.get(0);
@@ -302,9 +306,10 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         mListener.reset();
         channelListener.reset();
         mContentProvider.simulateDelete(testChannelId);
-        assertTrue(mListener.channeListUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
-        assertTrue(channelListener.channelChangedLatch.await(
-                WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(
+                mListener.channelListUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(
+                channelListener.channelChangedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
         assertEquals(1, channelListener.removedChannels.size());
         assertEquals(0, channelListener.updatedChannels.size());
         Channel removedChannel = channelListener.removedChannels.get(0);
@@ -344,7 +349,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     // This implements the minimal methods in content resolver
     // and detailed assumptions are written in each method.
     private class FakeContentProvider extends MockContentProvider {
-        private SparseArray<ChannelInfoWrapper> mChannelInfoList = new SparseArray<>();
+        private final SparseArray<ChannelInfoWrapper> mChannelInfoList = new SparseArray<>();
 
         public FakeContentProvider(Context context) {
             super(context);
@@ -365,14 +370,8 @@ public class ChannelDataManagerTest extends AndroidTestCase {
             if (DEBUG) {
                 Log.d(TAG, "dump query");
                 Log.d(TAG, "  uri=" + uri);
-                if (projection == null || projection.length == 0) {
-                    Log.d(TAG, "  projection=" + projection);
-                } else {
-                    for (int i = 0; i < projection.length; i++) {
-                        Log.d(TAG, "  projection=" + projection[i]);
-                    }
-                }
-                Log.d(TAG,"  selection=" + selection);
+                Log.d(TAG, "  projection=" + Arrays.toString(projection));
+                Log.d(TAG, "  selection=" + selection);
             }
             assertChannelUri(uri);
             return new FakeCursor(projection);
@@ -493,7 +492,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     }
 
     private class FakeCursor extends MockCursor {
-        private String[] ALL_COLUMNS =  {
+        private final String[] ALL_COLUMNS =  {
                 Channels._ID,
                 Channels.COLUMN_DISPLAY_NAME,
                 Channels.COLUMN_DISPLAY_NUMBER,
@@ -502,7 +501,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
                 Channels.COLUMN_ORIGINAL_NETWORK_ID,
                 COLUMN_BROWSABLE,
                 COLUMN_LOCKED};
-        private String[] mColumns;
+        private final String[] mColumns;
         private int mPosition;
 
         public FakeCursor(String[] columns) {
@@ -594,7 +593,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
 
     private class TestChannelDataManagerListener implements ChannelDataManager.Listener {
         public CountDownLatch loadFinishedLatch = new CountDownLatch(1);
-        public CountDownLatch channeListUpdatedLatch = new CountDownLatch(1);
+        public CountDownLatch channelListUpdatedLatch = new CountDownLatch(1);
         public boolean channelBrowsableChangedCalled;
 
         @Override
@@ -604,7 +603,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
 
         @Override
         public void onChannelListUpdated() {
-            channeListUpdatedLatch.countDown();
+            channelListUpdatedLatch.countDown();
         }
 
         @Override
@@ -614,7 +613,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
 
         public void reset() {
             loadFinishedLatch = new CountDownLatch(1);
-            channeListUpdatedLatch = new CountDownLatch(1);
+            channelListUpdatedLatch = new CountDownLatch(1);
             channelBrowsableChangedCalled = false;
         }
     }
@@ -622,8 +621,8 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     private class TestChannelDataManagerChannelListener
             implements ChannelDataManager.ChannelListener {
         public CountDownLatch channelChangedLatch = new CountDownLatch(1);
-        public List<Channel> removedChannels = new ArrayList<>();
-        public List<Channel> updatedChannels = new ArrayList<>();
+        public final List<Channel> removedChannels = new ArrayList<>();
+        public final List<Channel> updatedChannels = new ArrayList<>();
 
         @Override
         public void onChannelRemoved(Channel channel) {

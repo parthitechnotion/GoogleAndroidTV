@@ -17,7 +17,6 @@
 package com.android.tv.recommendation;
 
 import android.support.annotation.VisibleForTesting;
-import android.text.TextUtils;
 
 import com.android.tv.data.Program;
 
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 public class RoutineWatchEvaluator extends Recommender.Evaluator {
     // TODO: test and refine constant values in WatchedProgramRecommender in order to

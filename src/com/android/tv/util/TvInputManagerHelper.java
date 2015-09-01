@@ -47,60 +47,61 @@ public class TvInputManagerHelper {
     // Bundled (system) inputs not in the list will get the high priority
     // so they and their channels come first in the UI.
     private static final Set<String> BUNDLED_PACKAGE_SET = new HashSet<>();
+
     static {
         BUNDLED_PACKAGE_SET.add("com.android.tv");
         BUNDLED_PACKAGE_SET.add("com.android.tv");
-    };
+        BUNDLED_PACKAGE_SET.add("com.google.android.usbtuner");
+    }
 
     private final Context mContext;
     private final TvInputManager mTvInputManager;
     private final Map<String, Integer> mInputStateMap = new HashMap<>();
     private final Map<String, TvInputInfo> mInputMap = new HashMap<>();
     private final Map<String, Boolean> mInputIdToPartnerInputMap = new HashMap<>();
-    private final TvInputCallback mInternalCallback =
-            new TvInputCallback() {
-                @Override
-                public void onInputStateChanged(String inputId, int state) {
-                    mInputStateMap.put(inputId, state);
-                    for (TvInputCallback callback : mCallbacks) {
-                        callback.onInputStateChanged(inputId, state);
-                    }
-                }
+    private final TvInputCallback mInternalCallback = new TvInputCallback() {
+        @Override
+        public void onInputStateChanged(String inputId, int state) {
+            mInputStateMap.put(inputId, state);
+            for (TvInputCallback callback : mCallbacks) {
+                callback.onInputStateChanged(inputId, state);
+            }
+        }
 
-                @Override
-                public void onInputAdded(String inputId) {
-                    TvInputInfo info  = mTvInputManager.getTvInputInfo(inputId);
-                    if (info != null) {
-                        mInputMap.put(inputId, info);
-                        mInputStateMap.put(inputId, mTvInputManager.getInputState(inputId));
-                        mInputIdToPartnerInputMap.put(inputId, isPartnerInput(info));
-                    }
-                    mContentRatingsManager.update();
-                    for (TvInputCallback callback : mCallbacks) {
-                        callback.onInputAdded(inputId);
-                    }
-                }
+        @Override
+        public void onInputAdded(String inputId) {
+            TvInputInfo info = mTvInputManager.getTvInputInfo(inputId);
+            if (info != null) {
+                mInputMap.put(inputId, info);
+                mInputStateMap.put(inputId, mTvInputManager.getInputState(inputId));
+                mInputIdToPartnerInputMap.put(inputId, isPartnerInput(info));
+            }
+            mContentRatingsManager.update();
+            for (TvInputCallback callback : mCallbacks) {
+                callback.onInputAdded(inputId);
+            }
+        }
 
-                @Override
-                public void onInputRemoved(String inputId) {
-                    mInputMap.remove(inputId);
-                    mInputStateMap.remove(inputId);
-                    mInputIdToPartnerInputMap.remove(inputId);
-                    mContentRatingsManager.update();
-                    for (TvInputCallback callback : mCallbacks) {
-                        callback.onInputRemoved(inputId);
-                    }
-                }
+        @Override
+        public void onInputRemoved(String inputId) {
+            mInputMap.remove(inputId);
+            mInputStateMap.remove(inputId);
+            mInputIdToPartnerInputMap.remove(inputId);
+            mContentRatingsManager.update();
+            for (TvInputCallback callback : mCallbacks) {
+                callback.onInputRemoved(inputId);
+            }
+        }
 
-                @Override
-                public void onInputUpdated(String inputId) {
-                    TvInputInfo info  = mTvInputManager.getTvInputInfo(inputId);
-                    mInputMap.put(inputId, info);
-                    for (TvInputCallback callback : mCallbacks) {
-                        callback.onInputUpdated(inputId);
-                    }
-                }
-            };
+        @Override
+        public void onInputUpdated(String inputId) {
+            TvInputInfo info = mTvInputManager.getTvInputInfo(inputId);
+            mInputMap.put(inputId, info);
+            for (TvInputCallback callback : mCallbacks) {
+                callback.onInputUpdated(inputId);
+            }
+        }
+    };
 
     private final Handler mHandler = new Handler();
     private boolean mStarted;
@@ -178,15 +179,30 @@ public class TvInputManagerHelper {
      * Checks if the input is from a partner.
      *
      * It's visible for comparator test.
-     * Package private is enough for this method, but public is necessary to workaround mockito bug.
+     * Package private is enough for this method, but public is necessary to workaround mockito
+     * bug.
      */
     @VisibleForTesting
     public boolean isPartnerInput(TvInputInfo inputInfo) {
+        return isSystemInput(inputInfo) && !isBundledInput(inputInfo);
+    }
+
+    /**
+     * Does the input have {@link ApplicationInfo#FLAG_SYSTEM} set.
+     */
+    public boolean isSystemInput(TvInputInfo inputInfo) {
         return inputInfo != null
                 && (inputInfo.getServiceInfo().applicationInfo.flags
-                        & ApplicationInfo.FLAG_SYSTEM) != 0
-                && !BUNDLED_PACKAGE_SET.contains(
-                        inputInfo.getServiceInfo().applicationInfo.packageName);
+                    & ApplicationInfo.FLAG_SYSTEM) != 0;
+    }
+
+    /**
+     * Is the input one known bundled inputs not written by OEM/SOCs.
+     */
+    public boolean isBundledInput(TvInputInfo inputInfo) {
+        return inputInfo != null 
+               && BUNDLED_PACKAGE_SET.contains(
+                   inputInfo.getServiceInfo().applicationInfo.packageName);
     }
 
     /**
@@ -202,7 +218,8 @@ public class TvInputManagerHelper {
      * Loads label of {@param info}.
      *
      * It's visible for comparator test to mock TvInputInfo.
-     * Package private is enough for this method, but public is necessary to workaround mockito bug.
+     * Package private is enough for this method, but public is necessary to workaround mockito
+     * bug.
      */
     @VisibleForTesting
     public String loadLabel(TvInputInfo info) {
@@ -214,7 +231,8 @@ public class TvInputManagerHelper {
      */
     public boolean hasTvInputInfo(String inputId) {
         if (!mStarted) {
-            Log.w(TAG, "hasTvInputInfo() called before TvInputManagerHelper was started.");
+            Utils.engThrowElseWarn(TAG,
+                    "hasTvInputInfo() called before TvInputManagerHelper was started.");
             return false;
         }
         return !TextUtils.isEmpty(inputId) && mInputMap.get(inputId) != null;
@@ -222,7 +240,8 @@ public class TvInputManagerHelper {
 
     public TvInputInfo getTvInputInfo(String inputId) {
         if (!mStarted) {
-            Log.w(TAG, "getTvInputInfo() called before TvInputManagerHelper was started.");
+            Utils.engThrowElseWarn(TAG,
+                    "getTvInputInfo() called before TvInputManagerHelper was started.");
             return null;
         }
         if (inputId == null) {
@@ -291,7 +310,7 @@ public class TvInputManagerHelper {
      */
     @VisibleForTesting
     static class TvInputInfoComparator implements Comparator<TvInputInfo> {
-        private TvInputManagerHelper mInputManager;
+        private final TvInputManagerHelper mInputManager;
 
         public TvInputInfoComparator(TvInputManagerHelper inputManager) {
             mInputManager = inputManager;
@@ -304,5 +323,5 @@ public class TvInputManagerHelper {
             }
             return mInputManager.loadLabel(lhs).compareTo(mInputManager.loadLabel(rhs));
         }
-    };
+    }
 }

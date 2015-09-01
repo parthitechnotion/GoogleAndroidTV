@@ -124,5 +124,6 @@
                     android:resource="@xml/tv_content_rating_systems" />
         </receiver>
 
+
     </application>
 </manifest>

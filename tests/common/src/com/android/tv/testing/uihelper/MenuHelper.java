@@ -27,13 +27,11 @@ import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.Until;
 
 import com.android.tv.R;
-import com.android.tv.common.TvCommonConstants;
-import com.android.tv.menu.MenuView;
 
 import junit.framework.Assert;
 
 /**
- * Helper for testing {@link MenuView}.
+ * Helper for testing {@link com.android.tv.menu.Menu}.
  */
 public class MenuHelper extends BaseUiDeviceHelper {
     private final BySelector byChannels;
@@ -41,12 +39,7 @@ public class MenuHelper extends BaseUiDeviceHelper {
     public MenuHelper(UiDevice uiDevice, Resources targetResources) {
         super(uiDevice, targetResources);
         byChannels = ByResource.id(mTargetResources, R.id.item_list)
-                .hasDescendant(ByResource.text(mTargetResources, getMenuTitleChannelsResId()));
-    }
-
-    public int getMenuTitleChannelsResId() {
-        return TvCommonConstants.IS_MNC_OR_HIGHER ? R.string.menu_title_channels
-                : R.string.menu_title_channels_legacy;
+                .hasDescendant(ByResource.text(mTargetResources, R.string.menu_title_channels));
     }
 
     public BySelector getByChannels() {
@@ -104,7 +97,7 @@ public class MenuHelper extends BaseUiDeviceHelper {
         UiDeviceAsserts.assertHas(mUiDevice, MENU, true);
         // The play controls row doesn't have title when selected, so can't use
         // MenuHelper.assertNavigateToRow().
-        assertNavigateToRow(getMenuTitleChannelsResId());
+        assertNavigateToRow(R.string.menu_title_channels);
         mUiDevice.pressDPadUp();
     }
 
@@ -148,7 +141,7 @@ public class MenuHelper extends BaseUiDeviceHelper {
     }
 
     public UiObject2 assertPressProgramGuide() {
-        return assertPressMenuItem(getMenuTitleChannelsResId(),
+        return assertPressMenuItem(R.string.menu_title_channels,
                 R.string.channels_item_program_guide);
     }
 

@@ -18,11 +18,10 @@ package com.android.tv.util;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.util.Log;
-
-import com.android.tv.common.TvCommonConstants;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -51,25 +50,20 @@ public final class SearchManagerHelper {
         }
     }
 
-    public boolean launchAssistAction() {
+    public void launchAssistAction() {
         try {
-            if (TvCommonConstants.IS_MNC_PREVIEW) {
-                return (boolean) SearchManager.class.getDeclaredMethod(
-                        "launchAssistAction", String.class, Integer.TYPE, Bundle.class).invoke(
-                                mSearchManager, null, UserHandle.myUserId(), null);
-            } else if (TvCommonConstants.IS_MNC_OR_HIGHER) {
-                return (boolean) SearchManager.class.getDeclaredMethod(
+            if (Build.VERSION.SDK_INT >= 23) {
+                SearchManager.class.getDeclaredMethod(
                         "launchLegacyAssist", String.class, Integer.TYPE, Bundle.class).invoke(
                                 mSearchManager, null, UserHandle.myUserId(), null);
             } else {
-                return (boolean) SearchManager.class.getDeclaredMethod(
+                SearchManager.class.getDeclaredMethod(
                         "launchAssistAction", Integer.TYPE, String.class, Integer.TYPE).invoke(
                                 mSearchManager, 0, null, UserHandle.myUserId());
             }
         }  catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException
                 | InvocationTargetException e) {
             Log.e(TAG, "Fail to call SearchManager.launchAssistAction", e);
-            return false;
         }
     }
 }

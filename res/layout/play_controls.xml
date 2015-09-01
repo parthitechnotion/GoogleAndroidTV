@@ -15,39 +15,11 @@
   ~ limitations under the License.
   -->
 
-<com.android.tv.menu.PlayControlsRowView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:clipChildren="false"
-    android:clipToPadding="false"
-    android:focusable="true"
-    android:descendantFocusability="afterDescendants">
-
-    <!-- Although the text leading can be changed accroding to the text size,
-         we decided to set fixed layout_height since it doesn't make a big difference,
-         and it makes code more simpler. -->
+<com.android.tv.menu.PlayControlsRowView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/menu_row_view">
     <TextView
         android:id="@+id/title"
-        android:layout_width="@dimen/menu_row_title_width"
-        android:layout_height="@dimen/menu_row_title_height"
-        android:paddingBottom="@dimen/menu_row_title_padding_bottom"
-        android:fontFamily="@string/condensed_font"
-        android:textAlignment="viewStart"
-        android:gravity="start|bottom"
-        android:textColor="@color/menu_row_title"
-        android:textSize="@dimen/menu_row_title_text_size_deselected"
-        android:transformPivotX="@dimen/menu_row_title_transform_pivot_x"
-        android:transformPivotY="@dimen/menu_row_title_transform_pivot_y"
-        android:text="@string/menu_title_play_controls" />
-
-    <!-- The animation of this view includes an alpha animation, while one of its child is scaled
-         to out of bounds of this view. This results in visual artifacts while animating, because
-         alpha animation only occurs within the bounds of the view.
-
-         To work around, this view takes up extra space up to its neighbors using negative margins,
-         and compensate the same space with padding.
-    -->
-    <include layout="@layout/play_controls_contents"/>
-
+        style="@style/menu_row_title_view" />
+    <include layout="@layout/play_controls_contents" />
 </com.android.tv.menu.PlayControlsRowView>

@@ -20,12 +20,14 @@ import android.support.test.uiautomator.BySelector;
 
 public final class Constants {
 
-    public static final double EXTRA_TIMEOUT_PRECENT = .05;
+    public static final double EXTRA_TIMEOUT_PERCENT = .05;
     public static final int MIN_EXTRA_TIMEOUT = 10;
     public static final long MAX_SHOW_DELAY_MILLIS = 200;
     public static final String TV_APP_PACKAGE = "com.android.tv";
+    public static final BySelector TV_VIEW = By.res(TV_APP_PACKAGE, "main_tunable_tv_view");
     public static final BySelector CHANNEL_BANNER = By.res(TV_APP_PACKAGE, "channel_banner_view");
-    public static final BySelector MENU = By.res(TV_APP_PACKAGE, "menu_list");
+    public static final BySelector KEYPAD_CHANNEL_SWITCH = By.res(TV_APP_PACKAGE, "channel_number");
+    public static final BySelector MENU = By.res(TV_APP_PACKAGE, "menu");
     public static final BySelector SIDE_PANEL = By.res(TV_APP_PACKAGE, "side_panel");
     public static final BySelector PROGRAM_GUIDE = By.res(TV_APP_PACKAGE, "program_guide");
     public static final BySelector FOCUSED_VIEW = By.focused(true);

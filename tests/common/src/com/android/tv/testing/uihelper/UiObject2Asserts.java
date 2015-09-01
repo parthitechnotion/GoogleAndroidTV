@@ -52,7 +52,7 @@ public final class UiObject2Asserts {
 
     public static long getAdjustedTimeout(long timeout) {
         return timeout + Math.max(
-                Constants.MIN_EXTRA_TIMEOUT, (long) (timeout * Constants.EXTRA_TIMEOUT_PRECENT));
+                Constants.MIN_EXTRA_TIMEOUT, (long) (timeout * Constants.EXTRA_TIMEOUT_PERCENT));
     }
 
     private UiObject2Asserts() {

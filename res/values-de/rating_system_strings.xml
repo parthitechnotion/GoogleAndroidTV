@@ -17,165 +17,21 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- no translation found for description_age_4 (2260506104299774027) -->
-    <skip />
-    <!-- no translation found for description_age_5 (312882360850848623) -->
-    <skip />
-    <!-- no translation found for description_age_6 (7780895021659413979) -->
-    <skip />
-    <!-- no translation found for description_age_7 (7465836675187750087) -->
-    <skip />
-    <!-- no translation found for description_age_8 (8518389733138803056) -->
-    <skip />
-    <!-- no translation found for description_age_9 (1963837231871036561) -->
-    <skip />
-    <!-- no translation found for description_age_10 (9199865628328446876) -->
-    <skip />
-    <!-- no translation found for description_age_11 (1056140065021078183) -->
-    <skip />
-    <!-- no translation found for description_age_12 (2523883089926997157) -->
-    <skip />
-    <!-- no translation found for description_age_13 (4539863086843940979) -->
-    <skip />
-    <!-- no translation found for description_age_14 (276938165219847540) -->
-    <skip />
-    <!-- no translation found for description_age_15 (3875804533354572649) -->
-    <skip />
-    <!-- no translation found for description_age_16 (7068358107904351707) -->
-    <skip />
-    <!-- no translation found for description_age_17 (6090244054207338066) -->
-    <skip />
-    <!-- no translation found for description_age_18 (7827138562117972763) -->
-    <skip />
-    <!-- no translation found for description_age_19 (5739639668332937969) -->
-    <skip />
-    <!-- no translation found for description_age_20 (8099318760823109592) -->
-    <skip />
-    <!-- no translation found for description_ar_tv_atp (547579136010287221) -->
-    <skip />
-    <!-- no translation found for description_ar_tv_sam_13 (4692291035708752548) -->
-    <skip />
-    <!-- no translation found for description_ar_tv_sam_16 (7723173815471130793) -->
-    <skip />
-    <!-- no translation found for description_ar_tv_sam_18 (6396037038854141228) -->
-    <skip />
-    <string name="description_ar_tv_d" msgid="1108913881840440081">"Drogen"</string>
-    <string name="description_ar_tv_s" msgid="6939530616220134707">"Sex"</string>
-    <string name="description_ar_tv_v" msgid="3593686925402404659">"Gewalt"</string>
-    <!-- no translation found for description_au_tv_p (6450834908576229026) -->
-    <skip />
-    <!-- no translation found for description_au_tv_c (1308451360610501896) -->
-    <skip />
-    <!-- no translation found for description_au_tv_g (2120367806197069921) -->
-    <skip />
-    <!-- no translation found for description_au_tv_pg (3703098381263561194) -->
-    <skip />
-    <!-- no translation found for description_au_tv_m (3835952110876245500) -->
-    <skip />
-    <!-- no translation found for description_au_tv_ma (7991042881149741890) -->
-    <skip />
-    <!-- no translation found for description_au_tv_av (3792394272837573390) -->
-    <skip />
-    <!-- no translation found for description_au_tv_r (488701479788807290) -->
-    <skip />
-    <!-- no translation found for description_br_tv_l (1750755104141314952) -->
-    <skip />
-    <!-- no translation found for description_br_tv_10 (9206699509782547619) -->
-    <skip />
-    <!-- no translation found for description_br_tv_12 (7319572965100214976) -->
-    <skip />
-    <!-- no translation found for description_br_tv_14 (3743044568707308995) -->
-    <skip />
-    <!-- no translation found for description_br_tv_16 (763942958761698764) -->
-    <skip />
-    <!-- no translation found for description_br_tv_18 (2543086592733416771) -->
-    <skip />
-    <string name="description_br_tv_d" msgid="6117156505386584449">"Drogen"</string>
-    <string name="description_br_tv_s" msgid="2713003081092951596">"Sex"</string>
-    <string name="description_br_tv_v" msgid="8360268389564584952">"Gewalt"</string>
-    <!-- no translation found for description_ca_tv_en_exempt (3869530797231884669) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_en_c (6170724506314571912) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_en_c8 (7942870097063909046) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_en_g (7893908216230285607) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_en_pg (2736709384517099303) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_en_14 (8063534593921657009) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_en_18 (3552078692829803323) -->
-    <skip />
-    <string name="title_ca_tv_fr" msgid="5354916412253251759">"Französisch"</string>
-    <!-- no translation found for description_ca_tv_fr_e (191173579009161428) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_fr_g (5572294714137666887) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_fr_8 (7142414766270693085) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_fr_13 (5198848759504239143) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_fr_16 (1034513066641057587) -->
-    <skip />
-    <!-- no translation found for description_ca_tv_fr_18 (2919990256513482762) -->
-    <skip />
-    <!-- no translation found for description_fr_dvb_u (8232083238497153682) -->
-    <skip />
-    <!-- no translation found for description_es_dvb_all (4821183217465284547) -->
-    <skip />
-    <!-- no translation found for description_es_dvb_c (1367395312248365855) -->
-    <skip />
-    <!-- no translation found for description_es_dvb_x (438890727939582714) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_all (3048365195196820853) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_7 (5892929693766504059) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_12 (1883893246941826597) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_15 (397719456648820574) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_19 (2562374912814706392) -->
-    <skip />
-    <!-- no translation found for description_sg_tv_g (1552875095194906311) -->
-    <skip />
-    <!-- no translation found for description_sg_tv_pg (5180090945868922455) -->
-    <skip />
-    <!-- no translation found for description_sg_tv_pg13 (3655542939788886420) -->
-    <skip />
-    <!-- no translation found for description_sg_tv_nc16 (3484254252201121736) -->
-    <skip />
-    <!-- no translation found for description_sg_tv_m18 (392321217022988206) -->
-    <skip />
-    <!-- no translation found for description_sg_tv_r21 (1466786788649950591) -->
-    <skip />
     <string name="description_us_tv_d" msgid="12333789157204816">"Anzüglicher Dialog"</string>
     <string name="description_us_tv_l" msgid="4105102855627964319">"Derbe Sprache"</string>
     <string name="description_us_tv_s" msgid="7552447251273237176">"Pornografische Inhalte"</string>
     <string name="description_us_tv_v" msgid="4799470820740236198">"Gewalt"</string>
     <string name="description_us_tv_fv" msgid="4760884520245003167">"Fantasiegewalt"</string>
-    <!-- no translation found for description_us_tv_y (1352346035366881161) -->
-    <skip />
-    <!-- no translation found for description_us_tv_y7 (8074158131815307880) -->
-    <skip />
-    <!-- no translation found for description_us_tv_g (4129784125991285944) -->
-    <skip />
-    <!-- no translation found for description_us_tv_pg (5647218792100947596) -->
-    <skip />
-    <!-- no translation found for description_us_tv_14 (8682987672893857317) -->
-    <skip />
-    <!-- no translation found for description_us_tv_ma (8912237130594289176) -->
-    <skip />
+    <string name="description_us_tv_y" msgid="1352346035366881161">"Diese Sendung richtet sich ohne Altersbeschränkung an alle Kinder."</string>
+    <string name="description_us_tv_y7" msgid="8074158131815307880">"Diese Sendung richtet sich an Kinder ab 7 Jahren."</string>
+    <string name="description_us_tv_g" msgid="4129784125991285944">"Diese Sendung sollte in der Regel für alle Altersgruppen geeignet sein."</string>
+    <string name="description_us_tv_pg" msgid="5647218792100947596">"Diese Sendung ist möglicherweise für jüngere Kinder nicht geeignet. Daher wird sie von Kindern häufig unter elterlicher Aufsicht angesehen."</string>
+    <string name="description_us_tv_14" msgid="8682987672893857317">"Diese Sendung ist für Kinder unter 14 Jahren möglicherweise nicht geeignet."</string>
+    <string name="description_us_tv_ma" msgid="8912237130594289176">"Diese Sendung richtet sich speziell an Erwachsene und ist darum für Jugendliche unter 17 Jahren möglicherweise nicht geeignet."</string>
     <string name="title_us_mv" msgid="7861766023361439035">"Altersfreigaben für Filme"</string>
-    <!-- no translation found for description_us_mv_g (9185817407450418638) -->
-    <skip />
-    <!-- no translation found for description_us_mv_pg (8578620326248525384) -->
-    <skip />
-    <!-- no translation found for description_us_mv_pg13 (7077331984538950084) -->
-    <skip />
-    <!-- no translation found for description_us_mv_r (4482914375592527277) -->
-    <skip />
-    <!-- no translation found for description_us_mv_nc17 (1897668555117874369) -->
-    <skip />
+    <string name="description_us_mv_g" msgid="9185817407450418638">"Allgemeine Zielgruppe, die Inhalte sind für Kinder geeignet."</string>
+    <string name="description_us_mv_pg" msgid="8578620326248525384">"Elterliche Aufsicht wird empfohlen. Einige Inhalte sind möglicherweise für Kinder ungeeignet."</string>
+    <string name="description_us_mv_pg13" msgid="7077331984538950084">"Elterliche Aufsicht wird dringend empfohlen. Einige Inhalte sind möglicherweise für Kinder ungeeignet."</string>
+    <string name="description_us_mv_r" msgid="4482914375592527277">"Eingeschränkt, enthält Inhalte nur für Erwachsene. Es wird dringend empfohlen, dass Eltern sich die Inhalte des Films genau ansehen, bevor sie ihren Kindern erlauben, sich ihn anzusehen."</string>
+    <string name="description_us_mv_nc17" msgid="1897668555117874369">"Nicht für Kinder und Jugendliche unter 17 Jahren geeignet. Inhalte nur für Erwachsene."</string>
 </resources>

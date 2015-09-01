@@ -22,22 +22,18 @@
     android:id="@+id/menu"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/menu_enter_offset_y_negative"
-    android:paddingBottom="@dimen/menu_padding_bottom"
-    android:clipChildren="false"
-    android:clipToPadding="false"
+    android:layout_marginTop="@dimen/menu_margin_top"
     android:background="@drawable/menu_background"
     android:visibility="gone">
 
-    <android.support.v17.leanback.widget.VerticalGridView
-        android:id="@+id/menu_list"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/menu_height"
-        android:layout_gravity="bottom"
-        android:paddingStart="@dimen/menu_padding_start"
-        android:paddingEnd="@dimen/menu_padding_end"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:focusable="true" />
+    <!-- Temporary TextView's are used for the animation. -->
+    <TextView
+        android:id="@+id/temp_title_for_old"
+        style="@style/menu_row_title_view"
+        android:visibility="gone" />
+    <TextView
+        android:id="@+id/temp_title_for_current"
+        style="@style/menu_row_title_view"
+        android:visibility="gone" />
 
 </com.android.tv.menu.MenuView>

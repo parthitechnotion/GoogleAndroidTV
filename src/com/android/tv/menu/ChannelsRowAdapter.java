@@ -18,13 +18,13 @@ package com.android.tv.menu;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.view.View;
 
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Tracker;
-import com.android.tv.common.TvCommonConstants;
 import com.android.tv.data.Channel;
 import com.android.tv.recommendation.Recommender;
 import com.android.tv.util.SetupUtils;
@@ -151,7 +151,7 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
         if (mShowSetupCard) {
             channelList.add(dummyChannel);
         }
-        if (TvCommonConstants.IS_MNC_OR_HIGHER) {
+        if (Build.VERSION.SDK_INT >= 23) {
             Channel currentChannel = ((MainActivity) mContext).getCurrentChannel();
             mShowAppLinkCard = currentChannel != null
                     && currentChannel.getAppLinkType(mContext) != Channel.APP_LINK_TYPE_NONE;

@@ -24,16 +24,20 @@ import android.view.KeyEvent;
  */
 public final class UiDeviceUtils {
 
-    public static boolean pressDpad(UiDevice uiDevice, Direction direction) {
+    public static void pressDpad(UiDevice uiDevice, Direction direction) {
         switch (direction) {
             case UP:
-                return uiDevice.pressDPadUp();
+                uiDevice.pressDPadUp();
+                break;
             case DOWN:
-                return uiDevice.pressDPadDown();
+                uiDevice.pressDPadDown();
+                break;
             case LEFT:
-                return uiDevice.pressDPadLeft();
+                uiDevice.pressDPadLeft();
+                break;
             case RIGHT:
-                return uiDevice.pressDPadRight();
+                uiDevice.pressDPadRight();
+                break;
             default:
                 throw new IllegalArgumentException(direction.toString());
         }

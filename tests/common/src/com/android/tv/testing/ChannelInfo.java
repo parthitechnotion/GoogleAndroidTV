@@ -22,6 +22,8 @@ import android.media.tv.TvContract;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
+import java.util.Objects;
+
 /**
  * Channel Information.
  */
@@ -78,8 +80,12 @@ public final class ChannelInfo {
                 .setName("Channel " + channelNumber)
                 .setOriginalNetworkId(channelNumber);
         if (context != null) {
-            builder.setLogoUrl(Utils.getUriStringForResource(
-                    context, LOGOS_RES[channelNumber % LOGOS_RES.length]));
+            // tests/input/tools/get_test_logos.sh only stores 1000 logos.
+            int logo_num = (channelNumber % 1000) + 1;
+            builder.setLogoUrl(
+                    "android.resource://com.android.tv.testinput/drawable/ch_" + logo_num
+                            + "_logo"
+            );
         }
         return builder.build();
     }
@@ -144,6 +150,37 @@ public final class ChannelInfo {
                 + ", appLinkIconUri=" + appLinkIconUri
                 + ", appLinkPosterArtUri=" + appLinkPosterArtUri
                 + ", appLinkIntentUri=" + appLinkIntentUri + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChannelInfo that = (ChannelInfo) o;
+        return Objects.equals(originalNetworkId, that.originalNetworkId) &&
+                Objects.equals(videoWidth, that.videoWidth) &&
+                Objects.equals(videoHeight, that.videoHeight) &&
+                Objects.equals(audioChannel, that.audioChannel) &&
+                Objects.equals(audioLanguageCount, that.audioLanguageCount) &&
+                Objects.equals(hasClosedCaption, that.hasClosedCaption) &&
+                Objects.equals(appLinkColor, that.appLinkColor) &&
+                Objects.equals(number, that.number) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(logoUrl, that.logoUrl) &&
+                Objects.equals(program, that.program) &&
+                Objects.equals(appLinkText, that.appLinkText) &&
+                Objects.equals(appLinkIconUri, that.appLinkIconUri) &&
+                Objects.equals(appLinkPosterArtUri, that.appLinkPosterArtUri) &&
+                Objects.equals(appLinkIntentUri, that.appLinkIntentUri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, name, originalNetworkId);
     }
 
     /**

@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import com.android.tv.data.Channel;
@@ -392,6 +393,7 @@ public class ChannelTuner {
      * @param channelId The ID of the channel to be loaded.
      * @return a channel if it has been loaded. {@code null} if the channel is not found.
      */
+    @WorkerThread
     public Channel loadChannel(long channelId) {
         if (channelId < 0) {
             return null;

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelNumber;
+import com.android.tv.ui.OnRepeatedKeyInterceptListener;
 import com.android.tv.ui.sidepanel.ActionItem;
 import com.android.tv.ui.sidepanel.ChannelCheckItem;
 import com.android.tv.ui.sidepanel.DividerItem;
@@ -57,27 +58,6 @@ public class ChannelsBlockedFragment extends SideFragment {
     private final Item mLockAllItem = new BlockAllItem();
     private final List<Item> mItems = new ArrayList<>();
 
-    private final VerticalGridView.OnKeyInterceptListener mOnKeyInterceptListener =
-            new VerticalGridView.OnKeyInterceptListener() {
-        @Override
-        public boolean onInterceptKeyEvent(KeyEvent event) {
-            // In order to send tune operation once for continuous channel up/down events, we only
-            // call the moveToChannel method on ACTION_UP event of channel switch keys.
-            if (event.getAction() == KeyEvent.ACTION_UP) {
-                switch (event.getKeyCode()) {
-                    case KeyEvent.KEYCODE_DPAD_UP:
-                    case KeyEvent.KEYCODE_DPAD_DOWN:
-                        if (mLastFocusedChannelId != Channel.INVALID_ID) {
-                            getMainActivity().tuneToChannel(
-                                    getChannelDataManager().getChannel(mLastFocusedChannelId));
-                        }
-                        break;
-                }
-            }
-            return false;
-        }
-    };
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -86,7 +66,25 @@ public class ChannelsBlockedFragment extends SideFragment {
             setSelectedPosition(mSelectedPosition);
         }
         VerticalGridView listView = (VerticalGridView) view.findViewById(R.id.side_panel_list);
-        listView.setOnKeyInterceptListener(mOnKeyInterceptListener);
+        listView.setOnKeyInterceptListener(new OnRepeatedKeyInterceptListener(listView) {
+            @Override
+            public boolean onInterceptKeyEvent(KeyEvent event) {
+                // In order to send tune operation once for continuous channel up/down events,
+                // we only call the moveToChannel method on ACTION_UP event of channel switch keys.
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    switch (event.getKeyCode()) {
+                        case KeyEvent.KEYCODE_DPAD_UP:
+                        case KeyEvent.KEYCODE_DPAD_DOWN:
+                            if (mLastFocusedChannelId != Channel.INVALID_ID) {
+                                getMainActivity().tuneToChannel(
+                                        getChannelDataManager().getChannel(mLastFocusedChannelId));
+                            }
+                            break;
+                    }
+                }
+                return super.onInterceptKeyEvent(event);
+            }
+        });
         getActivity().getContentResolver().registerContentObserver(TvContract.Programs.CONTENT_URI,
                 true, mProgramUpdateObserver);
         getMainActivity().startShrunkenTvView(true, true);

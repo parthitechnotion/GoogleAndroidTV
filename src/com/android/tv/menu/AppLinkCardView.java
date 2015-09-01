@@ -274,7 +274,9 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
             banner.setBounds(0, 0, mCardImageWidth, mCardImageHeight);
             banner.draw(canvas);
             mImageView.setImageDrawable(banner);
-            extractAndSetMetaViewBackgroundColor(bitmap);
+            if (mChannel.getAppLinkColor() == 0) {
+                extractAndSetMetaViewBackgroundColor(bitmap);
+            }
         }
     }
 

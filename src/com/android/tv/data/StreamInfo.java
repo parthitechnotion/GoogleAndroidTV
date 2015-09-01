@@ -16,8 +16,6 @@
 
 package com.android.tv.data;
 
-import android.media.tv.TvInputInfo;
-
 public interface StreamInfo {
     int VIDEO_DEFINITION_LEVEL_UNKNOWN = 0;
     int VIDEO_DEFINITION_LEVEL_SD = 1;

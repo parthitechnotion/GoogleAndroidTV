@@ -16,12 +16,36 @@
 
 package com.android.tv.analytics;
 
+import com.android.tv.TimeShiftManager;
+import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 
 /**
  * Interface for sending user activity for analysis.
  */
 public interface Tracker {
+
+    /**
+     * Send the number of channels that doesn't change often.
+     *
+     * <p>Because the number of channels does not change often, this method should not be called
+     * more than once a day.
+     *
+     * @param browsableChannelCount the number of browsable channels.
+     * @param totalChannelCount the number of all channels.
+     */
+    void sendChannelCount(int browsableChannelCount, int totalChannelCount);
+
+    /**
+     * Send data that doesn't change often.
+     *
+     * <p>Because configuration info does not change often, this method should not be called more
+     * than once a day.
+     *
+     * @param info the configuration info.
+     */
+    void sendConfigurationInfo(TvApplication.ConfigurationInfo info);
+
     /**
      * Sends tracking information for starting the MainActivity.
      */
@@ -43,8 +67,9 @@ public interface Tracker {
      * Sends tracking information for starting to view a channel.
      *
      * @param channel the current channel
+     * @param tunedByRecommendation True, if the channel was tuned by the recommendation.
      */
-    void sendChannelViewStart(Channel channel);
+    void sendChannelViewStart(Channel channel, boolean tunedByRecommendation);
 
     /**
      * Sends tracking information for tuning to a channel.
@@ -103,17 +128,17 @@ public interface Tracker {
     void sendMenuClicked(int labelResId);
 
     /**
-     * Sends tracking information for showing the Enhanced Program Guide (EPG).
+     * Sends tracking information for showing the Electronic Program Guide (EPG).
      */
     void sendShowEpg();
 
     /**
-     * Sends tracking information for clicking an Enhanced Program Guide (EPG) item.
+     * Sends tracking information for clicking an Electronic Program Guide (EPG) item.
      */
     void sendEpgItemClicked();
 
     /**
-     * Sends tracking for hiding the Enhanced Program Guide (EPG).
+     * Sends tracking for hiding the Electronic Program Guide (EPG).
      *
      * @param durationMs The duration the EPG was shown in milliseconds.
      */
@@ -154,7 +179,7 @@ public interface Tracker {
     void sendChannelNumberItemChosenByTimeout();
 
     /**
-     * Sends HDMI AC3 passthrough capablities.
+     * Sends HDMI AC3 passthrough capabilities.
      *
      * @param isSupported {@code true} if the feature is supported; otherwise {@code false}.
      */
@@ -195,4 +220,11 @@ public interface Tracker {
      * @param durationMs The duration the side panel was shown in milliseconds.
      */
     void sendHideSidePanel(HasTrackerLabel trackerLabel, long durationMs);
+
+    /**
+     * Sends time shift action (pause, ff, etc).
+     *
+     * @param actionId The label of the side panel
+     */
+    void sendTimeShiftAction(@TimeShiftManager.TimeShiftActionId int actionId);
 }

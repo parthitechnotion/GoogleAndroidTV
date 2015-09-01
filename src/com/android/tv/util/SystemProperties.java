@@ -20,6 +20,25 @@ package com.android.tv.util;
  * A convenience class for getting TV related system properties.
  */
 public final class SystemProperties {
+
+    /**
+     * Allow Google Analytics for eng builds.
+     */
+    public static final BooleanSystemProperty ALLOW_ANALYTICS_IN_ENG = new BooleanSystemProperty(
+            "tv_allow_analytics_in_eng", false);
+
+    /**
+     * Allow Strict mode for debug builds.
+     */
+    public static final BooleanSystemProperty ALLOW_STRICT_MODE = new BooleanSystemProperty(
+            "tv_allow_strict_mode", true);
+
+    /**
+     * Allow Strict death penalty for eng builds.
+     */
+    public static final BooleanSystemProperty ALLOW_DEATH_PENALTY = new BooleanSystemProperty(
+            "tv_allow_death_penalty", true);
+
     /**
      * When true {@link android.view.KeyEvent}s  are logged.  Defaults to false.
      */

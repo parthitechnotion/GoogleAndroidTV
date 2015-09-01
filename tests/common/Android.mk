@@ -9,8 +9,10 @@ LOCAL_SRC_FILES := \
 LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-annotations \
     mockito-target \
-    tv-common \
     ub-uiautomator
+
+# Link tv-common as shared library to avoid the problem of initialization of the constants
+LOCAL_JAVA_LIBRARIES := tv-common
 
 LOCAL_INSTRUMENTATION_FOR := TV
 LOCAL_MODULE := tv-test-common

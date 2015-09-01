@@ -31,6 +31,7 @@ import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 
+import com.android.tv.BuildConfig;
 import com.android.tv.MainActivity.MemoryManageable;
 import com.android.tv.util.AsyncDbTask;
 import com.android.tv.util.Clock;
@@ -421,6 +422,7 @@ public class ProgramDataManager implements MemoryManageable {
                         continue;
                     }
                     while (c.moveToNext()) {
+                        int duplicateCount = 0;
                         if (isCancelled()) {
                             if (DEBUG) {
                                 Log.d(TAG, "ProgramsPrefetchTask canceled.");
@@ -429,6 +431,7 @@ public class ProgramDataManager implements MemoryManageable {
                         }
                         Program program = Program.fromCursor(c);
                         if (isDuplicateProgram(program, lastReadProgram)) {
+                            duplicateCount++;
                             continue;
                         } else {
                             lastReadProgram = program;
@@ -439,6 +442,9 @@ public class ProgramDataManager implements MemoryManageable {
                             programMap.put(program.getChannelId(), programs);
                         }
                         programs.add(program);
+                        if (duplicateCount > 0) {
+                            Log.w(TAG, "Found " + duplicateCount + " duplicate programs");
+                        }
                     }
                     mSuccess = true;
                     break;
@@ -498,6 +504,7 @@ public class ProgramDataManager implements MemoryManageable {
         public List<Program> onQuery(Cursor c) {
             final List<Program> programs = new ArrayList<>();
             if (c != null) {
+                int duplicateCount = 0;
                 Program lastReadProgram = null;
                 while (c.moveToNext()) {
                     if (isCancelled()) {
@@ -505,11 +512,15 @@ public class ProgramDataManager implements MemoryManageable {
                     }
                     Program program = Program.fromCursor(c);
                     if (isDuplicateProgram(program, lastReadProgram)) {
+                        duplicateCount++;
                         continue;
                     } else {
                         lastReadProgram = program;
                     }
                     programs.add(program);
+                }
+                if (duplicateCount > 0) {
+                    Log.w(TAG, "Found " + duplicateCount + " duplicate programs");
                 }
             }
             return programs;
@@ -517,9 +528,7 @@ public class ProgramDataManager implements MemoryManageable {
 
         @Override
         protected void onPostExecute(List<Program> programs) {
-            if (DEBUG) {
-                Log.d(TAG, "ProgramsUpdateTask done");
-            }
+            if (DEBUG) Log.d(TAG, "ProgramsUpdateTask done");
             mProgramsUpdateTask = null;
             if (programs == null) {
                 return;
@@ -674,7 +683,7 @@ public class ProgramDataManager implements MemoryManageable {
         boolean isDuplicate = p1.getChannelId() == p2.getChannelId()
                 && p1.getStartTimeUtcMillis() == p2.getStartTimeUtcMillis()
                 && p1.getEndTimeUtcMillis() == p2.getEndTimeUtcMillis();
-        if (isDuplicate) {
+        if (BuildConfig.ENG && isDuplicate) {
             Log.w(TAG, "Duplicate programs detected! - \"" + p1.getTitle() + "\" and \""
                     + p2.getTitle() + "\"");
         }

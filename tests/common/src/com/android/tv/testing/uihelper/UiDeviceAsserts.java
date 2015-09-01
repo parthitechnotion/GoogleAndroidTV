@@ -16,7 +16,6 @@
 package com.android.tv.testing.uihelper;
 
 import static com.android.tv.testing.uihelper.Constants.FOCUSED_VIEW;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -68,7 +67,7 @@ public final class UiDeviceAsserts {
      *
      * @param uiDevice        The device under test.
      * @param searchCondition The condition to wait for.
-     * @return {@true} if the condition is met, otherwise {@code false}.
+     * @return {@code true} if the condition is met, otherwise {@code false}.
      */
     public static boolean waitForCondition(UiDevice uiDevice,
             SearchCondition<Boolean> searchCondition) {
@@ -78,7 +77,7 @@ public final class UiDeviceAsserts {
     private static boolean waitForCondition(UiDevice uiDevice,
             SearchCondition<Boolean> searchCondition, long timeout) {
         long adjustedTimeout = timeout + Math.max(Constants.MIN_EXTRA_TIMEOUT,
-                (long) (timeout * Constants.EXTRA_TIMEOUT_PRECENT));
+                (long) (timeout * Constants.EXTRA_TIMEOUT_PERCENT));
         return uiDevice.wait(searchCondition, adjustedTimeout);
     }
 

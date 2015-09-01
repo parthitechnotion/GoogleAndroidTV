@@ -20,6 +20,9 @@
     <!-- menu_height should be bigger than the height when all possible menu rows are
          enabled and the focus is on the row which has the biggest height. -->
     <dimen name="menu_height">500dp</dimen>
+    <dimen name="menu_margin_top">@dimen/menu_enter_offset_y_negative</dimen>
+    <dimen name="menu_margin_bottom_min">27dp</dimen>
+    <dimen name="menu_row_align_from_bottom">124dp</dimen>
     <dimen name="menu_row_title_width">300dp</dimen>
     <dimen name="menu_row_title_height">48dp</dimen>
     <dimen name="menu_row_title_padding_bottom">4dp</dimen>
@@ -32,6 +35,14 @@
     <!-- The value in the redlines is 27dp but the items have padding tops and bottoms,
          so need to adjust by 7dp. -->
     <dimen name="menu_padding_bottom">20dp</dimen>
+    <!-- This should be changed as the font change -->
+    <dimen name="menu_row_title_text_descender_height">4.5dp</dimen>
+    <!-- This value is 16dp in the redlines. Considering the descenders, it needs to be subtracted
+         by "menu_row_text_descender_height". -->
+    <!-- NOTE: The top and bottom padding sizes should be bigger than or equals to 8 dp.
+         otherwise it will make a clipping issue. See b/18632820 for more details. -->
+    <dimen name="menu_row_contents_padding_top">11.5dp</dimen>
+    <dimen name="menu_row_contents_padding_bottom_max">48dp</dimen>
     <dimen name="menu_list_margin_top">-1.5dp</dimen>
     <dimen name="menu_list_margin_bottom">-30dp</dimen>
     <dimen name="menu_list_margin_start">@dimen/menu_padding_start_negative</dimen>
@@ -48,6 +59,8 @@
     <dimen name="menu_enter_offset_y">32dp</dimen>
     <dimen name="menu_enter_offset_y_negative">-32dp</dimen>
     <dimen name="menu_exit_offset_y">32dp</dimen>
+    <dimen name="menu_row_scroll_up_anim_offset">32dp</dimen>
+    <dimen name="menu_row_scroll_up_anim_offset_negative">-32dp</dimen>
 
     <!-- Play controls -->
     <dimen name="play_controls_width">696dp</dimen>
@@ -199,7 +212,6 @@
     <dimen name="program_guide_table_item_padding">16dp</dimen>
     <dimen name="program_guide_table_item_program_title_font_size">14sp</dimen>
     <dimen name="program_guide_table_item_program_episode_title_font_size">12sp</dimen>
-    <dimen name="program_guide_table_item_min_program_display_width">192dp</dimen>
     <dimen name="program_guide_table_item_visible_threshold">48dp</dimen>
     <dimen name="program_guide_table_detail_height">112dp</dimen>
     <dimen name="program_guide_table_detail_padding">16dp</dimen>

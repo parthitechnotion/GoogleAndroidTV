@@ -20,13 +20,15 @@ import android.content.Context;
 
 import com.android.tv.R;
 import com.android.tv.TimeShiftManager;
-import com.android.tv.common.TvCommonConstants;
 
 public class PlayControlsRow extends MenuRow {
     public static final String ID = PlayControlsRow.class.getName();
 
-    public PlayControlsRow(Context context) {
-        super(context, R.string.menu_title_play_controls, R.dimen.play_controls_height);
+    private final TimeShiftManager mTimeShiftManager;
+
+    public PlayControlsRow(Context context, Menu menu, TimeShiftManager timeShiftManager) {
+        super(context, menu, R.string.menu_title_play_controls, R.dimen.play_controls_height);
+        mTimeShiftManager = timeShiftManager;
     }
 
     @Override
@@ -38,8 +40,11 @@ public class PlayControlsRow extends MenuRow {
         return R.layout.play_controls;
     }
 
+    /**
+     * Returns an instance of {@link TimeShiftManager}.
+     */
     public TimeShiftManager getTimeShiftManager() {
-        return getMainActivity().getTimeShiftManager();
+        return mTimeShiftManager;
     }
 
     @Override
@@ -49,6 +54,11 @@ public class PlayControlsRow extends MenuRow {
 
     @Override
     public boolean isVisible() {
-        return TvCommonConstants.HAS_TIME_SHIFT_API;
+        return mTimeShiftManager.isAvailable();
+    }
+
+    @Override
+    public boolean hideTitleWhenSelected() {
+        return true;
     }
 }

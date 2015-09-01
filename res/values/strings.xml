@@ -63,9 +63,7 @@
          The play means a playback of video and audio. [CHAR LIMIT=NONE] -->
     <string name="menu_title_play_controls">Play controls</string>
     <!-- Title of the channels row in the main menu. [CHAR LIMIT=NONE] -->
-    <string name="menu_title_channels">Channels</string>
-    <!-- Legacy title of the channels row in the main menu before MCN. [CHAR LIMIT=NONE] -->
-    <string name="menu_title_channels_legacy">Recent channels</string>
+    <string name="menu_title_channels">Recent channels</string>
     <!-- Title of the TV option row in the main menu. [CHAR LIMIT=NONE] -->
     <string name="menu_title_options">TV options</string>
     <!-- Title of the PIP option row in the main menu. [CHAR LIMIT=NONE] -->

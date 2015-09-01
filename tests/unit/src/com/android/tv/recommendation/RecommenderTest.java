@@ -18,6 +18,7 @@ package com.android.tv.recommendation;
 
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.data.Channel;
 import com.android.tv.recommendation.RecommendationUtils.ChannelRecordSortedMapHelper;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@SmallTest
 public class RecommenderTest extends AndroidTestCase {
     private static final int DEFAULT_NUMBER_OF_CHANNELS = 5;
     private static final long DEFAULT_WATCH_START_TIME_MS =
@@ -69,6 +71,7 @@ public class RecommenderTest extends AndroidTestCase {
     private Channel mChannel_3;
     private Channel mChannel_4;
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -306,7 +309,7 @@ public class RecommenderTest extends AndroidTestCase {
     }
 
     private class FakeEvaluator extends Recommender.Evaluator {
-        private Map<Long, Double> mChannelScore = new HashMap<>();
+        private final Map<Long, Double> mChannelScore = new HashMap<>();
 
         @Override
         public double evaluateChannel(long channelId) {

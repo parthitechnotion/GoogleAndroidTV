@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.testing.ComparatorTester;
 import com.android.tv.util.TvInputManagerHelper;
@@ -36,6 +37,7 @@ import java.util.Comparator;
 /**
  * Tests for {@link Channel}.
  */
+@SmallTest
 public class ChannelTest extends AndroidTestCase {
     // Used for testing TV inputs with invalid input package. This could happen when a TV input is
     // uninstalled while drawing an app link card.
@@ -50,40 +52,41 @@ public class ChannelTest extends AndroidTestCase {
     private static final String LEANBACK_TV_INPUT_PACKAGE_NAME =
             "com.android.tv.leanback_tv_input";
     private static final String TEST_APP_LINK_TEXT = "test_app_link_text";
+    private static final String PARTNER_INPUT_ID = "partner";
     private static final ActivityInfo TEST_ACTIVITY_INFO = new ActivityInfo();
 
     private Context mMockContext;
     private Intent mInvalidIntent;
     private Intent mValidIntent;
-    private Intent mLiveChannelsIntent;
-    private Intent mLeanbackTvInputIntent;
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         mInvalidIntent = new Intent(Intent.ACTION_VIEW);
         mInvalidIntent.setComponent(new ComponentName(INVALID_TV_INPUT_PACKAGE_NAME, ".test"));
         mValidIntent = new Intent(Intent.ACTION_VIEW);
         mValidIntent.setComponent(new ComponentName(LEANBACK_TV_INPUT_PACKAGE_NAME, ".test"));
-        mLiveChannelsIntent = new Intent(Intent.ACTION_VIEW);
-        mLiveChannelsIntent.setComponent(
+        Intent liveChannelsIntent = new Intent(Intent.ACTION_VIEW);
+        liveChannelsIntent.setComponent(
                 new ComponentName(LIVE_CHANNELS_PACKAGE_NAME, ".MainActivity"));
-        mLeanbackTvInputIntent = new Intent(Intent.ACTION_VIEW);
-        mLeanbackTvInputIntent.setComponent(
+        Intent leanbackTvInputIntent = new Intent(Intent.ACTION_VIEW);
+        leanbackTvInputIntent.setComponent(
                 new ComponentName(LEANBACK_TV_INPUT_PACKAGE_NAME, ".test"));
 
         PackageManager mockPackageManager = Mockito.mock(PackageManager.class);
         Mockito.when(mockPackageManager.getLeanbackLaunchIntentForPackage(
                 INVALID_TV_INPUT_PACKAGE_NAME)).thenReturn(null);
         Mockito.when(mockPackageManager.getLeanbackLaunchIntentForPackage(
-                LIVE_CHANNELS_PACKAGE_NAME)).thenReturn(mLiveChannelsIntent);
+                LIVE_CHANNELS_PACKAGE_NAME)).thenReturn(liveChannelsIntent);
         Mockito.when(mockPackageManager.getLeanbackLaunchIntentForPackage(
                 NONE_LEANBACK_TV_INPUT_PACKAGE_NAME)).thenReturn(null);
         Mockito.when(mockPackageManager.getLeanbackLaunchIntentForPackage(
-                LEANBACK_TV_INPUT_PACKAGE_NAME)).thenReturn(mLeanbackTvInputIntent);
+                LEANBACK_TV_INPUT_PACKAGE_NAME)).thenReturn(leanbackTvInputIntent);
 
         // Channel.getAppLinkIntent() calls initAppLinkTypeAndIntent() which calls
         // Intent.resolveActivityInfo() which calls PackageManager.getActivityInfo().
         Mockito.doAnswer(new Answer<ActivityInfo>() {
+            @Override
             public ActivityInfo answer(InvocationOnMock invocation) {
                 // We only check the package name, since the class name can be changed
                 // when an intent is changed to an uri and created from the uri.
@@ -165,17 +168,65 @@ public class ChannelTest extends AndroidTestCase {
 
     private void assertAppLinkType(int expectedType, String inputPackageName, String appLinkText,
             Intent appLinkIntent) {
+        // In Channel, Intent.URI_INTENT_SCHEME is used to parse the URI. So the same flag should be
+        // used when the URI is created.
         Channel testChannel = new Channel.Builder()
                 .setPackageName(inputPackageName)
                 .setAppLinkText(appLinkText)
-                .setAppLinkIntentUri(appLinkIntent == null ? null : appLinkIntent.toUri(0))
+                .setAppLinkIntentUri(appLinkIntent == null ? null : appLinkIntent.toUri(
+                        Intent.URI_INTENT_SCHEME))
                 .build();
         assertEquals("Unexpected app-link type for for " + testChannel,
                 expectedType, testChannel.getAppLinkType(mMockContext));
     }
 
     public void testComparator() {
-        final String PARTNER_INPUT_ID = "partner";
+
+        TvInputManagerHelper manager = Mockito.mock(TvInputManagerHelper.class);
+        Mockito.when(manager.isPartnerInput(Matchers.anyString())).thenAnswer(
+                new Answer<Boolean>() {
+                    @Override
+                    public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                        String inputId = (String) invocation.getArguments()[0];
+                        boolean isPartner = PARTNER_INPUT_ID.equals(inputId);
+                        return isPartner;
+                    }
+                });
+        Comparator<Channel> comparator = new TestChannelComparator(manager);
+        ComparatorTester<Channel> comparatorTester =
+                ComparatorTester.withoutEqualsTest(comparator);
+        comparatorTester.addComparableGroup(
+                new Channel.Builder().setInputId(PARTNER_INPUT_ID).build());
+        comparatorTester.addComparableGroup(
+                new Channel.Builder().setInputId("1").build());
+        comparatorTester.addComparableGroup(
+                new Channel.Builder().setInputId("1").setDisplayNumber("2").build());
+        comparatorTester.addComparableGroup(
+                new Channel.Builder().setInputId("2").setDisplayNumber("1.0").build());
+
+        // display name does not affect comparator
+        comparatorTester.addComparableGroup(
+                new Channel.Builder().setInputId("2").setDisplayNumber("1.62")
+                        .setDisplayName("test1").build(),
+                new Channel.Builder().setInputId("2").setDisplayNumber("1.62")
+                        .setDisplayName("test2").build(),
+                new Channel.Builder().setInputId("2").setDisplayNumber("1.62")
+                        .setDisplayName("test3").build());
+        comparatorTester.addComparableGroup(
+                new Channel.Builder().setInputId("2").setDisplayNumber("2.0").build());
+        // Numeric display number sorting
+        comparatorTester.addComparableGroup(
+                new Channel.Builder().setInputId("2").setDisplayNumber("12.2").build());
+        comparatorTester.test();
+    }
+
+    /**
+     * Test Input Label handled by {@link com.android.tv.data.Channel.DefaultComparator}.
+     *
+     * <p>Sort partner inputs first, then sort by input label, then by input id.
+     * See <a href="http://b/23031603">b/23031603</a>.
+     */
+    public void testComparatorLabel() {
 
         TvInputManagerHelper manager = Mockito.mock(TvInputManagerHelper.class);
         Mockito.when(manager.isPartnerInput(Matchers.anyString())).thenAnswer(
@@ -186,26 +237,21 @@ public class ChannelTest extends AndroidTestCase {
                         return PARTNER_INPUT_ID.equals(inputId);
                     }
                 });
-        Comparator<Channel> comparator = new TestChannelComparator(manager);
+        Comparator<Channel> comparator = new ChannelComparatorWithDescriptionAsLabel(manager);
         ComparatorTester<Channel> comparatorTester =
                 ComparatorTester.withoutEqualsTest(comparator);
+
         comparatorTester.addComparableGroup(
-                new Channel.Builder().setInputId(PARTNER_INPUT_ID).setDisplayNumber("100").build());
+                new Channel.Builder().setInputId(PARTNER_INPUT_ID).setDescription("A").build());
+
+        // The description is used as a label for this test.
         comparatorTester.addComparableGroup(
-                new Channel.Builder().setInputId("1").setDisplayNumber("2").build());
+                new Channel.Builder().setDescription("A").setInputId("1").build());
         comparatorTester.addComparableGroup(
-                new Channel.Builder().setInputId("2").setDisplayNumber("1.0").build());
+                new Channel.Builder().setDescription("A").setInputId("2").build());
         comparatorTester.addComparableGroup(
-                new Channel.Builder().setInputId("2").setDisplayNumber("1.62")
-                        .setDisplayName("test1").build(),
-                new Channel.Builder().setInputId("2").setDisplayNumber("1.62")
-                        .setDisplayName("test2").build(),
-                new Channel.Builder().setInputId("2").setDisplayNumber("1.62")
-                        .setDisplayName("test3").build());
-        comparatorTester.addComparableGroup(
-                new Channel.Builder().setInputId("2").setDisplayNumber("2.0").build());
-        comparatorTester.addComparableGroup(
-                new Channel.Builder().setInputId("2").setDisplayNumber("12.2").build());
+                new Channel.Builder().setDescription("B").setInputId("1").build());
+
         comparatorTester.test();
     }
 
@@ -218,5 +264,16 @@ public class ChannelTest extends AndroidTestCase {
         public String getInputLabelForChannel(Channel channel) {
             return channel.getInputId();
         }
-    };
+    }
+
+    private static class ChannelComparatorWithDescriptionAsLabel extends Channel.DefaultComparator {
+        public ChannelComparatorWithDescriptionAsLabel(TvInputManagerHelper manager) {
+            super(null, manager);
+        }
+
+        @Override
+        public String getInputLabelForChannel(Channel channel) {
+            return channel.getDescription();
+        }
+    }
 }

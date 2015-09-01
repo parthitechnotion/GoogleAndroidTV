@@ -16,12 +16,23 @@
 
 package com.android.tv.analytics;
 
+import android.support.annotation.VisibleForTesting;
+
+import com.android.tv.TimeShiftManager;
+import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 
 /**
  * A implementation of Tracker that does nothing.
  */
+@VisibleForTesting
 public class StubTracker implements Tracker {
+    @Override
+    public void sendChannelCount(int browsableChannelCount, int totalChannelCount) { }
+
+    @Override
+    public void sendConfigurationInfo(TvApplication.ConfigurationInfo info) { }
+
     @Override
     public void sendMainStart() { }
 
@@ -32,7 +43,7 @@ public class StubTracker implements Tracker {
     public void sendScreenView(String screenName) { }
 
     @Override
-    public void sendChannelViewStart(Channel channel) { }
+    public void sendChannelViewStart(Channel channel, boolean tunedByRecommendation) { }
 
     @Override
     public void sendChannelTuneTime(Channel channel, long durationMs) { }
@@ -102,4 +113,7 @@ public class StubTracker implements Tracker {
 
     @Override
     public void sendHideSidePanel(HasTrackerLabel trackerLabel, long durationMs) { }
+
+    @Override
+    public void sendTimeShiftAction(@TimeShiftManager.TimeShiftActionId int actionId) { }
 }

@@ -15,33 +15,15 @@
   ~ limitations under the License.
   -->
 
-<com.android.tv.menu.ItemListRowView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.tv.menu.ItemListRowView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:lb="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_list"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:clipChildren="false"
-    android:clipToPadding="false"
-    android:focusable="true"
-    android:descendantFocusability="afterDescendants">
+    style="@style/menu_row_view">
 
-    <!-- Although the text leading can be changed accroding to the text size,
-         we decided to set fixed layout_height since it doesn't make a big difference,
-         and it makes code more simpler. -->
     <TextView
         android:id="@+id/title"
-        android:layout_width="@dimen/menu_row_title_width"
-        android:layout_height="@dimen/menu_row_title_height"
-        android:layout_gravity="start"
-        android:paddingBottom="@dimen/menu_row_title_padding_bottom"
-        android:fontFamily="@string/condensed_font"
-        android:gravity="start|bottom"
-        android:textAlignment="viewStart"
-        android:textColor="@color/menu_row_title"
-        android:textSize="@dimen/menu_row_title_text_size_deselected"
-        android:transformPivotX="@dimen/menu_row_title_transform_pivot_x"
-        android:transformPivotY="@dimen/menu_row_title_transform_pivot_y" />
+        style="@style/menu_row_title_view" />
 
     <!-- The animation of this view includes an alpha animation, while one of its child is scaled
          to out of bounds of this view. This results in visual artifacts while animating, because
@@ -53,15 +35,7 @@
          The accurate layout height is set in MenuRowView.onBind(). -->
     <android.support.v17.leanback.widget.HorizontalGridView
         android:id="@+id/list_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/menu_list_margin_top"
-        android:layout_marginBottom="@dimen/menu_list_margin_bottom"
-        android:layout_marginStart="@dimen/menu_list_margin_start"
-        android:layout_marginEnd="@dimen/menu_list_margin_end"
-        android:paddingTop="@dimen/menu_list_padding_top"
-        android:paddingStart="@dimen/menu_list_padding_start"
-        android:paddingEnd="@dimen/menu_list_padding_end"
+        style="@style/menu_row_contents_view"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:focusable="true"

@@ -16,6 +16,7 @@
 
 package com.android.tv.ui;
 
+import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.util.AttributeSet;
@@ -23,7 +24,7 @@ import android.view.KeyEvent;
 import android.view.View;
 
 import com.android.tv.R;
-import com.android.tv.menu.MenuView;
+import com.android.tv.menu.Menu;
 
 public class IntroView extends FullscreenDialogView {
     private AnimationDrawable mRippleDrawable;
@@ -39,7 +40,6 @@ public class IntroView extends FullscreenDialogView {
 
     public IntroView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        setTransitionAnimationEnabled(false);
     }
 
     @Override
@@ -78,7 +78,37 @@ public class IntroView extends FullscreenDialogView {
     @Override
     public void onDestroy() {
         if (mOpenMenu) {
-            getActivity().getOverlayManager().showMenu(MenuView.REASON_GUIDE);
+            getActivity().getOverlayManager().showMenu(Menu.REASON_GUIDE);
         }
+    }
+
+    @Override
+    protected void onStartEnterAnimation(TimeInterpolator interpolator, long duration) {
+        View v = findViewById(R.id.container);
+        v.setAlpha(0);
+        v.animate()
+                .alpha(1.0f)
+                .setInterpolator(interpolator)
+                .setDuration(duration)
+                .withLayer()
+                .start();
+    }
+
+    @Override
+    protected void onStartExitAnimation(TimeInterpolator interpolator, long duration,
+            final Runnable onAnimationEnded) {
+        View v = findViewById(R.id.container);
+        v.animate()
+                .alpha(0.0f)
+                .setInterpolator(interpolator)
+                .setDuration(duration)
+                .withLayer()
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        onAnimationEnded.run();
+                    }
+                })
+                .start();
     }
 }

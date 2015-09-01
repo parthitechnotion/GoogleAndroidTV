@@ -19,12 +19,15 @@ package com.android.tv.menu;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.tv.R;
+import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.ProgramDataManager;
+import com.android.tv.util.Utils;
 
 import java.util.List;
 
@@ -34,27 +37,18 @@ import java.util.List;
 public class ChannelsPosterPrefetcher {
     private static final String TAG = "PosterPrefetcher";
     private static final boolean DEBUG = false;
+    private static final int MSG_PREFETCH_IMAGE = 1000;
+    private static final int ONDEMAND_POSTER_PREFETCH_DELAY_MILLIS = 500;  // 500 milliseconds
 
     private final ProgramDataManager mProgramDataManager;
     private final ChannelsRowAdapter mChannelsAdapter;
     private final int mPosterArtWidth;
     private final int mPosterArtHeight;
     private final Context mContext;
+    private final Handler mHandler = new PrefetchHandler(this);
 
-    private static final int MSG_PREFETCH_IMAGE = 1000;
+    private boolean isCanceled;
 
-    private static final int ONDEMAND_POSTER_PREFETCH_DELAY_MILLIS = 500; // 500 milliseconds
-
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_PREFETCH_IMAGE:
-                    doPrefetchImages();
-                    break;
-            }
-        }
-    };
 
     /**
      * Create {@link ChannelsPosterPrefetcher} object with given parameters.
@@ -67,13 +61,17 @@ public class ChannelsPosterPrefetcher {
                 R.dimen.card_image_layout_width);
         mPosterArtHeight = context.getResources().getDimensionPixelSize(
                 R.dimen.card_image_layout_height);
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     /**
      * Start prefetching of program poster art of recommendation.
      */
     public void prefetch() {
+        if (isCanceled) {
+            Utils.engThrowElseWarn(TAG, "Prefetch called after cancel was called.");
+            return;
+        }
         if (DEBUG) {
             Log.d(TAG, "startPrefetching()");
         }
@@ -86,6 +84,14 @@ public class ChannelsPosterPrefetcher {
                 mHandler.obtainMessage(MSG_PREFETCH_IMAGE), ONDEMAND_POSTER_PREFETCH_DELAY_MILLIS);
     }
 
+    /**
+     * Cancels pending and current prefetch requests.
+     */
+    public void cancel() {
+        isCanceled = true;
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
     private void doPrefetchImages() {
         if (DEBUG) {
             Log.d(TAG, "doPrefetchImages()");
@@ -94,6 +100,9 @@ public class ChannelsPosterPrefetcher {
         List<Channel> channelList = mChannelsAdapter.getItemList();
         if (channelList != null) {
             for (Channel channel : channelList) {
+                if (isCanceled) {
+                    return;
+                }
                 if (!Channel.isValid(channel)) {
                     continue;
                 }
@@ -103,6 +112,21 @@ public class ChannelsPosterPrefetcher {
                 if (program != null) {
                     program.prefetchPosterArt(mContext, mPosterArtWidth, mPosterArtHeight);
                 }
+            }
+        }
+    }
+
+    private static class PrefetchHandler extends WeakHandler<ChannelsPosterPrefetcher> {
+        public PrefetchHandler(ChannelsPosterPrefetcher ref) {
+            super(ref);
+        }
+
+        @Override
+        public void handleMessage(Message msg, @NonNull ChannelsPosterPrefetcher prefetcher) {
+            switch (msg.what) {
+                case MSG_PREFETCH_IMAGE:
+                    prefetcher.doPrefetchImages();
+                    break;
             }
         }
     }

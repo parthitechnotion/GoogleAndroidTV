@@ -124,7 +124,11 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadImageC
         @Override
         public void run() {
             mCurrentHeight = 0;
-            mMainActivity.goToEmptyScene(true);
+            mMainActivity.getOverlayManager().hideOverlays(
+                    TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
         }
     };
     private final long mShowDurationMillis;

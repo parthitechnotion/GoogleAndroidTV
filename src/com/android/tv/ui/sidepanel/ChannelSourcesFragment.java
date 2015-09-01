@@ -28,6 +28,9 @@ import java.util.List;
 
 public class ChannelSourcesFragment extends SideFragment {
     private static final String TRACKER_LABEL =  "channel sources";
+
+    private static int ADDITIONAL_DELAY_TO_SHOW_SETUP_DIALOG_MILLIS = 50;
+
     private final long mCurrentChannelId;
 
     public ChannelSourcesFragment(long currentChannelId) {
@@ -80,7 +83,11 @@ public class ChannelSourcesFragment extends SideFragment {
             @Override
             protected void onSelected() {
                 closeFragment();
-                activity.getOverlayManager().showSetupDialog();
+                // Running two animations at the same time causes performance drop.
+                // Show the setup dialog with delayed animation.
+                activity.getOverlayManager().showSetupDialog(
+                        activity.getResources().getInteger(R.integer.side_panel_anim_short_duration)
+                        + ADDITIONAL_DELAY_TO_SHOW_SETUP_DIALOG_MILLIS);
             }
         });
         return items;

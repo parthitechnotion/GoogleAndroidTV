@@ -27,31 +27,10 @@ public final class TvCommonConstants {
      */
     public static final String EXTRA_APP_LINK_CHANNEL_URI = "app_link_channel_uri";
 
-    private static int sPreviewSdkInt;
-    static {
-        try {
-            sPreviewSdkInt = Build.VERSION.PREVIEW_SDK_INT;
-        } catch (java.lang.NoSuchFieldError e) {
-            sPreviewSdkInt = 0;
-        }
-    }
-
-    /**
-     * A flag whether this platform is MNC Preview or not.
-     */
-    public static final boolean IS_MNC_PREVIEW =
-            Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1 && sPreviewSdkInt > 0;
-
-    /**
-     * A flag whether this platform is after MNC Preview or not.
-     */
-    public static final boolean IS_MNC_OR_HIGHER = Build.VERSION.SDK_INT >= 23;
-
     /**
      * A flag whether this platform supports time shifting API or not.
-     * TODO: Stop supporting mnc preview if possible.
      */
-    public static final boolean HAS_TIME_SHIFT_API = IS_MNC_PREVIEW || IS_MNC_OR_HIGHER;
+    public static final boolean HAS_TIME_SHIFT_API = Build.VERSION.SDK_INT >= 23;
 
     private TvCommonConstants() {
     }

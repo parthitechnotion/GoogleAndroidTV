@@ -32,8 +32,10 @@
     <integer name="menu_enter_duration">250</integer>
     <integer name="menu_exit_duration">150</integer>
     <integer name="menu_focus_anim_duration">100</integer>
-    <integer name="menu_row_selection_anim_duration">200</integer>
-
+    <integer name="menu_row_selection_anim_duration">250</integer>
+    <integer name="menu_previous_contents_fade_out_duration">50</integer>
+    <integer name="menu_current_contents_fade_in_duration">200</integer>
+    
     <!-- Side panel -->
     <integer name="side_panel_show_duration">60000</integer>
     <integer name="side_panel_anim_duration">250</integer>
@@ -47,6 +49,7 @@
     <integer name="program_guide_table_detail_toggle_anim_duration">100</integer>
     <integer name="program_guide_show_duration">60000</integer>
     <integer name="program_guide_ripple_anim_duration">@integer/ripple_anim_duration</integer>
+    <integer name="program_guide_selection_row">2</integer>
 
     <!-- Channel banner -->
     <integer name="channel_banner_show_duration">8000</integer>

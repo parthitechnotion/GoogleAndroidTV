@@ -28,7 +28,6 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
 import com.android.tv.R;
-import com.android.tv.common.TvCommonConstants;
 import com.android.tv.testing.uihelper.ByResource;
 import com.android.tv.testing.uihelper.Constants;
 import com.android.tv.testing.uihelper.LiveChannelsUiDeviceHelper;
@@ -151,9 +150,8 @@ public class ProgramGuideJankTest extends JankTestBase {
 
     public void selectProgramGuideMenuItem() {
         mMenuHelper.showMenu();
-        int rowTitleResId = TvCommonConstants.IS_MNC_OR_HIGHER ? R.string.menu_title_channels
-                : R.string.menu_title_channels_legacy;
-        mMenuHelper.assertNavigateToMenuItem(rowTitleResId, R.string.channels_item_program_guide);
+        mMenuHelper.assertNavigateToMenuItem(R.string.menu_title_channels,
+                R.string.channels_item_program_guide);
         mDevice.waitForIdle();
     }
 

@@ -41,7 +41,7 @@ public class PlayControlsRowViewTest extends LiveChannelsTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mLiveChannelsHelper.assertAppStarted();
-        pressKeysForChannel(TvTestInputConstants.CH_1);
+        pressKeysForChannel(TvTestInputConstants.CH_1_DEFAULT_DONT_MODIFY);
         // Tune to a new channel to ensure that the channel is changed.
         mDevice.pressDPadUp();
         getInstrumentation().waitForIdleSync();

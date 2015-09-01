@@ -49,15 +49,6 @@ public class CustomAction implements Comparable<CustomAction> {
         return mPositionPriority < POSITION_THRESHOLD;
     }
 
-    /**
-     * Returns position priority defined in partner customization package.
-     * If there’s multiple custom options are at the front or back,
-     * options in each group will be sorted by their priority in ascending order.
-     */
-    public int getPositionPriority() {
-        return mPositionPriority;
-    }
-
     @Override
     public int compareTo(@NonNull CustomAction another) {
         return mPositionPriority - another.mPositionPriority;

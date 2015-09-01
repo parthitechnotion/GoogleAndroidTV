@@ -20,8 +20,7 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"mono"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"stéréo"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Commandes de lecture"</string>
-    <string name="menu_title_channels" msgid="1949045451672990132">"Chaînes"</string>
-    <string name="menu_title_channels_legacy" msgid="700324464656729334">"Chaînes récentes"</string>
+    <string name="menu_title_channels" msgid="1801845517674690003">"Chaînes récentes"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"Options TV"</string>
     <string name="menu_title_pip_options" msgid="4252934960762407689">"Options PIP"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"Commandes de lecture indisponibles pour cette chaîne."</string>
@@ -110,7 +109,7 @@
     <string name="option_channels_unlock_all" msgid="6839513296447567623">"Tout débloquer"</string>
     <string name="option_channels_subheader_hidden" msgid="4669425935426972078">"Chaînes masquées"</string>
     <string name="option_program_restrictions" msgid="241342023067364108">"Filtrage des programmes"</string>
-    <string name="option_change_pin" msgid="2881594075631152566">"Modifier le code PIN"</string>
+    <string name="option_change_pin" msgid="2881594075631152566">"Modifier le code"</string>
     <string name="option_country_rating_systems" msgid="7288569813945260224">"Système de classification"</string>
     <string name="option_ratings" msgid="4009116954188688616">"Notes"</string>
     <string name="option_see_all_rating_systems" msgid="7702673500014877288">"Voir tous les systèmes de classification"</string>
@@ -142,7 +141,7 @@
     <item quantity="other" msgid="8829550842387756054">"Vous avez saisi un code d\'accès incorrect à cinq reprises.\nVeuillez réessayer dans <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> secondes."</item>
   </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"Ce code d\'accès est incorrect. Veuillez réessayer."</string>
-    <string name="pin_toast_not_match" msgid="4283624338659521768">"Le code PIN est incorrect. Veuillez réessayer."</string>
+    <string name="pin_toast_not_match" msgid="4283624338659521768">"Le code est incorrect. Veuillez réessayer."</string>
     <string name="side_panel_title_about" msgid="4572960435017168299">"À propos"</string>
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licences Open Source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licences Open Source"</string>

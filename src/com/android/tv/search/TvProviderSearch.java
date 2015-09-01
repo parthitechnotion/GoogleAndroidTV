@@ -28,6 +28,7 @@ import android.media.tv.TvContract.WatchedPrograms;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.net.Uri;
+import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -76,6 +77,7 @@ public class TvProviderSearch {
      * @param action One of {@link #ACTION_TYPE_SWITCH_CHANNEL}, {@link #ACTION_TYPE_SWITCH_INPUT},
      *               or {@link #ACTION_TYPE_AMBIGUOUS},
      */
+    @WorkerThread
     public List<SearchResult> search(String query, int limit, int action) {
         List<SearchResult> results = new ArrayList<>();
         Set<Long> channelsFound = new HashSet<>();
@@ -108,8 +110,8 @@ public class TvProviderSearch {
         return results;
     }
 
-    private StringBuilder appendSelectionString(StringBuilder sb,
-            String[] columnForExactMatching, String[] columnForPartialMatching) {
+    private void appendSelectionString(StringBuilder sb, String[] columnForExactMatching,
+            String[] columnForPartialMatching) {
         boolean firstColumn = true;
         if (columnForExactMatching != null) {
             for (String column : columnForExactMatching) {
@@ -131,7 +133,6 @@ public class TvProviderSearch {
                 sb.append(column).append(" LIKE ?");
             }
         }
-        return sb;
     }
 
     private void insertSelectionArgumentStrings(String[] selectionArgs, int pos,
@@ -151,6 +152,7 @@ public class TvProviderSearch {
         }
     }
 
+    @WorkerThread
     private List<SearchResult> searchChannels(String query, Set<Long> channels, int limit) {
         List<SearchResult> results = new ArrayList<>();
         if (TextUtils.isDigitsOnly(query)) {
@@ -174,6 +176,7 @@ public class TvProviderSearch {
         return results;
     }
 
+    @WorkerThread
     private List<SearchResult> searchChannels(String query, String[] columnForExactMatching,
             String[] columnForPartialMatching, Set<Long> channelsFound, int limit) {
         Assert.assertTrue(
@@ -246,6 +249,7 @@ public class TvProviderSearch {
      * program information of the channel if the current program information exists and it is not
      * blocked.
      */
+    @WorkerThread
     private void fillProgramInfo(SearchResult result) {
         long now = System.currentTimeMillis();
         Uri uri = TvContract.buildProgramsUriForChannel(result.channelId, now, now);
@@ -293,6 +297,7 @@ public class TvProviderSearch {
         return (int)(100 * (current - startUtcMillis) / (endUtcMillis - startUtcMillis));
     }
 
+    @WorkerThread
     private List<SearchResult> searchPrograms(String query, String[] columnForExactMatching,
             String[] columnForPartialMatching, Set<Long> channelsFound, int limit) {
         Assert.assertTrue(
@@ -459,6 +464,8 @@ public class TvProviderSearch {
         return result;
     }
 
+
+    @WorkerThread
     private class ChannelComparatorWithSameDisplayNumber implements Comparator<SearchResult> {
         private final Map<Long, Long> mMaxWatchStartTimeMap = new HashMap<>();
 

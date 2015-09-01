@@ -16,6 +16,8 @@
 
 package com.android.tv.recommendation;
 
+import android.test.suitebuilder.annotation.SmallTest;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Unit tests for {@link RecentChannelEvaluator}.
  */
+@SmallTest
 public class RecentChannelEvaluatorTest extends EvaluatorTestCase<RecentChannelEvaluator> {
     private static final int DEFAULT_NUMBER_OF_CHANNELS = 4;
     private static final long DEFAULT_WATCH_START_TIME_MS =
@@ -32,6 +35,7 @@ public class RecentChannelEvaluatorTest extends EvaluatorTestCase<RecentChannelE
             System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
     private static final long DEFAULT_MAX_WATCH_DURATION_MS = TimeUnit.HOURS.toMillis(1);
 
+    @Override
     public RecentChannelEvaluator createEvaluator() {
         return new RecentChannelEvaluator();
     }

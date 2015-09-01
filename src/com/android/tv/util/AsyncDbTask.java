@@ -21,7 +21,9 @@ import android.database.Cursor;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 import android.util.Log;
 import android.util.Range;
 
@@ -168,6 +170,7 @@ public abstract class AsyncDbTask<Params, Progress, Result>
          *
          * <p><b>Note</b> This is executed on the DB thread by {@link #doInBackground(Void...)}
          */
+        @WorkerThread
         protected abstract Result onQuery(Cursor c);
 
         @Override
@@ -215,6 +218,7 @@ public abstract class AsyncDbTask<Params, Progress, Result>
          *
          * @param c The cursor with the values to create T from.
          */
+        @WorkerThread
         protected abstract T fromCursor(Cursor c);
     }
 
@@ -238,6 +242,7 @@ public abstract class AsyncDbTask<Params, Progress, Result>
      * Execute the task on the {@link #DB_EXECUTOR} thread.
      */
     @SafeVarargs
+    @MainThread
     public final void executeOnDbThread(Params... params) {
         executeOnExecutor(DB_EXECUTOR, params);
     }

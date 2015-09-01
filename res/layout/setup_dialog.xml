@@ -18,20 +18,27 @@
 <com.android.tv.ui.SetupView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/setup_background">
+    android:layout_height="match_parent">
+    <View
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/setup_background" />
+    <!-- clipChildern:false is given for item animations in input_list view. -->
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
         android:orientation="horizontal" >
         <LinearLayout
+            android:id="@+id/setup_left"
             android:layout_width="592dp"
             android:layout_height="match_parent"
             android:paddingStart="56dp"
             android:paddingEnd="32dp"
             android:paddingTop="183dp"
-            android:orientation="vertical" >
+            android:orientation="vertical">
             <TextView
                 android:id="@+id/setup_title"
                 android:layout_width="match_parent"
@@ -46,7 +53,7 @@
                 android:layout_height="match_parent"
                 android:fontFamily="@string/font"
                 android:textColor="@color/setup_description"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </LinearLayout>
         <android.support.v17.leanback.widget.VerticalGridView
             android:id="@+id/input_list"

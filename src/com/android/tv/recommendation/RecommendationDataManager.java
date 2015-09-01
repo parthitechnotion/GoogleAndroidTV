@@ -28,9 +28,12 @@ import android.media.tv.TvInputManager.TvInputCallback;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
+import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 
@@ -71,11 +74,12 @@ public class RecommendationDataManager {
     private static final int INVALID_INDEX = -1;
 
     private static RecommendationDataManager sManager;
+    private final static Object sListenerLock = new Object();
     private final ContentObserver mContentObserver;
     private final Map<Long, ChannelRecord> mChannelRecordMap = new ConcurrentHashMap<>();
     private final Map<Long, ChannelRecord> mAvailableChannelRecordMap = new ConcurrentHashMap<>();
 
-    private Context mContext;
+    private final Context mContext;
     private boolean mStarted;
     private boolean mCancelLoadTask;
     private boolean mChannelRecordMapLoaded;
@@ -90,7 +94,6 @@ public class RecommendationDataManager {
 
     private final HandlerThread mHandlerThread;
 
-    @SuppressWarnings("unchecked")
     private final Handler mHandler;
 
     private final List<ListenerRecord> mListeners = new ArrayList<>();
@@ -117,7 +120,7 @@ public class RecommendationDataManager {
      */
     public void release(@NonNull Listener listener) {
         removeListener(listener);
-        synchronized (mListeners) {
+        synchronized (sListenerLock) {
             if (mListeners.size() == 0) {
                 stop();
             }
@@ -183,46 +186,7 @@ public class RecommendationDataManager {
         mContext = context.getApplicationContext();
         mHandlerThread = new HandlerThread("RecommendationDataManager");
         mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case MSG_START:
-                        onStart();
-                        break;
-                    case MSG_STOP:
-                        if (mStarted) {
-                            onStop();
-                        }
-                        break;
-                    case MSG_UPDATE_CHANNEL:
-                        if (mStarted) {
-                            onUpdateChannel((Uri) msg.obj);
-                        }
-                        break;
-                    case MSG_UPDATE_CHANNELS:
-                        if (mStarted) {
-                            onUpdateChannels((Uri) msg.obj);
-                        }
-                        break;
-                    case MSG_UPDATE_WATCH_HISTORY:
-                        if (mStarted) {
-                            onLoadWatchHistory((Uri) msg.obj);
-                        }
-                        break;
-                    case MSG_NOTIFY_CHANNEL_RECORD_MAP_LOADED:
-                        if (mStarted) {
-                            onNotifyChannelRecordMapLoaded();
-                        }
-                        break;
-                    case MSG_NOTIFY_CHANNEL_RECORD_MAP_CHANGED:
-                        if (mStarted) {
-                            onNotifyChannelRecordMapChanged();
-                        }
-                        break;
-                }
-            }
-        };
+        mHandler = new RecommendationHandler(mHandlerThread.getLooper(), this);
         mContentObserver = new RecommendationContentObserver(mHandler);
     }
 
@@ -270,7 +234,7 @@ public class RecommendationDataManager {
     }
 
     private void addListener(Listener listener) {
-        synchronized (mListeners) {
+        synchronized (sListenerLock) {
             if (getListenerIndexLocked(listener) == INVALID_INDEX) {
                 mListeners.add((new ListenerRecord(listener)));
             }
@@ -278,10 +242,11 @@ public class RecommendationDataManager {
     }
 
     private void removeListener(Listener listener) {
-        synchronized (mListeners) {
+        synchronized (sListenerLock) {
             int idx = getListenerIndexLocked(listener);
             if (idx != INVALID_INDEX) {
-                mListeners.remove(idx);
+                ListenerRecord record = mListeners.remove(idx);
+                record.mListener = null;
             }
         }
     }
@@ -319,6 +284,7 @@ public class RecommendationDataManager {
         mStarted = false;
     }
 
+    @WorkerThread
     private void onUpdateChannel(Uri uri) {
         Channel channel = null;
         try (Cursor cursor = mContext.getContentResolver().query(uri, Channel.PROJECTION,
@@ -341,6 +307,7 @@ public class RecommendationDataManager {
         }
     }
 
+    @WorkerThread
     private void onUpdateChannels(Uri uri) {
         List<Channel> channels = new ArrayList<>();
         try (Cursor cursor = mContext.getContentResolver().query(uri, Channel.PROJECTION,
@@ -378,6 +345,7 @@ public class RecommendationDataManager {
         }
     }
 
+    @WorkerThread
     private void onLoadWatchHistory(Uri uri) {
         List<WatchedProgram> history = new ArrayList<>();
         try (Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null)) {
@@ -394,7 +362,7 @@ public class RecommendationDataManager {
             final ChannelRecord channelRecord =
                     updateChannelRecordFromWatchedProgram(watchedProgram);
             if (mChannelRecordMapLoaded && channelRecord != null) {
-                synchronized (mListeners) {
+                synchronized (sListenerLock) {
                     for (ListenerRecord l : mListeners) {
                         l.postNewWatchLog(channelRecord);
                     }
@@ -437,7 +405,7 @@ public class RecommendationDataManager {
 
     private void onNotifyChannelRecordMapLoaded() {
         mChannelRecordMapLoaded = true;
-        synchronized (mListeners) {
+        synchronized (sListenerLock) {
             for (ListenerRecord l : mListeners) {
                 l.postChannelRecordLoaded();
             }
@@ -445,7 +413,7 @@ public class RecommendationDataManager {
     }
 
     private void onNotifyChannelRecordMapChanged() {
-        synchronized (mListeners) {
+        synchronized (sListenerLock) {
             for (ListenerRecord l : mListeners) {
                 l.postChannelRecordChanged();
             }
@@ -551,8 +519,10 @@ public class RecommendationDataManager {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (mListener != null) {
-                        mListener.onChannelRecordLoaded();
+                    synchronized (sListenerLock) {
+                        if (mListener != null) {
+                            mListener.onChannelRecordLoaded();
+                        }
                     }
                 }
             });
@@ -562,8 +532,10 @@ public class RecommendationDataManager {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (mListener != null) {
-                        mListener.onNewWatchLog(channelRecord);
+                    synchronized (sListenerLock) {
+                        if (mListener != null) {
+                            mListener.onNewWatchLog(channelRecord);
+                        }
                     }
                 }
             });
@@ -573,11 +545,58 @@ public class RecommendationDataManager {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (mListener != null) {
-                        mListener.onChannelRecordChanged();
+                    synchronized (sListenerLock) {
+                        if (mListener != null) {
+                            mListener.onChannelRecordChanged();
+                        }
                     }
                 }
             });
+        }
+    }
+
+    private static class RecommendationHandler extends WeakHandler<RecommendationDataManager> {
+        public RecommendationHandler(@NonNull Looper looper, RecommendationDataManager ref) {
+            super(looper, ref);
+        }
+
+        @Override
+        public void handleMessage(Message msg, @NonNull RecommendationDataManager dataManager) {
+            switch (msg.what) {
+                case MSG_START:
+                    dataManager.onStart();
+                    break;
+                case MSG_STOP:
+                    if (dataManager.mStarted) {
+                        dataManager.onStop();
+                    }
+                    break;
+                case MSG_UPDATE_CHANNEL:
+                    if (dataManager.mStarted) {
+                        dataManager.onUpdateChannel((Uri) msg.obj);
+                    }
+                    break;
+                case MSG_UPDATE_CHANNELS:
+                    if (dataManager.mStarted) {
+                        dataManager.onUpdateChannels((Uri) msg.obj);
+                    }
+                    break;
+                case MSG_UPDATE_WATCH_HISTORY:
+                    if (dataManager.mStarted) {
+                        dataManager.onLoadWatchHistory((Uri) msg.obj);
+                    }
+                    break;
+                case MSG_NOTIFY_CHANNEL_RECORD_MAP_LOADED:
+                    if (dataManager.mStarted) {
+                        dataManager.onNotifyChannelRecordMapLoaded();
+                    }
+                    break;
+                case MSG_NOTIFY_CHANNEL_RECORD_MAP_CHANGED:
+                    if (dataManager.mStarted) {
+                        dataManager.onNotifyChannelRecordMapChanged();
+                    }
+                    break;
+            }
         }
     }
 }

@@ -26,11 +26,15 @@ import android.media.tv.TvInputManager.TvInputCallback;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.MutableInt;
 
+import com.android.tv.analytics.Tracker;
+import com.android.tv.common.WeakHandler;
 import com.android.tv.util.AsyncDbTask;
+import com.android.tv.util.RecurringRunner;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -41,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The class to manage channel data.
@@ -54,6 +59,7 @@ public class ChannelDataManager {
     private static final boolean DEBUG = false;
 
     private static final int MSG_UPDATE_CHANNELS = 1000;
+    private static final long SEND_CHANNEL_STATUS_INTERVAL_MS = TimeUnit.DAYS.toMillis(1);
 
     private final Context mContext;
     private final TvInputManagerHelper mInputManager;
@@ -61,6 +67,9 @@ public class ChannelDataManager {
     private boolean mDbLoadFinished;
     private QueryAllChannelsTask mChannelsUpdateTask;
     private final List<Runnable> mPostRunnablesAfterChannelUpdate = new ArrayList<>();
+    // TODO: move ChannelDataManager to TvApplication to consistently run mRecurringRunner.
+    private RecurringRunner mRecurringRunner;
+    private final Tracker mTracker;
 
     private final Set<Listener> mListeners = new HashSet<>();
     private final Map<Long, ChannelWrapper> mChannelWrapperMap = new HashMap<>();
@@ -123,12 +132,13 @@ public class ChannelDataManager {
         }
     };
 
-    public ChannelDataManager(Context context, TvInputManagerHelper inputManager) {
-        this(context, inputManager, context.getContentResolver(), Looper.myLooper());
+    public ChannelDataManager(Context context, TvInputManagerHelper inputManager,
+            Tracker tracker) {
+        this(context, inputManager, tracker, context.getContentResolver(), Looper.myLooper());
     }
 
     @VisibleForTesting
-    ChannelDataManager(Context context, TvInputManagerHelper inputManager,
+    ChannelDataManager(Context context, TvInputManagerHelper inputManager, Tracker tracker,
             ContentResolver contentResolver, Looper looper) {
         mContext = context;
         mInputManager = inputManager;
@@ -136,14 +146,7 @@ public class ChannelDataManager {
         mChannelComparator = new Channel.DefaultComparator(context, inputManager);
         // Detect duplicate channels while sorting.
         mChannelComparator.setDetectDuplicatesEnabled(true);
-        mHandler = new Handler(looper) {
-            @Override
-            public void handleMessage(Message msg) {
-                if (msg.what == MSG_UPDATE_CHANNELS) {
-                    handleUpdateChannels();
-                }
-            }
-        };
+        mHandler = new ChannelDataManagerHandler(looper, this);
         mChannelObserver = new ContentObserver(mHandler) {
             @Override
             public void onChange(boolean selfChange) {
@@ -152,6 +155,9 @@ public class ChannelDataManager {
                 }
             }
         };
+        mTracker = tracker;
+        mRecurringRunner = new RecurringRunner(mContext, SEND_CHANNEL_STATUS_INTERVAL_MS,
+                new SendChannelStatusRunnable());
     }
 
     @VisibleForTesting
@@ -185,6 +191,7 @@ public class ChannelDataManager {
         }
         mStarted = false;
         mDbLoadFinished = false;
+        mRecurringRunner.stop();
 
         ChannelLogoFetcher.stopFetchingChannelLogos();
         mInputManager.removeCallback(mTvInputCallback);
@@ -602,6 +609,7 @@ public class ChannelDataManager {
 
             if (!mDbLoadFinished) {
                 mDbLoadFinished = true;
+                mRecurringRunner.start();
                 for (Listener l : mListeners) {
                     l.onLoadFinished();
                 }
@@ -640,5 +648,31 @@ public class ChannelDataManager {
                 mContentResolver.update(TvContract.Channels.CONTENT_URI, values, selection, null);
             }
         });
+    }
+
+    private static class ChannelDataManagerHandler extends WeakHandler<ChannelDataManager> {
+        public ChannelDataManagerHandler(Looper looper, ChannelDataManager channelDataManager) {
+            super(looper, channelDataManager);
+        }
+
+        @Override
+        public void handleMessage(Message msg, @NonNull ChannelDataManager channelDataManager) {
+            if (msg.what == MSG_UPDATE_CHANNELS) {
+                channelDataManager.handleUpdateChannels();
+            }
+        }
+    }
+
+    private class SendChannelStatusRunnable implements Runnable {
+        @Override
+        public void run() {
+            int browsableChannelCount = 0;
+            for (Channel channel : mChannels) {
+                if (channel.isBrowsable()) {
+                    ++browsableChannelCount;
+                }
+            }
+            mTracker.sendChannelCount(browsableChannelCount, mChannels.size());
+        }
     }
 }

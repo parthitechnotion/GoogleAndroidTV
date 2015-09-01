@@ -16,9 +16,13 @@
 
 package com.android.tv.ui;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.ViewGroup;
 
 import com.android.tv.ChannelTuner;
 import com.android.tv.MainActivity;
@@ -27,13 +31,16 @@ import com.android.tv.R;
 import com.android.tv.TimeShiftManager;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.WeakHandler;
 import com.android.tv.dialog.FullscreenDialogFragment;
 import com.android.tv.dialog.PinDialogFragment;
 import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.dialog.SafeDismissDialogFragment;
 import com.android.tv.guide.ProgramGuide;
+import com.android.tv.menu.Menu;
+import com.android.tv.menu.Menu.MenuShowReason;
+import com.android.tv.menu.MenuRowFactory;
 import com.android.tv.menu.MenuView;
-import com.android.tv.menu.MenuView.MenuShowReason;
 import com.android.tv.search.ProgramGuideSearchFragment;
 import com.android.tv.ui.TvTransitionManager.SceneType;
 import com.android.tv.ui.sidepanel.AboutFragment;
@@ -60,7 +67,7 @@ public class TvOverlayManager {
             value = {FLAG_HIDE_OVERLAYS_DEFAULT, FLAG_HIDE_OVERLAYS_WITHOUT_ANIMATION,
                     FLAG_HIDE_OVERLAYS_KEEP_SCENE, FLAG_HIDE_OVERLAYS_KEEP_DIALOG,
                     FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS, FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANEL_HISTORY,
-                    FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE})
+                    FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE, FLAG_HIDE_OVERLAYS_KEEP_MENU})
     public @interface HideOverlayFlag {}
     // FLAG_HIDE_OVERLAYs must be bitwise exclusive.
     public static final int FLAG_HIDE_OVERLAYS_DEFAULT =                 0b00000000;
@@ -70,6 +77,9 @@ public class TvOverlayManager {
     public static final int FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS =        0b00010000;
     public static final int FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANEL_HISTORY = 0b00100000;
     public static final int FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE =      0b01000000;
+    public static final int FLAG_HIDE_OVERLAYS_KEEP_MENU =               0b10000000;
+
+    public static final int MSG_SHOW_DIALOG = 1000;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(flag = true,
@@ -101,7 +111,7 @@ public class TvOverlayManager {
     private final MainActivity mMainActivity;
     private final ChannelTuner mChannelTuner;
     private final TvTransitionManager mTransitionManager;
-    private final MenuView mMenuView;
+    private final Menu mMenu;
     private final SideFragmentManager mSideFragmentManager;
     private final ProgramGuide mProgramGuide;
     private final KeypadChannelSwitchView mKeypadChannelSwitchView;
@@ -109,20 +119,24 @@ public class TvOverlayManager {
     private final ProgramGuideSearchFragment mSearchFragment;
     private final Tracker mTracker;
     private SafeDismissDialogFragment mCurrentDialog;
+    private final Handler mHandler = new TvOverlayHandler(this);
 
     private @TvOverlayType int mOpenedOverlays;
 
     public TvOverlayManager(MainActivity mainActivity, ChannelTuner channelTuner,
-            TvTransitionManager transitionManager, KeypadChannelSwitchView keypadChannelSwitchView,
-            SelectInputView selectInputView, ProgramGuideSearchFragment searchFragment) {
+            KeypadChannelSwitchView keypadChannelSwitchView,
+            ChannelBannerView channelBannerView, InputBannerView inputBannerView,
+            SelectInputView selectInputView, ViewGroup sceneContainer,
+            ProgramGuideSearchFragment searchFragment) {
         mMainActivity = mainActivity;
         mChannelTuner = channelTuner;
-        mTransitionManager = transitionManager;
         mKeypadChannelSwitchView = keypadChannelSwitchView;
         mSelectInputView = selectInputView;
         mSearchFragment = searchFragment;
         mTracker = ((TvApplication) mainActivity.getApplication()).getTracker();
-        transitionManager.setListener(new TvTransitionManager.Listener() {
+        mTransitionManager = new TvTransitionManager(mainActivity, sceneContainer,
+                channelBannerView, inputBannerView, mKeypadChannelSwitchView, selectInputView);
+        mTransitionManager.setListener(new TvTransitionManager.Listener() {
             @Override
             public void onSceneChanged(int fromScene, int toScene) {
                 // Call notifyOverlayOpened first so that the listener can know that a new scene
@@ -136,19 +150,18 @@ public class TvOverlayManager {
             }
         });
         // Menu
-        mMenuView = (MenuView) mainActivity.findViewById(R.id.menu);
-        mMenuView.setPreShowCallback(new Runnable() {
-            @Override
-            public void run() {
-                onOverlayOpened(OVERLAY_TYPE_MENU);
-            }
-        });
-        mMenuView.setPostHideCallback(new Runnable() {
-            @Override
-            public void run() {
-                onOverlayClosed(OVERLAY_TYPE_MENU);
-            }
-        });
+        MenuView menuView = (MenuView) mainActivity.findViewById(R.id.menu);
+        mMenu = new Menu(mainActivity, menuView, new MenuRowFactory(mainActivity),
+                new Menu.OnMenuVisibilityChangeListener() {
+                    @Override
+                    public void onMenuVisibilityChange(boolean visible) {
+                        if (visible) {
+                            onOverlayOpened(OVERLAY_TYPE_MENU);
+                        } else {
+                            onOverlayClosed(OVERLAY_TYPE_MENU);
+                        }
+                    }
+                });
         // Side Fragment
         mSideFragmentManager = new SideFragmentManager(mainActivity,
                 new Runnable() {
@@ -185,26 +198,19 @@ public class TvOverlayManager {
     }
 
     /**
-     * A method to follow the lifecycle of the {@link MainActivity}.
-     * This is called from {@link MainActivity#onStart}.
+     * A method to release all the allocated resources or unregister listeners.
+     * This is called from {@link MainActivity#onDestroy}.
      */
-    public void onStart() {
-        mMenuView.onStart();
+    public void release() {
+        mMenu.release();
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     /**
-     * A method to follow the lifecycle of the {@link MainActivity}.
-     * This is called from {@link MainActivity#onStop}.
+     * Returns the instance of {@link Menu}.
      */
-    public void onStop() {
-        mMenuView.onStop();
-    }
-
-    /**
-     * Returns the instance of {@link MenuView}.
-     */
-    public MenuView getMenuView() {
-        return mMenuView;
+    public Menu getMenu() {
+        return mMenu;
     }
 
     /**
@@ -233,7 +239,7 @@ public class TvOverlayManager {
      */
     public void showMenu(@MenuShowReason int reason) {
         if (mChannelTuner != null && mChannelTuner.areAllChannelsLoaded()) {
-            mMenuView.show(reason);
+            mMenu.show(reason);
         }
     }
 
@@ -242,7 +248,7 @@ public class TvOverlayManager {
      */
     public boolean showMenuWithTimeShiftPauseIfNeeded() {
         if (mMainActivity.getTimeShiftManager().isPaused()) {
-            showMenu(MenuView.REASON_PLAY_CONTROLS_PAUSE);
+            showMenu(Menu.REASON_PLAY_CONTROLS_PAUSE);
             return true;
         }
         return false;
@@ -253,6 +259,14 @@ public class TvOverlayManager {
      */
     public void showDialogFragment(String tag, SafeDismissDialogFragment dialog,
             boolean keepSidePanelHistory) {
+        showDialogFragment(tag, dialog, keepSidePanelHistory, 0);
+    }
+
+    /**
+     * Shows the given dialog with a delay {@code delayMillis}.
+     */
+    public void showDialogFragment(String tag, SafeDismissDialogFragment dialog,
+            boolean keepSidePanelHistory, long delayMillis) {
         int flags = FLAG_HIDE_OVERLAYS_KEEP_DIALOG;
         if (keepSidePanelHistory) {
             flags |= FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANEL_HISTORY;
@@ -269,7 +283,11 @@ public class TvOverlayManager {
         }
 
         mCurrentDialog = dialog;
-        dialog.show(mMainActivity.getFragmentManager(), tag);
+        if (delayMillis == 0) {
+            dialog.show(mMainActivity.getFragmentManager(), tag);
+        } else {
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_SHOW_DIALOG, tag), delayMillis);
+        }
 
         // Calling this from SafeDismissDialogFragment.onCreated() might be late
         // because it takes time for onCreated to be called
@@ -281,9 +299,17 @@ public class TvOverlayManager {
      * Shows setup dialog.
      */
     public void showSetupDialog() {
+        showSetupDialog(0);
+    }
+
+    /**
+     * Shows setup dialog with a delay {@code delayMillis}.
+     */
+    public void showSetupDialog(long delayMillis) {
         if (DEBUG) Log.d(TAG,"showSetupDialog");
         showDialogFragment(FullscreenDialogFragment.DIALOG_TAG,
-                new FullscreenDialogFragment(R.layout.setup_dialog, SETUP_TRACKER_LABEL), false);
+                new FullscreenDialogFragment(R.layout.setup_dialog, SETUP_TRACKER_LABEL), false,
+                delayMillis);
     }
 
     /**
@@ -304,6 +330,35 @@ public class TvOverlayManager {
     }
 
     /**
+     * Shows banner view.
+     */
+    public void showBanner() {
+        mTransitionManager.goToChannelBannerScene();
+    }
+
+    public void showKeypadChannelSwitch() {
+        hideOverlays(TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SCENE
+                | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
+                | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG);
+        mTransitionManager.goToKeypadChannelSwitchScene();
+    }
+
+    /**
+     * Shows select input view.
+     */
+    public void showSelectInputView() {
+        hideOverlays(TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SCENE);
+        mTransitionManager.goToSelectInputScene();
+    }
+
+    /**
+     * Initializes animators if animators are not initialized yet.
+     */
+    public void initAnimatorIfNeeded() {
+        mTransitionManager.initIfNeeded();
+    }
+
+    /**
      * It is called when a SafeDismissDialogFragment is destroyed.
      */
     public void onDialogDestroyed() {
@@ -315,8 +370,12 @@ public class TvOverlayManager {
      * Shows the program guide.
      */
     public void showProgramGuide() {
-        hideOverlays(TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE);
-        mProgramGuide.show();
+        mProgramGuide.show(new Runnable() {
+            @Override
+            public void run() {
+                hideOverlays(TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE);
+            }
+        });
     }
 
     /**
@@ -337,14 +396,23 @@ public class TvOverlayManager {
                     // to null.
                     ((PinDialogFragment) mCurrentDialog).setResultListener(null);
                 }
-                mCurrentDialog.dismiss();
+                if (mHandler.hasMessages(MSG_SHOW_DIALOG)) {
+                    mHandler.removeMessages(MSG_SHOW_DIALOG);
+                    onDialogDestroyed();
+                } else {
+                    mCurrentDialog.dismiss();
+                }
             }
             mCurrentDialog = null;
         }
 
         boolean withAnimation = (flags & FLAG_HIDE_OVERLAYS_WITHOUT_ANIMATION) == 0;
 
-        mMenuView.hide(withAnimation);
+        if ((flags & FLAG_HIDE_OVERLAYS_KEEP_MENU) != 0) {
+            // Keeps the menu.
+        } else {
+            mMenu.hide(withAnimation);
+        }
         if ((flags & FLAG_HIDE_OVERLAYS_KEEP_SCENE) != 0) {
             // Keeps the current scene.
         } else {
@@ -364,6 +432,17 @@ public class TvOverlayManager {
         } else {
             mProgramGuide.hide();
         }
+    }
+
+    /**
+     * Returns true, if a main view needs to hide informational text. Specifically, when overlay
+     * UIs except banner is shown, the informational text needs to be hidden for clean UI.
+     */
+    public boolean needHideTextOnMainView() {
+        return getSideFragmentManager().isActive()
+                || getMenu().isActive()
+                || mTransitionManager.isKeypadChannelSwitchActive()
+                || mTransitionManager.isSelectInputActive();
     }
 
     @TvOverlayType private int convertSceneToOverlayType(@SceneType int sceneType) {
@@ -419,8 +498,8 @@ public class TvOverlayManager {
     public void onUserInteraction() {
         if (mSideFragmentManager.isActive()) {
             mSideFragmentManager.scheduleHideAll();
-        } else if (mMenuView.isActive()) {
-            mMenuView.scheduleHide();
+        } else if (mMenu.isActive()) {
+            mMenu.scheduleHide();
         } else if (mProgramGuide.isActive()) {
             mProgramGuide.scheduleHide();
         }
@@ -439,7 +518,7 @@ public class TvOverlayManager {
             // Consumes the keys which may trigger system's default music player.
             return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED;
         }
-        if (mMenuView.isActive() || mSideFragmentManager.isActive() || mProgramGuide.isActive()) {
+        if (mMenu.isActive() || mSideFragmentManager.isActive() || mProgramGuide.isActive()) {
             return MainActivity.KEY_EVENT_HANDLER_RESULT_DISPATCH_TO_OVERLAY;
         }
         if (mTransitionManager.isKeypadChannelSwitchActive()) {
@@ -477,31 +556,31 @@ public class TvOverlayManager {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_MEDIA_PLAY:
                     timeShiftManager.play();
-                    showMenu(MenuView.REASON_PLAY_CONTROLS_PLAY);
+                    showMenu(Menu.REASON_PLAY_CONTROLS_PLAY);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PAUSE:
                     timeShiftManager.pause();
-                    showMenu(MenuView.REASON_PLAY_CONTROLS_PAUSE);
+                    showMenu(Menu.REASON_PLAY_CONTROLS_PAUSE);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
                     timeShiftManager.togglePlayPause();
-                    showMenu(MenuView.REASON_PLAY_CONTROLS_PLAY_PAUSE);
+                    showMenu(Menu.REASON_PLAY_CONTROLS_PLAY_PAUSE);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_REWIND:
                     timeShiftManager.rewind();
-                    showMenu(MenuView.REASON_PLAY_CONTROLS_REWIND);
+                    showMenu(Menu.REASON_PLAY_CONTROLS_REWIND);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
                     timeShiftManager.fastForward();
-                    showMenu(MenuView.REASON_PLAY_CONTROLS_FAST_FORWARD);
+                    showMenu(Menu.REASON_PLAY_CONTROLS_FAST_FORWARD);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                     timeShiftManager.jumpToPrevious();
-                    showMenu(MenuView.REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS);
+                    showMenu(Menu.REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
                     timeShiftManager.jumpToNext();
-                    showMenu(MenuView.REASON_PLAY_CONTROLS_JUMP_TO_NEXT);
+                    showMenu(Menu.REASON_PLAY_CONTROLS_JUMP_TO_NEXT);
                     break;
                 default:
                     // Does nothing.
@@ -513,7 +592,7 @@ public class TvOverlayManager {
             if (mTransitionManager.isSelectInputActive()) {
                 mSelectInputView.onKeyUp(keyCode, event);
             } else {
-                mMainActivity.showSelectInputView();
+                showSelectInputView();
             }
             return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED;
         }
@@ -537,7 +616,7 @@ public class TvOverlayManager {
             }
             return MainActivity.KEY_EVENT_HANDLER_RESULT_DISPATCH_TO_OVERLAY;
         }
-        if (mMenuView.isActive() || mTransitionManager.isSceneActive()) {
+        if (mMenu.isActive() || mTransitionManager.isSceneActive()) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 TimeShiftManager timeShiftManager = mMainActivity.getTimeShiftManager();
                 if (timeShiftManager.isPaused()) {
@@ -547,7 +626,7 @@ public class TvOverlayManager {
                         | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG);
                 return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED;
             }
-            if (mMenuView.isActive()) {
+            if (mMenu.isActive()) {
                 if (KeypadChannelSwitchView.isChannelNumberKey(keyCode)) {
                     mMainActivity.showKeypadChannelSwitchView(keyCode);
                     return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED;
@@ -591,5 +670,20 @@ public class TvOverlayManager {
                 return true;
         }
         return false;
+    }
+
+    private static class TvOverlayHandler extends WeakHandler<TvOverlayManager> {
+        public TvOverlayHandler(TvOverlayManager ref) {
+            super(ref);
+        }
+
+        @Override
+        public void handleMessage(Message msg, @NonNull TvOverlayManager tvOverlayManager) {
+            if (msg.what == MSG_SHOW_DIALOG) {
+                String tag = (String) msg.obj;
+                tvOverlayManager.mCurrentDialog
+                        .show(tvOverlayManager.mMainActivity.getFragmentManager(), tag);
+            }
+        }
     }
 }

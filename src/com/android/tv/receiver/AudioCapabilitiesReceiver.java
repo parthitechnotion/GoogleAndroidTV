@@ -36,6 +36,13 @@ public final class AudioCapabilitiesReceiver {
     private static final String PREFS_NAME = "com.android.tv.audio_capabilities";
     private static final String SETTINGS_KEY_AC3_PASSTHRU_REPORTED = "ac3_passthrough_reported";
     private static final String SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES = "ac3_passthrough";
+    private static final String SETTINGS_KEY_AC3_REPORT_REVISION = "ac3_report_revision";
+
+    // AC3 capabilities stat is sent to Google Analytics just once in order to avoid
+    // duplicated stat reports since it doesn't change over time in most cases.
+    // Increase this revision when we should force the stat to be sent again.
+    // TODO: Consier using custom metrics.
+    private static final int REPORT_REVISION = 1;
 
     private final Context mContext;
     private final Tracker mTracker;
@@ -72,17 +79,21 @@ public final class AudioCapabilitiesReceiver {
     }
 
     private void reportAudioCapabilities(int[] supportedEncodings) {
-        boolean newVal = supportedEncodings == null
-                ? false : Arrays.binarySearch(supportedEncodings, AudioFormat.ENCODING_AC3) >= 0;
-        boolean oldVal = getBoolean(SETTINGS_KEY_AC3_PASSTHRU_REPORTED, false);
-        boolean reported = getBoolean(SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES, false);
+        boolean newVal = supportedEncodings != null
+                && Arrays.binarySearch(supportedEncodings, AudioFormat.ENCODING_AC3) >= 0;
+        boolean oldVal = getBoolean(SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES, false);
+        boolean reported = getBoolean(SETTINGS_KEY_AC3_PASSTHRU_REPORTED, false);
+        int revision = getInt(SETTINGS_KEY_AC3_REPORT_REVISION, 0);
 
         // Send the value just once. But we send it again if the value changed, to include
         // the case where users have switched TV device with different AC3 passthrough capabilities.
-        if (!reported || oldVal != newVal) {
+        if (!reported || oldVal != newVal || REPORT_REVISION > revision) {
             mTracker.sendAc3PassthroughCapabilities(newVal);
             setBoolean(SETTINGS_KEY_AC3_PASSTHRU_REPORTED, true);
             setBoolean(SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES, newVal);
+            if (REPORT_REVISION > revision) {
+                setInt(SETTINGS_KEY_AC3_REPORT_REVISION, REPORT_REVISION);
+            }
         }
     }
 
@@ -96,5 +107,13 @@ public final class AudioCapabilitiesReceiver {
 
     private void setBoolean(String key, boolean val) {
         getSharedPreferences().edit().putBoolean(key, val).apply();
+    }
+
+    private int getInt(String key, int def) {
+        return getSharedPreferences().getInt(key, def);
+    }
+
+    private void setInt(String key, int val) {
+        getSharedPreferences().edit().putInt(key, val).apply();
     }
 }

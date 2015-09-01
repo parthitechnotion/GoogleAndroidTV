@@ -26,13 +26,13 @@ import com.android.tv.util.SetupUtils;
 import com.android.tv.util.TestUtils;
 import com.android.tv.util.TvInputManagerHelper;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 
 /**
  * Test for {@link SetupView}

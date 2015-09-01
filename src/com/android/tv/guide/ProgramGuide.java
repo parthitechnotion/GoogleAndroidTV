@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.widget.OnChildSelectedListener;
 import android.support.v17.leanback.widget.SearchOrbView;
 import android.support.v17.leanback.widget.VerticalGridView;
@@ -37,6 +38,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.View.MeasureSpec;
+import android.view.View.OnScrollChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
@@ -46,10 +48,12 @@ import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.analytics.DurationTimer;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.WeakHandler;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.GenreItems;
 import com.android.tv.data.ProgramDataManager;
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter;
+import com.android.tv.ui.OnRepeatedKeyInterceptListener;
 import com.android.tv.util.SystemProperties;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
@@ -81,7 +85,6 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
 
     private static final int MSG_PROGRAM_TABLE_FADE_IN_ANIM = 1000;
 
-    private static final int SELECTION_ROW = 2;  // Row that is focused
     private static final String SCREEN_NAME = "EPG";
 
     private final MainActivity mActivity;
@@ -96,6 +99,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
     private final long mViewPortMillis;
     private final int mRowHeight;
     private final int mDetailHeight;
+    private final int mSelectionRow;  // Row that is focused
     private final int mTableFadeAnimDuration;
     private final int mAnimationDuration;
     private final int mDetailPadding;
@@ -134,14 +138,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
     private boolean mTimelineAnimation;
     private int mLastRequestedGenreId = GenreItems.ID_ALL_CHANNELS;
     private boolean mIsDuringResetRowSelection;
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == MSG_PROGRAM_TABLE_FADE_IN_ANIM) {
-                mProgramTableFadeInAnimator.start();
-            }
-        }
-    };
+    private final Handler mHandler = new ProgramGuideHandler(this);
 
     private final Runnable mHideRunnable = new Runnable() {
         @Override
@@ -150,6 +147,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         }
     };
     private final long mShowDurationMillis;
+    private ViewTreeObserver.OnGlobalLayoutListener mOnLayoutListenerForShow;
 
     private final ProgramManagerListener mProgramManagerListener = new ProgramManagerListener();
 
@@ -189,6 +187,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
 
         mRowHeight = res.getDimensionPixelSize(R.dimen.program_guide_table_item_row_height);
         mDetailHeight = res.getDimensionPixelSize(R.dimen.program_guide_table_detail_height);
+        mSelectionRow = res.getInteger(R.integer.program_guide_selection_row);
         mTableFadeAnimDuration =
                 res.getInteger(R.integer.program_guide_table_detail_fade_anim_duration);
         mShowDurationMillis = res.getInteger(R.integer.program_guide_show_duration);
@@ -307,7 +306,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
             }
         });
         mGrid.setFocusScrollStrategy(ProgramGrid.FOCUS_SCROLL_ALIGNED);
-        mGrid.setWindowAlignmentOffset(SELECTION_ROW * mRowHeight);
+        mGrid.setWindowAlignmentOffset(mSelectionRow * mRowHeight);
         mGrid.setWindowAlignmentOffsetPercent(ProgramGrid.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED);
         mGrid.setItemAlignmentOffset(0);
         mGrid.setItemAlignmentOffsetPercent(ProgramGrid.ITEM_ALIGN_OFFSET_PERCENT_DISABLED);
@@ -353,7 +352,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         mHideAnimatorFull.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mContainer.setVisibility(View.INVISIBLE);
+                mContainer.setVisibility(View.GONE);
             }
         });
         mHideAnimatorPartial = createAnimator(
@@ -363,7 +362,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         mHideAnimatorPartial.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mContainer.setVisibility(View.INVISIBLE);
+                mContainer.setVisibility(View.GONE);
             }
         });
 
@@ -405,7 +404,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
     @Override
     public void onRequestChildFocus(View oldFocus, View newFocus) {
         if (oldFocus != null && newFocus != null) {
-            int selectionRowOffset = SELECTION_ROW * mRowHeight;
+            int selectionRowOffset = mSelectionRow * mRowHeight;
             if (oldFocus.getTop() < newFocus.getTop()) {
                 // Selection moves downwards
                 // Adjust scroll offset to be at the bottom of the target row and to expand up. This
@@ -459,8 +458,12 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
     /**
      * Show the program guide.  This reveals the side panel, and the program guide table is shown
      * partially.
+     *
+     * <p>Note: the animation which starts together with ProgramGuide showing animation needs to
+     * be initiated in {@code runnableAfterAnimatorReady}. If the animation starts together
+     * with show(), the animation may drop some frames.
      */
-    public void show() {
+    public void show(final Runnable runnableAfterAnimatorReady) {
         if (mContainer.getVisibility() == View.VISIBLE) {
             return;
         }
@@ -475,9 +478,8 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         mStartUtcTime = Utils.floorTime(
                 System.currentTimeMillis() - MIN_DURATION_FROM_START_TIME_TO_CURRENT_TIME,
                 HALF_HOUR_IN_MILLIS);
-        mProgramManager.setInitialTimeRange(mStartUtcTime, mStartUtcTime + mViewPortMillis);
+        mProgramManager.updateInitialTimeRange(mStartUtcTime, mStartUtcTime + mViewPortMillis);
         mProgramManager.addListener(mProgramManagerListener);
-        mProgramManager.buildGenreFilters();
         mLastRequestedGenreId = GenreItems.ID_ALL_CHANNELS;
         mTimeListAdapter.update(mStartUtcTime);
         mTimelineRow.resetScroll();
@@ -490,23 +492,48 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         }
 
         mContainer.setVisibility(View.VISIBLE);
+        positionCurrentTimeIndicator();
         mSidePanelGridView.setSelectedPosition(0);
-        mHandler.post(new Runnable() {
+        if (DEBUG) {
+            Log.d(TAG, "show()");
+        }
+        mOnLayoutListenerForShow = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void run() {
-                // setVisibility is not immediately applied. In order to start animation after
-                // making it visible, we post mShowAnimatorXXX.start() instead of calling
-                // mShowAnimatorXXX.start() in show().
+            public void onGlobalLayout() {
+                mContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mTable.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                mSidePanelGridView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                mTable.buildLayer();
+                mSidePanelGridView.buildLayer();
+                mOnLayoutListenerForShow = null;
+                mTimelineAnimation = true;
+                // Make sure that time indicator update starts after animation is finished.
+                startCurrentTimeIndicator(TIME_INDICATOR_UPDATE_FREQUENCY);
+                if (DEBUG) {
+                    mContainer.getViewTreeObserver().addOnDrawListener(
+                            new ViewTreeObserver.OnDrawListener() {
+                        long time = System.currentTimeMillis();
+                        int count = 0;
+                        @Override
+                        public void onDraw() {
+                            long curtime = System.currentTimeMillis();
+                            Log.d(TAG, "onDraw " + count++ + " " + (curtime - time) + "ms");
+                            time = curtime;
+                            if (count > 10) {
+                                mContainer.getViewTreeObserver().removeOnDrawListener(this);
+                            }
+                        }
+                    });
+                }
+                runnableAfterAnimatorReady.run();
                 if (mShowGuidePartial) {
                     mShowAnimatorPartial.start();
                 } else {
                     mShowAnimatorFull.start();
                 }
             }
-        });
-
-        mTimelineAnimation = true;
-        startCurrentTimeIndicator();
+        };
+        mContainer.getViewTreeObserver().addOnGlobalLayoutListener(mOnLayoutListenerForShow);
         scheduleHide();
     }
 
@@ -516,6 +543,10 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
     public void hide() {
         if (!isActive()) {
             return;
+        }
+        if (mOnLayoutListenerForShow != null) {
+            mContainer.getViewTreeObserver().removeOnGlobalLayoutListener(mOnLayoutListenerForShow);
+            mOnLayoutListenerForShow = null;
         }
         mTracker.sendHideEpg(mVisibleDuration.reset());
         cancelHide();
@@ -631,8 +662,8 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         mProgramTableFadeOutAnimator.start();
     }
 
-    private void startCurrentTimeIndicator() {
-        mHandler.post(mUpdateTimeIndicator);
+    private void startCurrentTimeIndicator(long initialDelay) {
+        mHandler.postDelayed(mUpdateTimeIndicator, initialDelay);
     }
 
     private void stopCurrentTimeIndicator() {
@@ -894,6 +925,19 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
                         + mProgramManager.getShiftedTime() + " millis)");
             }
             mTimelineRow.scrollTo(scrollOffset, mTimelineAnimation);
+        }
+    }
+
+    private static class ProgramGuideHandler extends WeakHandler<ProgramGuide> {
+        public ProgramGuideHandler(ProgramGuide ref) {
+            super(ref);
+        }
+
+        @Override
+        public void handleMessage(Message msg, @NonNull ProgramGuide programGuide) {
+            if (msg.what == MSG_PROGRAM_TABLE_FADE_IN_ANIM) {
+                programGuide.mProgramTableFadeInAnimator.start();
+            }
         }
     }
 }

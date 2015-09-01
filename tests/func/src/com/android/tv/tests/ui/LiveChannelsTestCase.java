@@ -16,9 +16,12 @@
 
 package com.android.tv.tests.ui;
 
+import static com.android.tv.testing.uihelper.UiDeviceAsserts.assertWaitForCondition;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.Until;
 import android.test.InstrumentationTestCase;
 
 import com.android.tv.testing.ChannelInfo;
@@ -78,8 +81,7 @@ public abstract class LiveChannelsTestCase extends InstrumentationTestCase {
      */
     protected void pressKeysForChannel(ChannelInfo channel) {
         UiDeviceUtils.pressKeys(mDevice, channel.number);
-        // TODO: Sometimes, next statement doesn't close the SelectInputView. It makes the tests
-        // which use this method flaky. b/22509489
+        assertWaitForCondition(mDevice, Until.hasObject(Constants.KEYPAD_CHANNEL_SWITCH));
         mDevice.pressDPadCenter();
     }
 

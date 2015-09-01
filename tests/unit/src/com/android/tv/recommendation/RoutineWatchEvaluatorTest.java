@@ -17,6 +17,7 @@
 package com.android.tv.recommendation;
 
 import android.test.MoreAsserts;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.data.Program;
 import com.android.tv.recommendation.RoutineWatchEvaluator.ProgramTime;
@@ -25,8 +26,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@SmallTest
 public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEvaluator> {
 
+    @Override
     public RoutineWatchEvaluator createEvaluator() {
         return new RoutineWatchEvaluator();
     }
@@ -157,7 +160,7 @@ public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEva
 
     private void assertOverlappedIntervalScore(int expectedSeconds, boolean overlappedOnSameDay,
             ProgramTime t1, ProgramTime t2) {
-        double score = (double) expectedSeconds;
+        double score = expectedSeconds;
         if (!overlappedOnSameDay) {
             score *= RoutineWatchEvaluator.MULTIPLIER_FOR_UNMATCHED_DAY_OF_WEEK;
         }

@@ -20,8 +20,7 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"mono"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"stereo"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Mga kontrol sa Play"</string>
-    <string name="menu_title_channels" msgid="1949045451672990132">"Mga Channel"</string>
-    <string name="menu_title_channels_legacy" msgid="700324464656729334">"Mga kamakailang channel"</string>
+    <string name="menu_title_channels" msgid="1801845517674690003">"Kamakailang channel"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"Opsyon sa TV"</string>
     <string name="menu_title_pip_options" msgid="4252934960762407689">"Mga opsyon sa PIP"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"Hindi available para sa channel na ito ang mga kontrol ng laro"</string>

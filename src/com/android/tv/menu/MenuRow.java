@@ -18,8 +18,6 @@ package com.android.tv.menu;
 
 import android.content.Context;
 
-import com.android.tv.MainActivity;
-
 /**
  * A base class of the item which will be displayed in the main menu.
  * It contains the data such as title to represent a row.
@@ -30,15 +28,17 @@ public abstract class MenuRow {
     private final Context mContext;
     private final String mTitle;
     private final int mHeight;
+    private final Menu mMenu;
 
     // TODO: Check if the heightResId is really necessary.
-    public MenuRow(Context context, int titleResId, int heightResId) {
-        this(context, context.getString(titleResId), heightResId);
+    public MenuRow(Context context, Menu menu, int titleResId, int heightResId) {
+        this(context, menu, context.getString(titleResId), heightResId);
     }
 
-    public MenuRow(Context context, String title, int heightResId) {
+    public MenuRow(Context context, Menu menu, String title, int heightResId) {
         mContext = context;
         mTitle = title;
+        mMenu = menu;
         mHeight = context.getResources().getDimensionPixelSize(heightResId);
     }
 
@@ -49,8 +49,11 @@ public abstract class MenuRow {
         return mContext;
     }
 
-    protected MainActivity getMainActivity() {
-        return (MainActivity) mContext;
+    /**
+     * Returns the menu object.
+     */
+    public Menu getMenu() {
+        return mMenu;
     }
 
     /**
@@ -96,4 +99,21 @@ public abstract class MenuRow {
      * Returns the ID of this row. This ID is used to select the row in the main menu.
      */
     abstract public String getId();
+
+    /**
+     * This method is called when recent channels are changed.
+     */
+    public void onRecentChannelsChanged() { }
+
+    /**
+     * This method is called when stream information is changed.
+     */
+    public void onStreamInfoChanged() { }
+
+    /**
+     * Returns whether to hide the title when the row is selected.
+     */
+    public boolean hideTitleWhenSelected() {
+        return false;
+    }
 }

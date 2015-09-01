@@ -17,6 +17,7 @@
 package com.android.tv.recommendation;
 
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Unit tests for {@link ChannelRecord}.
  */
+@SmallTest
 public class ChannelRecordTest extends AndroidTestCase {
     private static final int CHANNEL_RECORD_MAX_HISTORY_SIZE = ChannelRecord.MAX_HISTORY_SIZE;
 
@@ -31,6 +33,7 @@ public class ChannelRecordTest extends AndroidTestCase {
     private ChannelRecord mChannelRecord;
     private long mLatestWatchEndTimeMs;
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         mLatestWatchEndTimeMs = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);

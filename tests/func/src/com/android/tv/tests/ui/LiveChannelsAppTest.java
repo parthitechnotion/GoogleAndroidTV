@@ -42,7 +42,7 @@ public class LiveChannelsAppTest extends LiveChannelsTestCase {
         super.setUp();
         mSidePanelHelper = new SidePanelHelper(mDevice, mTargetResources);
         mLiveChannelsHelper.assertAppStarted();
-        pressKeysForChannel(TvTestInputConstants.CH_1);
+        pressKeysForChannel(TvTestInputConstants.CH_1_DEFAULT_DONT_MODIFY);
         getInstrumentation().waitForIdleSync();
     }
 
@@ -74,11 +74,11 @@ public class LiveChannelsAppTest extends LiveChannelsTestCase {
         updateThenTune(data, TvTestInputConstants.CH_2);
 
         mMenuHelper.assertPressOptionsDisplayMode();
-        BySelector byDisplayModeSidelPanel = mSidePanelHelper
+        BySelector byDisplayModeSidePanel = mSidePanelHelper
                 .bySidePanelTitled(R.string.side_panel_title_display_mode);
-        assertWaitForCondition(mDevice, Until.hasObject(byDisplayModeSidelPanel));
+        assertWaitForCondition(mDevice, Until.hasObject(byDisplayModeSidePanel));
         mDevice.pressBack();
-        assertWaitForCondition(mDevice, Until.gone(byDisplayModeSidelPanel));
+        assertWaitForCondition(mDevice, Until.gone(byDisplayModeSidePanel));
         assertHas(mDevice, Constants.MENU, false);
     }
 
@@ -95,11 +95,11 @@ public class LiveChannelsAppTest extends LiveChannelsTestCase {
         updateThenTune(data, TvTestInputConstants.CH_2);
 
         mMenuHelper.assertPressOptionsMultiAudio();
-        BySelector byMultiAudioSidelPanel = mSidePanelHelper
+        BySelector byMultiAudioSidePanel = mSidePanelHelper
                 .bySidePanelTitled(R.string.side_panel_title_multi_audio);
-        assertWaitForCondition(mDevice, Until.hasObject(byMultiAudioSidelPanel));
+        assertWaitForCondition(mDevice, Until.hasObject(byMultiAudioSidePanel));
         mDevice.pressBack();
-        assertWaitForCondition(mDevice, Until.gone(byMultiAudioSidelPanel));
+        assertWaitForCondition(mDevice, Until.gone(byMultiAudioSidePanel));
         assertHas(mDevice, Constants.MENU, false);
     }
 

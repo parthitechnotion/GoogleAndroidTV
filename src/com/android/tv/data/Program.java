@@ -42,7 +42,7 @@ public final class Program implements Comparable<Program> {
     private static final String TAG = "Program";
 
     public static final String[] PROJECTION = {
-        // Columns should match what is read in Program.fromCursor()
+        // Columns must match what is read in Program.fromCursor()
         TvContract.Programs.COLUMN_CHANNEL_ID,
         TvContract.Programs.COLUMN_TITLE,
         TvContract.Programs.COLUMN_EPISODE_TITLE,
@@ -58,6 +58,32 @@ public final class Program implements Comparable<Program> {
         TvContract.Programs.COLUMN_VIDEO_WIDTH,
         TvContract.Programs.COLUMN_VIDEO_HEIGHT
     };
+
+    /**
+     * Creates {@code Program} object from cursor.
+     *
+     * <p>The query that created the cursor MUST use {@link #PROJECTION}.
+     */
+    public static Program fromCursor(Cursor cursor) {
+        // Columns read must match the order of match {@link #PROJECTION}
+        Builder builder = new Builder();
+        int index = 0;
+        builder.setChannelId(cursor.getLong(index++));
+        builder.setTitle(cursor.getString(index++));
+        builder.setEpisodeTitle(cursor.getString(index++));
+        builder.setSeasonNumber(cursor.getInt(index++));
+        builder.setEpisodeNumber(cursor.getInt(index++));
+        builder.setDescription(cursor.getString(index++));
+        builder.setPosterArtUri(cursor.getString(index++));
+        builder.setThumbnailUri(cursor.getString(index++));
+        builder.setCanonicalGenres(cursor.getString(index++));
+        builder.setContentRatings(Utils.stringToContentRatings(cursor.getString(index++)));
+        builder.setStartTimeUtcMillis(cursor.getLong(index++));
+        builder.setEndTimeUtcMillis(cursor.getLong(index++));
+        builder.setVideoWidth((int) cursor.getLong(index++));
+        builder.setVideoHeight((int) cursor.getLong(index++));
+        return builder.build();
+    }
 
     private long mChannelId;
     private String mTitle;
@@ -264,82 +290,6 @@ public final class Program implements Comparable<Program> {
         mThumbnailUri = other.mThumbnailUri;
         mCanonicalGenreIds = other.mCanonicalGenreIds;
         mContentRatings = other.mContentRatings;
-    }
-
-    public static Program fromCursor(Cursor cursor) {
-        // Columns read here should match Program.PROJECTION
-
-        Builder builder = new Builder();
-        int index = cursor.getColumnIndex(TvContract.Programs.COLUMN_CHANNEL_ID);
-        if (index >= 0) {
-            builder.setChannelId(cursor.getLong(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_TITLE);
-        if (index >= 0) {
-            builder.setTitle(cursor.getString(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_EPISODE_TITLE);
-        if (index >= 0) {
-            builder.setEpisodeTitle(cursor.getString(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_SEASON_NUMBER);
-        if(index >= 0) {
-            builder.setSeasonNumber(cursor.getInt(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_EPISODE_NUMBER);
-        if(index >= 0) {
-            builder.setEpisodeNumber(cursor.getInt(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_SHORT_DESCRIPTION);
-        if (index >= 0) {
-            builder.setDescription(cursor.getString(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_POSTER_ART_URI);
-        if (index >= 0) {
-            builder.setPosterArtUri(cursor.getString(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_THUMBNAIL_URI);
-        if (index >= 0) {
-            builder.setThumbnailUri(cursor.getString(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_CANONICAL_GENRE);
-        if (index >= 0) {
-            builder.setCanonicalGenres(cursor.getString(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_CONTENT_RATING);
-        if (index >= 0) {
-            builder.setContentRatings(Utils.stringToContentRatings(cursor.getString(index)));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS);
-        if (index >= 0) {
-            builder.setStartTimeUtcMillis(cursor.getLong(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS);
-        if (index >= 0) {
-            builder.setEndTimeUtcMillis(cursor.getLong(index));
-        }
-
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_VIDEO_WIDTH);
-        if (index >= 0) {
-            builder.setVideoWidth((int) cursor.getLong(index));
-        }
-        index = cursor.getColumnIndex(TvContract.Programs.COLUMN_VIDEO_HEIGHT);
-        if (index >= 0) {
-            builder.setVideoHeight((int) cursor.getLong(index));
-        }
-
-        return builder.build();
     }
 
     public static final class Builder {

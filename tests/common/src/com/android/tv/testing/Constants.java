@@ -23,7 +23,7 @@ import android.media.tv.TvTrackInfo;
 public final class Constants {
     public static final int FUNC_TEST_CHANNEL_COUNT = 100;
     public static final int UNIT_TEST_CHANNEL_COUNT = 4;
-    public static final int JANK_TEST_CHANNEL_COUNT = 1000;
+    public static final int JANK_TEST_CHANNEL_COUNT = 500; // TODO: increase to 1000 see b/23526997
 
     public static final TvTrackInfo EN_STEREO_AUDIO_TRACK = new TvTrackInfo.Builder(
             TvTrackInfo.TYPE_AUDIO, "English Stereo Audio").setLanguage("en")

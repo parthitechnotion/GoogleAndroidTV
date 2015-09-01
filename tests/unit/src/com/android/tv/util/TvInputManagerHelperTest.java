@@ -23,11 +23,11 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.testing.ComparatorTester;
 
-import java.util.LinkedHashMap;
-
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import java.util.LinkedHashMap;
 
 /**
  * Test for {@link TvInputManagerHelper}

@@ -19,7 +19,18 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+include $(LOCAL_PATH)/version.mk
+
+LOCAL_BUILDCONFIG_CLASS := src/com/android/tv/BuildConfig.java
+BC_OUT_DIR := $(LOCAL_PATH)
+BC_APPLICATION_ID := "com.android.tv"
+BC_VERSION_CODE := $(version_code_package)
+BC_VERSION_NAME := "$(version_name_package)"
+include $(LOCAL_PATH)/buildconfig.mk
+
+LOCAL_SRC_FILES := $(call all-java-files-under, src) \
+   $(LOCAL_BUILDCONFIG_CLASS)
+
 LOCAL_PACKAGE_NAME := TV
 
 # It is required for com.android.providers.tv.permission.ALL_EPG_DATA
@@ -39,9 +50,10 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v17-leanback \
     tv-common
 
+
 LOCAL_JAVACFLAGS := -Xlint:deprecation -Xlint:unchecked
 
-include $(LOCAL_PATH)/version.mk
+
 LOCAL_AAPT_FLAGS := --auto-add-overlay \
     --extra-packages android.support.v7.recyclerview \
     --extra-packages android.support.v17.leanback \
@@ -49,5 +61,9 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay \
     --version-code $(version_code_package) \
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
+
+
+
 include $(BUILD_PACKAGE)
+
 include $(call all-makefiles-under,$(LOCAL_PATH))

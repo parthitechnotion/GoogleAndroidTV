@@ -58,7 +58,6 @@ public class ProgramItemView extends TextView {
     private static final int[] STATE_TOO_WIDE = { R.attr.state_program_too_wide };
 
     private static int sVisibleThreshold;
-    private static int sMinProgramDisplayDurationPixels;
     private static int sItemPadding;
     private static TextAppearanceSpan sProgramTitleStyle;
     private static TextAppearanceSpan sGrayedOutProgramTitleStyle;
@@ -67,6 +66,7 @@ public class ProgramItemView extends TextView {
 
     private TableEntry mTableEntry;
     private int mMaxWidthForRipple;
+    private int mTextWidth;
 
     // If set this flag disables requests to re-layout the parent view as a result of changing
     // this view, improving performance. This also prevents the parent view to lose child focus
@@ -148,8 +148,6 @@ public class ProgramItemView extends TextView {
 
         sVisibleThreshold = res.getDimensionPixelOffset(
                 R.dimen.program_guide_table_item_visible_threshold);
-        sMinProgramDisplayDurationPixels = res.getDimensionPixelOffset(
-                R.dimen.program_guide_table_item_min_program_display_width);
 
         sItemPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_item_padding);
 
@@ -256,7 +254,8 @@ public class ProgramItemView extends TextView {
             }
             setText(description);
         }
-
+        measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        mTextWidth = getMeasuredWidth() - getPaddingStart() - getPaddingEnd();
         int start = GuideUtils.convertMillisToPixel(entry.entryStartUtcMillis);
         int guideStart = GuideUtils.convertMillisToPixel(programManager.getFromUtcMillis());
         layoutVisibleArea(guideStart - start);
@@ -280,8 +279,9 @@ public class ProgramItemView extends TextView {
      public void layoutVisibleArea(int offset) {
         int width = mTableEntry.getWidth();
         int startPadding = Math.max(0, offset);
-        if (startPadding > 0 && width - startPadding < sMinProgramDisplayDurationPixels) {
-            startPadding = Math.max(0, width - sMinProgramDisplayDurationPixels);
+        int minWidth = Math.min(width, mTextWidth + 2 * sItemPadding);
+        if (startPadding > 0 && width - startPadding < minWidth) {
+            startPadding = Math.max(0, width - minWidth);
         }
 
         if (startPadding + sItemPadding != getPaddingStart()) {

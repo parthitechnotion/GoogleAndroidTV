@@ -17,6 +17,7 @@
 package com.android.tv.recommendation;
 
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.data.Channel;
 import com.android.tv.recommendation.RecommendationUtils.ChannelRecordSortedMapHelper;
@@ -36,6 +37,7 @@ public abstract class EvaluatorTestCase<T extends Evaluator> extends AndroidTest
 
     public T mEvaluator;
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         mChannelRecordSortedMap = new ChannelRecordSortedMapHelper(getContext());

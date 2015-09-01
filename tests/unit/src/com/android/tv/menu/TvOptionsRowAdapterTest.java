@@ -17,7 +17,7 @@ package com.android.tv.menu;
 
 import android.media.tv.TvTrackInfo;
 import android.os.SystemClock;
-import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.MediumTest;
 
 import com.android.tv.BaseMainActivityTestCase;
 import com.android.tv.MainActivity;
@@ -32,11 +32,10 @@ import java.util.List;
 /**
  * Tests for {@link TvOptionsRowAdapter}.
  */
-@SmallTest
+@MediumTest
 public class TvOptionsRowAdapterTest extends BaseMainActivityTestCase {
     private static final int WAIT_TRACK_SIZE_TIMEOUT_MS = 300;
     public static final int TRACK_SIZE_CHECK_INTERVAL_MS = 10;
-
 
     // TODO: Refactor TvOptionsRowAdapter so it does not rely on MainActivity
     private TvOptionsRowAdapter mTvOptionsRowAdapter;
@@ -50,60 +49,63 @@ public class TvOptionsRowAdapterTest extends BaseMainActivityTestCase {
         super.setUp();
         mTvOptionsRowAdapter = new TvOptionsRowAdapter(mActivity,
                 Collections.<CustomAction>emptyList());
-        tuneToChannel(TvTestInputConstants.CH_1);
+        tuneToChannel(TvTestInputConstants.CH_1_DEFAULT_DONT_MODIFY);
+        waitUntilAudioTracksHaveSize(1);
+        mTvOptionsRowAdapter.update();
     }
 
     public void testUpdateAudioAction_2tracks() {
-        mTvOptionsRowAdapter.update();
         ChannelStateData data = new ChannelStateData();
         data.mTvTrackInfos.add(Constants.GENERIC_AUDIO_TRACK);
         updateThenTune(data, TvTestInputConstants.CH_2);
-        waitUntilTracksHaveSize(2);
+        waitUntilAudioTracksHaveSize(2);
 
-        boolean result = mTvOptionsRowAdapter.updateActions();
+        boolean result = mTvOptionsRowAdapter.updateMultiAudioAction();
         assertEquals("update Action had change", true, result);
         assertEquals("Multi Audio enabled", true,
                 MenuAction.SELECT_AUDIO_LANGUAGE_ACTION.isEnabled());
     }
 
     public void testUpdateAudioAction_1track() {
-        mTvOptionsRowAdapter.update();
         ChannelStateData data = new ChannelStateData();
         data.mTvTrackInfos.clear();
         data.mTvTrackInfos.add(Constants.GENERIC_AUDIO_TRACK);
         updateThenTune(data, TvTestInputConstants.CH_2);
-        waitUntilTracksHaveSize(1);
+        waitUntilAudioTracksHaveSize(1);
 
-        boolean result = mTvOptionsRowAdapter.updateActions();
-        assertEquals("update Action had change", true, result);
-        assertEquals("Multi Audio enabled", false,
-                MenuAction.SELECT_AUDIO_LANGUAGE_ACTION.isEnabled());
-    }
-
-    public void testUpdateAudioAction_noTracks() {
-        mTvOptionsRowAdapter.update();
-        ChannelStateData data = new ChannelStateData();
-        data.mTvTrackInfos.clear();
-        updateThenTune(data, TvTestInputConstants.CH_2);
-        waitUntilTracksHaveSize(0);
-
-        boolean result = mTvOptionsRowAdapter.updateActions();
+        boolean result = mTvOptionsRowAdapter.updateMultiAudioAction();
         assertEquals("update Action had change", false, result);
         assertEquals("Multi Audio enabled", false,
                 MenuAction.SELECT_AUDIO_LANGUAGE_ACTION.isEnabled());
     }
 
-    private void waitUntilTracksHaveSize(int expected) {
+    public void testUpdateAudioAction_noTracks() {
+        ChannelStateData data = new ChannelStateData();
+        data.mTvTrackInfos.clear();
+        updateThenTune(data, TvTestInputConstants.CH_2);
+        waitUntilAudioTracksHaveSize(0);
+
+        boolean result = mTvOptionsRowAdapter.updateMultiAudioAction();
+        assertEquals("update Action had change", false, result);
+        assertEquals("Multi Audio enabled", false,
+                MenuAction.SELECT_AUDIO_LANGUAGE_ACTION.isEnabled());
+    }
+
+    private void waitUntilAudioTracksHaveSize(int expected) {
         long start = SystemClock.elapsedRealtime();
+        int size = -1;
         while (SystemClock.elapsedRealtime() < start + WAIT_TRACK_SIZE_TIMEOUT_MS) {
             getInstrumentation().waitForIdleSync();
             List<TvTrackInfo> tracks = mActivity.getTracks(TvTrackInfo.TYPE_AUDIO);
-            if (tracks != null && tracks.size() == expected) {
-                return;
+            if (tracks != null) {
+                size = tracks.size();
+                if (size == expected) {
+                    return;
+                }
             }
             SystemClock.sleep(TRACK_SIZE_CHECK_INTERVAL_MS);
         }
         fail("Waited for " + WAIT_TRACK_SIZE_TIMEOUT_MS + " milliseconds for track size to be "
-                + expected);
+                + expected + " but was " + size);
     }
 }

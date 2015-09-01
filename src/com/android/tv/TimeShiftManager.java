@@ -16,7 +16,6 @@
 
 package com.android.tv;
 
-import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Handler;
@@ -28,6 +27,8 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.Range;
 
+import com.android.tv.analytics.Tracker;
+import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.OnCurrentProgramUpdatedListener;
 import com.android.tv.data.Program;
@@ -145,6 +146,7 @@ public class TimeShiftManager {
 
     private final PlayController mPlayController;
     private final ProgramManager mProgramManager;
+    private final Tracker mTracker;
     @VisibleForTesting
     final CurrentPositionMediator mCurrentPositionMediator = new CurrentPositionMediator();
 
@@ -153,6 +155,7 @@ public class TimeShiftManager {
     private int mEnabledActionIds = TIME_SHIFT_ACTION_ID_PLAY | TIME_SHIFT_ACTION_ID_PAUSE
             | TIME_SHIFT_ACTION_ID_REWIND | TIME_SHIFT_ACTION_ID_FAST_FORWARD
             | TIME_SHIFT_ACTION_ID_JUMP_TO_PREVIOUS | TIME_SHIFT_ACTION_ID_JUMP_TO_NEXT;
+    @TimeShiftActionId
     private int mLastActionId = 0;
 
     // TODO: Remove these variables once API level 23 is available.
@@ -162,27 +165,15 @@ public class TimeShiftManager {
     // This variable is used to block notification while changing the availability status.
     private boolean mNotificationEnabled;
 
-    @SuppressLint("HandlerLeak")
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_GET_CURRENT_POSITION:
-                    mPlayController.handleGetCurrentPosition();
-                    break;
-                case MSG_PREFETCH_PROGRAM:
-                    mProgramManager.prefetchPrograms();
-                    break;
-            }
-        }
-    };
+    private final Handler mHandler = new TimeShiftHandler(this);
 
     public TimeShiftManager(Context context, TunableTvView tvView,
-            ProgramDataManager programDataManager,
+            ProgramDataManager programDataManager, Tracker tracker,
             OnCurrentProgramUpdatedListener onCurrentProgramUpdatedListener) {
         mContext = context;
         mPlayController = new PlayController(tvView);
         mProgramManager = new ProgramManager(programDataManager);
+        mTracker = tracker;
         mOnCurrentProgramUpdatedListener = onCurrentProgramUpdatedListener;
         tvView.setOnScreenBlockedListener(new TunableTvView.OnScreenBlockingChangedListener() {
             @Override
@@ -235,6 +226,7 @@ public class TimeShiftManager {
         if (!isActionEnabled(TIME_SHIFT_ACTION_ID_PLAY)) {
             return;
         }
+        mTracker.sendTimeShiftAction(TIME_SHIFT_ACTION_ID_PLAY);
         mLastActionId = TIME_SHIFT_ACTION_ID_PLAY;
         mPlayController.play();
         updateActions();
@@ -250,6 +242,7 @@ public class TimeShiftManager {
             return;
         }
         mLastActionId = TIME_SHIFT_ACTION_ID_PAUSE;
+        mTracker.sendTimeShiftAction(mLastActionId);
         mPlayController.pause();
         updateActions();
     }
@@ -275,6 +268,7 @@ public class TimeShiftManager {
             return;
         }
         mLastActionId = TIME_SHIFT_ACTION_ID_REWIND;
+        mTracker.sendTimeShiftAction(mLastActionId);
         mPlayController.rewind();
         updateActions();
     }
@@ -291,6 +285,7 @@ public class TimeShiftManager {
             return;
         }
         mLastActionId = TIME_SHIFT_ACTION_ID_FAST_FORWARD;
+        mTracker.sendTimeShiftAction(mLastActionId);
         mPlayController.fastForward();
         updateActions();
     }
@@ -316,6 +311,7 @@ public class TimeShiftManager {
         long seekPosition =
                 Math.max(program.getStartTimeUtcMillis(), mPlayController.mRecordStartTimeMs);
         mLastActionId = TIME_SHIFT_ACTION_ID_JUMP_TO_PREVIOUS;
+        mTracker.sendTimeShiftAction(mLastActionId);
         mPlayController.seekTo(seekPosition);
         mCurrentPositionMediator.onSeekRequested(seekPosition);
         updateActions();
@@ -340,6 +336,7 @@ public class TimeShiftManager {
         Program nextProgram = mProgramManager.getProgramAt(currentProgram.getEndTimeUtcMillis());
         long currentTimeMs = System.currentTimeMillis();
         mLastActionId = TIME_SHIFT_ACTION_ID_JUMP_TO_NEXT;
+        mTracker.sendTimeShiftAction(mLastActionId);
         if (nextProgram == null || nextProgram.getStartTimeUtcMillis() > currentTimeMs) {
             mPlayController.seekTo(currentTimeMs);
             if (mPlayController.isForwarding()) {
@@ -721,8 +718,10 @@ public class TimeShiftManager {
         void togglePlayPause() {
             if (mPlayStatus == PLAY_STATUS_PAUSED) {
                 play();
+                mTracker.sendTimeShiftAction(TIME_SHIFT_ACTION_ID_PLAY);
             } else {
                 pause();
+                mTracker.sendTimeShiftAction(TIME_SHIFT_ACTION_ID_PAUSE);
             }
         }
 
@@ -1291,5 +1290,23 @@ public class TimeShiftManager {
          * Called when an action becomes enabled or disabled.
          */
         void onActionEnabledChanged(@TimeShiftActionId int actionId, boolean enabled);
+    }
+
+    private static class TimeShiftHandler extends WeakHandler<TimeShiftManager> {
+        public TimeShiftHandler(TimeShiftManager ref) {
+            super(ref);
+        }
+
+        @Override
+        public void handleMessage(Message msg, @NonNull TimeShiftManager timeShiftManager) {
+            switch (msg.what) {
+                case MSG_GET_CURRENT_POSITION:
+                    timeShiftManager.mPlayController.handleGetCurrentPosition();
+                    break;
+                case MSG_PREFETCH_PROGRAM:
+                    timeShiftManager.mProgramManager.prefetchPrograms();
+                    break;
+            }
+        }
     }
 }

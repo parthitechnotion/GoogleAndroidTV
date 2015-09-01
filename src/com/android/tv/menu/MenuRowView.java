@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
-import android.support.v17.leanback.widget.VerticalGridView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -30,10 +29,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.tv.R;
-import com.android.tv.menu.MenuView.MenuShowReason;
+import com.android.tv.menu.Menu.MenuShowReason;
 
 public abstract class MenuRowView extends LinearLayout {
-    private static final String TAG = MenuRowView.class.getSimpleName();
+    private static final String TAG = "MenuRowView";
     private static final boolean DEBUG = false;
 
     /**
@@ -57,13 +56,9 @@ public abstract class MenuRowView extends LinearLayout {
 
     private TextView mTitleView;
     private View mContentsView;
-    private MenuView mMenuView;
-    private VerticalGridView mParentView;
-    private boolean mIsSelected;
 
-    private final float mTitleScaleSelected;
-    private final float mTitleAlphaSelected;
-    private final float mTitleAlphaDeselected;
+    private final float mTitleViewAlphaDeselected;
+    private final float mTitleViewScaleSelected;
 
     /**
      * The lastly focused view. It is used to keep the focus while navigating the menu rows and
@@ -79,6 +74,20 @@ public abstract class MenuRowView extends LinearLayout {
         }
     };
 
+    /**
+     * Returns the alpha value of the title view when it's deselected.
+     */
+    public float getTitleViewAlphaDeselected() {
+        return mTitleViewAlphaDeselected;
+    }
+
+    /**
+     * Returns the scale value of the title view when it's selected.
+     */
+    public float getTitleViewScaleSelected() {
+        return mTitleViewScaleSelected;
+    }
+
     public MenuRowView(Context context) {
         this(context, null);
     }
@@ -93,26 +102,15 @@ public abstract class MenuRowView extends LinearLayout {
 
     public MenuRowView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-
-        mTitleScaleSelected = getTitleScaleSelected();
-        mTitleAlphaSelected = getTitleAlphaSelected();
+        Resources res = context.getResources();
         TypedValue outValue = new TypedValue();
-        context.getResources().getValue(
-                R.dimen.menu_row_title_alpha_deselected, outValue, true);
-        mTitleAlphaDeselected = outValue.getFloat();
-    }
-
-    protected float getTitleScaleSelected() {
-        Resources res = getContext().getResources();
-        int textSizeSelected =
+        res.getValue(R.dimen.menu_row_title_alpha_deselected, outValue, true);
+        mTitleViewAlphaDeselected = outValue.getFloat();
+        float textSizeSelected =
                 res.getDimensionPixelSize(R.dimen.menu_row_title_text_size_selected);
-        int textSizeDeselected =
+        float textSizeDeselected =
                 res.getDimensionPixelSize(R.dimen.menu_row_title_text_size_deselected);
-        return (float) textSizeSelected / textSizeDeselected;
-    }
-
-    protected float getTitleAlphaSelected() {
-        return 1.0f;
+        mTitleViewScaleSelected = textSizeSelected / textSizeDeselected;
     }
 
     @Override
@@ -125,6 +123,11 @@ public abstract class MenuRowView extends LinearLayout {
         if (mContentsView instanceof ViewGroup) {
             setOnFocusChangeListenerToChildren((ViewGroup) mContentsView);
         }
+        // Make contents view invisible in order that the view participates in the initial layout.
+        // The visibility is set to GONE after the first layout finishes.
+        // If not, we can't see the contents view animation for the first time it is shown.
+        // TODO: Find a better way to resolve this issue.
+        mContentsView.setVisibility(INVISIBLE);
     }
 
     private void setOnFocusChangeListenerToChildren(ViewGroup parent) {
@@ -142,15 +145,18 @@ public abstract class MenuRowView extends LinearLayout {
 
     abstract protected int getContentsViewId();
 
-    protected View getContentsView() {
-        return mContentsView;
+    /**
+     * Returns the title view.
+     */
+    public final TextView getTitleView() {
+        return mTitleView;
     }
 
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        updateView(mParentView.getChildAdapterPosition(this) == mParentView.getSelectedPosition()
-                ? ANIM_NONE_SELECTED : ANIM_NONE_DESELECTED);
+    /**
+     * Returns the contents view.
+     */
+    public final View getContentsView() {
+        return mContentsView;
     }
 
     /**
@@ -164,143 +170,19 @@ public abstract class MenuRowView extends LinearLayout {
         mLastFocusView = null;
     }
 
-    private void updateView(int animationType) {
-        boolean isSelected = animationType == ANIM_SELECTED || animationType == ANIM_NONE_SELECTED;
-        if (mIsSelected && isSelected) {
-            // Prevent from selected again so later calls to {@link updateView} cancels animation.
-            return;
-        }
-        mIsSelected = isSelected;
-        updateRowView(animationType);
-        updateTitleView(animationType);
-    }
-
-    private void updateRowView(int animationType) {
-        mContentsView.animate().cancel();
-        mContentsView.setAlpha(1f);
-        switch (animationType) {
-            case ANIM_NONE_SELECTED: {
-                mContentsView.setVisibility(View.VISIBLE);
-                break;
-            }
-            case ANIM_NONE_DESELECTED: {
-                mContentsView.setVisibility(View.GONE);
-                break;
-            }
-            case ANIM_SELECTED: {
-                mContentsView.setVisibility(View.VISIBLE);
-                mContentsView.setAlpha(0f);
-                mContentsView.animate()
-                        .alpha(1f)
-                        .setDuration(getMenuView().getRowSelectionAnimationDurationMs())
-                        .withLayer();
-                break;
-            }
-            case ANIM_DESELECTED: {
-                mContentsView.setVisibility(View.GONE);
-                break;
-            }
-        }
-    }
-
-    private void updateTitleView(int animationType) {
-        boolean withAnimation = animationType == ANIM_SELECTED || animationType == ANIM_DESELECTED;
-        int duration = withAnimation ? getMenuView().getRowSelectionAnimationDurationMs() : 0;
-
-        mTitleView.animate().cancel();
-        switch (animationType) {
-            case ANIM_SELECTED:
-                mTitleView.animate()
-                        .alpha(mTitleAlphaSelected)
-                        .scaleX(mTitleScaleSelected)
-                        .scaleY(mTitleScaleSelected)
-                        .setDuration(duration)
-                        .withLayer();
-                break;
-            case ANIM_NONE_SELECTED:
-                mTitleView.setAlpha(mTitleAlphaSelected);
-                mTitleView.setScaleX(mTitleScaleSelected);
-                mTitleView.setScaleY(mTitleScaleSelected);
-                break;
-            case ANIM_DESELECTED:
-                mTitleView.animate()
-                        .alpha(mTitleAlphaDeselected)
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(duration)
-                        .withLayer();
-                break;
-            case ANIM_NONE_DESELECTED:
-                mTitleView.setAlpha(mTitleAlphaDeselected);
-                mTitleView.setScaleX(1f);
-                mTitleView.setScaleY(1f);
-                break;
-        }
-    }
-
-    /**
-     * Updates the view contents.
-     * This method is called when the row is selected.
-     */
-    public void updateView(boolean withAnimation) {
-        int position = mParentView.getChildAdapterPosition(this);
-        int selectedPosition = mParentView.getSelectedPosition();
-        int animationType = ANIM_NONE_DESELECTED;
-        if (withAnimation) {
-            boolean scrollUp = mMenuView.getPreviousSelectedPosition() > selectedPosition;
-            switch (position - selectedPosition) {
-                case -2:
-                    animationType = ANIM_NONE_DESELECTED;
-                    break;
-                case -1:
-                    animationType = scrollUp ? ANIM_NONE_DESELECTED : ANIM_DESELECTED;
-                    break;
-                case 0:
-                    animationType = ANIM_SELECTED;
-                    break;
-                case 1:
-                    animationType = scrollUp ? ANIM_DESELECTED : ANIM_NONE_DESELECTED;
-                    break;
-                case 2:
-                    animationType = ANIM_NONE_DESELECTED;
-                    break;
-            }
-        } else {
-            animationType = (position == selectedPosition)
-                    ? ANIM_NONE_SELECTED : ANIM_NONE_DESELECTED;
-        }
-        updateView(animationType);
-    }
-
-    protected MenuView getMenuView() {
-        return mMenuView;
-    }
-
-    public void setMenuView(MenuView view) {
-        mMenuView = view;
-    }
-
-    public void setParentView(VerticalGridView view) {
-        mParentView = view;
+    protected Menu getMenu() {
+        return mRow == null ? null : mRow.getMenu();
     }
 
     public void onBind(MenuRow row) {
         if (DEBUG) Log.d(TAG, "onBind: row=" + row);
         mRow = row;
         mTitleView.setText(row.getTitle());
-
-        // mListView includes paddings to avoid an artifact while alpha animation.
-        // See res/layout/item_list.xml for more information.
-        ViewGroup.LayoutParams lp = mContentsView.getLayoutParams();
-        lp.height = row.getHeight() + mMenuView.getItemPaddingHeight()
-                - getContext().getResources().getDimensionPixelSize(
-                        R.dimen.menu_list_margin_bottom);
     }
 
     @Override
     protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
         // Expand view here so initial focused item can be shown.
-        updateView(ANIM_SELECTED);
         return getInitialFocusView().requestFocus();
     }
 
@@ -336,5 +218,42 @@ public abstract class MenuRowView extends LinearLayout {
      */
     public String getRowId() {
         return mRow == null ? null : mRow.getId();
+    }
+
+    /**
+     * Called when this row is selected.
+     *
+     * @param showTitle If {@code true}, the title is not hidden immediately after the row is
+     * selected even though hideTitleWhenSelected() is {@code true}.
+     */
+    public void onSelected(boolean showTitle) {
+        if (mRow.hideTitleWhenSelected() && !showTitle) {
+            // Title view should participate in the layout even though it is not visible.
+            mTitleView.setVisibility(INVISIBLE);
+        } else {
+            mTitleView.setVisibility(VISIBLE);
+            mTitleView.setAlpha(1.0f);
+            mTitleView.setScaleX(mTitleViewScaleSelected);
+            mTitleView.setScaleY(mTitleViewScaleSelected);
+        }
+        mContentsView.setVisibility(VISIBLE);
+    }
+
+    /**
+     * Called when this row is deselected.
+     */
+    public void onDeselected() {
+        mTitleView.setVisibility(VISIBLE);
+        mTitleView.setAlpha(mTitleViewAlphaDeselected);
+        mTitleView.setScaleX(1.0f);
+        mTitleView.setScaleY(1.0f);
+        mContentsView.setVisibility(GONE);
+    }
+
+    /**
+     * Returns the preferred height of the contents view. The top/bottom padding is excluded.
+     */
+    public int getPreferredContentsHeight() {
+        return mRow.getHeight();
     }
 }

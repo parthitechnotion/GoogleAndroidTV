@@ -30,14 +30,14 @@ import com.android.tv.menu.ItemListRowView.ItemListAdapter;
 public class ItemListRow extends MenuRow {
     private ItemListAdapter mAdapter;
 
-    public ItemListRow(Context context, int titleResId, int itemHeightResId,
+    public ItemListRow(Context context, Menu menu, int titleResId, int itemHeightResId,
             ItemListAdapter adapter) {
-        this(context, context.getString(titleResId), itemHeightResId, adapter);
+        this(context, menu, context.getString(titleResId), itemHeightResId, adapter);
     }
 
-    public ItemListRow(Context context, String title, int itemHeightResId,
+    public ItemListRow(Context context, Menu menu, String title, int itemHeightResId,
             ItemListAdapter adapter) {
-        super(context, title, itemHeightResId);
+        super(context, menu, title, itemHeightResId);
         mAdapter = adapter;
     }
 

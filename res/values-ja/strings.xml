@@ -20,8 +20,7 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"モノラル"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"ステレオ"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"再生操作"</string>
-    <string name="menu_title_channels" msgid="1949045451672990132">"チャンネル"</string>
-    <string name="menu_title_channels_legacy" msgid="700324464656729334">"最近のチャンネル"</string>
+    <string name="menu_title_channels" msgid="1801845517674690003">"最近のチャンネル"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"テレビオプション"</string>
     <string name="menu_title_pip_options" msgid="4252934960762407689">"PIPオプション"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"このチャンネルでは再生操作を使用できません"</string>
@@ -30,7 +29,7 @@
     <string name="play_controls_description_fast_rewind" msgid="953488122681015803">"巻き戻し"</string>
     <string name="play_controls_description_skip_next" msgid="1603587562124694592">"次へ"</string>
     <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"前へ"</string>
-    <string name="channels_item_program_guide" msgid="2889807207930678418">"プログラムガイド"</string>
+    <string name="channels_item_program_guide" msgid="2889807207930678418">"番組ガイド"</string>
     <string name="channels_item_setup" msgid="6557412175737379022">"利用できる新しいチャンネル"</string>
     <string name="channels_item_app_link_no_app_link" msgid="1884830234777824408">"リンクはありません"</string>
     <string name="channels_item_app_link_app_launcher" msgid="1395352122187670523">"<xliff:g id="APP_NAME">%1$s</xliff:g>を開く"</string>

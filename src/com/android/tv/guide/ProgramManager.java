@@ -175,17 +175,17 @@ public class ProgramManager {
         mChannelDataManager.addListener(new ChannelDataManager.Listener() {
             @Override
             public void onLoadFinished() {
-                updateChannels(true);
+                updateChannels(true, false);
             }
 
             @Override
             public void onChannelListUpdated() {
-                updateChannels(true);
+                updateChannels(true, false);
             }
 
             @Override
             public void onChannelBrowsableChanged() {
-                updateChannels(true);
+                updateChannels(true, false);
             }
         });
 
@@ -300,7 +300,7 @@ public class ProgramManager {
 
     // Note that This can be happens only if program guide isn't shown
     // because an user has to select channels as browsable through UI.
-    private void updateChannels(boolean notify) {
+    private void updateChannels(boolean notify, boolean clearPreviousTableEntries) {
         if (DEBUG) Log.d(TAG, "updateChannels");
         mChannels = mChannelDataManager.getBrowsableChannelList();
         mSelectedGenreId = GenreItems.ID_ALL_CHANNELS;
@@ -308,7 +308,7 @@ public class ProgramManager {
         if (notify) {
             notifyChannelsUpdated();
         }
-        updateTableEntries(notify, false);
+        updateTableEntries(notify, clearPreviousTableEntries);
     }
 
     private void updateTableEntries(boolean notify, boolean clear) {
@@ -404,19 +404,16 @@ public class ProgramManager {
     }
 
     /**
-     * Set the initial time range to manage.
+     * Update the initial time range to manage. It updates program entries and genre as well.
      */
-    public void setInitialTimeRange(long startUtcMillis, long endUtcMillis) {
+    public void updateInitialTimeRange(long startUtcMillis, long endUtcMillis) {
         mStartUtcMillis = startUtcMillis;
         if (endUtcMillis > mEndUtcMillis) {
             mEndUtcMillis = endUtcMillis;
         }
-        updateChannels(true);
 
         mProgramDataManager.setPrefetchTimeRange(mStartUtcMillis);
-
-        // Need to clear when the UI starts.
-        updateTableEntries(true, true);
+        updateChannels(true, true);
         setTimeRange(startUtcMillis, endUtcMillis);
     }
 
@@ -580,7 +577,7 @@ public class ProgramManager {
     }
 
     /**
-     * Returns the start time set by {@link #setInitialTimeRange}.
+     * Returns the start time set by {@link #updateInitialTimeRange}.
      */
     public long getStartTime() {
         return mStartUtcMillis;

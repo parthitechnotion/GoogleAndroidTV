@@ -24,10 +24,6 @@ import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject2;
 
 import com.android.tv.R;
-import com.android.tv.testing.uihelper.BaseUiDeviceHelper;
-import com.android.tv.testing.uihelper.ByResource;
-import com.android.tv.testing.uihelper.Constants;
-import com.android.tv.testing.uihelper.UiDeviceAsserts;
 import com.android.tv.ui.sidepanel.SideFragment;
 
 import junit.framework.Assert;

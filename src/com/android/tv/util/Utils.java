@@ -32,11 +32,13 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 
+import com.android.tv.BuildConfig;
 import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
@@ -124,6 +126,7 @@ public class Utils {
         return sb.toString();
     }
 
+    @WorkerThread
     public static String getInputIdForChannel(Context context, long channelId) {
         if (channelId == Channel.INVALID_ID) {
             return null;
@@ -219,6 +222,7 @@ public class Utils {
     /**
      * Gets the info of the program on particular time.
      */
+    @WorkerThread
     public static Program getProgramAt(Context context, long channelId, long timeMs) {
         if (channelId == Channel.INVALID_ID) {
             Log.e(TAG, "getCurrentProgramAt - channelId is invalid");
@@ -247,6 +251,7 @@ public class Utils {
     /**
      * Gets the info of the current program.
      */
+    @WorkerThread
     public static Program getCurrentProgram(Context context, long channelId) {
         return getProgramAt(context, channelId, System.currentTimeMillis());
     }
@@ -265,8 +270,8 @@ public class Utils {
      */
     public static String getDurationString(
             Context context, long startUtcMillis, long endUtcMillis, boolean useShortFormat) {
-        return getDurationString(context, System.currentTimeMillis(),
-                startUtcMillis, endUtcMillis, useShortFormat, 0);
+        return getDurationString(context, System.currentTimeMillis(), startUtcMillis, endUtcMillis,
+                useShortFormat, 0);
     }
 
     @VisibleForTesting
@@ -495,6 +500,7 @@ public class Utils {
     /**
      * Enable all channels synchronously.
      */
+    @WorkerThread
     public static void enableAllChannels(Context context) {
         ContentValues values = new ContentValues();
         values.put(Channels.COLUMN_BROWSABLE, 1);
@@ -543,5 +549,49 @@ public class Utils {
     @Nullable
     public static String intern(@Nullable String string) {
         return string == null ? null : string.intern();
+    }
+
+    /**
+     * Checks if this application is running in tests.
+     *
+     * <p>{@link android.app.ActivityManager#isRunningInTestHarness} doesn't return {@code true} for
+     * the usual devices even the application is running in tests. We need to figure it out by
+     * checking whether the class in tv-tests-common module can be loaded or not.
+     */
+    public static boolean isRunningInTest() {
+        try {
+            Class.forName("com.android.tv.testing.Utils");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Throws a {@link RuntimeException} if {@link BuildConfig#ENG} is true, else log a warning.
+     *
+     * @param tag Used to log message.
+     * @param msg The message
+     */
+    public static void engThrowElseWarn(String tag, String msg) {
+        if (BuildConfig.ENG) {
+            throw new RuntimeException(msg);
+        } else {
+            Log.w(tag, msg);
+        }
+    }
+
+    /**
+     * Throws a {@link RuntimeException} if {@link BuildConfig#ENG} is true, else log a warning.
+     *
+     * @param tag Used to log message.
+     * @param msg The message
+     */
+    public static void engThrowElseWarn(String tag, String msg, RuntimeException e) {
+        if (BuildConfig.ENG) {
+            throw e;
+        } else {
+            Log.w(tag, msg);
+        }
     }
 }

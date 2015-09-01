@@ -15,7 +15,6 @@
  */
 package com.android.tv.testing;
 
-import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,8 +28,6 @@ import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
-
-import com.android.tv.common.TvCommonConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,9 +54,7 @@ public class ChannelUtils {
 
         String[] projections = new String[ChannelInfo.PROJECTION.length + 1];
         projections[0] = Channels._ID;
-        for (int i = 0; i < ChannelInfo.PROJECTION.length; i++) {
-            projections[i + 1] = ChannelInfo.PROJECTION[i];
-        }
+        System.arraycopy(ChannelInfo.PROJECTION, 0, projections, 1, ChannelInfo.PROJECTION.length);
         try (Cursor cursor = context.getContentResolver()
                 .query(uri, projections, null, null, null)) {
             if (cursor != null) {
@@ -100,7 +95,7 @@ public class ChannelUtils {
             } else {
                 values.putNull(Channels.COLUMN_VIDEO_FORMAT);
             }
-            if (TvCommonConstants.IS_MNC_OR_HIGHER) {
+            if (Build.VERSION.SDK_INT >= 23) {
                 if (!TextUtils.isEmpty(channel.appLinkText)) {
                     values.put(Channels.COLUMN_APP_LINK_TEXT, channel.appLinkText);
                 }

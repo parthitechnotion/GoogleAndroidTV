@@ -53,6 +53,7 @@ import com.android.tv.common.TvCommonConstants;
 import com.android.tv.data.Channel;
 import com.android.tv.data.StreamInfo;
 import com.android.tv.parental.ContentRatingsManager;
+import com.android.tv.recommendation.NotificationService;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -233,7 +234,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
                         List<TvTrackInfo> tracks = getTracks(type);
                         boolean trackFound = false;
                         if (tracks != null) {
-                            for (TvTrackInfo track : getTracks(type)) {
+                            for (TvTrackInfo track : tracks) {
                                 if (track.getId().equals(trackId)) {
                                     if (type == TvTrackInfo.TYPE_VIDEO) {
                                         mVideoWidth = track.getVideoWidth();
@@ -454,7 +455,9 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         }
         mOnTuneListener = listener;
         mCurrentChannel = channel;
-        mTracker.sendChannelViewStart(mCurrentChannel);
+        boolean tunedByRecommendation = params != null
+                && params.getString(NotificationService.TUNE_PARAMS_RECOMMENDATION_TYPE) != null;
+        mTracker.sendChannelViewStart(mCurrentChannel, tunedByRecommendation);
         mChannelViewTimer.start();
         boolean needSurfaceSizeUpdate = false;
         if (!inputInfo.equals(mInputInfo)) {

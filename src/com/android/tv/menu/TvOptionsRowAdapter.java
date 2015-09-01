@@ -18,6 +18,7 @@ package com.android.tv.menu;
 
 import android.content.Context;
 import android.media.tv.TvTrackInfo;
+import android.support.annotation.VisibleForTesting;
 
 import com.android.tv.R;
 import com.android.tv.TvOptionsManager;
@@ -138,7 +139,8 @@ public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
         return changed;
     }
 
-    private boolean updateMultiAudioAction() {
+    @VisibleForTesting
+    boolean updateMultiAudioAction() {
         List<TvTrackInfo> audioTracks = getMainActivity().getTracks(TvTrackInfo.TYPE_AUDIO);
         boolean oldEnabled = MenuAction.SELECT_AUDIO_LANGUAGE_ACTION.isEnabled();
         boolean newEnabled = audioTracks != null && audioTracks.size() > 1;

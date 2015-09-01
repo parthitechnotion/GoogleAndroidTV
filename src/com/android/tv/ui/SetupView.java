@@ -16,14 +16,21 @@
 
 package com.android.tv.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.animation.TimeInterpolator;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager.TvInputCallback;
 import android.support.annotation.VisibleForTesting;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -38,17 +45,22 @@ import com.android.tv.util.SetupUtils;
 import com.android.tv.util.TvInputManagerHelper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class SetupView extends FullscreenDialogView {
+    private static final String TAG = "SetupView";
+    private static final boolean DEBUG = false;
+
     private static final int FINISH_ACTIVITY_DELAY_MS = 200;
     private static final int REFRESH_DELAY_MS_AFTER_WINDOW_FOCUS_GAINED = 200;
 
+    private static final long ANIMATION_START_DELAY = 25;
+
     private VerticalGridView mInputView;
     private ChannelDataManager mChannelDataManager;
+    private TvInputManagerHelper mInputManager;
     private List<TvInputInfo> mInputList;
     // mInputList[0:mKnownInputStartIndex - 1] are new inputs.
     // And mInputList[mKnownInputStartIndex:end] are inputs which have been shown in SetupView.
@@ -59,25 +71,52 @@ public class SetupView extends FullscreenDialogView {
     private boolean mInitialized;
     private SetupUtils mSetupUtils;
     private boolean mNeedIntroDialog;
+    private final int mEnterTranslationX;
+    private final int mExitTranslationX;
+    private Animator mEnterAnimator;
 
-    private final ChannelDataManager.Listener mChannelDataListener = new ChannelDataManager.Listener() {
+    private final TvInputCallback mInputCallback = new TvInputCallback() {
         @Override
-        public void onLoadFinished() { }
-
-        @Override
-        public void onChannelListUpdated() {
-            if (mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
+        public void onInputAdded(String inputId) {
+            if (DEBUG) {
+                Log.d(TAG, "onInputAdded: " + inputId);
             }
+            if (!mInitialized) {
+                return;
+            }
+            updateInputList();
         }
 
         @Override
-        public void onChannelBrowsableChanged() {
-            if (mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
+        public void onInputRemoved(String inputId) {
+            if (DEBUG) {
+                Log.d(TAG, "onInputRemoved: " + inputId);
             }
+            if (!mInitialized) {
+                return;
+            }
+            updateInputList();
         }
     };
+    private final ChannelDataManager.Listener mChannelDataListener =
+            new ChannelDataManager.Listener() {
+                @Override
+                public void onLoadFinished() { }
+
+                @Override
+                public void onChannelListUpdated() {
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onChannelBrowsableChanged() {
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+            };
 
     public SetupView(Context context) {
         this(context, null, 0);
@@ -89,7 +128,10 @@ public class SetupView extends FullscreenDialogView {
 
     public SetupView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        setTransitionAnimationEnabled(true);
+        mEnterTranslationX = context.getResources().getInteger(
+                R.integer.fullscreen_dialog_enter_translation_x);
+        mExitTranslationX = context.getResources().getInteger(
+                R.integer.fullscreen_dialog_exit_translation_x);
     }
 
     @Override
@@ -103,6 +145,18 @@ public class SetupView extends FullscreenDialogView {
         TypedValue outValue = new TypedValue();
         getResources().getValue(R.dimen.setup_item_window_alignment_offset_percent, outValue, true);
         mInputView.setWindowAlignmentOffsetPercent(outValue.getFloat());
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mInputManager.addCallback(mInputCallback);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mInputManager.removeCallback(mInputCallback);
     }
 
     @Override
@@ -138,12 +192,21 @@ public class SetupView extends FullscreenDialogView {
             throw new IllegalStateException("initialize() is called more than once");
         }
         mInitialized = true;
-        final TvInputManagerHelper inputManager = getActivity().getTvInputManagerHelper();
+        mInputManager = getActivity().getTvInputManagerHelper();
         mChannelDataManager = getActivity().getChannelDataManager();
         mSetupUtils = SetupUtils.getInstance(activity);
+        mNeedIntroDialog = mSetupUtils.isFirstTune();
+        mAdapter = new SetupAdapter();
+        mInputView.setAdapter(mAdapter);
+        mChannelDataManager.addListener(mChannelDataListener);
+        updateInputList();
+    }
+
+    private void updateInputList() {
+        mInputList = new ArrayList<>();
         mKnownInputStartIndex = 0;
-        mInputList = inputManager.getTvInputInfos(true, true);
-        Collections.sort(mInputList, new TvInputInfoComparator(mSetupUtils, inputManager));
+        mInputList = mInputManager.getTvInputInfos(true, true);
+        Collections.sort(mInputList, new TvInputInfoComparator(mSetupUtils, mInputManager));
         for (TvInputInfo input : mInputList) {
             if (mSetupUtils.isNewInput(input.getId())) {
                 mSetupUtils.markAsKnownInput(input.getId());
@@ -151,10 +214,8 @@ public class SetupView extends FullscreenDialogView {
             }
         }
         mShowDivider = mKnownInputStartIndex != 0 && mKnownInputStartIndex != mInputList.size();
-        mAdapter = new SetupAdapter();
-        mInputView.setAdapter(mAdapter);
-        mChannelDataManager.addListener(mChannelDataListener);
         mNeedIntroDialog = mSetupUtils.isFirstTune();
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -186,6 +247,79 @@ public class SetupView extends FullscreenDialogView {
             getActivity().finish();
         }
         dismiss();
+    }
+
+    @Override
+    protected void onStartEnterAnimation(final TimeInterpolator interpolator, final long duration) {
+        List<Animator> animatorList = new ArrayList<>();
+        View leftPanel = findViewById(R.id.setup_left);
+        leftPanel.setAlpha(0);
+        leftPanel.setTranslationX(mEnterTranslationX);
+        animatorList.add(buildEnterAnimator(leftPanel, duration, 0, interpolator));
+
+        for (int i = 0; i < mInputView.getChildCount(); ++i) {
+            View itemView = mInputView.getChildAt(i);
+            itemView.setAlpha(0);
+            itemView.setTranslationX(mEnterTranslationX);
+            int itemPosition = mInputView.getChildAdapterPosition(itemView);
+            animatorList.add(buildEnterAnimator(itemView, duration,
+                    ANIMATION_START_DELAY * (itemPosition + 1), interpolator));
+        }
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animatorList);
+        mEnterAnimator = animatorSet;
+        mEnterAnimator.start();
+    }
+
+    private Animator buildEnterAnimator(View v, long duration, long startDelay,
+            TimeInterpolator interpolator) {
+        Animator animator = ObjectAnimator.ofPropertyValuesHolder(v,
+                PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1.0f),
+                PropertyValuesHolder.ofFloat(View.TRANSLATION_X, mEnterTranslationX, 0));
+        animator.setStartDelay(startDelay);
+        animator.setDuration(duration);
+        animator.setInterpolator(interpolator);
+        animator.addListener(new HardwareLayerAnimatorListenerAdapter(v));
+        return animator;
+    }
+
+    @Override
+    protected void onStartExitAnimation(TimeInterpolator interpolator, long duration,
+            final Runnable onAnimationEnded) {
+        if (mEnterAnimator != null && mEnterAnimator.isRunning()) {
+            mEnterAnimator.cancel();
+        }
+        List<Animator> animatorList = new ArrayList<>();
+        animatorList.add(
+                buildExitAnimator(findViewById(R.id.setup_left), duration, 0, interpolator));
+        for (int i = 0; i < mInputView.getChildCount(); ++i) {
+            View itemView = mInputView.getChildAt(i);
+            int itemPosition = mInputView.getChildAdapterPosition(itemView);
+            animatorList.add(buildExitAnimator(itemView, duration,
+                    ANIMATION_START_DELAY * (itemPosition + 1), interpolator));
+        }
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animatorList);
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                onAnimationEnded.run();
+            }
+        });
+        animatorSet.start();
+    }
+
+    private Animator buildExitAnimator(View v, long duration, long startDelay,
+            TimeInterpolator interpolator) {
+        Animator animator = ObjectAnimator.ofPropertyValuesHolder(v,
+                PropertyValuesHolder.ofFloat(View.ALPHA, v.getAlpha(), 0f),
+                PropertyValuesHolder.ofFloat(View.TRANSLATION_X,
+                        v.getTranslationX(), mExitTranslationX));
+        animator.setStartDelay(startDelay);
+        animator.setDuration(duration);
+        animator.setInterpolator(interpolator);
+        animator.addListener(new HardwareLayerAnimatorListenerAdapter(v));
+        return animator;
     }
 
     private class SetupAdapter extends RecyclerView.Adapter<MyViewHolder> {
@@ -286,8 +420,8 @@ public class SetupView extends FullscreenDialogView {
 
     @VisibleForTesting
     static class TvInputInfoComparator implements Comparator<TvInputInfo> {
-        private SetupUtils mSetupUtils;
-        private TvInputManagerHelper mInputManager;
+        private final SetupUtils mSetupUtils;
+        private final TvInputManagerHelper mInputManager;
 
         public TvInputInfoComparator(SetupUtils setupUtils, TvInputManagerHelper inputManager) {
             mSetupUtils = setupUtils;
@@ -303,5 +437,5 @@ public class SetupView extends FullscreenDialogView {
             }
             return mInputManager.getDefaultTvInputInfoComparator().compare(lhs, rhs);
         }
-    };
+    }
 }

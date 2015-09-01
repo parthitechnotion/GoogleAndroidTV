@@ -19,8 +19,7 @@ package com.android.tv.util;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.media.tv.TvInputInfo;
-
-import com.android.tv.common.TvCommonConstants;
+import android.os.Build;
 
 import java.lang.reflect.Constructor;
 
@@ -33,7 +32,7 @@ public class TestUtils {
         // Create a mock TvInputInfo by using private constructor
         // TODO: Find better way to mock TvInputInfo.
         // Note that mockito doesn't support mock/spy on final object.
-        if (!TvCommonConstants.IS_MNC_PREVIEW && !TvCommonConstants.IS_MNC_OR_HIGHER) {
+        if (Build.VERSION.SDK_INT < 23) {
             return createTvInputInfoForLmp(service, id, parentId, type);
         }
         return createTvInputInfoForMnc(service, id, parentId, type, isHardwareInput);

@@ -20,8 +20,7 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"mono"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"stereo"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Afspeelknoppen"</string>
-    <string name="menu_title_channels" msgid="1949045451672990132">"Kanalen"</string>
-    <string name="menu_title_channels_legacy" msgid="700324464656729334">"Recente kanalen"</string>
+    <string name="menu_title_channels" msgid="1801845517674690003">"Recente kanalen"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"Tv-opties"</string>
     <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP-opties"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"Er zijn geen afspeelknoppen beschikbaar voor dit kanaal"</string>
@@ -138,8 +137,8 @@
     <string name="pin_enter_again" msgid="2618999754723090427">"Uw pincode bevestigen"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"Uw huidige pincode opgeven"</string>
   <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"U heeft vijf keer een verkeerde pincode ingevoerd.\nProbeer het over <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> seconde opnieuw."</item>
-    <item quantity="other" msgid="8829550842387756054">"U heeft vijf keer een verkeerde pincode ingevoerd.\nProbeer het over <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> seconden opnieuw."</item>
+    <item quantity="one" msgid="5555357148779935468">"Je hebt vijf keer een verkeerde pincode ingevoerd.\nProbeer het over <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> seconde opnieuw."</item>
+    <item quantity="other" msgid="8829550842387756054">"Je hebt vijf keer een verkeerde pincode ingevoerd.\nProbeer het over <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> seconden opnieuw."</item>
   </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"Die pincode is onjuist. Probeer het opnieuw."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Probeer het opnieuw; de pincode komt niet overeen"</string>
@@ -148,7 +147,7 @@
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Open-sourcelicenties"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versie"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Als u dit kanaal wilt bekijken, drukt u rechts en geeft u uw pincode op"</string>
-    <string name="tvview_content_locked" msgid="391823084917017730">"Als u dit programma wilt bekijken, drukt u rechts en geeft u uw pincode op"</string>
+    <string name="tvview_content_locked" msgid="391823084917017730">"Als je dit programma wilt bekijken, druk je rechts en geef je je pincode op"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Dit programma is beoordeeld als <xliff:g id="RATING">%1$s</xliff:g>.\nAls u dit programma wilt bekijken, drukt u rechts en geeft u uw pincode op."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Programma is geblokkeerd"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Dit programma is beoordeeld als <xliff:g id="RATING">%1$s</xliff:g>"</string>
