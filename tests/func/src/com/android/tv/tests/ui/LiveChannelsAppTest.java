@@ -22,6 +22,7 @@ import static com.android.tv.testing.uihelper.UiDeviceAsserts.assertWaitForCondi
 import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.Until;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.android.tv.R;
 import com.android.tv.testing.testinput.ChannelStateData;
@@ -34,6 +35,7 @@ import com.android.tv.testing.uihelper.SidePanelHelper;
  * Basic tests for the LiveChannels app.
  */
 @LargeTest
+@Suppress  // http://b/25147411 Tests fail missing classes from tests/common
 public class LiveChannelsAppTest extends LiveChannelsTestCase {
     private SidePanelHelper mSidePanelHelper;
 

@@ -21,7 +21,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.media.PlaybackParams;
+//import android.media.PlaybackParams;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
@@ -34,6 +34,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 
+import com.android.tv.common.LmpOnly;
 import com.android.tv.common.TvCommonConstants;
 import com.android.tv.testing.ChannelInfo;
 import com.android.tv.testing.testinput.ChannelState;
@@ -195,7 +196,8 @@ public class TestTvInputService extends TvInputService {
                 Log.i(TAG, "Tuning to " + mChannel);
             }
             if (TvCommonConstants.HAS_TIME_SHIFT_API) {
-                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+                LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
+                //notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
                 mRecordStartTimeMs = mCurrentPositionMs = mLastCurrentPositionUpdateTimeMs
                         = System.currentTimeMillis();
                 mPausedTimeMs = 0;
@@ -222,41 +224,41 @@ public class TestTvInputService extends TvInputService {
             return true;
         }
 
-        @Override
-        public long onTimeShiftGetCurrentPosition() {
-            Log.d(TAG, "currentPositionMs=" + mCurrentPositionMs);
-            return mCurrentPositionMs;
-        }
-
-        @Override
-        public long onTimeShiftGetStartPosition() {
-            return mRecordStartTimeMs;
-        }
-
-        @Override
-        public void onTimeShiftPause() {
-            mCurrentPositionMs = mPausedTimeMs = mLastCurrentPositionUpdateTimeMs
-                    = System.currentTimeMillis();
-        }
-
-        @Override
-        public void onTimeShiftResume() {
-            mSpeed = 1;
-            mPausedTimeMs = 0;
-            mLastCurrentPositionUpdateTimeMs = System.currentTimeMillis();
-        }
-
-        @Override
-        public void onTimeShiftSeekTo(long timeMs) {
-            mLastCurrentPositionUpdateTimeMs = System.currentTimeMillis();
-            mCurrentPositionMs = Math.max(mRecordStartTimeMs,
-                    Math.min(timeMs, mLastCurrentPositionUpdateTimeMs));
-        }
-
-        @Override
-        public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
-            mSpeed = params.getSpeed();
-        }
+//        @Override
+//        public long onTimeShiftGetCurrentPosition() {
+//            Log.d(TAG, "currentPositionMs=" + mCurrentPositionMs);
+//            return mCurrentPositionMs;
+//        }
+//
+//        @Override
+//        public long onTimeShiftGetStartPosition() {
+//            return mRecordStartTimeMs;
+//        }
+//
+//        @Override
+//        public void onTimeShiftPause() {
+//            mCurrentPositionMs = mPausedTimeMs = mLastCurrentPositionUpdateTimeMs
+//                    = System.currentTimeMillis();
+//        }
+//
+//        @Override
+//        public void onTimeShiftResume() {
+//            mSpeed = 1;
+//            mPausedTimeMs = 0;
+//            mLastCurrentPositionUpdateTimeMs = System.currentTimeMillis();
+//        }
+//
+//        @Override
+//        public void onTimeShiftSeekTo(long timeMs) {
+//            mLastCurrentPositionUpdateTimeMs = System.currentTimeMillis();
+//            mCurrentPositionMs = Math.max(mRecordStartTimeMs,
+//                    Math.min(timeMs, mLastCurrentPositionUpdateTimeMs));
+//        }
+//
+//        @Override
+//        public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
+//            mSpeed = params.getSpeed();
+//        }
 
         private final class DrawRunnable implements Runnable {
             private volatile boolean mIsCanceled = false;

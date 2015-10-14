@@ -94,7 +94,7 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
                 R.dimen.card_meta_layout_height);
         mExtendedTextViewCardHeight = getResources().getDimensionPixelOffset(
                 R.dimen.card_meta_layout_height_extended);
-        mIconColorFilter = getResources().getColor(R.color.app_link_card_icon_color_filter, null);
+        mIconColorFilter = getResources().getColor(R.color.app_link_card_icon_color_filter);
     }
 
     /**
@@ -285,7 +285,7 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
             @Override
             public void onGenerated(Palette palette) {
                 mMetaViewHolder.setBackgroundColor(palette.getDarkVibrantColor(
-                        getResources().getColor(R.color.channel_card_meta_background, null)));
+                        getResources().getColor(R.color.channel_card_meta_background)));
             }
         });
     }

@@ -18,6 +18,7 @@ package com.android.tv.menu;
 import android.media.tv.TvTrackInfo;
 import android.os.SystemClock;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.android.tv.BaseMainActivityTestCase;
 import com.android.tv.MainActivity;
@@ -33,6 +34,7 @@ import java.util.List;
  * Tests for {@link TvOptionsRowAdapter}.
  */
 @MediumTest
+@Suppress  // http://b/25147411 Tests fail missing classes from tests/common
 public class TvOptionsRowAdapterTest extends BaseMainActivityTestCase {
     private static final int WAIT_TRACK_SIZE_TIMEOUT_MS = 300;
     public static final int TRACK_SIZE_CHECK_INTERVAL_MS = 10;

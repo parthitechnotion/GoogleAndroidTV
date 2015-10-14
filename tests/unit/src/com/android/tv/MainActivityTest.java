@@ -16,6 +16,7 @@
 package com.android.tv;
 
 import android.test.suitebuilder.annotation.MediumTest;
+import android.test.suitebuilder.annotation.Suppress;
 import android.view.View;
 import android.widget.TextView;
 
@@ -42,12 +43,14 @@ public class MainActivityTest extends BaseMainActivityTestCase {
         assertFalse("PIP disabled", mActivity.isPipEnabled());
     }
 
+    @Suppress  // http://b/25147411 Tests fail missing classes from tests/common
     public void testTuneToChannel() throws Throwable {
         tuneToChannel(TvTestInputConstants.CH_2);
         assertChannelBannerShown(true);
         assertChannelName(TvTestInputConstants.CH_2.name);
     }
 
+    @Suppress  // http://b/25147411 Tests fail missing classes from tests/common
     public void testShowProgramGuide() throws Throwable {
         tuneToChannel(TvTestInputConstants.CH_2);
         showProgramGuide();

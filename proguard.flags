@@ -44,8 +44,8 @@
     void decodeDone(java.nio.ByteBuffer, long);
 }
 
-# For tests
--keep @android.support.annotation.VisibleForTesting class *
--keepclasseswithmembers class * {
-    @android.support.annotation.VisibleForTesting <methods>;
+# Keep classes and methods that have the  @VisibleForTesting annotation
+-keep @**.VisibleForTesting class *
+-keepclassmembers class * {
+@**.VisibleForTesting *;
 }

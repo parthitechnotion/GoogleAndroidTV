@@ -27,6 +27,7 @@ import android.test.mock.MockContentProvider;
 import android.test.mock.MockContentResolver;
 import android.test.mock.MockCursor;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.Suppress;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -46,6 +47,7 @@ import java.util.concurrent.TimeUnit;
  * Test for {@link com.android.tv.data.ProgramDataManager}
  */
 @SmallTest
+@Suppress  // http://b/25147411 Tests fail missing classes from tests/common
 public class ProgramDataManagerTest extends AndroidTestCase {
     private static final boolean DEBUG = false;
     private static final String TAG = "ProgramDataManagerTest";

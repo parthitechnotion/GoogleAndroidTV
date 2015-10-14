@@ -32,6 +32,7 @@ import android.test.mock.MockContentProvider;
 import android.test.mock.MockContentResolver;
 import android.test.mock.MockCursor;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.Suppress;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -56,6 +57,7 @@ import java.util.concurrent.TimeUnit;
  * A test method may include tests for multiple methods to minimize the DB access.
  */
 @SmallTest
+@Suppress  // http://b/25147411 Tests fail missing classes from tests/common
 public class ChannelDataManagerTest extends AndroidTestCase {
     private static final boolean DEBUG = false;
     private static final String TAG = "ChannelDataManagerTest";

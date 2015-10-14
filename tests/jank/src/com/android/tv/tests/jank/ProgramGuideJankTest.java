@@ -21,10 +21,12 @@ import android.content.res.Resources;
 import android.os.SystemClock;
 import android.support.test.jank.JankTest;
 import android.support.test.jank.JankTestBase;
-import android.support.test.jank.WindowContentFrameStatsMonitor;
+import android.support.test.jank.JankType;
+//import android.support.test.jank.WindowContentFrameStatsMonitor;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.Until;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 
 import com.android.tv.R;
@@ -38,6 +40,7 @@ import com.android.tv.testing.uihelper.UiDeviceUtils;
  * Jank tests for the program guide.
  */
 @MediumTest
+@Suppress  // http://b/25147411 Tests fail missing classes from tests/common
 public class ProgramGuideJankTest extends JankTestBase {
     private static final boolean DEBUG = false;
     private static final String TAG = "ProgramGuideJank";
@@ -64,11 +67,11 @@ public class ProgramGuideJankTest extends JankTestBase {
         pressKeysForChannelNumber(STARTING_CHANNEL);
     }
 
-    @JankTest(expectedFrames = 7,
+    @JankTest(type= JankType.ANIMATION_FRAMES, expectedFrames = 7,
             beforeTest = "warmProgramGuide",
             beforeLoop = "selectProgramGuideMenuItem",
             afterLoop = "clearProgramGuide")
-    @WindowContentFrameStatsMonitor
+    //@WindowContentFrameStatsMonitor
     public void testShowProgramGuide() {
         mDevice.pressDPadCenter();
 
@@ -77,29 +80,29 @@ public class ProgramGuideJankTest extends JankTestBase {
         waitForIdleAtLeast(delay);
     }
 
-    @JankTest(expectedFrames = EXPECTED_FRAMES,
+    @JankTest(type= JankType.ANIMATION_FRAMES, expectedFrames = EXPECTED_FRAMES,
             beforeLoop = "showProgramGuide")
-    @WindowContentFrameStatsMonitor
+    //@WindowContentFrameStatsMonitor
     public void testClearProgramGuide() {
         mDevice.pressBack();
         // Full show has two animations.
         waitForIdleAtLeast(mTargetResources.getInteger(R.integer.program_guide_anim_duration) * 2);
     }
 
-    @JankTest(expectedFrames = EXPECTED_FRAMES,
+    @JankTest(type= JankType.ANIMATION_FRAMES, expectedFrames = EXPECTED_FRAMES,
             beforeLoop = "showProgramGuide",
             afterLoop = "clearProgramGuide")
-    @WindowContentFrameStatsMonitor
+    //@WindowContentFrameStatsMonitor
     public void testScrollDown() {
         mDevice.pressDPadDown();
         waitForIdleAtLeast(mTargetResources
                 .getInteger(R.integer.program_guide_table_detail_toggle_anim_duration));
     }
 
-    @JankTest(expectedFrames = EXPECTED_FRAMES,
+    @JankTest(type= JankType.ANIMATION_FRAMES, expectedFrames = EXPECTED_FRAMES,
             beforeLoop = "showProgramGuide",
             afterLoop = "clearProgramGuide")
-    @WindowContentFrameStatsMonitor
+    //@WindowContentFrameStatsMonitor
     public void testScrollRight() {
         mDevice.pressDPadRight();
         waitForIdleAtLeast(mTargetResources

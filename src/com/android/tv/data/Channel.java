@@ -30,6 +30,7 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.tv.common.LmpOnly;
 import com.android.tv.common.TvCommonConstants;
 import com.android.tv.util.ImageLoader;
 import com.android.tv.util.TvInputManagerHelper;
@@ -90,17 +91,18 @@ public final class Channel {
     // Additional fields added in MNC.
     private static final String[] PROJECTION_ADDED_IN_MNC = {
             // Columns should match what is read in Channel.fromCursor()
-            TvContract.Channels.COLUMN_APP_LINK_TEXT,
-            TvContract.Channels.COLUMN_APP_LINK_COLOR,
-            TvContract.Channels.COLUMN_APP_LINK_ICON_URI,
-            TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI,
-            TvContract.Channels.COLUMN_APP_LINK_INTENT_URI,
+//            TvContract.Channels.COLUMN_APP_LINK_TEXT,
+//            TvContract.Channels.COLUMN_APP_LINK_COLOR,
+//            TvContract.Channels.COLUMN_APP_LINK_ICON_URI,
+//            TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI,
+//            TvContract.Channels.COLUMN_APP_LINK_INTENT_URI,
     };
 
     public static final String[] PROJECTION = createProjection();
 
     private static String[] createProjection() {
         if (Build.VERSION.SDK_INT >= 23) {
+            LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
             ArrayList<String> temp = new ArrayList<>(
                     PROJECTION_BASE.length + PROJECTION_ADDED_IN_MNC.length);
             temp.addAll(Arrays.asList(PROJECTION_BASE));

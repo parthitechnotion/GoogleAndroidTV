@@ -23,7 +23,7 @@ import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.media.PlaybackParams;
+//import android.media.PlaybackParams;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
@@ -49,6 +49,7 @@ import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.DurationTimer;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.LmpOnly;
 import com.android.tv.common.TvCommonConstants;
 import com.android.tv.data.Channel;
 import com.android.tv.data.StreamInfo;
@@ -292,9 +293,10 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
                     }
                 }
 
-                @Override
+                // @Override
                 public void onTimeShiftStatusChanged(String inputId, int status) {
-                    setTimeShiftAvailable(status == TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+                    setTimeShiftAvailable(false
+                           /* status == TvInputManager.TIME_SHIFT_STATUS_AVAILABLE*/);
                 }
             };
 
@@ -479,10 +481,10 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         mHasClosedCaption = false;
         mTvView.setCallback(mCallback);
         mTimeShiftCurrentPositionMs = INVALID_TIME;
-        if (TvCommonConstants.HAS_TIME_SHIFT_API) {
-            // To reduce the IPCs, unregister the callback here and register it when necessary.
-            mTvView.setTimeShiftPositionCallback(null);
-        }
+//        if (TvCommonConstants.HAS_TIME_SHIFT_API) {
+//            // To reduce the IPCs, unregister the callback here and register it when necessary.
+//            mTvView.setTimeShiftPositionCallback(null);
+//        }
         setTimeShiftAvailable(false);
         mTvView.tune(mInputInfo.getId(), mCurrentChannel.getUri(), params);
         if (needSurfaceSizeUpdate && mFixedSurfaceWidth > 0 && mFixedSurfaceHeight > 0) {
@@ -826,12 +828,10 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
     private void updateBlockScreenTextView() {
         // TODO: need to add animation for padding change when the block screen type is changed
         // NORMAL to SHRUNKEN and vice verse.
-        mBlockScreenTextView.setPadding(0,
-                getResources().getDimensionPixelOffset(
+        mBlockScreenTextView.setPadding(0, getResources().getDimensionPixelOffset(
                         mBlockScreenType == BLOCK_SCREEN_TYPE_SHRUNKEN_TV_VIEW
                                 ? R.dimen.shrunken_tvview_block_text_padding_top
-                                : R.dimen.tvview_block_text_padding_top),
-                0, 0);
+                                : R.dimen.tvview_block_text_padding_top), 0, 0);
 
         if (mScreenBlocked) {
             switch (mBlockScreenType) {
@@ -1019,22 +1019,23 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         }
         mTimeShiftAvailable = isTimeShiftAvailable;
         if (isTimeShiftAvailable) {
-            mTvView.setTimeShiftPositionCallback(new TvView.TimeShiftPositionCallback() {
-                @Override
-                public void onTimeShiftStartPositionChanged(String inputId, long timeMs) {
-                    if (mTimeShiftListener != null && mCurrentChannel != null
-                            && mCurrentChannel.getInputId().equals(inputId)) {
-                        mTimeShiftListener.onRecordStartTimeChanged(timeMs);
-                    }
-                }
-
-                @Override
-                public void onTimeShiftCurrentPositionChanged(String inputId, long timeMs) {
-                    mTimeShiftCurrentPositionMs = timeMs;
-                }
-            });
+            LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
+//            mTvView.setTimeShiftPositionCallback(new TvView.TimeShiftPositionCallback() {
+//                @Override
+//                public void onTimeShiftStartPositionChanged(String inputId, long timeMs) {
+//                    if (mTimeShiftListener != null && mCurrentChannel != null
+//                            && mCurrentChannel.getInputId().equals(inputId)) {
+//                        mTimeShiftListener.onRecordStartTimeChanged(timeMs);
+//                    }
+//                }
+//
+//                @Override
+//                public void onTimeShiftCurrentPositionChanged(String inputId, long timeMs) {
+//                    mTimeShiftCurrentPositionMs = timeMs;
+//                }
+//            });
         } else {
-            mTvView.setTimeShiftPositionCallback(null);
+//            mTvView.setTimeShiftPositionCallback(null);
         }
         if (mTimeShiftListener != null) {
             mTimeShiftListener.onAvailabilityChanged();
@@ -1069,10 +1070,11 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
         }
+        LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
         if (mTimeShiftState == TIME_SHIFT_STATE_PLAY) {
             return;
         }
-        mTvView.timeShiftResume();
+        //mTvView.timeShiftResume();
     }
 
     /**
@@ -1086,10 +1088,11 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
         }
+        LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
         if (mTimeShiftState == TIME_SHIFT_STATE_PAUSE) {
             return;
         }
-        mTvView.timeShiftPause();
+        //mTvView.timeShiftPause();
     }
 
     /**
@@ -1105,13 +1108,14 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
         }
+        LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
         if (speed <= 0) {
             throw new IllegalArgumentException("The speed should be a positive integer.");
         }
         mTimeShiftState = TIME_SHIFT_STATE_REWIND;
-        PlaybackParams params = new PlaybackParams();
-        params.setSpeed(speed * -1);
-        mTvView.timeShiftSetPlaybackParams(params);
+//        PlaybackParams params = new PlaybackParams();
+//        params.setSpeed(speed * -1);
+//        mTvView.timeShiftSetPlaybackParams(params);
     }
 
     /**
@@ -1127,13 +1131,14 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
         }
+        LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
         if (speed <= 0) {
             throw new IllegalArgumentException("The speed should be a positive integer.");
         }
         mTimeShiftState = TIME_SHIFT_STATE_FAST_FORWARD;
-        PlaybackParams params = new PlaybackParams();
-        params.setSpeed(speed);
-        mTvView.timeShiftSetPlaybackParams(params);
+//        PlaybackParams params = new PlaybackParams();
+//        params.setSpeed(speed);
+//        mTvView.timeShiftSetPlaybackParams(params);
     }
 
     /**
@@ -1149,7 +1154,8 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
         }
-        mTvView.timeShiftSeekTo(timeMs);
+        LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
+        //mTvView.timeShiftSeekTo(timeMs);
     }
 
     /**
@@ -1163,6 +1169,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
         }
+        LmpOnly.throwIllegalStateBecauseNotBuiltWithLmp();
         if (DEBUG) {
             Log.d(TAG, "timeshiftGetCurrentPositionMs: current position ="
                     + Utils.toTimeString(mTimeShiftCurrentPositionMs));

@@ -95,23 +95,23 @@ public class ChannelUtils {
             } else {
                 values.putNull(Channels.COLUMN_VIDEO_FORMAT);
             }
-            if (Build.VERSION.SDK_INT >= 23) {
-                if (!TextUtils.isEmpty(channel.appLinkText)) {
-                    values.put(Channels.COLUMN_APP_LINK_TEXT, channel.appLinkText);
-                }
-                if (channel.appLinkColor != 0) {
-                    values.put(Channels.COLUMN_APP_LINK_COLOR, channel.appLinkColor);
-                }
-                if (!TextUtils.isEmpty(channel.appLinkPosterArtUri)) {
-                    values.put(Channels.COLUMN_APP_LINK_POSTER_ART_URI, channel.appLinkPosterArtUri);
-                }
-                if (!TextUtils.isEmpty(channel.appLinkIconUri)) {
-                    values.put(Channels.COLUMN_APP_LINK_ICON_URI, channel.appLinkIconUri);
-                }
-                if (!TextUtils.isEmpty(channel.appLinkIntentUri)) {
-                    values.put(Channels.COLUMN_APP_LINK_INTENT_URI, channel.appLinkIntentUri);
-                }
-            }
+//            if (Build.VERSION.SDK_INT >= 23) {
+//                if (!TextUtils.isEmpty(channel.appLinkText)) {
+//                    values.put(Channels.COLUMN_APP_LINK_TEXT, channel.appLinkText);
+//                }
+//                if (channel.appLinkColor != 0) {
+//                    values.put(Channels.COLUMN_APP_LINK_COLOR, channel.appLinkColor);
+//                }
+//                if (!TextUtils.isEmpty(channel.appLinkPosterArtUri)) {
+//                    values.put(Channels.COLUMN_APP_LINK_POSTER_ART_URI, channel.appLinkPosterArtUri);
+//                }
+//                if (!TextUtils.isEmpty(channel.appLinkIconUri)) {
+//                    values.put(Channels.COLUMN_APP_LINK_ICON_URI, channel.appLinkIconUri);
+//                }
+//                if (!TextUtils.isEmpty(channel.appLinkIntentUri)) {
+//                    values.put(Channels.COLUMN_APP_LINK_INTENT_URI, channel.appLinkIntentUri);
+//                }
+//            }
             Long rowId = existingChannelsMap.get(channel.originalNetworkId);
             Uri uri;
             if (rowId == null) {
