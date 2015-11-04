@@ -121,6 +121,10 @@ public class MenuHelper extends BaseUiDeviceHelper {
                 R.string.options_item_channel_sources);
     }
 
+    public UiObject2 assertPressOptionsAbout() {
+        return assertPressMenuItem(R.string.menu_title_options,
+                R.string.options_item_about);
+    }
 
     public UiObject2 assertPressOptionsClosedCaptions() {
         return assertPressMenuItem(R.string.menu_title_options,

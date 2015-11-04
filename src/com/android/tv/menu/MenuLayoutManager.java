@@ -35,6 +35,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.TextView;
 
 import com.android.tv.R;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
@@ -312,16 +313,16 @@ public class MenuLayoutManager {
         if (mSelectedPosition == position) {
             return;
         }
-        if (position < 0 || position >= mMenuRowViews.size()) {
-            String msg = "Invalid position: " + position;
-            Utils.engThrowElseWarn(TAG, msg, new IllegalArgumentException(msg));
+        boolean indexValid = Utils.isIndexValid(mMenuRowViews, position);
+        SoftPreconditions.checkArgument(indexValid, TAG, "position " + position);
+        if (!indexValid) {
             return;
         }
-        if (mSelectedPosition >= 0 && mSelectedPosition < mMenuRowViews.size()) {
+        if (Utils.isIndexValid(mMenuRowViews, mSelectedPosition)) {
             mMenuRowViews.get(mSelectedPosition).onDeselected();
         }
         mSelectedPosition = position;
-        if (mSelectedPosition >= 0 && mSelectedPosition < mMenuRowViews.size()) {
+        if (Utils.isIndexValid(mMenuRowViews, mSelectedPosition)) {
             mMenuRowViews.get(mSelectedPosition).onSelected(false);
         }
         if (mMenuView.getVisibility() == View.VISIBLE) {
@@ -348,14 +349,15 @@ public class MenuLayoutManager {
         if (mSelectedPosition == position) {
             return;
         }
-        if (mSelectedPosition < 0 || mSelectedPosition >= mMenuRowViews.size()) {
-            String msg = "No previous selection: " + mSelectedPosition;
-            Utils.engThrowElseWarn(TAG, msg, new IllegalStateException(msg));
+        boolean oldIndexValid = Utils.isIndexValid(mMenuRowViews, mSelectedPosition);
+        SoftPreconditions
+                .checkState(oldIndexValid, TAG, "No previous selection: " + mSelectedPosition);
+        if (!oldIndexValid) {
             return;
         }
-        if (position < 0 || position >= mMenuRowViews.size()) {
-            String msg = "Invalid position: " + position;
-            Utils.engThrowElseWarn(TAG, msg, new IllegalArgumentException(msg));
+        boolean newIndexValid = Utils.isIndexValid(mMenuRowViews, position);
+        SoftPreconditions.checkArgument(newIndexValid, TAG, "position " + position);
+        if (!newIndexValid) {
             return;
         }
         if (mAnimatorSet != null) {
@@ -629,8 +631,8 @@ public class MenuLayoutManager {
         if (mMenuView.getVisibility() != View.VISIBLE) {
             int count = mMenuRowViews.size();
             for (int i = 0; i < count; ++i) {
-                mMenuRowViews.get(i).setVisibility(mMenuRows.get(i).isVisible() ? View.VISIBLE
-                        : View.GONE);
+                mMenuRowViews.get(i)
+                        .setVisibility(mMenuRows.get(i).isVisible() ? View.VISIBLE : View.GONE);
             }
             return;
         }

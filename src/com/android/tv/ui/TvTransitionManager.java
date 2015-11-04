@@ -123,6 +123,7 @@ public class TvTransitionManager extends TransitionManager {
         initIfNeeded();
         if (mCurrentScene != mSelectInputScene) {
             transitionTo(mSelectInputScene);
+            mSelectInputView.setCurrentChannel(mMainActivity.getCurrentChannel());
         }
     }
 

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +49,7 @@ public class PipInputManager {
     private final ChannelTuner mChannelTuner;
     private boolean mStarted;
     private final Map<String, PipInput> mPipInputMap = new HashMap<>();  // inputId -> PipInput
-    private final Set<Listener> mListeners = new HashSet<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
 
     private final TvInputCallback mTvInputCallback = new TvInputCallback() {
         @Override

@@ -47,6 +47,7 @@ import com.android.tv.R;
 import com.android.tv.TvOptionsManager;
 import com.android.tv.data.DisplayMode;
 import com.android.tv.util.TvSettings;
+import com.android.tv.util.Utils;
 
 /**
  * The TvViewUiManager is responsible for handling UI layouting and animation of main and PIP
@@ -778,8 +779,9 @@ public class TvViewUiManager {
         // Set marginEnd as well because setTvViewPosition uses both start/end margin.
         layoutParams.setMarginEnd(mScreenWidth - layoutParams.width - marginStart);
 
-        setBackgroundColor(mResources.getColor(isTvViewFullScreen() ? R.color.tvactivity_background
-                : R.color.tvactivity_background_on_shrunken_tvview), layoutParams, animate);
+        setBackgroundColor(Utils.getColor(mResources, isTvViewFullScreen()
+                ? R.color.tvactivity_background : R.color.tvactivity_background_on_shrunken_tvview),
+                layoutParams, animate);
         setTvViewPosition(layoutParams, tvViewFrame, animate);
 
         // Update the current display mode.

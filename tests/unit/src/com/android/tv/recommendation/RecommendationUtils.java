@@ -17,21 +17,18 @@
 package com.android.tv.recommendation;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.tv.data.Channel;
+import com.android.tv.testing.Utils;
 
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -39,23 +36,6 @@ import java.util.concurrent.TimeUnit;
 public class RecommendationUtils {
     private static final String TAG = "RecommendationUtils";
     private static final long INVALID_CHANNEL_ID = -1;
-    private static final long DEFAULT_RANDOM_SEED = getSeed();
-
-    private static long getSeed() {
-        // Set random seed as the date to track failed test data easily.
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-        String today = dateFormat.format(new Date());
-        Log.d(TAG, "Today's random seed is " + today);
-        return Long.valueOf(today);
-    }
-
-    /**
-     * Return the Random class which is needed to make random data for testing.
-     * Default seed of the random is today's date.
-     */
-    public static Random createTestRandom() {
-        return new Random(DEFAULT_RANDOM_SEED);
-    }
 
     /**
      * Create a mock RecommendationDataManager backed by a {@link ChannelRecordSortedMapHelper}.
@@ -88,7 +68,7 @@ public class RecommendationUtils {
     public static class ChannelRecordSortedMapHelper extends TreeMap<Long, ChannelRecord> {
         private final Context mContext;
         private Recommender mRecommender;
-        private Random mRandom = createTestRandom();
+        private Random mRandom = Utils.createTestRandom();
 
         public ChannelRecordSortedMapHelper(Context context) {
             mContext = context;

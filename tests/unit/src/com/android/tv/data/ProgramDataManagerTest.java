@@ -27,7 +27,6 @@ import android.test.mock.MockContentProvider;
 import android.test.mock.MockContentResolver;
 import android.test.mock.MockCursor;
 import android.test.suitebuilder.annotation.SmallTest;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -80,6 +79,7 @@ public class ProgramDataManagerTest extends AndroidTestCase {
         mHandlerThread.start();
         mProgramDataManager = new ProgramDataManager(
                 mContentResolver, mClock, mHandlerThread.getLooper());
+        mProgramDataManager.setPrefetchEnabled(true);
         mProgramDataManager.addListener(mListener);
     }
 
@@ -93,14 +93,6 @@ public class ProgramDataManagerTest extends AndroidTestCase {
     private void startAndWaitForComplete() throws Exception {
         mProgramDataManager.start();
         assertTrue(mListener.programUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
-    }
-
-    private static boolean equals(ProgramInfo lhs, long lhsStarTimeMs, Program rhs) {
-        return TextUtils.equals(lhs.title, rhs.getTitle())
-                && TextUtils.equals(lhs.episode, rhs.getEpisodeTitle())
-                && TextUtils.equals(lhs.description, rhs.getDescription())
-                && lhsStarTimeMs == rhs.getStartTimeUtcMillis()
-                && lhsStarTimeMs + lhs.durationMs == rhs.getEndTimeUtcMillis();
     }
 
     /**
@@ -150,8 +142,7 @@ public class ProgramDataManagerTest extends AndroidTestCase {
             for (Program program : programs) {
                 ProgramInfo programInfoAt = stub.build(getContext(), index);
                 long startTimeMs = stub.getStartTimeMs(index, channelId);
-                assertTrue(program.toString() + " differ from " + programInfoAt,
-                        equals(programInfoAt, startTimeMs, program));
+                assertProgramEquals(startTimeMs, programInfoAt, program);
                 index++;
             }
             // Case #2: Corner cases where there's a program that starts at the start of the range.
@@ -194,13 +185,12 @@ public class ProgramDataManagerTest extends AndroidTestCase {
         TestProgramDataManagerOnCurrentProgramUpdatedListener listener =
                 new TestProgramDataManagerOnCurrentProgramUpdatedListener();
         mProgramDataManager.addOnCurrentProgramUpdatedListener(testChannelId, listener);
-        assertTrue(listener.currentProgramUpdatedLatch.await(WAIT_TIME_OUT_MS,
-                TimeUnit.MILLISECONDS));
+        assertTrue(
+                listener.currentProgramUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
         assertEquals(testChannelId, listener.updatedChannelId);
-        assertTrue(ProgramDataManagerTest.equals(
-                nextProgramInfo, nextProgramStartTimeMs,
-                mProgramDataManager.getCurrentProgram(testChannelId)));
-        assertEquals(listener.updatedProgram, mProgramDataManager.getCurrentProgram(testChannelId));
+        Program currentProgram = mProgramDataManager.getCurrentProgram(testChannelId);
+        assertProgramEquals(nextProgramStartTimeMs, nextProgramInfo, currentProgram);
+        assertEquals(listener.updatedProgram, currentProgram);
     }
 
     /**
@@ -220,8 +210,8 @@ public class ProgramDataManagerTest extends AndroidTestCase {
         mContentProvider.simulateAppend(testChannelId);
         assertTrue(mListener.programUpdatedLatch.await(WAIT_TIME_OUT_MS, TimeUnit.MILLISECONDS));
         programList = mProgramDataManager.getPrograms(testChannelId, mClock.currentTimeMillis());
-        assertTrue(lastProgramEndTime
-                < programList.get(programList.size() - 1).getEndTimeUtcMillis());
+        assertTrue(
+                lastProgramEndTime < programList.get(programList.size() - 1).getEndTimeUtcMillis());
     }
 
     /**
@@ -237,6 +227,16 @@ public class ProgramDataManagerTest extends AndroidTestCase {
         mContentProvider.simulateAppend(testChannelId);
         assertFalse(mListener.programUpdatedLatch.await(FAILURE_TIME_OUT_MS,
                 TimeUnit.MILLISECONDS));
+    }
+
+    public static void assertProgramEquals(long expectedStartTime, ProgramInfo expectedInfo,
+            Program actualProgram) {
+        assertEquals("title", expectedInfo.title, actualProgram.getTitle());
+        assertEquals("episode", expectedInfo.episode, actualProgram.getEpisodeTitle());
+        assertEquals("description", expectedInfo.description, actualProgram.getDescription());
+        assertEquals("startTime", expectedStartTime, actualProgram.getStartTimeUtcMillis());
+        assertEquals("endTime", expectedStartTime + expectedInfo.durationMs,
+                actualProgram.getEndTimeUtcMillis());
     }
 
     private class FakeContentResolver extends MockContentResolver {

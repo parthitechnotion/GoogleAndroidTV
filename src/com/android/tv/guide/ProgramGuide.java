@@ -38,12 +38,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.View.OnScrollChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 
 import com.android.tv.ChannelTuner;
+import com.android.tv.Features;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.analytics.DurationTimer;
@@ -53,8 +53,6 @@ import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.GenreItems;
 import com.android.tv.data.ProgramDataManager;
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter;
-import com.android.tv.ui.OnRepeatedKeyInterceptListener;
-import com.android.tv.util.SystemProperties;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -214,7 +212,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         mSidePanelGridView.setWindowAlignmentOffsetPercent(
                 VerticalGridView.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED);
         // TODO: Remove this check when we ship TV with epg search enabled.
-        if (SystemProperties.USE_EPG_SEARCH.getValue()) {
+        if (Features.EPG_SEARCH.isEnabled(mActivity)) {
             mSearchOrb = (SearchOrbView) mContainer.findViewById(
                     R.id.program_guide_side_panel_search_orb);
             mSearchOrb.setVisibility(View.VISIBLE);

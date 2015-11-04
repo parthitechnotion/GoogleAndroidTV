@@ -30,7 +30,6 @@ import com.android.tv.recommendation.Recommender;
 import com.android.tv.util.SetupUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -187,7 +186,6 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
                 }
             }
         }
-
-        return Collections.unmodifiableList(channelList);
+        return channelList;
     }
 }

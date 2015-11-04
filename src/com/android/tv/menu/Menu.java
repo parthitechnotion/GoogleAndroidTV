@@ -132,7 +132,7 @@ public class Menu {
         mHideAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mMenuView.onHide();
+                hideInternal();
             }
         });
         mHideAnimator.setTarget(mMenuView);
@@ -222,11 +222,15 @@ public class Menu {
             // mMenuView.onHide() is called in AnimatorListener.
             mHideAnimator.end();
         } else {
-            mMenuView.onHide();
-            mTracker.sendHideMenu(mVisibleTimer.reset());
-            if (mOnMenuVisibilityChangeListener != null) {
-                mOnMenuVisibilityChangeListener.onMenuVisibilityChange(false);
-            }
+            hideInternal();
+        }
+    }
+
+    private void hideInternal() {
+        mMenuView.onHide();
+        mTracker.sendHideMenu(mVisibleTimer.reset());
+        if (mOnMenuVisibilityChangeListener != null) {
+            mOnMenuVisibilityChangeListener.onMenuVisibilityChange(false);
         }
     }
 

@@ -22,15 +22,17 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.android.tv.TvApplication;
+import com.android.tv.analytics.Analytics;
 import com.android.tv.analytics.Tracker;
 
-import java.util.Arrays;
-
 /**
- * Creates HDMI plug broadcast receiver, and reports AC3 passthrough capabilities
- * to Google Analytics. Call {@link #register} to start receiving notifications,
- * and {@link #unregister} to stop.
+ * Creates HDMI plug broadcast receiver, and reports AC3 passthrough capabilities to Google
+ * Analytics and listeners. Call {@link #register} to start receiving notifications, and
+ * {@link #unregister} to stop.
  */
 public final class AudioCapabilitiesReceiver {
     private static final String PREFS_NAME = "com.android.tv.audio_capabilities";
@@ -45,18 +47,25 @@ public final class AudioCapabilitiesReceiver {
     private static final int REPORT_REVISION = 1;
 
     private final Context mContext;
+    private final Analytics mAnalytics;
     private final Tracker mTracker;
+    @Nullable
+    private final OnAc3PassthroughCapabilityChangeListener mListener;
     private final BroadcastReceiver mReceiver = new HdmiAudioPlugBroadcastReceiver();
 
     /**
      * Constructs a new audio capabilities receiver.
      *
      * @param context context for registering to receive broadcasts
-     * @param tracker tracker object used to upload capabilities info to Google Analytics
+     * @param listener listener which receives AC3 passthrough capability change notification
      */
-    public AudioCapabilitiesReceiver(Context context, Tracker tracker) {
+    public AudioCapabilitiesReceiver(@NonNull Context context,
+            @Nullable OnAc3PassthroughCapabilityChangeListener listener) {
         mContext = context;
-        mTracker = tracker;
+        TvApplication tvApplication = (TvApplication) context.getApplicationContext();
+        mAnalytics = tvApplication.getAnalytics();
+        mTracker = tvApplication.getTracker();
+        mListener = listener;
     }
 
     public void register() {
@@ -74,23 +83,36 @@ public final class AudioCapabilitiesReceiver {
             if (!action.equals(AudioManager.ACTION_HDMI_AUDIO_PLUG)) {
                 return;
             }
-            reportAudioCapabilities(intent.getIntArrayExtra(AudioManager.EXTRA_ENCODINGS));
+            boolean supported = false;
+            int[] supportedEncodings = intent.getIntArrayExtra(AudioManager.EXTRA_ENCODINGS);
+            if (supportedEncodings != null) {
+                for (int supportedEncoding : supportedEncodings) {
+                    if (supportedEncoding == AudioFormat.ENCODING_AC3) {
+                        supported = true;
+                        break;
+                    }
+                }
+            }
+            if (mListener != null) {
+                mListener.onAc3PassthroughCapabilityChange(supported);
+            }
+            if (!mAnalytics.isAppOptOut()) {
+                reportAudioCapabilities(supported);
+            }
         }
     }
 
-    private void reportAudioCapabilities(int[] supportedEncodings) {
-        boolean newVal = supportedEncodings != null
-                && Arrays.binarySearch(supportedEncodings, AudioFormat.ENCODING_AC3) >= 0;
+    private void reportAudioCapabilities(boolean ac3Supported) {
         boolean oldVal = getBoolean(SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES, false);
         boolean reported = getBoolean(SETTINGS_KEY_AC3_PASSTHRU_REPORTED, false);
         int revision = getInt(SETTINGS_KEY_AC3_REPORT_REVISION, 0);
 
         // Send the value just once. But we send it again if the value changed, to include
         // the case where users have switched TV device with different AC3 passthrough capabilities.
-        if (!reported || oldVal != newVal || REPORT_REVISION > revision) {
-            mTracker.sendAc3PassthroughCapabilities(newVal);
+        if (!reported || oldVal != ac3Supported || REPORT_REVISION > revision) {
+            mTracker.sendAc3PassthroughCapabilities(ac3Supported);
             setBoolean(SETTINGS_KEY_AC3_PASSTHRU_REPORTED, true);
-            setBoolean(SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES, newVal);
+            setBoolean(SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES, ac3Supported);
             if (REPORT_REVISION > revision) {
                 setInt(SETTINGS_KEY_AC3_REPORT_REVISION, REPORT_REVISION);
             }
@@ -115,5 +137,15 @@ public final class AudioCapabilitiesReceiver {
 
     private void setInt(String key, int val) {
         getSharedPreferences().edit().putInt(key, val).apply();
+    }
+
+    /**
+     * Listener notified when AC3 passthrough capability changes.
+     */
+    public interface OnAc3PassthroughCapabilityChangeListener {
+        /**
+         * Called when the AC3 passthrough capability changes.
+         */
+        void onAc3PassthroughCapabilityChange(boolean capability);
     }
 }

@@ -25,6 +25,7 @@ import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
@@ -198,6 +199,7 @@ public final class Channel {
         return mDisplayNumber;
     }
 
+    @Nullable
     public String getDisplayName() {
         return mDisplayName;
     }

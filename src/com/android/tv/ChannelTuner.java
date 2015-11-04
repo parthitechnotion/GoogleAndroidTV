@@ -16,21 +16,19 @@
 
 package com.android.tv;
 
-import android.content.Context;
-import android.database.Cursor;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
+import com.android.tv.util.CollectionUtils;
+import com.android.tv.util.SoftPreconditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,9 +40,6 @@ import java.util.Set;
 public class ChannelTuner {
     private static final String TAG = "ChannelTuner";
 
-    private static final int INVALID_INDEX = -1;
-
-    private final Context mContext;
     private boolean mStarted;
     private boolean mChannelDataManagerLoaded;
     private final List<Channel> mChannels = new ArrayList<>();
@@ -56,7 +51,7 @@ public class ChannelTuner {
 
     private final Handler mHandler = new Handler();
     private final ChannelDataManager mChannelDataManager;
-    private final Set<Listener> mListeners = new HashSet<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
     private Channel mCurrentChannel;
 
     private final ChannelDataManager.Listener mChannelDataManagerListener =
@@ -84,8 +79,7 @@ public class ChannelTuner {
                 }
     };
 
-    public ChannelTuner(Context context, ChannelDataManager channelDataManager) {
-        mContext = context;
+    public ChannelTuner(ChannelDataManager channelDataManager) {
         mChannelDataManager = channelDataManager;
     }
 
@@ -286,12 +280,11 @@ public class ChannelTuner {
             setCurrentChannelAndNotify(channel);
             return true;
         }
+        SoftPreconditions.checkState(mChannelDataManagerLoaded, TAG, "Channel data is not loaded");
         Channel newChannel = mChannelMap.get(channel.getId());
         if (newChannel != null) {
             setCurrentChannelAndNotify(newChannel);
             return true;
-        } else if (!mChannelDataManagerLoaded) {
-            return loadChannel(channel.getId()) != null;
         }
         return false;
     }
@@ -385,38 +378,5 @@ public class ChannelTuner {
                 mBrowsableChannels.add(channel);
             }
         }
-    }
-
-    /**
-     * Loads and returns a channel which has the given channel ID.
-     *
-     * @param channelId The ID of the channel to be loaded.
-     * @return a channel if it has been loaded. {@code null} if the channel is not found.
-     */
-    @WorkerThread
-    public Channel loadChannel(long channelId) {
-        if (channelId < 0) {
-            return null;
-        }
-        if (mChannelDataManagerLoaded) {
-            return mChannelMap.get(channelId);
-        }
-        Channel channel = mChannelMap.get(channelId);
-        if (channel != null) {
-            return channel;
-        }
-
-        Uri uri = TvContract.buildChannelUri(channelId);
-        try (Cursor c = mContext.getContentResolver().query(uri, Channel.PROJECTION,
-                null, null, null)) {
-            if (c != null && c.moveToNext()) {
-                channel = Channel.fromCursor(c);
-                List<Channel> channels = new ArrayList<>(mChannels);
-                channels.add(channel);
-                updateChannelData(channels);
-                return channel;
-            }
-        }
-        return null;
     }
 }

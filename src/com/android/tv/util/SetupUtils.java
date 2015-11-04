@@ -27,6 +27,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.android.tv.TvApplication;
+import com.android.tv.data.Channel;
+import com.android.tv.data.ChannelDataManager;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,18 +44,20 @@ public class SetupUtils {
     // Known inputs are inputs which are shown in SetupView before. When a new input is installed,
     // the input will not be included in "PREF_KEY_KNOWN_INPUTS".
     private static final String PREF_KEY_KNOWN_INPUTS = "known_inputs";
-    // Set up inputs are inputs whose setup activity has been launched from Live channels app.
+    // Set up inputs are inputs whose setup activity has been launched and finished successfully.
     private static final String PREF_KEY_SET_UP_INPUTS = "set_up_inputs";
     private static final String PREF_KEY_IS_FIRST_TUNE = "is_first_tune";
     private static SetupUtils sSetupUtils;
 
+    private final TvApplication mTvApplication;
     private final SharedPreferences mSharedPreferences;
     private final Set<String> mKnownInputs;
     private final Set<String> mSetUpInputs;
     private boolean mIsFirstTune;
 
-    private SetupUtils(Context context) {
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    private SetupUtils(TvApplication tvApplication) {
+        mTvApplication = tvApplication;
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(tvApplication);
         mSetUpInputs = new HashSet<>(mSharedPreferences.getStringSet(PREF_KEY_SET_UP_INPUTS,
                 new HashSet<String>()));
         mKnownInputs = new HashSet<>(mSharedPreferences.getStringSet(PREF_KEY_KNOWN_INPUTS,
@@ -66,8 +72,64 @@ public class SetupUtils {
         if (sSetupUtils != null) {
             return sSetupUtils;
         }
-        sSetupUtils = new SetupUtils(context.getApplicationContext());
+        sSetupUtils = new SetupUtils((TvApplication) context.getApplicationContext());
         return sSetupUtils;
+    }
+
+    /**
+     * Additional work after the setup of TV input.
+     */
+    public void onTvInputSetupFinished(final String inputId, final Runnable postRunnable) {
+        // When TIS adds several channels, ChannelDataManager.Listener.onChannelList
+        // Updated() can be called several times. In this case, it is hard to detect
+        // which one is the last callback. To reduce error prune, we update channel
+        // list again and make all channels of {@code inputId} browsable.
+        onSetupDone(inputId);
+        final ChannelDataManager manager = mTvApplication.getChannelDataManager();
+        if (!manager.isDbLoadFinished()) {
+            manager.addListener(new ChannelDataManager.Listener() {
+                @Override
+                public void onLoadFinished() {
+                    manager.removeListener(this);
+                    updateChannelBrowsable(mTvApplication, inputId, postRunnable);
+                }
+
+                @Override
+                public void onChannelListUpdated() { }
+
+                @Override
+                public void onChannelBrowsableChanged() { }
+            });
+        } else {
+            updateChannelBrowsable(mTvApplication, inputId, postRunnable);
+        }
+    }
+
+    private static void updateChannelBrowsable(Context context, final String inputId,
+            final Runnable postRunnable) {
+        TvApplication tvApplication = (TvApplication) context.getApplicationContext();
+        final ChannelDataManager manager = tvApplication.getChannelDataManager();
+        manager.updateChannels(new Runnable() {
+            @Override
+            public void run() {
+                boolean browsableChanged = false;
+                for (Channel channel : manager.getChannelList()) {
+                    if (channel.getInputId().equals(inputId)) {
+                        if (!channel.isBrowsable()) {
+                            manager.updateBrowsable(channel.getId(), true, true);
+                            browsableChanged = true;
+                        }
+                    }
+                }
+                if (browsableChanged) {
+                    manager.notifyChannelBrowsableChanged();
+                    manager.applyUpdatedValuesToDb();
+                }
+                if (postRunnable != null) {
+                    postRunnable.run();
+                }
+            }
+        });
     }
 
     public boolean isFirstTune() {
@@ -91,14 +153,14 @@ public class SetupUtils {
     }
 
     /**
-     * Returns true, if {@code inputId}'s setup activity has been launched.
+     * Returns {@code true}, if {@code inputId}'s setup has been done before.
      */
-    public boolean hasSetupLaunched(String inputId) {
-        boolean launched = mSetUpInputs.contains(inputId);
+    public boolean isSetupDone(String inputId) {
+        boolean done = mSetUpInputs.contains(inputId);
         if (DEBUG) {
-            Log.d(TAG, "hasSetupLaunched: (input=" + inputId + ", result= " + launched + ")");
+            Log.d(TAG, "isSetupDone: (input=" + inputId + ", result= " + done + ")");
         }
-        return launched;
+        return done;
     }
 
     /**
@@ -120,7 +182,7 @@ public class SetupUtils {
      */
     public static void grantEpgPermissionToSetUpPackages(Context context) {
         // TvProvider allows granting of Uri permissions starting from MNC.
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(context);
             Set<String> setUpInputs = new HashSet<>(sharedPreferences.getStringSet(
@@ -143,7 +205,7 @@ public class SetupUtils {
      */
     public static void grantEpgPermission(Context context, String packageName) {
         // TvProvider allows granting of Uri permissions starting from MNC.
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (DEBUG) {
                 Log.d(TAG, "grantEpgPermission(context=" + context + ", packageName=" + packageName
                         + ")");
@@ -155,7 +217,7 @@ public class SetupUtils {
                 context.grantUriPermission(packageName, TvContract.Programs.CONTENT_URI, modeFlags);
             } catch (SecurityException e) {
                 Log.e(TAG, "Either TvProvider does not allow granting of Uri permissions or the app"
-                        + " does not have permission" + e);
+                        + " does not have permission.", e);
             }
         }
     }
@@ -194,11 +256,15 @@ public class SetupUtils {
     }
 
     /**
-     * Called when an setup activity is launched. Once it is called, {@link #hasSetupLaunched}
-     * will return true for {@code inputId}.
+     * Called when an setup is done. Once it is called, {@link #isSetupDone} returns {@code true}
+     * for {@code inputId}.
      */
-    public void onSetupLaunched(String inputId) {
-        if (DEBUG) Log.d(TAG, "onSetupLaunched: input=" + inputId);
+    public void onSetupDone(String inputId) {
+        if (DEBUG) Log.d(TAG, "onSetupDone: input=" + inputId);
+        if (!mKnownInputs.contains(inputId)) {
+            Log.i(TAG, "An unknown input's setup has been done. inputId=" + inputId);
+            mKnownInputs.add(inputId);
+        }
         mSetUpInputs.add(inputId);
         mSharedPreferences.edit()
                 .putStringSet(PREF_KEY_SET_UP_INPUTS, mSetUpInputs).apply();

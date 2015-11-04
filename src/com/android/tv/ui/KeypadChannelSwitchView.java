@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -42,8 +43,7 @@ import com.android.tv.analytics.DurationTimer;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelNumber;
-
-import junit.framework.Assert;
+import com.android.tv.util.SoftPreconditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +62,7 @@ public class KeypadChannelSwitchView extends LinearLayout implements
     private final Tracker mTracker;
     private final DurationTimer mViewDurationTimer = new DurationTimer();
     private boolean mNavigated = false;
+    @Nullable  //Once mChannels is set to null it should not be used again.
     private List<Channel> mChannels;
     private TextView mChannelNumberView;
     private ListView mChannelItemListView;
@@ -157,7 +158,7 @@ public class KeypadChannelSwitchView extends LinearLayout implements
                 } else {
                     mSelectedChannel = (Channel) mAdapter.getItem(position);
                 }
-                if(position!=0 && !mNavigated) {
+                if (position != 0 && !mNavigated) {
                     mNavigated = true;
                     mTracker.sendChannelInputNavigated();
                 }
@@ -178,7 +179,7 @@ public class KeypadChannelSwitchView extends LinearLayout implements
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        Assert.assertNotNull(mChannels);
+        SoftPreconditions.checkNotNull(mChannels, TAG, "mChannels");
         if (isChannelNumberKey(keyCode)) {
             onNumberKeyUp(keyCode - KeyEvent.KEYCODE_0);
             return true;
@@ -227,7 +228,7 @@ public class KeypadChannelSwitchView extends LinearLayout implements
         mAdapter.notifyDataSetChanged();
     }
 
-    public void setChannels(List<Channel> channels) {
+    public void setChannels(@Nullable List<Channel> channels) {
         mChannels = channels;
     }
 

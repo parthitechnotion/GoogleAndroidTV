@@ -144,11 +144,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Άδειες λογισμικού ανοικτού κώδικα"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Άδειες λογισμικού ανοικτού κώδικα"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Έκδοση"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Συμβολή στη βελτίωση των Zωντανών καναλιών"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Μοιραστείτε ανώνυμα δεδομένα χρήσης και διαγνωστικών στοιχείων με τη Google για να βελτιώσουμε τα Ζωντανά κανάλια και να αποτρέψουμε προβλήματα όπως διακοπές λειτουργίας και πάγωμα της εφαρμογής."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Για να παρακολουθήσετε αυτό το κανάλι, πατήστε το δεξιά και εισαγάγετε το PIN σας"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Για να παρακολουθήσετε αυτό το πρόγραμμα, πατήστε δεξιά και εισαγάγετε το PIN σας"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Αυτό το πρόγραμμα αξιολογήθηκε ως <xliff:g id="RATING">%1$s</xliff:g>.\nΓια να παρακολουθήσετε αυτό το πρόγραμμα, πατήστε δεξιά και εισαγάγετε το PIN σας"</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"Για να παρακολουθήσετε αυτό το κανάλι, χρησιμοποιήστε την προεπιλεγμένη εφαρμογή ζωντανής τηλεοπτικής μετάδοσης."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"Για να παρακολουθήσετε αυτό το πρόγραμμα, χρησιμοποιήστε την προεπιλεγμένη εφαρμογή ζωντανής τηλεοπτικής μετάδοσης."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Αυτό το πρόγραμμα χαρακτηρίστηκε <xliff:g id="RATING">%1$s</xliff:g>.\nΓια να παρακολουθήσετε αυτό το πρόγραμμα, χρησιμοποιήστε την προεπιλεγμένη εφαρμογή ζωντανής τηλεοπτικής μετάδοσης."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Το πρόγραμμα αποκλείστηκε"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Αυτό το πρόγραμμα αξιολογήθηκε ως <xliff:g id="RATING">%1$s</xliff:g>."</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Μόνο ήχος"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Χωρίς τίτλο"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Το κανάλι αποκλείστηκε"</string>
     <string name="episode_format" msgid="4881195874563241096">"Σεζ. <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Επ. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -175,4 +181,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Μη διαθέσιμο λόγω αδύναμου σήματος βίντεο"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Το βίντεο δεν είναι διαθέσιμο απροσδόκητα"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Το πλήκτρο BACK αφορά τη συνδεδεμένη συσκευή. Πατήστε το πλήκτρο HOME για έξοδο."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Τα ζωντανά κανάλια δεν υποστηρίζονται σε αυτήν τη συσκευή με Android Lollipop."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Τα ζωντανά κανάλια χρειάζονται άδεια για να διαβάσουν τις τηλεοπτικές καταχωρίσεις."</string>
 </resources>

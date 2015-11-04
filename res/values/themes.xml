@@ -32,10 +32,18 @@
         <!-- For ImageCardView -->
         <item name="imageCardViewStyle">@style/Widget.Leanback.ImageCardViewStyle</item>
     </style>
+
     <style name="Theme.TV.dialog.Fullscreen" parent="@style/Theme.TV">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="Theme.SelectInputActivity" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/Animation.SelectInputActivity</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 </resources>

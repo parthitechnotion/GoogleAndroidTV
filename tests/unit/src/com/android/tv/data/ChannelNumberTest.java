@@ -43,6 +43,9 @@ public class ChannelNumberTest extends TestCase {
     public void testParseChannelNumber() {
         assertNull(parseChannelNumber(""));
         assertNull(parseChannelNumber(" "));
+        assertNull(parseChannelNumber("abcd12"));
+        assertNull(parseChannelNumber("12abcd"));
+        assertNull(parseChannelNumber("-12"));
         assertChannelEquals(parseChannelNumber("1"), "1", false, "");
         assertChannelEquals(parseChannelNumber("1234 4321"), "1234", true, "4321");
         assertChannelEquals(parseChannelNumber("3-4"), "3", true, "4");
@@ -76,6 +79,8 @@ public class ChannelNumberTest extends TestCase {
         assertEquals("compareTo(null,null)", 0, ChannelNumber.compare(null, null));
         assertEquals("compareTo(1,1)", 0, ChannelNumber.compare("1", "1"));
         assertEquals("compareTo(null,1)<0", true, ChannelNumber.compare(null, "1") < 0);
+        assertEquals("compareTo(mal-formatted,1)<0", true, ChannelNumber.compare("abcd", "1") < 0);
+        assertEquals("compareTo(mal-formatted,1)<0", true, ChannelNumber.compare(".4", "1") < 0);
         assertEquals("compareTo(1,null)>0", true, ChannelNumber.compare("1", null) > 0);
     }
 

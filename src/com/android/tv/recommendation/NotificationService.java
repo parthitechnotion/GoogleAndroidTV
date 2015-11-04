@@ -141,11 +141,16 @@ public class NotificationService extends Service implements Recommender.Listener
                 getResources().getDimensionPixelOffset(R.dimen.notif_ch_logo_padding_bottom);
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mTvInputManagerHelper = ((TvApplication) getApplicationContext()).getTvInputManagerHelper();
+        TvApplication application = ((TvApplication) getApplicationContext());
+        mTvInputManagerHelper = application.getTvInputManagerHelper();
         mHandlerThread = new HandlerThread("tv notification");
         mHandlerThread.start();
         mHandler = new NotificationHandler(mHandlerThread.getLooper(), this);
         mHandler.sendEmptyMessage(MSG_INITIALIZE_RECOMMENDER);
+
+        // Just called for early initialization.
+        application.getChannelDataManager();
+        application.getProgramDataManager();
     }
 
     private void handleInitializeRecommender() {
@@ -309,8 +314,10 @@ public class NotificationService extends Service implements Recommender.Listener
             return false;
         }
         final Channel channel = cr.getChannel();
-        if (DEBUG) Log.d(TAG, "sendNotification (" + channel.getDisplayName()
-                + " notifyId=" + notificationId + ")");
+        if (DEBUG) {
+            Log.d(TAG, "sendNotification (channelName=" + channel.getDisplayName() + " notifyId="
+                    + notificationId + ")");
+        }
         Intent intent = new Intent(Intent.ACTION_VIEW, channel.getUri());
         intent.putExtra(TUNE_PARAMS_RECOMMENDATION_TYPE, mRecommendationType);
         final PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -359,13 +366,15 @@ public class NotificationService extends Service implements Recommender.Listener
                         // This callback will run on the main thread.
                         Bitmap largeIconBitmap = (channelLogo == null) ? posterArtBitmap
                                 : overlayChannelLogo(channelLogo, posterArtBitmap);
+                        String channelDisplayName = channel.getDisplayName();
                         Notification notification =
                                 new Notification.Builder(NotificationService.this)
                                         .setContentIntent(notificationIntent)
                                         .setContentTitle(program.getTitle())
-                                        .setContentText(inputDisplayName + " "
-                                                + channel.getDisplayName())
-                                        .setContentInfo(channel.getDisplayName())
+                                        .setContentText(inputDisplayName + " " +
+                                                (TextUtils.isEmpty(channelDisplayName)
+                                                ? channel.getDisplayNumber() : channelDisplayName))
+                                        .setContentInfo(channelDisplayName)
                                         .setAutoCancel(true)
                                         .setLargeIcon(largeIconBitmap)
                                         .setSmallIcon(R.drawable.ic_launcher_s)
@@ -375,8 +384,8 @@ public class NotificationService extends Service implements Recommender.Listener
                                                 false)
                                         .setSortKey(mRecommender.getChannelSortKey(channelId))
                                         .build();
-                        notification.color =
-                                getResources().getColor(R.color.recommendation_card_background);
+                        notification.color = Utils.getColor(getResources(),
+                                R.color.recommendation_card_background);
                         if (!TextUtils.isEmpty(program.getThumbnailUri())) {
                             notification.extras.putString(Notification.EXTRA_BACKGROUND_IMAGE_URI,
                                     program.getThumbnailUri());

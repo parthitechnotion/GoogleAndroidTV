@@ -11,22 +11,31 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License
  */
 
-package com.android.tv.receiver;
+package com.android.tv.common.feature;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 
-import com.android.tv.recommendation.NotificationService;
 
-public class NotificationReceiver extends BroadcastReceiver {
+/**
+ * A feature controlled by a GServices flag.
+ */
+public class GServiceFeature implements Feature {
+    private static final String LIVECHANNELS_PREFIX = "livechannels:";
+    private final String mKey;
+    private final boolean mDefaultValue;
+
+    public GServiceFeature(String key, boolean defaultValue) {
+        mKey = LIVECHANNELS_PREFIX + key;
+        mDefaultValue = defaultValue;
+    }
+
     @Override
-    public void onReceive(Context context, Intent intent) {
-        Intent notificationIntent = new Intent(context, NotificationService.class);
-        notificationIntent.setAction(NotificationService.ACTION_SHOW_RECOMMENDATION);
-        context.startService(notificationIntent);
+    public boolean isEnabled(Context context) {
+
+        // GServices is not available outside of Google.
+        return mDefaultValue;
     }
 }

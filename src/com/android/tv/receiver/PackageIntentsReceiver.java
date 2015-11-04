@@ -25,6 +25,7 @@ import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.os.Handler;
 
+import com.android.tv.Features;
 import com.android.tv.TvActivity;
 import com.android.tv.util.SetupUtils;
 
@@ -42,7 +43,8 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
     private TvInputManager mTvInputManager;
     private final Handler mHandler = new Handler();
     private Runnable mOnPackageUpdatedRunnable;
-    private boolean mPermissionGranted;
+    private PackageManager mPackageManager;
+    private ComponentName mTvActivityComponentName;
 
     private void init(Context context) {
         mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
@@ -51,27 +53,25 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
         mOnPackageUpdatedRunnable = new Runnable() {
             @Override
             public void run() {
-                List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
-                // Enable the MainActivity only if there is at least one tuner type input.
-                boolean enable = false;
-                for (TvInputInfo input : inputs) {
-                    if (input.getType() == TvInputInfo.TYPE_TUNER) {
-                        enable = true;
-                        break;
+                if (!Features.ONBOARDING_EXPERIENCE.isEnabled(applicationContext)) {
+                    List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
+                    // Enable the MainActivity only if there is at least one tuner type input.
+                    boolean enable = false;
+                    for (TvInputInfo input : inputs) {
+                        if (input.getType() == TvInputInfo.TYPE_TUNER) {
+                            enable = true;
+                            break;
+                        }
                     }
+                    enableTvActivityWithinPackageManager(applicationContext, enable);
                 }
-                enableTvActivityWithinPackageManager(applicationContext, enable);
 
                 SetupUtils.getInstance(applicationContext).onInputListUpdated(mTvInputManager);
             }
         };
 
-        // Grant permission to already set up packages after the system has finished booting. (Note
-        // that the PackageIntentsReceiver filters the ACTION_BOOT_COMPLETED action.)
-        if (!mPermissionGranted) {
-            SetupUtils.grantEpgPermissionToSetUpPackages(applicationContext);
-            mPermissionGranted = true;
-        }
+        mPackageManager = applicationContext.getPackageManager();
+        mTvActivityComponentName = new ComponentName(applicationContext, TvActivity.class);
     }
 
     @Override
@@ -82,8 +82,13 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
 
         mHandler.removeCallbacks(mOnPackageUpdatedRunnable);
         mHandler.postDelayed(mOnPackageUpdatedRunnable, TV_INPUT_UPDATE_DELAY_MS);
+
     }
 
+
+    /**
+     * Enables/Disables {@link TvActivity}.
+     */
     private void enableTvActivityWithinPackageManager(Context context, boolean enable) {
         PackageManager pm = context.getPackageManager();
         ComponentName name = new ComponentName(context, TvActivity.class);

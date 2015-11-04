@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.GLOBAL_SEARCH" tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_TV_LISTINGS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.MODIFY_PARENTAL_CONTROLS" />
     <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA" />
@@ -29,9 +30,6 @@
     <uses-permission android:name="com.android.providers.tv.permission.ACCESS_ALL_EPG_DATA" />
     <uses-permission android:name="com.android.providers.tv.permission.ACCESS_WATCHED_PROGRAMS" />
 
-    <!-- Permissions/feature for USB tuner -->
-    <uses-permission android:name="android.permission.DVB_DEVICE" />
-    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
 
     <!-- Limit only for Android TV -->
     <uses-feature android:name="android.software.leanback" android:required="true" />
@@ -83,6 +81,21 @@
         <activity android:name=".LauncherActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
+        <activity android:name=".SetupPassthroughActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="com.android.tv.intent.action.INPUT_SETUP" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".SelectInputActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.SelectInputActivity" />
+
+        <activity android:name=".onboarding.OnboardingActivity"
+            android:launchMode="singleTop" />
+
         <provider android:name="com.android.tv.search.LocalSearchProvider"
             android:authorities="com.android.tv.search"
             android:exported="true"
@@ -93,7 +106,7 @@
         <service android:name="com.android.tv.recommendation.NotificationService"
              android:exported="false" />
 
-        <receiver android:name="com.android.tv.receiver.NotificationReceiver">
+        <receiver android:name="com.android.tv.receiver.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -101,7 +114,7 @@
         <receiver android:name="com.android.tv.receiver.PackageIntentsReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <!-- PACKAGE_CHANGED for package enabled/disabled notification-->
+                <!-- PACKAGE_CHANGED for package enabled/disabled notification -->
                 <action android:name="android.intent.action.PACKAGE_CHANGED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <data android:scheme="package"/>
@@ -123,7 +136,6 @@
             <meta-data android:name="android.media.tv.metadata.CONTENT_RATING_SYSTEMS"
                     android:resource="@xml/tv_content_rating_systems" />
         </receiver>
-
 
     </application>
 </manifest>

@@ -17,11 +17,15 @@
 package com.android.tv.util;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.content.res.Resources.Theme;
 import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
@@ -29,6 +33,7 @@ import android.media.tv.TvContract.Channels;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -38,14 +43,15 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 
-import com.android.tv.BuildConfig;
+import com.android.tv.Features;
 import com.android.tv.R;
+import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
-
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -386,6 +392,8 @@ public class Utils {
         String language = context.getString(R.string.default_language);
         if (track.getLanguage() != null) {
             language = new Locale(track.getLanguage()).getDisplayName();
+        } else {
+            Log.d(TAG, "No language information found for the audio track: " + track);
         }
 
         StringBuilder metadata = new StringBuilder();
@@ -405,8 +413,13 @@ public class Utils {
                 metadata.append(context.getString(R.string.multi_audio_channel_surround_8));
                 break;
             default:
-                metadata.append(context.getString(R.string.multi_audio_channel_suffix,
-                        track.getAudioChannelCount()));
+                if (track.getAudioChannelCount() > 0) {
+                    metadata.append(context.getString(R.string.multi_audio_channel_suffix,
+                            track.getAudioChannelCount()));
+                } else {
+                    Log.d(TAG, "Invalid audio channel count (" + track.getAudioChannelCount()
+                            + ") found for the audio track: " + track);
+                }
                 break;
         }
         if (showSampleRate) {
@@ -568,30 +581,103 @@ public class Utils {
     }
 
     /**
-     * Throws a {@link RuntimeException} if {@link BuildConfig#ENG} is true, else log a warning.
-     *
-     * @param tag Used to log message.
-     * @param msg The message
+     * Check if the index is valid for the collection,
+     * @param collection the collection
+     * @param index the index position to test
+     * @return index >= 0 && index < collection.size().
      */
-    public static void engThrowElseWarn(String tag, String msg) {
-        if (BuildConfig.ENG) {
-            throw new RuntimeException(msg);
+    public static boolean isIndexValid(@Nullable Collection<?> collection, int index) {
+        return collection == null ? false : index >= 0 && index < collection.size();
+    }
+
+    /**
+     * Returns a color integer associated with a particular resource ID.
+     *
+     * @see #getColor(android.content.res.Resources,int,Theme)
+     */
+    public static int getColor(Resources res, int id) {
+        return getColor(res, id, null);
+    }
+
+    /**
+     * Returns a color integer associated with a particular resource ID.
+     *
+     * <p>In M version, {@link android.content.res.Resources#getColor(int)} was deprecated and
+     * {@link android.content.res.Resources#getColor(int,Theme)} was newly added.
+     *
+     * @see android.content.res.Resources#getColor(int)
+     */
+    public static int getColor(Resources res, int id, @Nullable Theme theme) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return res.getColor(id, theme);
         } else {
-            Log.w(tag, msg);
+            return res.getColor(id);
         }
     }
 
     /**
-     * Throws a {@link RuntimeException} if {@link BuildConfig#ENG} is true, else log a warning.
+     * Returns a color state list associated with a particular resource ID.
      *
-     * @param tag Used to log message.
-     * @param msg The message
+     * @see #getColorStateList(android.content.res.Resources,int,Theme)
      */
-    public static void engThrowElseWarn(String tag, String msg, RuntimeException e) {
-        if (BuildConfig.ENG) {
-            throw e;
+    public static ColorStateList getColorStateList(Resources res, int id) {
+        return getColorStateList(res, id, null);
+    }
+
+    /**
+     * Returns a color state list associated with a particular resource ID.
+     *
+     * <p>In M version, {@link android.content.res.Resources#getColorStateList(int)} was deprecated
+     * and {@link android.content.res.Resources#getColorStateList(int,Theme)} was newly added.
+     *
+     * @see android.content.res.Resources#getColorStateList(int)
+     */
+    public static ColorStateList getColorStateList(Resources res, int id, @Nullable Theme theme) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return res.getColorStateList(id, theme);
         } else {
-            Log.w(tag, msg);
+            return res.getColorStateList(id);
+        }
+    }
+
+
+    private static final class SyncRunnable implements Runnable {
+        private final Runnable mTarget;
+        private boolean mComplete;
+
+        public SyncRunnable(Runnable target) {
+            mTarget = target;
+        }
+
+        @Override
+        public void run() {
+            try {
+                mTarget.run();
+            } finally {
+                synchronized (this) {
+                    mComplete = true;
+                    notifyAll();
+                }
+            }
+        }
+
+        public void waitForComplete() {
+            boolean interrupted = false;
+            synchronized (this) {
+                try {
+                    while (!mComplete) {
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                            interrupted = true;
+                        }
+                    }
+                } finally {
+                    if (interrupted) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
         }
     }
 }

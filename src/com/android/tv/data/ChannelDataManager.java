@@ -19,6 +19,8 @@ package com.android.tv.data;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.ContentObserver;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
@@ -34,6 +36,8 @@ import android.util.MutableInt;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.util.AsyncDbTask;
+import com.android.tv.util.CollectionUtils;
+import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.RecurringRunner;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
@@ -60,6 +64,7 @@ public class ChannelDataManager {
 
     private static final int MSG_UPDATE_CHANNELS = 1000;
     private static final long SEND_CHANNEL_STATUS_INTERVAL_MS = TimeUnit.DAYS.toMillis(1);
+    private static final String SHARED_PREF_BROWSABLE = "browsable_shared_preference";
 
     private final Context mContext;
     private final TvInputManagerHelper mInputManager;
@@ -71,7 +76,7 @@ public class ChannelDataManager {
     private RecurringRunner mRecurringRunner;
     private final Tracker mTracker;
 
-    private final Set<Listener> mListeners = new HashSet<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
     private final Map<Long, ChannelWrapper> mChannelWrapperMap = new HashMap<>();
     private final Map<String, MutableInt> mChannelCountMap = new HashMap<>();
     private final Channel.DefaultComparator mChannelComparator;
@@ -83,6 +88,8 @@ public class ChannelDataManager {
 
     private final ContentResolver mContentResolver;
     private final ContentObserver mChannelObserver;
+    private final boolean mStoreBrowsableInSharedPreferences;
+    private final SharedPreferences mBrowsableSharedPreferences;
 
     private final TvInputCallback mTvInputCallback = new TvInputCallback() {
         @Override
@@ -134,19 +141,19 @@ public class ChannelDataManager {
 
     public ChannelDataManager(Context context, TvInputManagerHelper inputManager,
             Tracker tracker) {
-        this(context, inputManager, tracker, context.getContentResolver(), Looper.myLooper());
+        this(context, inputManager, tracker, context.getContentResolver());
     }
 
     @VisibleForTesting
     ChannelDataManager(Context context, TvInputManagerHelper inputManager, Tracker tracker,
-            ContentResolver contentResolver, Looper looper) {
+            ContentResolver contentResolver) {
         mContext = context;
         mInputManager = inputManager;
         mContentResolver = contentResolver;
         mChannelComparator = new Channel.DefaultComparator(context, inputManager);
         // Detect duplicate channels while sorting.
         mChannelComparator.setDetectDuplicatesEnabled(true);
-        mHandler = new ChannelDataManagerHandler(looper, this);
+        mHandler = new ChannelDataManagerHandler(this);
         mChannelObserver = new ContentObserver(mHandler) {
             @Override
             public void onChange(boolean selfChange) {
@@ -158,6 +165,9 @@ public class ChannelDataManager {
         mTracker = tracker;
         mRecurringRunner = new RecurringRunner(mContext, SEND_CHANNEL_STATUS_INTERVAL_MS,
                 new SendChannelStatusRunnable());
+        mStoreBrowsableInSharedPreferences = !PermissionUtils.hasAccessAllEpg(mContext);
+        mBrowsableSharedPreferences = context.getSharedPreferences(SHARED_PREF_BROWSABLE,
+                Context.MODE_PRIVATE);
     }
 
     @VisibleForTesting
@@ -185,6 +195,7 @@ public class ChannelDataManager {
      * Stops the manager. It clears manager states and runs pending DB operations. Added listeners
      * aren't automatically removed by this method.
      */
+    @VisibleForTesting
     public void stop() {
         if (!mStarted) {
             return;
@@ -413,11 +424,22 @@ public class ChannelDataManager {
             channelWrapper.mBrowsableInDb = channelWrapper.mChannel.isBrowsable();
         }
         String column = TvContract.Channels.COLUMN_BROWSABLE;
-        if (browsableIds.size() != 0) {
-            updateOneColumnValue(column, 1, browsableIds);
-        }
-        if (unbrowsableIds.size() != 0) {
-            updateOneColumnValue(column, 0, unbrowsableIds);
+        if (mStoreBrowsableInSharedPreferences) {
+            Editor editor = mBrowsableSharedPreferences.edit();
+            for (Long id : browsableIds) {
+                editor.putBoolean(getBrowsableKey(getChannel(id)), true);
+            }
+            for (Long id : unbrowsableIds) {
+                editor.putBoolean(getBrowsableKey(getChannel(id)), false);
+            }
+            editor.apply();
+        } else {
+            if (browsableIds.size() != 0) {
+                updateOneColumnValue(column, 1, browsableIds);
+            }
+            if (unbrowsableIds.size() != 0) {
+                updateOneColumnValue(column, 0, unbrowsableIds);
+            }
         }
         mBrowsableUpdateChannelIds.clear();
 
@@ -507,7 +529,7 @@ public class ChannelDataManager {
     }
 
     private class ChannelWrapper {
-        final Set<ChannelListener> mChannelListeners = new HashSet<>();
+        final Set<ChannelListener> mChannelListeners = CollectionUtils.createSmallSet();
         final Channel mChannel;
         boolean mBrowsableInDb;
         boolean mLockedInDb;
@@ -561,7 +583,17 @@ public class ChannelDataManager {
             boolean channelAdded = false;
             boolean channelUpdated = false;
             boolean channelRemoved = false;
+            Map<String, ?> deletedBrowsableMap = null;
+            if (mStoreBrowsableInSharedPreferences) {
+                deletedBrowsableMap = new HashMap<>(mBrowsableSharedPreferences.getAll());
+            }
             for (Channel channel : channels) {
+                if (mStoreBrowsableInSharedPreferences) {
+                    String browsableKey = getBrowsableKey(channel);
+                    channel.setBrowsable(mBrowsableSharedPreferences.getBoolean(browsableKey,
+                            false));
+                    deletedBrowsableMap.remove(browsableKey);
+                }
                 long channelId = channel.getId();
                 boolean newlyAdded = !removedChannelIds.remove(channelId);
                 ChannelWrapper channelWrapper;
@@ -590,6 +622,17 @@ public class ChannelDataManager {
                         }
                     }
                 }
+            }
+            if (mStoreBrowsableInSharedPreferences && !deletedBrowsableMap.isEmpty()
+                    && PermissionUtils.hasReadTvListings(mContext)) {
+                // If hasReadTvListings(mContext) is false, the given channel list would
+                // empty. In this case, we skip the browsable data clean up process.
+                Editor editor = mBrowsableSharedPreferences.edit();
+                for (String key : deletedBrowsableMap.keySet()) {
+                    if (DEBUG) Log.d(TAG, "remove key: " + key);
+                    editor.remove(key);
+                }
+                editor.apply();
             }
 
             for (long id : removedChannelIds) {
@@ -639,6 +682,10 @@ public class ChannelDataManager {
      */
     private void updateOneColumnValue(
             final String columnName, final int columnValue, final List<Long> ids) {
+        if (!PermissionUtils.hasAccessAllEpg(mContext)) {
+            // TODO: support this feature for non-system LC app. b/23939816
+            return;
+        }
         AsyncDbTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -650,9 +697,13 @@ public class ChannelDataManager {
         });
     }
 
+    private String getBrowsableKey(Channel channel) {
+        return channel.getInputId() + "|" + channel.getId();
+    }
+
     private static class ChannelDataManagerHandler extends WeakHandler<ChannelDataManager> {
-        public ChannelDataManagerHandler(Looper looper, ChannelDataManager channelDataManager) {
-            super(looper, channelDataManager);
+        public ChannelDataManagerHandler(ChannelDataManager channelDataManager) {
+            super(Looper.getMainLooper(), channelDataManager);
         }
 
         @Override

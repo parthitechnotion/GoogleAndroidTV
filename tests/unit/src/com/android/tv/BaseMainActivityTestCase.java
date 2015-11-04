@@ -18,6 +18,7 @@ package com.android.tv;
 import android.content.Context;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
+import android.text.TextUtils;
 
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
@@ -131,7 +132,7 @@ public abstract class BaseMainActivityTestCase
         waitUntilChannelLoadingFinish();
         List<Channel> channelList = mActivity.getChannelDataManager().getChannelList();
         for (Channel c : channelList) {
-            if (c.getDisplayName().equals(displayName)) {
+            if (TextUtils.equals(c.getDisplayName(), displayName)) {
                 return c;
             }
         }

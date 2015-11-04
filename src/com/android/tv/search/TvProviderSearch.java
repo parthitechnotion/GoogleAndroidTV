@@ -33,6 +33,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.tv.search.LocalSearchProvider.SearchResult;
+import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.Utils;
 
 import junit.framework.Assert;
@@ -48,17 +49,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class TvProviderSearch {
+/**
+ * An implementation of {@link SearchInterface} to search query from TvProvider directly.
+ */
+public class TvProviderSearch implements SearchInterface {
     private static final boolean DEBUG = false;
     private static final String TAG = "TvProviderSearch";
 
     private static final int NO_LIMIT = 0;
-
-    static final int ACTION_TYPE_AMBIGUOUS = 1;
-    static final int ACTION_TYPE_SWITCH_CHANNEL = 2;
-    static final int ACTION_TYPE_SWITCH_INPUT = 3;
-
-    private static final String SOURCE_TV_SEARCH = "TvSearch";
 
     private final Context mContext;
     private final ContentResolver mContentResolver;
@@ -77,9 +75,14 @@ public class TvProviderSearch {
      * @param action One of {@link #ACTION_TYPE_SWITCH_CHANNEL}, {@link #ACTION_TYPE_SWITCH_INPUT},
      *               or {@link #ACTION_TYPE_AMBIGUOUS},
      */
+    @Override
     @WorkerThread
     public List<SearchResult> search(String query, int limit, int action) {
         List<SearchResult> results = new ArrayList<>();
+        if (!PermissionUtils.hasAccessAllEpg(mContext)) {
+            // TODO: support this feature for non-system LC app. b/23939816
+            return results;
+        }
         Set<Long> channelsFound = new HashSet<>();
         if (action == ACTION_TYPE_SWITCH_CHANNEL) {
             results.addAll(searchChannels(query, channelsFound, limit));
@@ -463,7 +466,6 @@ public class TvProviderSearch {
         result.intentData = TvContract.buildChannelUriForPassthroughInput(inputId).toString();
         return result;
     }
-
 
     @WorkerThread
     private class ChannelComparatorWithSameDisplayNumber implements Comparator<SearchResult> {

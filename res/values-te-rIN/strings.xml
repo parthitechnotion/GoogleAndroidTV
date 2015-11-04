@@ -146,11 +146,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"సంస్కరణ"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"ప్రత్యక్ష ప్రసార ఛానెల్‌లను మెరుగుపరచడంలో సహాయపడండి"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"అనామక వినియోగ మరియు విశ్లేషణల డేటాను Googleతో భాగస్వామ్యం చేయండి, తద్వారా మేము లైవ్ ఛానెల్‌లను మెరుగ్గా చేయగలము అలాగే క్రాష్ కావడం మరియు స్తంభించడం వంటి సమస్యలను నిరోధించగలము."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ఈ ఛానెల్‌ను చూడటానికి, కుడివైపు బటన్ నొక్కి, మీ పిన్‌ని నమోదు చేయండి"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"ఈ ప్రోగ్రామ్‌ని చూడటానికి, కుడివైపు బటన్ నొక్కి, మీ పిన్‌ని నమోదు చేయండి"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"ఈ కార్యక్రమం <xliff:g id="RATING">%1$s</xliff:g> అని రేట్ చేయబడింది.\nఈ కార్యక్రమాన్ని చూడటానికి, కుడివైపు బటన్ నొక్కి, మీ PINని నమోదు చేయండి."</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"ఈ ఛానెల్‌ను చూడటానికి, డిఫాల్ట్ లైవ్ టీవీ అనువర్తనాన్ని ఉపయోగించండి."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"ఈ కార్యక్రమాన్ని చూడటానికి, డిఫాల్ట్ లైవ్ టీవీ అనువర్తనాన్ని ఉపయోగించండి."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"ఈ కార్యక్రమానికి <xliff:g id="RATING">%1$s</xliff:g> అని రేట్ చేయబడింది.\nఈ కార్యక్రమాన్ని చూడటానికి, డిఫాల్ట్ లైవ్ టీవీ అనువర్తనాన్ని ఉపయోగించండి."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"కార్యక్రమం బ్లాక్ చేయబడింది"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"ఈ కార్యక్రమం <xliff:g id="RATING">%1$s</xliff:g> అని రేట్ చేయబడింది"</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"ఆడియో మాత్రమే"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"శీర్షిక లేదు"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"ఛానెల్ బ్లాక్ చేయబడింది"</string>
     <string name="episode_format" msgid="4881195874563241096">"సీ.<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: ఎపి. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -177,4 +183,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"వీడియో సిగ్నల్ బలహీనంగా ఉన్నందున అందుబాటులో లేదు"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"వీడియో ఊహించని విధంగా అందుబాటులో లేకుండా పోయింది"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"BACK కీ కనెక్ట్ చేయబడిన పరికరం కోసం ఉద్దేశించినది. నిష్క్రమించడానికి HOME బటన్‌ను నొక్కండి."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Android Lollipop అమలులో ఉన్న ఈ పరికరంలో ప్రత్యక్ష ప్రసార ఛానెల్‌లకు మద్దతు లేదు."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"టీవీ జాబితాలను చదవడానికి ప్రత్యక్ష ప్రసార ఛానెల్‌లకు అనుమతి అవసరం."</string>
 </resources>

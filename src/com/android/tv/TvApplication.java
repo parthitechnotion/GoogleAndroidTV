@@ -16,6 +16,7 @@
 
 package com.android.tv;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -30,25 +32,30 @@ import android.view.KeyEvent;
 
 import com.android.tv.analytics.Analytics;
 import com.android.tv.analytics.StubAnalytics;
+import com.android.tv.analytics.OptOutPreferenceHelper;
 import com.android.tv.analytics.StubAnalytics;
 import com.android.tv.analytics.Tracker;
-import com.android.tv.util.RecurringRunner;
+import com.android.tv.data.ChannelDataManager;
+import com.android.tv.data.ProgramDataManager;
 import com.android.tv.util.SystemProperties;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class TvApplication extends Application {
     private static final String TAG = "TvApplication";
     private static final boolean DEBUG = false;
     private static String versionName = "";
 
-    private MainActivity mActivity;
+    private MainActivity mMainActivity;
+    private SelectInputActivity mSelectInputActivity;
+    private Analytics mAnalytics;
     private Tracker mTracker;
     private TvInputManagerHelper mTvInputManagerHelper;
-    private RecurringRunner mSendConfigInfoRecurringRunner;
+    private ChannelDataManager mChannelDataManager;
+    private ProgramDataManager mProgramDataManager;
+    private OptOutPreferenceHelper mOptPreferenceHelper;
 
     @Override
     public void onCreate() {
@@ -66,13 +73,33 @@ public class TvApplication extends Application {
             }
             StrictMode.setVmPolicy(vmPolicyBuilder.build());
         }
-        Analytics analytics;
+
         if (BuildConfig.ENG && !SystemProperties.ALLOW_ANALYTICS_IN_ENG.getValue()) {
-            analytics = StubAnalytics.getInstance(this);
+            mAnalytics = StubAnalytics.getInstance(this);
         } else {
-            analytics = StubAnalytics.getInstance(this);
+            mAnalytics = StubAnalytics.getInstance(this);
         }
-        mTracker = analytics.getDefaultTracker();
+        mTracker = mAnalytics.getDefaultTracker();
+        if(Features.ANALYTICS_OPT_OUT.isEnabled(this)) {
+            mOptPreferenceHelper = new OptOutPreferenceHelper(this);
+            mOptPreferenceHelper.registerChangeListener(mAnalytics,
+                    OptOutPreferenceHelper.ANALYTICS_OPT_OUT_DEFAULT_VALUE);
+            // always start with analytics off
+            mAnalytics.setAppOptOut(true);
+            // then update with the saved preference in an AsyncTask.
+            new AsyncTask<Void, Void, Boolean>() {
+                @Override
+                protected Boolean doInBackground(Void... voids) {
+                    return mOptPreferenceHelper.getOptOutPreference(
+                            OptOutPreferenceHelper.ANALYTICS_OPT_OUT_DEFAULT_VALUE);
+                }
+
+                @Override
+                protected void onPostExecute(Boolean result) {
+                    mAnalytics.setAppOptOut(result);
+                }
+            }.execute();
+        }
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             versionName = pInfo.versionName;
@@ -82,16 +109,52 @@ public class TvApplication extends Application {
         }
         mTvInputManagerHelper = new TvInputManagerHelper(this);
         mTvInputManagerHelper.start();
-        mSendConfigInfoRecurringRunner = new RecurringRunner(this, TimeUnit.DAYS.toMillis(1),
-                new SendConfigInfoRunnable());
-        mSendConfigInfoRecurringRunner.start();
         if (DEBUG) Log.i(TAG, "Started Live TV " + versionName);
     }
 
+    /**
+     * Returns the {@link Analytics}.
+     */
+    public Analytics getAnalytics() {
+        return mAnalytics;
+    }
+
+    /**
+     * Returns the default tracker.
+     */
     public Tracker getTracker() {
         return mTracker;
     }
 
+    public OptOutPreferenceHelper getOptPreferenceHelper(){
+        return mOptPreferenceHelper;
+    }
+
+    /**
+     * Returns {@link ChannelDataManager}.
+     */
+    public ChannelDataManager getChannelDataManager() {
+        if (mChannelDataManager == null) {
+            mChannelDataManager = new ChannelDataManager(this, mTvInputManagerHelper, mTracker);
+            mChannelDataManager.start();
+        }
+        return mChannelDataManager;
+    }
+
+    /**
+     * Returns {@link ProgramDataManager}.
+     */
+    public ProgramDataManager getProgramDataManager() {
+        if (mProgramDataManager == null) {
+            mProgramDataManager = new ProgramDataManager(this);
+            mProgramDataManager.start();
+        }
+        return mProgramDataManager;
+    }
+
+    /**
+     * Returns {@link TvInputManagerHelper}.
+     */
     public TvInputManagerHelper getTvInputManagerHelper() {
         return mTvInputManagerHelper;
     }
@@ -101,21 +164,39 @@ public class TvApplication extends Application {
      * {@link MainActivity#onDestroy}.
      */
     public void setMainActivity(MainActivity activity) {
-        mActivity = activity;
+        mMainActivity = activity;
+    }
+
+    /**
+     * SelectInputActivity is set in {@link SelectInputActivity#onCreate} and cleared in
+     * {@link SelectInputActivity#onDestroy}.
+     */
+    public void setSelectInputActivity(SelectInputActivity activity) {
+        mSelectInputActivity = activity;
     }
 
     /**
      * Checks if MainActivity is set or not.
      */
     public boolean hasMainActivity() {
-        return (mActivity != null);
+        return (mMainActivity != null);
+    }
+
+    /**
+     * Returns true, if {@code activity} is the current activity.
+     *
+     * Note: MainActivity can start while another MainActivity destroys. In this case, the current
+     * activity is the newly created activity.
+     */
+    public boolean isCurrentMainActivity(MainActivity activity) {
+        return mMainActivity == activity;
     }
 
     /**
      * Handles the global key KEYCODE_TV.
      */
     public void handleTvKey() {
-        if (mActivity == null || !mActivity.isActivityResumed()) {
+        if (mMainActivity == null || !mMainActivity.isActivityResumed()) {
             startMainActivity(null);
         }
     }
@@ -139,16 +220,22 @@ public class TvApplication extends Application {
         if (inputCount < 2) {
             return;
         }
-        if (mActivity != null && mActivity.isActivityResumed()) {
+        Activity activityToHandle = mMainActivity != null && mMainActivity.isActivityResumed()
+                ? mMainActivity : mSelectInputActivity;
+        if (activityToHandle != null) {
             // If startActivity is called, MainActivity.onPause is unnecessarily called. To
             // prevent it, MainActivity.dispatchKeyEvent is directly called.
-            mActivity.dispatchKeyEvent(
+            activityToHandle.dispatchKeyEvent(
                     new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_TV_INPUT));
-            mActivity.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_TV_INPUT));
-        } else {
+            activityToHandle.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,
+                    KeyEvent.KEYCODE_TV_INPUT));
+        } else if (mMainActivity != null && mMainActivity.isActivityStarted()) {
             Bundle extras = new Bundle();
             extras.putString(Utils.EXTRA_KEY_ACTION, Utils.EXTRA_ACTION_SHOW_TV_INPUT);
             startMainActivity(extras);
+        } else {
+            startActivity(new Intent(this, SelectInputActivity.class).setFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
 
@@ -168,35 +255,4 @@ public class TvApplication extends Application {
        return versionName;
     }
 
-    /**
-     * Data useful for tracking that doesn't change often.
-     */
-    public static class ConfigurationInfo {
-        public final int systemInputCount;
-        public final int nonSystemInputCount;
-
-        public ConfigurationInfo(int systemInputCount, int nonSystemInputCount) {
-            this.systemInputCount = systemInputCount;
-            this.nonSystemInputCount = nonSystemInputCount;
-        }
-    }
-
-    private class SendConfigInfoRunnable implements Runnable {
-        @Override
-        public void run() {
-            List<TvInputInfo> infoList = mTvInputManagerHelper.getTvInputInfos(false, false);
-            int systemInputCount = 0;
-            int nonSystemInputCount = 0;
-            for (TvInputInfo info : infoList) {
-                if (mTvInputManagerHelper.isSystemInput(info)) {
-                    systemInputCount++;
-                } else {
-                    nonSystemInputCount++;
-                }
-            }
-            ConfigurationInfo configurationInfo = new ConfigurationInfo(systemInputCount,
-                    nonSystemInputCount);
-            mTracker.sendConfigurationInfo(configurationInfo);
-        }
-    }
 }

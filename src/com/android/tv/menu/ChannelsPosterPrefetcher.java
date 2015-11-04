@@ -27,7 +27,7 @@ import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.ProgramDataManager;
-import com.android.tv.util.Utils;
+import com.android.tv.util.SoftPreconditions;
 
 import java.util.List;
 
@@ -68,8 +68,8 @@ public class ChannelsPosterPrefetcher {
      * Start prefetching of program poster art of recommendation.
      */
     public void prefetch() {
+        SoftPreconditions.checkState(!isCanceled, TAG, "Prefetch called after cancel was called.");
         if (isCanceled) {
-            Utils.engThrowElseWarn(TAG, "Prefetch called after cancel was called.");
             return;
         }
         if (DEBUG) {

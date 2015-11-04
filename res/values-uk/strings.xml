@@ -146,11 +146,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Ліцензії ПЗ з відкритим кодом"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Ліцензії ПЗ з відкритим кодом"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Версія"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Допомагати покращити додаток Live TV"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Надсилати в Google анонімні дані про використання та діагностику. Це допоможе нам покращити додаток Телеканали та вирішити такі проблеми, як аварійне завершення роботи й зависання."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Щоб дивитися цей канал, натисніть стрілку праворуч і введіть PIN-код"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Щоб дивитися цю телепередачу, натисніть стрілку праворуч і введіть PIN-код"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Ця телепередача належить до категорії <xliff:g id="RATING">%1$s</xliff:g>.\nЩоб дивитися її, натисніть стрілку праворуч і введіть PIN-код."</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"Щоб дивитися цей канал, відкрийте додаток для прямих трансляцій за умовчанням."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"Щоб дивитися цю телепередачу, відкрийте додаток для прямих трансляцій за умовчанням."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Категорія цієї телепередачі – <xliff:g id="RATING">%1$s</xliff:g>.\nЩоб дивитися її, відкрийте додаток для прямих трансляцій за умовчанням."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Телепередачу заблоковано"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Ця телепередача належить до категорії <xliff:g id="RATING">%1$s</xliff:g>"</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Лише аудіо"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Без назви"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Канал заблоковано"</string>
     <string name="episode_format" msgid="4881195874563241096">"Сезон <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>, серія <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g>: \"<xliff:g id="EPISODE_TITLE">%3$s</xliff:g>\""</string>
@@ -177,4 +183,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Відео недоступне через слабкий сигнал"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Відео недоступне з невідомої причини"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Клавіша \"НАЗАД\" діє на підключеному пристрої. Натисніть \"ГОЛОВНИЙ ЕКРАН\", щоб вийти."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Додаток Live TV не підтримується на цьому пристрої з ОС Android Lollipop."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Додатку Live TV потрібен дозвіл переглядати програму телепередач."</string>
 </resources>

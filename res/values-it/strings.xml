@@ -40,7 +40,7 @@
     <string name="options_item_pip_off" msgid="8799500161592387451">"Non attiva"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Multi-audio"</string>
     <string name="options_item_channel_sources" msgid="2217574947817750560">"Impostaz. canale"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"Filtro famiglia"</string>
+    <string name="options_item_parental_controls" msgid="7880060136509458287">"Controllo genitori"</string>
     <string name="options_item_about" msgid="3023532413252052050">"Informazioni"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"Fonte"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"Scambia"</string>
@@ -101,7 +101,7 @@
   </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"Nessun canale aggiunto"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Sintonizzatore"</string>
-    <string name="menu_parental_controls" msgid="2474294054521345840">"Filtro famiglia"</string>
+    <string name="menu_parental_controls" msgid="2474294054521345840">"Controllo genitori"</string>
     <string name="option_toggle_parental_controls_on" msgid="9122851821454622696">"Attivo"</string>
     <string name="option_toggle_parental_controls_off" msgid="7797910199040440618">"Non attivo"</string>
     <string name="option_channels_locked" msgid="5797855082297549907">"Canali bloccati"</string>
@@ -148,11 +148,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licenze open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licenze open source"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versione"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Contribuisci a migliorare Live TV"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Condividi con Google dati anonimi sull\'utilizzo e sulla diagnostica per consentirci di migliorare l\'app Dirette TV ed di evitare problemi, quali arresti anomali e blocchi."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Per guardare questo canale, premi il pulsante destro e inserisci il PIN"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Per guardare questo programma, premi il pulsante destro e inserisci il PIN"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Questo programma è classificato come <xliff:g id="RATING">%1$s</xliff:g>.\nPer guardarlo, premi il tasto destro e inserisci il PIN."</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"Per guardare questo canale, utilizza l\'app predefinita per la trasmissione di contenuti TV in tempo reale."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"Per guardare questo programma utilizza l\'app predefinita per la trasmissione di contenuti TV in tempo reale."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"La valutazione di questo programma è <xliff:g id="RATING">%1$s</xliff:g>.\nPer guardare questo programma utilizza l\'app predefinita per la trasmissione di contenuti TV in tempo reale."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Il programma è bloccato"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Questo programma è classificato come <xliff:g id="RATING">%1$s</xliff:g>"</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Solo audio"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Senza titolo"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Canale bloccato"</string>
     <string name="episode_format" msgid="4881195874563241096">"Stag. <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Punt. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -179,4 +185,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Non disponibile a causa di segnale video debole"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Il video è improvvisamente non disponibile"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Il tasto INDIETRO è per il dispositivo connesso. Per uscire premi il pulsante HOME."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Live TV non è supportato su questo dispositivo con Android Lollipop."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Live TV richiede l\'autorizzazione per leggere gli elenchi TV."</string>
 </resources>

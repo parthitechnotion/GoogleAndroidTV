@@ -101,13 +101,13 @@ public class ProgramTableAdapter extends
                 R.string.program_title_for_no_information);
         mProgramTitleForBlockedChannel = res.getString(
                 R.string.program_title_for_blocked_channel);
-        mChannelTextColor = res.getColor(
+        mChannelTextColor = Utils.getColor(res,
                 R.color.program_guide_table_header_column_channel_number_text_color);
-        mChannelBlockedTextColor = res.getColor(R.color
-                .program_guide_table_header_column_channel_number_blocked_text_color);
-        mDetailTextColor = res.getColor(
+        mChannelBlockedTextColor = Utils.getColor(res,
+                R.color.program_guide_table_header_column_channel_number_blocked_text_color);
+        mDetailTextColor = Utils.getColor(res,
                 R.color.program_guide_table_detail_title_text_color);
-        mDetailGrayedTextColor = res.getColor(
+        mDetailGrayedTextColor = Utils.getColor(res,
                 R.color.program_guide_table_detail_title_grayed_text_color);
         mAnimationDuration =
                 res.getInteger(R.integer.program_guide_table_detail_fade_anim_duration);
@@ -117,7 +117,7 @@ public class ProgramTableAdapter extends
         int episodeTitleSize = res.getDimensionPixelSize(
                 R.dimen.program_guide_table_detail_episode_title_text_size);
         ColorStateList episodeTitleColor = ColorStateList.valueOf(
-                res.getColor(R.color.program_guide_table_detail_episode_title_text_color));
+                Utils.getColor(res, R.color.program_guide_table_detail_episode_title_text_color));
         mEpisodeTitleStyle = new TextAppearanceSpan(null, 0, episodeTitleSize,
                 episodeTitleColor, null);
 

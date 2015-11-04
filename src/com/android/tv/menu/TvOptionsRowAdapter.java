@@ -29,6 +29,7 @@ import com.android.tv.ui.sidepanel.AboutFragment;
 import com.android.tv.ui.sidepanel.ClosedCaptionFragment;
 import com.android.tv.ui.sidepanel.DisplayModeFragment;
 import com.android.tv.ui.sidepanel.MultiAudioFragment;
+import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.PipInputManager;
 
 import java.util.ArrayList;
@@ -54,7 +55,13 @@ public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
         mPositionPipAction = actionList.size() - 1;
         actionList.add(MenuAction.SELECT_AUDIO_LANGUAGE_ACTION);
         actionList.add(MenuAction.CHANNEL_SOURCES_ACTION);
-        actionList.add(MenuAction.PARENTAL_CONTROLS_ACTION);
+        if (PermissionUtils.hasModifyParentalControls(getMainActivity())) {
+            actionList.add(MenuAction.PARENTAL_CONTROLS_ACTION);
+        } else {
+            // Note: parental control is turned off, when MODIFY_PARENTAL_CONTROLS is not granted.
+            // But, we may be able to turn on channel lock feature regardless of the permission.
+            // It's TBD.
+        }
         actionList.add(MenuAction.ABOUT_ACTION);
 
         for (MenuAction action : actionList) {

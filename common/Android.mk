@@ -8,7 +8,19 @@ LOCAL_MODULE := tv-common
 LOCAL_MODULE_TAGS := optional
 LOCAL_SDK_VERSION := current
 
+LOCAL_RESOURCE_DIR := \
+    $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
+    $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
+    $(LOCAL_PATH)/res
+
 LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-annotations \
+    android-support-v4 \
+    android-support-v7-recyclerview \
+    android-support-v17-leanback \
+
+LOCAL_AAPT_FLAGS := --auto-add-overlay \
+    --extra-packages android.support.v7.recyclerview \
+    --extra-packages android.support.v17.leanback \
 
 include $(BUILD_STATIC_JAVA_LIBRARY)

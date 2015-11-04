@@ -52,8 +52,8 @@ public final class RecurringRunner {
     }
 
     public void start() {
+        SoftPreconditions.checkState(!mRunning, TAG, "start is called twice.");
         if (mRunning) {
-            Utils.engThrowElseWarn(TAG, "start is called twice.", new IllegalStateException());
             return;
         }
         mRunning = true;

@@ -20,11 +20,15 @@ import com.android.tv.R;
 
 public class SwitchItem extends CompoundButtonItem {
     public SwitchItem(String title) {
-        super(title, null);
+        this(title, null, null);
     }
 
     public SwitchItem(String checkedTitle, String uncheckedTitle) {
-        super(checkedTitle, uncheckedTitle, null);
+        this(checkedTitle, uncheckedTitle, null);
+    }
+
+    public SwitchItem(String checkedTitle, String uncheckedTitle, String description) {
+        super(checkedTitle, uncheckedTitle, description);
     }
 
     @Override

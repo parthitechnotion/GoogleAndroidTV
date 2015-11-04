@@ -25,6 +25,8 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.tv.util.PermissionUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,13 +62,12 @@ public class LocalSearchProvider extends ContentProvider {
     private static final String LIVE_CONTENTS = "1";
 
     static final String SUGGEST_PARAMETER_ACTION = "action";
-    static final int DEFAULT_SEARCH_ACTION = TvProviderSearch.ACTION_TYPE_AMBIGUOUS;
+    static final int DEFAULT_SEARCH_ACTION = SearchInterface.ACTION_TYPE_AMBIGUOUS;
 
-    private TvProviderSearch mTvProviderSearch;
+    private SearchInterface mSearch;
 
     @Override
     public boolean onCreate() {
-        mTvProviderSearch = new TvProviderSearch(getContext());
         return true;
     }
 
@@ -76,6 +77,11 @@ public class LocalSearchProvider extends ContentProvider {
         if (DEBUG) {
             Log.d(TAG, "query(" + uri + ", " + Arrays.toString(projection) + ", " + selection + ", "
                     + Arrays.toString(selectionArgs) + ", " + sortOrder + ")");
+        }
+        if (PermissionUtils.hasAccessAllEpg(getContext())) {
+            mSearch = new TvProviderSearch(getContext());
+        } else {
+            mSearch = new DataManagerSearch(getContext());
         }
         String query = uri.getLastPathSegment();
         int limit = DEFAULT_SEARCH_LIMIT;
@@ -88,7 +94,7 @@ public class LocalSearchProvider extends ContentProvider {
         }
         List<SearchResult> results = new ArrayList<>();
         if (!TextUtils.isEmpty(query)) {
-            results.addAll(mTvProviderSearch.search(query, limit, action));
+            results.addAll(mSearch.search(query, limit, action));
         }
         return createSuggestionsCursor(results);
     }

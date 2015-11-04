@@ -101,22 +101,41 @@ public final class ChannelNumber implements Comparable<ChannelNumber> {
         }
         if (indexOfDelimiter < 0) {
             ret.majorNumber = number;
-            return ret;
+            if (!isInteger(ret.majorNumber)) {
+                return null;
+            }
+        } else {
+            ret.hasDelimiter = true;
+            ret.majorNumber = number.substring(0, indexOfDelimiter);
+            ret.minorNumber = number.substring(indexOfDelimiter + 1);
+            if (!isInteger(ret.majorNumber) || !isInteger(ret.minorNumber)) {
+                return null;
+            }
         }
-        ret.hasDelimiter = true;
-        ret.majorNumber = number.substring(0, indexOfDelimiter);
-        ret.minorNumber = number.substring(indexOfDelimiter + 1);
         return ret;
     }
 
     public static int compare(String lhs, String rhs) {
-        if (lhs == null && rhs == null) {
+        ChannelNumber lhsNumber = parseChannelNumber(lhs);
+        ChannelNumber rhsNumber = parseChannelNumber(rhs);
+        if (lhsNumber == null && rhsNumber == null) {
             return 0;
-        } else if (lhs == null /* && rhs != null */) {
+        } else if (lhsNumber == null /* && rhsNumber != null */) {
             return -1;
-        } else if (lhs != null && rhs == null) {
+        } else if (lhsNumber != null && rhsNumber == null) {
             return 1;
         }
-        return parseChannelNumber(lhs).compareTo(parseChannelNumber(rhs));
+        return lhsNumber.compareTo(rhsNumber);
+    }
+
+    public static boolean isInteger(String string) {
+        try {
+            Integer.parseInt(string);
+        } catch(NumberFormatException e) {
+            return false;
+        } catch(NullPointerException e) {
+            return false;
+        }
+        return true;
     }
 }

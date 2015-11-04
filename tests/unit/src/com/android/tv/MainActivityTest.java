@@ -58,7 +58,7 @@ public class MainActivityTest extends BaseMainActivityTestCase {
 
     private void showProgramGuide() throws Throwable {
         // Run on UI thread so views can be modified
-        runTestOnUiThread(new Runnable() {
+        getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
                 mActivity.getOverlayManager().showProgramGuide();

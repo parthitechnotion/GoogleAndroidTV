@@ -146,11 +146,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Åpen kildekode-lisenser"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Åpen kildekode-lisenser"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versjon"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Bidra til å forbedre Live TV"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Del anonyme bruksdata og diagnostikkdata med Google sånn at vi kan gjøre Direkte-TV bedre og forhindre problemer (for eksempel når appen kræsjer eller fryser)."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"For å se på denne kanalen, trykk til høyre og skriv inn PIN-koden din"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"For å se på dette programmet, trykk til høyre og skriv inn PIN-koden din"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Dette programmet har vurderingen <xliff:g id="RATING">%1$s</xliff:g>.\nFor å se på dette programmet, trykk til høyre og skriv inn PIN-koden din."</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"For å se på denne kanalen, bruk Live TV-appen som er angitt som standard."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"For å se dette programmet, bruk Live TV-appen som er angitt som standard."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Dette programmet er vurdert som <xliff:g id="RATING">%1$s</xliff:g>.\nFor å se dette programmet, bruk Live TV-appen som er angitt som standard."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Programmet er blokkert"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Dette programmet er vurdert som <xliff:g id="RATING">%1$s</xliff:g>."</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Bare lyd"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Ingen tittel"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Kanalen er blokkert"</string>
     <string name="episode_format" msgid="4881195874563241096">"S<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Ep. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -177,4 +183,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Utilgjengelig på grunn av svakt videosignal"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Videoen er utilgjengelig på grunn av en uventet feil"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"TILBAKE-tasten er for den tilkoblede enheten. Trykk på STARTSIDE-knappen for å avslutte."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Live TV støttes ikke på denne enheten med Android Lollipop."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Live TV trenger tillatelse til å lese TV-programoversikten."</string>
 </resources>

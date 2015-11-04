@@ -61,8 +61,8 @@
     <style name="menu_row_title_view">
         <item name="android:layout_width">@dimen/menu_row_title_width</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">@dimen/menu_list_padding_start</item>
-        <item name="android:layout_marginEnd">@dimen/menu_list_padding_end</item>
+        <item name="android:layout_marginStart">@dimen/menu_padding_start</item>
+        <item name="android:layout_marginEnd">@dimen/menu_padding_end</item>
         <item name="android:fontFamily">@string/condensed_font</item>
         <item name="android:textAlignment">gravity</item>
         <item name="android:gravity">start</item>
@@ -75,8 +75,13 @@
     <style name="menu_row_contents_view">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:paddingStart">@dimen/menu_list_padding_start</item>
-        <item name="android:paddingEnd">@dimen/menu_list_padding_end</item>
+        <item name="android:paddingStart">@dimen/menu_padding_start</item>
+        <item name="android:paddingEnd">@dimen/menu_padding_end</item>
         <item name="android:paddingTop">@dimen/menu_row_contents_padding_top</item>
+    </style>
+
+    <style name="Animation.SelectInputActivity" parent="android:Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/select_input_activity_enter</item>
+        <item name="android:windowExitAnimation">@anim/select_input_activity_exit</item>
     </style>
 </resources>

@@ -151,13 +151,13 @@ public class ProgramItemView extends TextView {
 
         sItemPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_item_padding);
 
-        ColorStateList programTitleColor = ColorStateList.valueOf(res.getColor(
+        ColorStateList programTitleColor = ColorStateList.valueOf(Utils.getColor(res,
                 R.color.program_guide_table_item_program_title_text_color));
-        ColorStateList grayedOutProgramTitleColor = res.getColorStateList(
+        ColorStateList grayedOutProgramTitleColor = Utils.getColorStateList(res,
                 R.color.program_guide_table_item_grayed_out_program_text_color);
-        ColorStateList episodeTitleColor = ColorStateList.valueOf(res.getColor(
+        ColorStateList episodeTitleColor = ColorStateList.valueOf(Utils.getColor(res,
                 R.color.program_guide_table_item_program_episode_title_text_color));
-        ColorStateList grayedOutEpisodeTitleColor = ColorStateList.valueOf(res.getColor(
+        ColorStateList grayedOutEpisodeTitleColor = ColorStateList.valueOf(Utils.getColor(res,
                 R.color.program_guide_table_item_grayed_out_program_episode_title_text_color));
         int programTitleSize = res.getDimensionPixelSize(
                 R.dimen.program_guide_table_item_program_title_font_size);

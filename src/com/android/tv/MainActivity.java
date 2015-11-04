@@ -24,6 +24,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -39,6 +40,7 @@ import android.media.tv.TvInputManager;
 import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView.OnUnhandledInputEventListener;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -61,6 +63,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.android.tv.analytics.DurationTimer;
+import com.android.tv.analytics.SendConfigInfoRunnable;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
@@ -69,9 +72,11 @@ import com.android.tv.data.OnCurrentProgramUpdatedListener;
 import com.android.tv.data.Program;
 import com.android.tv.data.ProgramDataManager;
 import com.android.tv.data.StreamInfo;
+import com.android.tv.data.WatchedHistoryManager;
 import com.android.tv.dialog.PinDialogFragment;
 import com.android.tv.dialog.SafeDismissDialogFragment;
 import com.android.tv.menu.Menu;
+import com.android.tv.onboarding.OnboardingActivity;
 import com.android.tv.parental.ContentRatingsManager;
 import com.android.tv.parental.ParentalControlSettings;
 import com.android.tv.receiver.AudioCapabilitiesReceiver;
@@ -83,6 +88,7 @@ import com.android.tv.ui.InputBannerView;
 import com.android.tv.ui.KeypadChannelSwitchView;
 import com.android.tv.ui.OverlayRootView;
 import com.android.tv.ui.SelectInputView;
+import com.android.tv.ui.SelectInputView.OnInputSelectedCallback;
 import com.android.tv.ui.TunableTvView;
 import com.android.tv.ui.TunableTvView.OnTuneListener;
 import com.android.tv.ui.TvOverlayManager;
@@ -97,10 +103,15 @@ import com.android.tv.ui.sidepanel.SideFragment;
 import com.android.tv.ui.sidepanel.parentalcontrols.ParentalControlsFragment;
 import com.android.tv.util.CaptionSettings;
 import com.android.tv.util.ImageCache;
+import com.android.tv.util.MemoryManageable;
+import com.android.tv.util.OnboardingUtils;
+import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.PipInputManager;
 import com.android.tv.util.PipInputManager.PipInput;
+import com.android.tv.util.RecurringRunner;
 import com.android.tv.util.SearchManagerHelper;
 import com.android.tv.util.SetupUtils;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.SystemProperties;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.TvSettings;
@@ -142,6 +153,9 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     private static final float FRAME_RATE_FOR_FILM = 23.976f;
     private static final float FRAME_RATE_EPSILON = 0.1f;
 
+
+    private static final int PERMISSIONS_REQUEST_READ_TV_LISTINGS = 1;
+    private static final String PERMISSION_READ_TV_LISTINGS = "android.permission.READ_TV_LISTINGS";
 
     // Tracker screen names.
     public static final String SCREEN_NAME = "Main";
@@ -201,6 +215,7 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     private AccessibilityManager mAccessibilityManager;
     private ChannelDataManager mChannelDataManager;
     private ProgramDataManager mProgramDataManager;
+    private WatchedHistoryManager mWatchedHistoryManager;
     private TvInputManagerHelper mTvInputManagerHelper;
     private ChannelTuner mChannelTuner;
     private PipInputManager mPipInputManager;
@@ -271,6 +286,7 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     private final ArrayDeque<Long> mRecentChannels = new ArrayDeque<>(MAX_RECENT_CHANNELS);
 
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
+    private RecurringRunner mSendConfigInfoRecurringRunner;
 
     // A caller which started this activity. (e.g. TvSearch)
     private String mSource;
@@ -375,20 +391,28 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (DEBUG) Log.d(TAG,"onCreate()");
-        if(BuildConfig.ENG && SystemProperties.ALLOW_STRICT_MODE.getValue()) {
-            Toast.makeText(this, "Using Strict Mode for eng builds", Toast.LENGTH_SHORT).show();
-        }
         super.onCreate(savedInstanceState);
-
         TvApplication tvApplication = (TvApplication) getApplication();
         tvApplication.setMainActivity(this);
+
+        if (Features.ONBOARDING_EXPERIENCE.isEnabled(this)
+                && OnboardingUtils.needToShowOnboarding(this)) {
+            startActivity(OnboardingActivity.buildIntent(this, getIntent()));
+            finish();
+            return;
+        }
+
+        if (BuildConfig.ENG && SystemProperties.ALLOW_STRICT_MODE.getValue()) {
+            Toast.makeText(this, "Using Strict Mode for eng builds", Toast.LENGTH_SHORT).show();
+        }
         mTracker = tvApplication.getTracker();
         mTvInputManagerHelper = tvApplication.getTvInputManagerHelper();
-        mChannelDataManager = new ChannelDataManager(this, mTvInputManagerHelper, mTracker);
-        mProgramDataManager = new ProgramDataManager(this);
+        mChannelDataManager = tvApplication.getChannelDataManager();
+        mProgramDataManager = tvApplication.getProgramDataManager();
         mProgramDataManager.addOnCurrentProgramUpdatedListener(Channel.INVALID_ID,
                 mOnCurrentProgramUpdatedListener);
-        mChannelTuner = new ChannelTuner(this, mChannelDataManager);
+        mProgramDataManager.setPrefetchEnabled(true);
+        mChannelTuner = new ChannelTuner(mChannelDataManager);
         mChannelTuner.addListener(mChannelTunerListener);
         mChannelTuner.start();
         mPipInputManager = new PipInputManager(this, mTvInputManagerHelper, mChannelTuner);
@@ -458,6 +482,11 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         mPipView.initialize((AppLayerTvView) findViewById(R.id.pip_tv_view), true, screenHeight,
                 shrunkenTvViewHeight);
 
+        if (!PermissionUtils.hasAccessWatchedHistory(this)) {
+            mWatchedHistoryManager = new WatchedHistoryManager(getApplicationContext());
+            mWatchedHistoryManager.start();
+            mTvView.setWatchedHistoryManager(mWatchedHistoryManager);
+        }
         mTvViewUiManager = new TvViewUiManager(this, mTvView, mPipView,
                 (FrameLayout) findViewById(android.R.id.content), mTvOptionsManager);
 
@@ -473,6 +502,36 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
                 .inflate(R.layout.input_banner, sceneContainer, false);
         SelectInputView selectInputView = (SelectInputView) getLayoutInflater()
                 .inflate(R.layout.select_input, sceneContainer, false);
+        selectInputView.setOnInputSelectedCallback(new OnInputSelectedCallback() {
+            @Override
+            public void onTunerInputSelected() {
+                Channel currentChannel = mChannelTuner.getCurrentChannel();
+                if (currentChannel != null && !currentChannel.isPassthrough()) {
+                    hideOverlays();
+                } else {
+                    tuneToLastWatchedChannelForTunerInput();
+                }
+            }
+
+            @Override
+            public void onPassthroughInputSelected(TvInputInfo input) {
+                Channel currentChannel = mChannelTuner.getCurrentChannel();
+                String currentInputId = currentChannel == null ? null : currentChannel.getInputId();
+                if (TextUtils.equals(input.getId(), currentInputId)) {
+                    hideOverlays();
+                } else {
+                    tuneToChannel(Channel.createPassthroughChannel(input.getId()));
+                }
+            }
+
+            private void hideOverlays() {
+                getOverlayManager().hideOverlays(
+                        TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
+            }
+        });
         mSearchFragment = new ProgramGuideSearchFragment();
         mOverlayManager = new TvOverlayManager(this, mChannelTuner,
                 mKeypadChannelSwitchView, mChannelBannerView, inputBannerView,
@@ -486,24 +545,33 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
             finish();
             return;
         }
-        if (!TvContract.isChannelUriForPassthroughInput(mInitChannelUri)) {
-            // Preloads the initial channel to reduce the initial tuning time.
-            Channel channel = loadInitialChannel(mInitChannelUri);
-            mInitChannelUri = channel == null ? null : channel.getUri();
-        }
-        // mChannelDataManager.start() and mProgramDataManager.start() are called
-        // after loadInitialChannel. Unless, loadInitialChannel can be blocked
-        // by channel data and program data loading.
-        mChannelDataManager.start();
-        mProgramDataManager.start();
 
-        mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, mTracker);
+        mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, null);
         mAudioCapabilitiesReceiver.register();
 
         mAccessibilityManager =
                 (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
-
+        mSendConfigInfoRecurringRunner = new RecurringRunner(this, TimeUnit.DAYS.toMillis(1),
+                new SendConfigInfoRunnable(mTracker, mTvInputManagerHelper));
+        mSendConfigInfoRecurringRunner.start();
         initForTest();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_READ_TV_LISTINGS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Restart live channels.
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, R.string.msg_read_tv_listing_permission_denied,
+                        Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
     }
 
     @Override
@@ -582,6 +650,16 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     protected void onResume() {
         if (DEBUG) Log.d(TAG, "onResume()");
         super.onResume();
+        if (!PermissionUtils.hasAccessAllEpg(this)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                Toast.makeText(this, R.string.msg_not_supported_device, Toast.LENGTH_LONG).show();
+                finish();
+            } else if (checkSelfPermission(PERMISSION_READ_TV_LISTINGS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{PERMISSION_READ_TV_LISTINGS},
+                        PERMISSIONS_REQUEST_READ_TV_LISTINGS);
+            }
+        }
         mTracker.sendScreenView(SCREEN_NAME);
 
         SystemProperties.updateSystemProperties();
@@ -600,9 +678,9 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         }
         if (mChannelTuner.areAllChannelsLoaded()) {
             markNewChannelsBrowsable();
+            resumeTvIfNeeded();
+            resumePipIfNeeded();
         }
-        resumeTvIfNeeded();
-        resumePipIfNeeded();
         mOverlayManager.showMenuWithTimeShiftPauseIfNeeded();
 
         // Note: The following codes are related to pop up an overlay UI after resume.
@@ -692,6 +770,13 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         return mActivityResumed;
     }
 
+    /**
+     * Returns true if {@link #onStart} is called and {@link #onStop} is not called yet.
+     */
+    public boolean isActivityStarted() {
+        return mActivityStarted;
+    }
+
     @Override
     public boolean requestVisibleBehind(boolean enable) {
         boolean state = super.requestVisibleBehind(enable);
@@ -732,10 +817,9 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         Set<String> newInputsWithChannels = new HashSet<>();
         for (TvInputInfo input : mTvInputManagerHelper.getTvInputInfos(true, true)) {
             String inputId = input.getId();
-            if (!setupUtils.hasSetupLaunched(inputId)
+            if (!setupUtils.isSetupDone(inputId)
                     && mChannelDataManager.getChannelCountForInput(inputId) > 0) {
-                setupUtils.onSetupLaunched(inputId);
-                setupUtils.markAsKnownInput(inputId);
+                setupUtils.onSetupDone(inputId);
                 newInputsWithChannels.add(inputId);
                 if (DEBUG) {
                     Log.d(TAG, "New input " + inputId + " has "
@@ -754,32 +838,6 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         }
     }
 
-    private Channel loadInitialChannel(Uri channelUri) {
-        if (TvContract.isChannelUriForPassthroughInput(channelUri)) {
-            throw new IllegalArgumentException("channelUri should be null or tuner input channel");
-        }
-        if (channelUri == null) {
-            // If any initial channel id is not given, remember the last channel the user watched.
-            long channelId = Utils.getLastWatchedChannelId(this);
-            if (channelId != Channel.INVALID_ID) {
-                channelUri = TvContract.buildChannelUri(channelId);
-            }
-        }
-        if (channelUri == null) {
-            return null;
-        }
-        long channelId = ContentUris.parseId(channelUri);
-        Channel channel = mChannelTuner.loadChannel(channelId);
-        if (channel == null) {
-            // If the requested channel doesn't exist, it's better to tune to the
-            // last watched channel.
-            channel = mChannelTuner.loadChannel(Utils.getLastWatchedChannelId(this));
-            Log.w(TAG, "The requested channel (id=" + channelId + ") doesn't exist. "
-                    + "The last watched channel will be tuned to.");
-        }
-        return channel;
-    }
-
     private void startTv(Uri channelUri) {
         if (DEBUG) Log.d(TAG, "startTv Uri=" + channelUri);
         if ((channelUri == null || !TvContract.isChannelUriForPassthroughInput(channelUri))
@@ -789,6 +847,9 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
             // is playing, we stop the passthrough TV input.
             stopTv();
         }
+        SoftPreconditions.checkState(TvContract.isChannelUriForPassthroughInput(channelUri)
+                || mChannelTuner.areAllChannelsLoaded(),
+                TAG, "startTV assumes that ChannelDataManager is already loaded.");
         if (mTvView.isPlaying()) {
             // TV has already started.
             if (channelUri == null) {
@@ -822,11 +883,10 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
                 Channel channel = Channel.createPassthroughChannel(channelUri);
                 mChannelTuner.moveToChannel(channel);
             } else {
-                Channel channel = loadInitialChannel(channelUri);
+                long channelId = ContentUris.parseId(channelUri);
+                Channel channel = mChannelDataManager.getChannel(channelId);
                 if (channel == null || !mChannelTuner.moveToChannel(channel)) {
                     mChannelTuner.moveToChannel(mChannelTuner.findNearestBrowsableChannel(0));
-                    long channelId = (channel == null) ? ContentUris.parseId(channelUri)
-                            : channel.getId();
                     Log.w(TAG, "The requested channel (id=" + channelId + ") doesn't exist. "
                             + "The first channel will be tuned to.");
                 }
@@ -880,8 +940,12 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
 
             mInputIdUnderSetup = input.getId();
             mIsSetupActivityCalledByDialog = calledByDialog;
+            // Call requestVisibleBehind(false) before starting other activity.
+            // In Activity.requestVisibleBehind(false), this activity is scheduled to be stopped
+            // immediately if other activity is about to start. And this activity is scheduled to
+            // to be stopped again after onPause().
+            stopTv("startSetupActivity()", false);
             startActivityForResultSafe(intent, REQUEST_CODE_START_SETUP_ACTIVITY);
-            SetupUtils.getInstance(this).onSetupLaunched(input.getId());
         } catch (ActivityNotFoundException e) {
             mInputIdUnderSetup = null;
             Toast.makeText(this, getString(R.string.msg_unable_to_start_setup_activity,
@@ -895,7 +959,6 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
             mOverlayManager.hideOverlays(TvOverlayManager.FLAG_HIDE_OVERLAYS_WITHOUT_ANIMATION
                     | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANEL_HISTORY);
         }
-        stopTv("startSetupActivity()", false);
     }
 
     public boolean hasCaptioningSettingsActivity() {
@@ -1120,31 +1183,12 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_CODE_START_SETUP_ACTIVITY:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     final String inputId = mInputIdUnderSetup;
-                    // When TIS adds several channels, ChannelDataManager.Listener.onChannelList
-                    // Updated() can be called several times. In this case, it is hard to detect
-                    // which one is the last callback. To reduce error prune, we update channel
-                    // list again and make all channels of {@code inputId} browsable.
-                    mChannelDataManager.updateChannels(new Runnable() {
+                    SetupUtils.getInstance(this).onTvInputSetupFinished(inputId, new Runnable() {
                         @Override
                         public void run() {
-                            int count = 0;
-                            boolean browsableChanged = false;
-                            for (Channel channel : mChannelDataManager.getChannelList()) {
-                                if (channel.getInputId().equals(inputId)) {
-                                    if (!channel.isBrowsable()) {
-                                        mChannelDataManager.updateBrowsable(channel.getId(), true,
-                                                true);
-                                        browsableChanged = true;
-                                    }
-                                    ++count;
-                                }
-                            }
-                            if (browsableChanged) {
-                                mChannelDataManager.notifyChannelBrowsableChanged();
-                                mChannelDataManager.applyUpdatedValuesToDb();
-                            }
+                            int count = mChannelDataManager.getChannelCountForInput(inputId);
                             String text;
                             if (count > 0) {
                                 text = getResources().getQuantityString(R.plurals.msg_channel_added,
@@ -1502,6 +1546,20 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         }
     }
 
+    /**
+     * Says {@code text} when accessibility is turned on.
+     */
+    public void sendAccessiblityText(String text) {
+        if (mAccessibilityManager.isEnabled()) {
+            AccessibilityEvent event = AccessibilityEvent.obtain();
+            event.setClassName(getClass().getName());
+            event.setPackageName(getPackageName());
+            event.setEventType(AccessibilityEvent.TYPE_ANNOUNCEMENT);
+            event.getText().add(text);
+            mAccessibilityManager.sendAccessibilityEvent(event);
+        }
+    }
+
     private void tune() {
         if (DEBUG) Log.d(TAG, "tune()");
         mTuneDurationTimer.start();
@@ -1596,6 +1654,8 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
             if (TvContract.isChannelUriForPassthroughInput(channel.getUri())) {
                 TvInputInfo input = mTvInputManagerHelper.getTvInputInfo(channel.getInputId());
                 event.getText().add(Utils.loadLabel(this, input));
+            } else if (TextUtils.isEmpty(channel.getDisplayName())) {
+                event.getText().add(channel.getDisplayNumber());
             } else {
                 event.getText().add(channel.getDisplayNumber() + " " + channel.getDisplayName());
             }
@@ -1822,8 +1882,8 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         boolean needToShowBanner = (reason == UPDATE_CHANNEL_BANNER_REASON_FORCE_SHOW
                 || reason == UPDATE_CHANNEL_BANNER_REASON_TUNE
                 || reason == UPDATE_CHANNEL_BANNER_REASON_TUNE_FAST);
-        boolean noOverlayUiWhenResume
-                = mInputToSetUp == null && !mShowProgramGuide && !mShowSelectInputView;
+        boolean noOverlayUiWhenResume =
+                mInputToSetUp == null && !mShowProgramGuide && !mShowSelectInputView;
         if (needToShowBanner && noOverlayUiWhenResume
                 && mOverlayManager.getCurrentDialog() == null) {
             if (mChannelTuner.getCurrentChannel() == null) {
@@ -1994,19 +2054,39 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     @Override
     protected void onDestroy() {
         if (DEBUG) Log.d(TAG, "onDestroy()");
-        mChannelTuner.removeListener(mChannelTunerListener);
-        mProgramDataManager.removeOnCurrentProgramUpdatedListener(
-                Channel.INVALID_ID, mOnCurrentProgramUpdatedListener);
-        mProgramDataManager.stop();
-        mChannelDataManager.stop();
-        mPipInputManager.stop();
-        mOverlayManager.release();
-        mChannelTuner.stop();
-        mKeypadChannelSwitchView.setChannels(null);
+        if (mChannelTuner != null) {
+            mChannelTuner.removeListener(mChannelTunerListener);
+            mChannelTuner.stop();
+        }
+        TvApplication application = ((TvApplication) getApplication());
+        if (mProgramDataManager != null) {
+            mProgramDataManager.removeOnCurrentProgramUpdatedListener(
+                    Channel.INVALID_ID, mOnCurrentProgramUpdatedListener);
+            if (application.isCurrentMainActivity(this)) {
+                mProgramDataManager.setPrefetchEnabled(false);
+            }
+        }
+        if (mPipInputManager != null) {
+            mPipInputManager.stop();
+        }
+        if (mOverlayManager != null) {
+            mOverlayManager.release();
+        }
+        if (mKeypadChannelSwitchView != null) {
+            mKeypadChannelSwitchView.setChannels(null);
+        }
         mMemoryManageables.clear();
-        ((TvApplication) getApplication()).setMainActivity(null);
-        mAudioCapabilitiesReceiver.unregister();
+        if (mAudioCapabilitiesReceiver != null) {
+            mAudioCapabilitiesReceiver.unregister();
+        }
         mHandler.removeCallbacksAndMessages(null);
+        if (application.isCurrentMainActivity(this)) {
+            application.setMainActivity(null);
+        }
+        if (mSendConfigInfoRecurringRunner != null) {
+            mSendConfigInfoRecurringRunner.stop();
+            mSendConfigInfoRecurringRunner = null;
+        }
         super.onDestroy();
     }
 
@@ -2130,6 +2210,10 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
             }
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    if (!PermissionUtils.hasModifyParentalControls(this)) {
+                        // TODO: support this feature for non-system LC app. b/23939816
+                        return true;
+                    }
                     PinDialogFragment dialog = null;
                     if (mTvView.isScreenBlocked()) {
                         dialog = new PinDialogFragment(
@@ -2284,7 +2368,9 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
-        mOverlayManager.onUserInteraction();
+        if (mOverlayManager != null) {
+            mOverlayManager.onUserInteraction();
+        }
     }
 
     public void togglePipView() {
@@ -2636,14 +2722,13 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         int stringId;
         switch (info.getVideoUnavailableReason()) {
             case TunableTvView.VIDEO_UNAVAILABLE_REASON_NOT_TUNED:
-                return;
             case TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING:
+            case TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING:
+            case TvInputManager.VIDEO_UNAVAILABLE_REASON_AUDIO_ONLY:
                 return;
             case TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL:
                 stringId = R.string.msg_channel_unavailable_weak_signal;
                 break;
-            case TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING:
-                return;
             case TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN:
             default:
                 stringId = R.string.msg_channel_unavailable_unknown;
@@ -2710,19 +2795,6 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
         for (MemoryManageable memoryManageable : mMemoryManageables) {
             memoryManageable.performTrimMemory(level);
         }
-    }
-
-    /**
-     * Interface for the fine-grained memory management.
-     * The class which wants to release memory based on the system constraints should inherit
-     * this interface and implement {@link #performTrimMemory}.
-     */
-    public interface MemoryManageable {
-        /**
-         * This method is called when the {@link MainActivity#onTrimMemory} is called.
-         * For more information, see {@link android.content.ComponentCallbacks2#onTrimMemory}.
-         */
-        void performTrimMemory(int level);
     }
 
     private static class MainActivityHandler extends WeakHandler<MainActivity> {

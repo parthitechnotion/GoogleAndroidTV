@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tv.util;
+package com.android.tv.common;
 
 import android.util.Log;
 
@@ -32,7 +32,7 @@ import java.util.List;
  * "https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/os/SystemProperties.java"
  * >android.os.SystemProperties.getBoolean</a>.
  */
-public final class BooleanSystemProperty {
+public class BooleanSystemProperty {
     private final static String TAG = "BooleanSystemProperty";
     private final static boolean DEBUG = false;
     private static final List<BooleanSystemProperty> ALL_PROPERTIES = new ArrayList<>();
@@ -40,6 +40,12 @@ public final class BooleanSystemProperty {
     private final String mKey;
     private Boolean mValue = null;
 
+    /**
+     * Create a boolean system property.
+     *
+     * @param key the system property key.
+     * @param defaultValue the value to return if the property is undefined or empty.
+     */
     public BooleanSystemProperty(String key, boolean defaultValue) {
         mDefaultValue = defaultValue;
         mKey = key;
@@ -55,7 +61,7 @@ public final class BooleanSystemProperty {
     /**
      * Gets system properties set by <code>adb shell setprop <em>key</em> <em>value</em></code>
      *
-     * @param key          the property key.
+     * @param key the property key.
      * @param defaultValue the value to return if the property is undefined or empty.
      * @return the system property value or the default value.
      */

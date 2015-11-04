@@ -32,6 +32,31 @@ public final class TvCommonConstants {
      */
     public static final boolean HAS_TIME_SHIFT_API = Build.VERSION.SDK_INT >= 23;
 
+    /**
+     * An intent action to launch setup activity of a TV input. The intent should include
+     * TV input ID in the value of {@link EXTRA_INPUT_ID}. Optionally, given the value of
+     * {@link EXTRA_ACTIVITY_AFTER_COMPLETION}, the activity will be launched after the setup
+     * activity successfully finishes.
+     */
+    public static final String INTENT_ACTION_INPUT_SETUP =
+            "com.android.tv.intent.action.INPUT_SETUP";
+    /**
+     * A constant for the key to indicate a TV input ID for the intent action
+     * {@link INTENT_ACTION_INPUT_SETUP}.
+     *
+     * <p>Value type: String
+     */
+    public static final String EXTRA_INPUT_ID =
+            "com.android.tv.intent.extra.INPUT_ID";
+    /**
+     * A constant for the key to indicate an Activity launch intent for the intent action
+     * {@link INTENT_ACTION_INPUT_SETUP}.
+     *
+     * <p>Value type: Intent (Parcelable)
+     */
+    public static final String EXTRA_ACTIVITY_AFTER_COMPLETION =
+            "com.android.tv.intent.extra.ACTIVITY_AFTER_COMPLETION";
+
     private TvCommonConstants() {
     }
 }

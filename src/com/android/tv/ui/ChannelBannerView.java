@@ -200,8 +200,9 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadImageC
                 R.dimen.channel_banner_channel_logo_margin_start);
         mProgramDescriptionTextViewWidth = mResources.getDimensionPixelSize(
                 R.dimen.channel_banner_program_description_width);
-        mChannelBannerTextColor = mResources.getColor(R.color.channel_banner_text_color);
-        mChannelBannerDimTextColor = mResources.getColor(R.color.channel_banner_dim_text_color);
+        mChannelBannerTextColor = Utils.getColor(mResources, R.color.channel_banner_text_color);
+        mChannelBannerDimTextColor = Utils.getColor(mResources,
+                R.color.channel_banner_dim_text_color);
         mResizeAnimDuration = mResources.getInteger(R.integer.channel_banner_fast_anim_duration);
 
         mResizeInterpolator = AnimationUtils.loadInterpolator(context,

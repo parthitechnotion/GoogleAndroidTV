@@ -17,7 +17,6 @@
 package com.android.tv.analytics;
 
 import com.android.tv.TimeShiftManager;
-import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 
 /**
@@ -44,7 +43,7 @@ public interface Tracker {
      *
      * @param info the configuration info.
      */
-    void sendConfigurationInfo(TvApplication.ConfigurationInfo info);
+    void sendConfigurationInfo(ConfigurationInfo info);
 
     /**
      * Sends tracking information for starting the MainActivity.
@@ -179,11 +178,32 @@ public interface Tracker {
     void sendChannelNumberItemChosenByTimeout();
 
     /**
+     * Sends tracking for the reason video is unavailable on a channel.
+     */
+    void sendChannelVideoUnavailable(Channel channel, int reason);
+
+    /**
      * Sends HDMI AC3 passthrough capabilities.
      *
      * @param isSupported {@code true} if the feature is supported; otherwise {@code false}.
      */
     void sendAc3PassthroughCapabilities(boolean isSupported);
+
+    /**
+     * Sends tracking for input a connection failure.
+     * <p><strong>WARNING</strong> callers must ensure no PII is included in the inputId.
+     *
+     * @param inputId the input the failure happened on
+     */
+    void sendInputConnectionFailure(String inputId);
+
+    /**
+     * Sends tracking for input disconnected.
+     * <p><strong>WARNING</strong> callers must ensure no PII is included in the inputId.
+     *
+     * @param inputId the input the failure happened on
+     */
+    void sendInputDisconnected(String inputId);
 
     /**
      * Sends tracking information for showing the input selection view.
@@ -224,7 +244,7 @@ public interface Tracker {
     /**
      * Sends time shift action (pause, ff, etc).
      *
-     * @param actionId The label of the side panel
+     * @param actionId The {@link com.android.tv.TimeShiftManager.TimeShiftActionId}
      */
     void sendTimeShiftAction(@TimeShiftManager.TimeShiftActionId int actionId);
 }

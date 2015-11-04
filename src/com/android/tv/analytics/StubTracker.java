@@ -19,7 +19,6 @@ package com.android.tv.analytics;
 import android.support.annotation.VisibleForTesting;
 
 import com.android.tv.TimeShiftManager;
-import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 
 /**
@@ -31,7 +30,7 @@ public class StubTracker implements Tracker {
     public void sendChannelCount(int browsableChannelCount, int totalChannelCount) { }
 
     @Override
-    public void sendConfigurationInfo(TvApplication.ConfigurationInfo info) { }
+    public void sendConfigurationInfo(ConfigurationInfo info) { }
 
     @Override
     public void sendMainStart() { }
@@ -97,7 +96,16 @@ public class StubTracker implements Tracker {
     public void sendChannelNumberItemChosenByTimeout() { }
 
     @Override
+    public void sendChannelVideoUnavailable(Channel channel, int reason) { }
+
+    @Override
     public void sendAc3PassthroughCapabilities(boolean isSupported) { }
+
+    @Override
+    public void sendInputConnectionFailure(String inputId) { }
+
+    @Override
+    public void sendInputDisconnected(String inputId) { }
 
     @Override
     public void sendShowInputSelection() { }

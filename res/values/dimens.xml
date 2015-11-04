@@ -17,24 +17,14 @@
 
 <resources>
     <!-- Main menu -->
-    <!-- menu_height should be bigger than the height when all possible menu rows are
-         enabled and the focus is on the row which has the biggest height. -->
-    <dimen name="menu_height">500dp</dimen>
     <dimen name="menu_margin_top">@dimen/menu_enter_offset_y_negative</dimen>
     <dimen name="menu_margin_bottom_min">27dp</dimen>
     <dimen name="menu_row_align_from_bottom">124dp</dimen>
     <dimen name="menu_row_title_width">300dp</dimen>
     <dimen name="menu_row_title_height">48dp</dimen>
-    <dimen name="menu_row_title_padding_bottom">4dp</dimen>
     <dimen name="menu_row_title_transform_pivot_x">0dp</dimen>
-    <dimen name="menu_row_title_transform_pivot_y">36dp</dimen>
     <dimen name="menu_padding_start">56dp</dimen>
-    <dimen name="menu_padding_start_negative">-56dp</dimen>
     <dimen name="menu_padding_end">56dp</dimen>
-    <dimen name="menu_padding_end_negative">-56dp</dimen>
-    <!-- The value in the redlines is 27dp but the items have padding tops and bottoms,
-         so need to adjust by 7dp. -->
-    <dimen name="menu_padding_bottom">20dp</dimen>
     <!-- This should be changed as the font change -->
     <dimen name="menu_row_title_text_descender_height">4.5dp</dimen>
     <!-- This value is 16dp in the redlines. Considering the descenders, it needs to be subtracted
@@ -44,15 +34,9 @@
     <dimen name="menu_row_contents_padding_top">11.5dp</dimen>
     <dimen name="menu_row_contents_padding_bottom_max">48dp</dimen>
     <dimen name="menu_list_margin_top">-1.5dp</dimen>
-    <dimen name="menu_list_margin_bottom">-30dp</dimen>
-    <dimen name="menu_list_margin_start">@dimen/menu_padding_start_negative</dimen>
-    <dimen name="menu_list_margin_end">@dimen/menu_padding_end_negative</dimen>
-    <!-- NOTE: The top and bottom padding size should be bigger than or equals to 8 dp.
+    <!-- NOTE: The top padding size should be bigger than or equals to 8 dp.
          otherwise it will make a clipping issue. See b/18632820 for more details. -->
     <dimen name="menu_list_padding_top">8dp</dimen>
-    <dimen name="menu_list_padding_bottom">8dp</dimen>
-    <dimen name="menu_list_padding_start">@dimen/menu_padding_start</dimen>
-    <dimen name="menu_list_padding_end">@dimen/menu_padding_end</dimen>
     <dimen name="menu_row_title_text_size_selected">20sp</dimen>
     <dimen name="menu_row_title_text_size_deselected">16sp</dimen>
     <dimen name="menu_inter_card_spacing">8dp</dimen>
@@ -60,7 +44,6 @@
     <dimen name="menu_enter_offset_y_negative">-32dp</dimen>
     <dimen name="menu_exit_offset_y">32dp</dimen>
     <dimen name="menu_row_scroll_up_anim_offset">32dp</dimen>
-    <dimen name="menu_row_scroll_up_anim_offset_negative">-32dp</dimen>
 
     <!-- Play controls -->
     <dimen name="play_controls_width">696dp</dimen>
@@ -319,4 +302,8 @@
     <dimen name="pin_number_picker_text_size">24sp</dimen>
     <dimen name="pin_number_picker_text_view_width">48dp</dimen>
     <dimen name="pin_number_picker_text_view_height">48dp</dimen>
+
+    <!-- Onboarding screen -->
+    <dimen name="onboarding_dot_radius">4dp</dimen>
+    <dimen name="onboarding_dot_gap">12dp</dimen>
 </resources>

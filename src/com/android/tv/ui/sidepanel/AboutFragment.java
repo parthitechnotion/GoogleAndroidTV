@@ -16,12 +16,17 @@
 
 package com.android.tv.ui.sidepanel;
 
+import android.app.Activity;
+import android.content.Context;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.android.tv.Features;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
+import com.android.tv.analytics.OptOutPreferenceHelper;
 import com.android.tv.dialog.WebDialogFragment;
 import com.android.tv.license.LicenseUtils;
 
@@ -29,16 +34,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Shows version and optional license information.
+ * Shows version, optional license information and Analytics OptOut.
  */
 public class AboutFragment extends SideFragment {
-    private final static String TAG = "AboutFragment";
     private static final String TRACKER_LABEL = "about";
 
     /**
      * Shows the application version name.
      */
-    public static class VersionItem extends Item {
+    private static final class VersionItem extends Item {
         @Override
         protected int getResourceId() {
             return R.layout.option_item_simple;
@@ -61,7 +65,7 @@ public class AboutFragment extends SideFragment {
     /**
      * Opens a dialog showing open source licenses.
      */
-    public static class LicenseActionItem extends ActionItem {
+    public static final class LicenseActionItem extends ActionItem {
         public final static String DIALOG_TAG = LicenseActionItem.class.getSimpleName();
         public static final String TRACKER_LABEL = "Open Source Licenses";
         private final MainActivity mMainActivity;
@@ -79,6 +83,70 @@ public class AboutFragment extends SideFragment {
         }
     }
 
+    /**
+     * Sets the users preference for allowing analytics.
+     */
+    private static final class AllowAnalyticsItem extends SwitchItem {
+        //TODO: change this to use SwitchPreference
+        private final OptOutPreferenceHelper mPreferenceHelper;
+        private TextView mDescriptionView;
+        private int mOriginalMaxDescriptionLine;
+        private MainActivity mMainActivity;
+        private View mBoundView;
+
+        public AllowAnalyticsItem(Context context) {
+            super(context.getResources().getString(R.string.about_menu_improve),
+                    context.getResources().getString(R.string.about_menu_improve),
+                    context.getResources().getString(R.string.about_menu_improve_summary));
+            mPreferenceHelper = ((TvApplication) context.getApplicationContext())
+                    .getOptPreferenceHelper();
+        }
+
+        @Override
+        protected void onBind(View view) {
+            super.onBind(view);
+            mDescriptionView = (TextView) view.findViewById(getDescriptionViewId());
+            mOriginalMaxDescriptionLine = mDescriptionView.getMaxLines();
+            mDescriptionView.setMaxLines(Integer.MAX_VALUE);
+            mMainActivity = (MainActivity) view.getContext();
+            mBoundView = view;
+        }
+
+        @Override
+        protected void onUnbind() {
+            super.onUnbind();
+            mDescriptionView.setMaxLines(mOriginalMaxDescriptionLine);
+            mDescriptionView = null;
+            mMainActivity = null;
+            mBoundView = null;
+        }
+
+        @Override
+        protected void onUpdate() {
+            super.onUpdate();
+            setChecked(!mPreferenceHelper
+                    .getOptOutPreference(OptOutPreferenceHelper.ANALYTICS_OPT_OUT_DEFAULT_VALUE));
+        }
+
+        @Override
+        protected void onSelected() {
+            super.onSelected();
+            mPreferenceHelper.setOptOutPreference(!isChecked());
+        }
+
+        @Override
+        public void setChecked(boolean checked) {
+            super.setChecked(checked);
+            if (mMainActivity != null && mBoundView != null && mBoundView.hasFocus()) {
+                // Quick fix for accessibility
+                // TODO: Need to change the resource in the future.
+                mMainActivity.sendAccessiblityText(checked ?
+                        mMainActivity.getString(R.string.options_item_pip_on)
+                        : mMainActivity.getString(R.string.options_item_pip_off));
+            }
+        }
+    }
+
     @Override
     protected String getTitle() {
         return getResources().getString(R.string.side_panel_title_about);
@@ -93,8 +161,12 @@ public class AboutFragment extends SideFragment {
     protected List<Item> getItemList() {
         List<Item> items = new ArrayList<>();
         items.add(new VersionItem());
-        if (LicenseUtils.hasLicenses(getActivity().getAssets())) {
-            items.add(new LicenseActionItem((MainActivity) getActivity()));
+        Activity activity = getActivity();
+        if (LicenseUtils.hasLicenses(activity.getAssets())) {
+            items.add(new LicenseActionItem((MainActivity) activity));
+        }
+        if (Features.ANALYTICS_OPT_OUT.isEnabled(activity)) {
+            items.add(new AllowAnalyticsItem(activity));
         }
         return items;
     }

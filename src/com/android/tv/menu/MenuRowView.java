@@ -236,7 +236,11 @@ public abstract class MenuRowView extends LinearLayout {
             mTitleView.setScaleX(mTitleViewScaleSelected);
             mTitleView.setScaleY(mTitleViewScaleSelected);
         }
+        // Making the content view visible will cause it to set a focus item
+        // So we store mLastFocusView and reset it
+        View lastFocusView = mLastFocusView;
         mContentsView.setVisibility(VISIBLE);
+        mLastFocusView = lastFocusView;
     }
 
     /**

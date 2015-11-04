@@ -32,20 +32,21 @@ import android.util.LongSparseArray;
 import android.util.LruCache;
 
 import com.android.tv.BuildConfig;
-import com.android.tv.MainActivity.MemoryManageable;
 import com.android.tv.util.AsyncDbTask;
 import com.android.tv.util.Clock;
+import com.android.tv.util.CollectionUtils;
+import com.android.tv.util.MemoryManageable;
+import com.android.tv.util.MultiLongSparseArray;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -81,20 +82,21 @@ public class ProgramDataManager implements MemoryManageable {
     private final Clock mClock;
     private final ContentResolver mContentResolver;
     private boolean mStarted;
-    private long mProgramPrefetchUpdateWaitMs;
     private ProgramsUpdateTask mProgramsUpdateTask;
     private final LongSparseArray<UpdateCurrentProgramForChannelTask> mProgramUpdateTaskMap =
             new LongSparseArray<>();
-    private long mLastPrefetchTaskRunMs;
-    private ProgramsPrefetchTask mProgramsPrefetchTask;
     private final Map<Long, Program> mChannelIdCurrentProgramMap = new HashMap<>();
-    private final Map<Long, List<OnCurrentProgramUpdatedListener>>
-            mOnCurrentProgramUpdatedListenersMap = new HashMap<>();
+    private final MultiLongSparseArray<OnCurrentProgramUpdatedListener>
+            mChannelId2ProgramUpdatedListeners = new MultiLongSparseArray<>();
     private final Handler mHandler;
-    private final List<Listener> mListeners = new ArrayList<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
 
     private final ContentObserver mProgramObserver;
 
+    private boolean mPrefetchEnabled;
+    private long mProgramPrefetchUpdateWaitMs;
+    private long mLastPrefetchTaskRunMs;
+    private ProgramsPrefetchTask mProgramsPrefetchTask;
     private Map<Long, ArrayList<Program>> mChannelIdProgramCache = new HashMap<>();
 
     // Any program that ends prior to this time will be removed from the cache
@@ -123,11 +125,13 @@ public class ProgramDataManager implements MemoryManageable {
                 if (isProgramUpdatePaused()) {
                     return;
                 }
-                // The delay time of an existing MSG_UPDATE_PREFETCH_PROGRAM could be quite long
-                // up to PROGRAM_GUIDE_SNAP_TIME_MS. So we need to remove the existing message and
-                // send MSG_UPDATE_PREFETCH_PROGRAM again.
-                mHandler.removeMessages(MSG_UPDATE_PREFETCH_PROGRAM);
-                mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
+                if (mPrefetchEnabled) {
+                    // The delay time of an existing MSG_UPDATE_PREFETCH_PROGRAM could be quite long
+                    // up to PROGRAM_GUIDE_SNAP_TIME_MS. So we need to remove the existing message and
+                    // send MSG_UPDATE_PREFETCH_PROGRAM again.
+                    mHandler.removeMessages(MSG_UPDATE_PREFETCH_PROGRAM);
+                    mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
+                }
             }
         };
         mProgramPrefetchUpdateWaitMs = PROGRAM_PREFETCH_UPDATE_WAIT_MS;
@@ -159,7 +163,9 @@ public class ProgramDataManager implements MemoryManageable {
         // Should be called directly instead of posting MSG_UPDATE_CURRENT_PROGRAMS message
         // to the handler. If not, another DB task can be executed before loading current programs.
         handleUpdateCurrentPrograms();
-        mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
+        if (mPrefetchEnabled) {
+            mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
+        }
         mContentResolver.registerContentObserver(Programs.CONTENT_URI,
                 true, mProgramObserver);
     }
@@ -168,6 +174,7 @@ public class ProgramDataManager implements MemoryManageable {
      * Stops the manager. It clears manager states and runs pending DB operations. Added listeners
      * aren't automatically removed by this method.
      */
+    @VisibleForTesting
     public void stop() {
         if (!mStarted) {
             return;
@@ -219,12 +226,36 @@ public class ProgramDataManager implements MemoryManageable {
     }
 
     /**
+     * Enables or Disables program prefetch.
+     */
+    public void setPrefetchEnabled(boolean enable) {
+        if (mPrefetchEnabled == enable) {
+            return;
+        }
+        if (enable) {
+            mPrefetchEnabled = true;
+            mLastPrefetchTaskRunMs = 0;
+            if (mStarted) {
+                mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
+            }
+        } else {
+            mPrefetchEnabled = false;
+            cancelPrefetchTask();
+            mChannelIdProgramCache.clear();
+            mHandler.removeMessages(MSG_UPDATE_PREFETCH_PROGRAM);
+        }
+    }
+
+    /**
      * Returns the programs for the given channel which ends after the given start time.
+     *
+     * <p> Prefetch should be enabled to call it.
      *
      * @return {@link List} with Programs. It may includes dummy program if the entry needs DB
      *         operations to get.
      */
     public List<Program> getPrograms(long channelId, long startTime) {
+        SoftPreconditions.checkState(mPrefetchEnabled, TAG, "Prefetch is disabled.");
         ArrayList<Program> cachedPrograms = mChannelIdProgramCache.get(channelId);
         if (cachedPrograms == null) {
             return Collections.emptyList();
@@ -267,13 +298,8 @@ public class ProgramDataManager implements MemoryManageable {
      */
     public void addOnCurrentProgramUpdatedListener(
             long channelId, OnCurrentProgramUpdatedListener listener) {
-        List<OnCurrentProgramUpdatedListener> listeners =
-                mOnCurrentProgramUpdatedListenersMap.get(channelId);
-        if (listeners == null) {
-            listeners = new ArrayList<>();
-            mOnCurrentProgramUpdatedListenersMap.put(channelId, listeners);
-        }
-        listeners.add(listener);
+        mChannelId2ProgramUpdatedListeners
+                .put(channelId, listener);
     }
 
     /**
@@ -282,36 +308,28 @@ public class ProgramDataManager implements MemoryManageable {
      */
     public void removeOnCurrentProgramUpdatedListener(
             long channelId, OnCurrentProgramUpdatedListener listener) {
-        List<OnCurrentProgramUpdatedListener> listeners =
-                mOnCurrentProgramUpdatedListenersMap.get(channelId);
-        if (listeners != null) {
-            listeners.remove(listener);
-            // Do not remove list from map although it's empty to reduce GC.
-            // The unused list is removed in {@link #performTrimMemory} which is called when
-            // the memory usage is high.
-        }
+        mChannelId2ProgramUpdatedListeners
+                .remove(channelId, listener);
     }
 
     private void notifyCurrentProgramUpdate(long channelId, Program program) {
-        List<OnCurrentProgramUpdatedListener> listeners =
-                mOnCurrentProgramUpdatedListenersMap.get(channelId);
-        if (listeners != null) {
-            for (OnCurrentProgramUpdatedListener listener : listeners) {
-                listener.onCurrentProgramUpdated(channelId, program);
+
+        for (OnCurrentProgramUpdatedListener listener : mChannelId2ProgramUpdatedListeners
+                .get(channelId)) {
+            listener.onCurrentProgramUpdated(channelId, program);
             }
-        }
-        listeners = mOnCurrentProgramUpdatedListenersMap.get(Channel.INVALID_ID);
-        if (listeners != null) {
-            for (OnCurrentProgramUpdatedListener listener : listeners) {
-                listener.onCurrentProgramUpdated(channelId, program);
+        for (OnCurrentProgramUpdatedListener listener : mChannelId2ProgramUpdatedListeners
+                .get(Channel.INVALID_ID)) {
+            listener.onCurrentProgramUpdated(channelId, program);
             }
-        }
     }
 
     private void updateCurrentProgram(long channelId, Program program) {
         Program previousProgram = mChannelIdCurrentProgramMap.put(channelId, program);
         if (!Objects.equals(program, previousProgram)) {
-            removePreviousProgramsAndUpdateCurrentProgramInCache(channelId, program);
+            if (mPrefetchEnabled) {
+                removePreviousProgramsAndUpdateCurrentProgramInCache(channelId, program);
+            }
             notifyCurrentProgramUpdate(channelId, program);
         }
 
@@ -329,6 +347,7 @@ public class ProgramDataManager implements MemoryManageable {
 
     private void removePreviousProgramsAndUpdateCurrentProgramInCache(
             long channelId, Program currentProgram) {
+        SoftPreconditions.checkState(mPrefetchEnabled, TAG, "Prefetch is disabled.");
         if (!Program.isValid(currentProgram)) {
             return;
         }
@@ -368,6 +387,11 @@ public class ProgramDataManager implements MemoryManageable {
                         cachedProgram.getEndTimeUtcMillis()));
             }
             break;
+        }
+        if (cachedPrograms.isEmpty()) {
+            // If all the cached programs finish before mPrefetchTimeRangeStartMs, the
+            // currentProgram would not have a chance to be inserted to the cache.
+            cachedPrograms.add(currentProgram);
         }
         mChannelIdProgramCache.put(channelId, cachedPrograms);
     }
@@ -452,6 +476,8 @@ public class ProgramDataManager implements MemoryManageable {
                     if (DEBUG) {
                         Log.d(TAG, "Database is changed while querying. Will retry.");
                     }
+                } catch (SecurityException e) {
+                    Log.d(TAG, "Security exception during program data query", e);
                 }
             }
             if (DEBUG) {
@@ -540,7 +566,9 @@ public class ProgramDataManager implements MemoryManageable {
                 removedChannelIds.remove(channelId);
             }
             for (Long channelId : removedChannelIds) {
-                mChannelIdProgramCache.remove(channelId);
+                if (mPrefetchEnabled) {
+                    mChannelIdProgramCache.remove(channelId);
+                }
                 mChannelIdCurrentProgramMap.remove(channelId);
                 notifyCurrentProgramUpdate(channelId, null);
             }
@@ -623,8 +651,11 @@ public class ProgramDataManager implements MemoryManageable {
      * Pause program update.
      * Updating program data will result in UI refresh,
      * but UI is fragile to handle it so we'd better disable it for a while.
+     *
+     * <p> Prefetch should be enabled to call it.
      */
     public void setPauseProgramUpdate(boolean pauseProgramUpdate) {
+        SoftPreconditions.checkState(mPrefetchEnabled, TAG, "Prefetch is disabled.");
         if (mPauseProgramUpdate && !pauseProgramUpdate) {
             if (!mHandler.hasMessages(MSG_UPDATE_PREFETCH_PROGRAM)) {
                 // MSG_UPDATE_PRFETCH_PROGRAM can be empty
@@ -645,11 +676,16 @@ public class ProgramDataManager implements MemoryManageable {
      * Sets program data prefetch time range.
      * Any program data that ends before the start time will be removed from the cache later.
      * Note that there's no limit for end time.
+     *
+     * <p> Prefetch should be enabled to call it.
      */
     public void setPrefetchTimeRange(long startTimeMs) {
+        SoftPreconditions.checkState(mPrefetchEnabled, TAG, "Prefetch is disabled.");
         if (mPrefetchTimeRangeStartMs > startTimeMs) {
-            // TODO: Do not throw exception and simply refresh the cache.
-            throw new IllegalArgumentException("");
+            // Fetch the programs immediately to re-create the cache.
+            if (!mHandler.hasMessages(MSG_UPDATE_PREFETCH_PROGRAM)) {
+                mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
+            }
         }
         mPrefetchTimeRangeStartMs = startTimeMs;
     }
@@ -692,13 +728,6 @@ public class ProgramDataManager implements MemoryManageable {
 
     @Override
     public void performTrimMemory(int level) {
-        // Removes unused listeners.
-        Iterator<Entry<Long, List<OnCurrentProgramUpdatedListener>>> it =
-                mOnCurrentProgramUpdatedListenersMap.entrySet().iterator();
-        while (it.hasNext()) {
-            if (it.next().getValue().isEmpty()) {
-                it.remove();
-            }
-        }
+        mChannelId2ProgramUpdatedListeners.clearEmptyCache();
     }
 }

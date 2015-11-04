@@ -17,11 +17,11 @@
 package com.android.tv.recommendation;
 
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.data.Channel;
 import com.android.tv.recommendation.RecommendationUtils.ChannelRecordSortedMapHelper;
 import com.android.tv.recommendation.Recommender.Evaluator;
+import com.android.tv.testing.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public abstract class EvaluatorTestCase<T extends Evaluator> extends AndroidTest
         mEvaluator = createEvaluator();
         mEvaluator.setRecommender(mRecommender);
         mChannelRecordSortedMap.setRecommender(mRecommender);
-        mChannelRecordSortedMap.resetRandom(RecommendationUtils.createTestRandom());
+        mChannelRecordSortedMap.resetRandom(Utils.createTestRandom());
     }
 
     /**

@@ -30,6 +30,7 @@ import android.util.Log;
 import com.android.tv.util.AsyncDbTask;
 import com.android.tv.util.BitmapUtils;
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
+import com.android.tv.util.PermissionUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -78,6 +79,10 @@ public class ChannelLogoFetcher {
      * The previous task is canceled and a new task starts.
      */
     public static void startFetchingChannelLogos(Context context) {
+        if (!PermissionUtils.hasAccessAllEpg(context)) {
+            // TODO: support this feature for non-system LC app. b/23939816
+            return;
+        }
         synchronized (sLock) {
             stopFetchingChannelLogos();
             if (DEBUG) Log.d(TAG, "Request to start fetching logos.");
@@ -201,6 +206,14 @@ public class ChannelLogoFetcher {
                     return null;
                 }
                 // Download the channel logo.
+                if (TextUtils.isEmpty(channel.getDisplayName())) {
+                    if (DEBUG) {
+                        Log.d(TAG, "The channel with ID (" + channel.getId()
+                                + ") doesn't have the display name.");
+                    }
+                    sChannelIdBlackListSet.add(channel.getId());
+                    continue;
+                }
                 String channelName = channel.getDisplayName().trim();
                 String logoUri = channelNameLogoUriMap.get(channelName);
                 if (TextUtils.isEmpty(logoUri)) {
@@ -216,16 +229,21 @@ public class ChannelLogoFetcher {
                             sb.append(splitName);
                         }
                         logoUri = channelNameLogoUriMap.get(sb.toString());
-                        if (DEBUG && TextUtils.isEmpty(logoUri)) {
-                            Log.d(TAG, "Can't find a logo URI for channel '" + sb.toString() + "'");
+                        if (DEBUG) {
+                            if (TextUtils.isEmpty(logoUri)) {
+                                Log.d(TAG, "Can't find a logo URI for channel '" + sb.toString()
+                                        + "'");
+                            }
                         }
                     }
                     if (TextUtils.isEmpty(logoUri)
                             && splitNames[0].length() != channelName.length()) {
                         logoUri = channelNameLogoUriMap.get(splitNames[0]);
-                        if (DEBUG && TextUtils.isEmpty(logoUri)) {
-                            Log.d(TAG, "Can't find a logo URI for channel '" + splitNames[0]
-                                    + "'");
+                        if (DEBUG) {
+                            if (TextUtils.isEmpty(logoUri)) {
+                                Log.d(TAG, "Can't find a logo URI for channel '" + splitNames[0]
+                                        + "'");
+                            }
                         }
                     }
                 }

@@ -23,6 +23,7 @@ import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.GenreItems;
 import com.android.tv.data.Program;
 import com.android.tv.data.ProgramDataManager;
+import com.android.tv.util.CollectionUtils;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -163,43 +165,53 @@ public class ProgramManager {
     // Should be matched with mSelectedGenreId always.
     private List<Channel> mFilteredChannels = mChannels;
 
-    private final List<Listener> mListeners = new ArrayList<>();
-    private final List<TableEntriesUpdatedListener>
-            mTableEntriesUpdatedListeners = new ArrayList<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
+    private final Set<TableEntriesUpdatedListener> mTableEntriesUpdatedListeners = CollectionUtils
+            .createSmallSet();
+
+    private final ChannelDataManager.Listener mChannelDataManagerListener =
+            new ChannelDataManager.Listener() {
+                @Override
+                public void onLoadFinished() {
+                    updateChannels(true, false);
+                }
+
+                @Override
+                public void onChannelListUpdated() {
+                    updateChannels(true, false);
+                }
+
+                @Override
+                public void onChannelBrowsableChanged() {
+                    updateChannels(true, false);
+                }
+            };
+
+    private final ProgramDataManager.Listener mProgramDataManagerListener =
+            new ProgramDataManager.Listener() {
+                @Override
+                public void onProgramUpdated() {
+                    updateTableEntries(true, true);
+                }
+            };
 
     public ProgramManager(TvInputManagerHelper tvInputManagerHelper,
             ChannelDataManager channelDataManager,
             ProgramDataManager programDataManager) {
         mTvInputManagerHelper = tvInputManagerHelper;
         mChannelDataManager = channelDataManager;
-        mChannelDataManager.addListener(new ChannelDataManager.Listener() {
-            @Override
-            public void onLoadFinished() {
-                updateChannels(true, false);
-            }
-
-            @Override
-            public void onChannelListUpdated() {
-                updateChannels(true, false);
-            }
-
-            @Override
-            public void onChannelBrowsableChanged() {
-                updateChannels(true, false);
-            }
-        });
-
         mProgramDataManager = programDataManager;
-        mProgramDataManager.addListener(new ProgramDataManager.Listener() {
-            @Override
-            public void onProgramUpdated() {
-                updateTableEntries(true, true);
-            }
-        });
     }
 
     public void programGuideVisibilityChanged(boolean visible) {
         mProgramDataManager.setPauseProgramUpdate(visible);
+        if (visible) {
+            mChannelDataManager.addListener(mChannelDataManagerListener);
+            mProgramDataManager.addListener(mProgramDataManagerListener);
+        } else {
+            mChannelDataManager.removeListener(mChannelDataManagerListener);
+            mProgramDataManager.removeListener(mProgramDataManagerListener);
+        }
     }
 
     /**

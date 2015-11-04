@@ -16,13 +16,17 @@
   -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <View
+    <TextView
         android:id="@+id/hide_screen"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black" />
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:fontFamily="@string/font"
+        android:textSize="@dimen/tvview_block_text_size"
+        android:lineSpacingExtra="4sp"
+        android:background="@android:color/black"
+        android:textColor="@color/tvview_block_text_color" />
 
     <ProgressBar
         android:id="@+id/buffering_spinner"

@@ -16,19 +16,18 @@
 
 package com.android.tv.guide;
 
-import com.android.tv.R;
-import com.android.tv.ui.OnRepeatedKeyInterceptListener;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+
+import com.android.tv.R;
+import com.android.tv.ui.OnRepeatedKeyInterceptListener;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;

@@ -19,6 +19,8 @@ package com.android.tv.recommendation;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import com.android.tv.testing.Utils;
+
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +40,7 @@ public class ChannelRecordTest extends AndroidTestCase {
         super.setUp();
         mLatestWatchEndTimeMs = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
         mChannelRecord = new ChannelRecord(getContext(), null, false);
-        mRandom = RecommendationUtils.createTestRandom();
+        mRandom = Utils.createTestRandom();
     }
 
     public void testGetLastWatchEndTime_noHistory() {

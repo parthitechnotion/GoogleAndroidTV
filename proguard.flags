@@ -20,28 +20,23 @@
 -dontwarn android.support.**
 -dontwarn com.ibm.icu.**
 -dontwarn com.google.android.exoplayer.**
--dontwarn com.google.android.usbtuner.**
--dontwarn com.google.android.tv.dvr.**
+-dontwarn com.android.usbtuner.**
+-dontwarn com.android.tv.dvr.**
 
 # This is due to legacy API katniss is referencing. Seems safe.
 -dontwarn com.google.android.volley.**
 -dontwarn com.google.android.common.**
 
 # Keep the methods called from native code.
--keepclasseswithmembers class com.google.android.usbtuner.UsbTunerInterface {
+-keepclasseswithmembers class com.android.usbtuner.UsbTunerInterface {
     int openDvbFrontEndFd();
     int openDvbDemuxFd();
     int openDvbDvrFd();
 }
--keepclasseswithmembers class com.google.android.usbtuner.*DataSource {
+-keepclasseswithmembers class com.android.usbtuner.*DataSource {
     int readAt(long, byte[], int, int);
     long getSize();
     void close();
-}
-# For software AC3 decoding
--keepclasseswithmembers class com.google.android.ssplayer.sink.FFmpegAc3Decoder {
-    long mNativeContext;
-    void decodeDone(java.nio.ByteBuffer, long);
 }
 
 # For tests

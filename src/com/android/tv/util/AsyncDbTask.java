@@ -162,6 +162,9 @@ public abstract class AsyncDbTask<Params, Progress, Result>
                     }
                     return null;
                 }
+            } catch (SecurityException e) {
+                Log.d(TAG, "Security exception during query", e);
+                return null;
             }
         }
 

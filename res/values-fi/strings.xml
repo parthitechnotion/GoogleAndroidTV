@@ -146,11 +146,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Avoimen lähdekoodin käyttöluvat"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Avoimen lähdekoodin käyttöluvat"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versio"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Auta parantamaan live-kanavia"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Jakamalla Googlelle anonyymejä käyttö- ja diagnostiikkatietoja autat meitä parantamaan livekanavia ja estämään kaatumisen ja pysähtymisen kaltaisia ongelmia."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Katsele tätä kanavaa painamalla näppäimellä oikealle ja antamalla PIN-koodi"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Katsele tämä ohjelma painamalla näppäimellä oikealle ja antamalla PIN-koodi"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Tämän ohjelman luokitus on <xliff:g id="RATING">%1$s</xliff:g>.\nKatso ohjelma painamalla näppäimellä oikealle ja antamalla PIN-koodi."</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"Katsele tätä kanavaa TV-lähetyksien oletussovelluksessa."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"Katsele tätä ohjelmaa TV-lähetyksien oletussovelluksessa."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Tämän ohjelman ikärajoitus on <xliff:g id="RATING">%1$s</xliff:g>.\nKatsele tätä ohjelmaa TV-lähetyksien oletussovelluksessa."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Ohjelma on estetty"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Tämän ohjelman luokitus on <xliff:g id="RATING">%1$s</xliff:g>."</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Vain ääni"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Ei nimeä"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Kanava estetty"</string>
     <string name="episode_format" msgid="4881195874563241096">"Kausi <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: jakso <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g>, <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -177,4 +183,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Ei käytettävissä heikon videosignaalin takia."</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Video ei yllättäen ole käytettävissä."</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"EDELLINEN-painike koskee liitettyä laitetta. Poistu painamalla ETUSIVU-painiketta."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Live-kanavia ei tueta tällä Android Lollipop -laitteella."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Live-kanavat tarvitsee luvan TV-ohjelmatietojen lukemiseen."</string>
 </resources>

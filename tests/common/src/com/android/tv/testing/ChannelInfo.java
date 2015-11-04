@@ -81,7 +81,7 @@ public final class ChannelInfo {
                 .setOriginalNetworkId(channelNumber);
         if (context != null) {
             // tests/input/tools/get_test_logos.sh only stores 1000 logos.
-            int logo_num = (channelNumber % 1000) + 1;
+            int logo_num = (channelNumber % 1000);
             builder.setLogoUrl(
                     "android.resource://com.android.tv.testinput/drawable/ch_" + logo_num
                             + "_logo"

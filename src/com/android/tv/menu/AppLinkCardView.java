@@ -38,6 +38,7 @@ import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.util.BitmapUtils;
 import com.android.tv.util.TvInputManagerHelper;
+import com.android.tv.util.Utils;
 
 /**
  * A view to render an app link card.
@@ -94,7 +95,7 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
                 R.dimen.card_meta_layout_height);
         mExtendedTextViewCardHeight = getResources().getDimensionPixelOffset(
                 R.dimen.card_meta_layout_height_extended);
-        mIconColorFilter = getResources().getColor(R.color.app_link_card_icon_color_filter, null);
+        mIconColorFilter = Utils.getColor(getResources(), R.color.app_link_card_icon_color_filter);
     }
 
     /**
@@ -107,7 +108,7 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
     @Override
     public void onBind(Channel channel, boolean selected) {
         if (DEBUG) {
-            Log.d(TAG, "onBind(channel=" + channel.getDisplayName() + ", selected=" + selected
+            Log.d(TAG, "onBind(channelName=" + channel.getDisplayName() + ", selected=" + selected
                     + ")");
         }
         mChannel = channel;
@@ -241,27 +242,26 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
     }
 
     // Try to set the card image with following order:
-    // 1) Provided poster art image, 2) Activity banner, 3) Application banner,
-    // 4) Activity logo, 5) Application logo, and 6) default image.
+    // 1) Provided poster art image, 2) Activity banner, 3) Activity icon, 4) Application banner,
+    // 5) Application icon, and 6) default image.
     private void setCardImageWithBanner(ApplicationInfo appInfo) {
         Drawable banner = null;
         try {
             banner = mPackageManager.getActivityBanner(mIntent);
+            if (banner == null) {
+                banner = mPackageManager.getActivityIcon(mIntent);
+            }
         } catch (PackageManager.NameNotFoundException e) {
             // do nothing.
         }
-        if (banner == null && appInfo != null && appInfo.banner != 0) {
-            banner = mPackageManager.getApplicationBanner(appInfo);
-        }
-        if (banner == null) {
-            try {
-                banner = mPackageManager.getActivityLogo(mIntent);
-            } catch (PackageManager.NameNotFoundException e) {
-                // do nothing.
+
+        if (banner == null && appInfo != null) {
+            if (appInfo.banner != 0) {
+                banner = mPackageManager.getApplicationBanner(appInfo);
             }
-        }
-        if (banner == null && appInfo != null && appInfo.logo != 0) {
-            banner = mPackageManager.getApplicationLogo(appInfo);
+            if (banner == null && appInfo.icon != 0) {
+                banner = mPackageManager.getApplicationIcon(appInfo);
+            }
         }
 
         if (banner == null) {
@@ -285,7 +285,7 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
             @Override
             public void onGenerated(Palette palette) {
                 mMetaViewHolder.setBackgroundColor(palette.getDarkVibrantColor(
-                        getResources().getColor(R.color.channel_card_meta_background, null)));
+                        Utils.getColor(getResources(), R.color.channel_card_meta_background)));
             }
         });
     }

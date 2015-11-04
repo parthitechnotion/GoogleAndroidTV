@@ -31,7 +31,7 @@ include $(LOCAL_PATH)/buildconfig.mk
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
    $(LOCAL_BUILDCONFIG_CLASS)
 
-LOCAL_PACKAGE_NAME := TV
+LOCAL_PACKAGE_NAME := LiveTv
 
 # It is required for com.android.providers.tv.permission.ALL_EPG_DATA
 LOCAL_PRIVILEGED_MODULE := true
@@ -40,6 +40,7 @@ LOCAL_SDK_VERSION := system_current
 LOCAL_RESOURCE_DIR := \
     $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
     $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
+    $(LOCAL_PATH)/common/res \
     $(LOCAL_PATH)/res
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
@@ -50,18 +51,17 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v17-leanback \
     tv-common
 
-
 LOCAL_JAVACFLAGS := -Xlint:deprecation -Xlint:unchecked
 
 
 LOCAL_AAPT_FLAGS := --auto-add-overlay \
     --extra-packages android.support.v7.recyclerview \
     --extra-packages android.support.v17.leanback \
+    --extra-packages com.android.tv.common \
     --version-name "$(version_name_package)" \
     --version-code $(version_code_package) \
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
-
 
 
 include $(BUILD_PACKAGE)

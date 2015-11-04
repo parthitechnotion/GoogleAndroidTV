@@ -146,11 +146,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licencje open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licencje open source"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Wersja"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Pomóż w ulepszaniu Telewizji online"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Udostępniaj Google anonimowe informacje o użytkowaniu i dane diagnostyczne, by pomóc w ulepszaniu Telewizji online i usuwaniu błędów takich jak np. zatrzymywanie obrazu."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Aby oglądać ten kanał, naciśnij Prawo i wpisz kod PIN"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Aby oglądać ten program, naciśnij Prawo i wpisz kod PIN"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Ten program ma ocenę <xliff:g id="RATING">%1$s</xliff:g>.\nAby go oglądać, naciśnij Prawo i wpisz kod PIN"</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"Aby oglądać ten kanał, użyj standardowej aplikacji Telewizja na żywo."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"Aby obejrzeć ten program, użyj standardowej aplikacji Telewizja na żywo."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Ten program ma ocenę <xliff:g id="RATING">%1$s</xliff:g>.\nAby go obejrzeć, użyj standardowej aplikacji Telewizja na żywo."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Program jest zablokowany"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Ten program ma ocenę <xliff:g id="RATING">%1$s</xliff:g>."</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Tylko dźwięk"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Bez tytułu"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Kanał zablokowany"</string>
     <string name="episode_format" msgid="4881195874563241096">"S<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>E<xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> – <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -170,11 +176,13 @@
     <string name="msg_no_specific_input" msgid="2688885987104249852">"Nie można znaleźć wejścia TV"</string>
     <string name="msg_no_pip_support" msgid="161508628996629445">"Tryb PIP nie jest obsługiwany"</string>
     <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"Brak sygnału wejściowego do wyświetlenia w trybie PIP"</string>
-    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"Nieodpowiedni typ tunera. Uruchom aplikację Kanały na żywo na jego wejściu TV."</string>
+    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"Nieodpowiedni typ tunera. Uruchom aplikację Telewizja online na jego wejściu TV."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"Strojenie nie powiodło się"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"Nie znaleziono aplikacji do obsługi tego działania."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"Wszystkie kanały źródłowe są ukryte.\nWybierz co najmniej jeden kanał do oglądania."</string>
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Niedostępne z powodu słabego sygnału wideo"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Sygnał wideo jest nieoczekiwanie niedostępny"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Klawisz BACK steruje podłączonym urządzeniem. Naciśnij przycisk HOME, by wyjść."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Telewizja online nie jest obsługiwana na tym urządzeniu z Androidem Lollipop."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Aby odczytywać programy telewizyjne, Telewizja online potrzebuje uprawnień."</string>
 </resources>

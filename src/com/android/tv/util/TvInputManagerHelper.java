@@ -29,8 +29,6 @@ import android.util.Log;
 import com.android.tv.parental.ContentRatingsManager;
 import com.android.tv.parental.ParentalControlSettings;
 
-import junit.framework.Assert;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,8 +48,7 @@ public class TvInputManagerHelper {
 
     static {
         BUNDLED_PACKAGE_SET.add("com.android.tv");
-        BUNDLED_PACKAGE_SET.add("com.android.tv");
-        BUNDLED_PACKAGE_SET.add("com.google.android.usbtuner");
+        BUNDLED_PACKAGE_SET.add("com.android.usbtuner");
     }
 
     private final Context mContext;
@@ -123,10 +120,6 @@ public class TvInputManagerHelper {
             return;
         }
         mStarted = true;
-        List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
-        if (inputs.size() < 1) {
-            return;
-        }
         mTvInputManager.registerCallback(mInternalCallback, mHandler);
         mInputMap.clear();
         mInputStateMap.clear();
@@ -137,7 +130,8 @@ public class TvInputManagerHelper {
             mInputStateMap.put(inputId, state);
             mInputIdToPartnerInputMap.put(inputId, isPartnerInput(input));
         }
-        Assert.assertEquals(mInputStateMap.size(), mInputMap.size());
+        SoftPreconditions.checkState(mInputStateMap.size() == mInputMap.size(), TAG,
+                "mInputStateMap not the same size as mInputMap");
         mContentRatingsManager.update();
     }
 
@@ -215,7 +209,7 @@ public class TvInputManagerHelper {
     }
 
     /**
-     * Loads label of {@param info}.
+     * Loads label of {@code info}.
      *
      * It's visible for comparator test to mock TvInputInfo.
      * Package private is enough for this method, but public is necessary to workaround mockito
@@ -230,18 +224,18 @@ public class TvInputManagerHelper {
      * Returns if TV input exists with the input id.
      */
     public boolean hasTvInputInfo(String inputId) {
+        SoftPreconditions.checkState(mStarted, TAG,
+                "hasTvInputInfo() called before TvInputManagerHelper was started.");
         if (!mStarted) {
-            Utils.engThrowElseWarn(TAG,
-                    "hasTvInputInfo() called before TvInputManagerHelper was started.");
             return false;
         }
         return !TextUtils.isEmpty(inputId) && mInputMap.get(inputId) != null;
     }
 
     public TvInputInfo getTvInputInfo(String inputId) {
+        SoftPreconditions.checkState(mStarted, TAG,
+                "getTvInputInfo() called before TvInputManagerHelper was started.");
         if (!mStarted) {
-            Utils.engThrowElseWarn(TAG,
-                    "getTvInputInfo() called before TvInputManagerHelper was started.");
             return null;
         }
         if (inputId == null) {
@@ -270,8 +264,10 @@ public class TvInputManagerHelper {
     }
 
     public int getInputState(String inputId) {
+        SoftPreconditions.checkState(mStarted, TAG, "AvailabilityManager not started");
         if (!mStarted) {
-            throw new IllegalStateException("AvailabilityManager doesn't started");
+            return TvInputManager.INPUT_STATE_DISCONNECTED;
+
         }
         Integer state = mInputStateMap.get(inputId);
         if (state == null) {

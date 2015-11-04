@@ -403,6 +403,15 @@
     <!-- Menu item that shows the application version(eg 1.2.03-final) as a second line below this title [CHAR LIMIT=35] -->
     <string name="about_menu_version">Version</string>
 
+    <!-- opt out preferences -->
+    <eat-comment />
+
+    <!--Title of option set to improve the Live TV app.
+       "Live TV" should match app_name -->
+    <string name="about_menu_improve">Help improve Live TV</string>
+    <!--Summary of option to improve the Live TV app. -->
+    <string name="about_menu_improve_summary">Share anonymous usage and diagnostics data with Google so we can make Live TV better and prevent issues like crashing and freezing.</string>
+
     <!-- TunableTvView -->
     <eat-comment />
     <!-- Description on the locked screen when current channel is locked by parental control. [CHAR LIMIT=NONE] -->
@@ -411,11 +420,21 @@
     <string name="tvview_content_locked">To watch this program, press Right and enter your PIN</string>
     <!-- Description on the locked screen with the rating when the rating of the current content is restricted by parental control. [CHAR LIMIT=NONE] -->
     <string name="tvview_content_locked_format">This program is rated <xliff:g id="rating" example="TV_MA">%1$s</xliff:g>.\nTo watch this program, press Right and enter your PIN.</string>
+    <!-- Description on the locked screen when current channel is locked by parental control. [CHAR LIMIT=NONE] -->
+    <string name="tvview_channel_locked_no_permission">To watch this channel, use the default Live TV app.</string>
+    <!-- Description on the locked screen when the rating of the current content is restricted by parental control. [CHAR LIMIT=NONE] -->
+    <string name="tvview_content_locked_no_permission">To watch this program, use the default Live TV app.</string>
+    <!-- Description on the locked screen with the rating when the rating of the current content is restricted by parental control. [CHAR LIMIT=NONE] -->
+    <string name="tvview_content_locked_format_no_permission">This program is rated <xliff:g id="rating" example="TV_MA">%1$s</xliff:g>.\nTo watch this program, use the default Live TV app.</string>
 
     <!-- Description on the locked screen when the rating of the current content is restricted by parental control. [CHAR LIMIT=NONE] -->
     <string name="shrunken_tvview_content_locked">Program is blocked</string>
     <!-- Description on the locked screen with the rating when the rating of the current content is restricted by parental control. [CHAR LIMIT=NONE] -->
     <string name="shrunken_tvview_content_locked_format">This program is rated <xliff:g id="rating" example="TV_MA">%1$s</xliff:g></string>
+
+    <!-- The text message which is shown when the current program is audio only one.
+         i.e. The program dones't have a video. [CHAR LIMIT=NONE] -->
+    <string name="tvview_msg_audio_only">Audio only</string>
 
     <!-- Channel Banner -->
     <eat-comment />
@@ -483,6 +502,11 @@
     <!-- Message to notify the different use of Back Button: Home Button(To exit) Back button
          (commands for external device)  [CHAR LIMIT=NONE] -->
     <string name="msg_back_key_guide">BACK key is for connected device. Press HOME button to exit.</string>
+    <!-- Error message when Live channels has been launched in Lollipop devices without system
+         permission. [CHAR LIMIT=NONE] -->
+    <string name="msg_not_supported_device">Live TV is not supported on this device with Android Lollipop.</string>
+    <!-- Error message when a user denied to grant READ_TV_LISTING permission. [CHAR LIMIT=NONE] -->
+    <string name="msg_read_tv_listing_permission_denied">Live TV needs permission to read the TV listings.</string>
 
     <!-- Strings for debug or not to be shown to users -->
     <eat-comment />
@@ -498,4 +522,35 @@
     <string name="search_result_no_result" translatable="false">No result</string>
     <string name="search_result_title" translatable="false">Search results</string>
 
+    <!-- Onboarding experience.
+         TODO: Change translatable to true.-->
+    <!-- Text for the illustration area -->
+    <string name="illustration_area_text" translatable="false">ILLUSTRATION AREA</string>
+    <!-- Text for the button which is used to navigate to the next page -->
+    <string name="welcome_next_button_text" translatable="false">Next &gt;</string>
+    <!-- Text for the button which is used to start the channel source setup. -->
+    <string name="welcome_start_button_text" translatable="false">Get started &gt;</string>
+    <!-- Text for the Live TV overview screen in onboarding. -->
+    <string name="app_overview_text" translatable="false">Get Live TV</string>
+    <!-- Description for the Live TV overview screen in onboarding. -->
+    <string name="app_overview_description_has_ac3" translatable="false">Live channels combine the experience of traditional TV channels with streaming channels provided by apps. Get started by setting up the channel sources you already have available, or browse the Google Play Store for more apps that offer live channels.
+\n\nAlso, learn about getting over-the-air broadcast channels like ABC, CBS, NBC, and FOX when you add a compatible TV tuner &amp; HDTV antenna to your Nexus Player.</string>
+    <string name="app_overview_description_no_ac3" translatable="false">Live channels combine the experience of traditional TV channels with streaming channels provided by apps. Get started by setting up the channel sources you already have available, or browse the Google nPlay Store for more apps that offer live channels.</string>
+    <!-- Text for the action for setting up channel sources. It will show the setup page of the channel sources. -->
+    <string name="app_overview_action_text_setup_source" translatable="false">Set up your channel sources</string>
+    <!-- Description for the action for setting up channel sources. It will show the setup page of the channel sources. -->
+    <string name="app_overview_action_description_setup_source" translatable="false">View the channel sources already installed</string>
+    <!-- Text for the action for getting more channels from play store. It will show the play store page. -->
+    <string name="app_overview_action_text_play_store" translatable="false">Get streaming channels</string>
+    <!-- Description for the action for getting more channels from play store. It will show the play store page. -->
+    <string name="app_overview_action_description_play_store" translatable="false">Browse apps that offer live channels</string>
+    <!-- Text for the action for setting up channel of USB tuner. It  will show the channel scan page. -->
+    <string name="app_overview_action_text_usb_tuner" translatable="false">Get over-the-air TV channels</string>
+    <!-- Description for the action for setting up channel of USB tuner. It  will show the channel scan page. -->
+    <string name="app_overview_action_description_usb_tuner" translatable="false">Learn about compatible TV tuners</string>
+    <!-- Text for the channel sources screen in onboarding. -->
+    <string name="setup_sources_text" translatable="false">Channel sources</string>
+    <!-- Description for channel sources screen in onboarding. -->
+    <string name="setup_sources_description" translatable="false">Set up live channels from the available sources. This may take several minutes depending on the channel source.
+\n\nGet more channels by installing compatible apps from the Google Play Store.</string>
 </resources>

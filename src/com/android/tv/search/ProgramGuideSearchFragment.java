@@ -42,6 +42,7 @@ import android.view.ViewGroup;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.util.ImageLoader;
+import com.android.tv.util.PermissionUtils;
 
 import java.util.List;
 
@@ -129,7 +130,7 @@ public class ProgramGuideSearchFragment extends SearchFragment {
     private final ArrayObjectAdapter mResultAdapter =
             new ArrayObjectAdapter(new ListRowPresenter());
     private MainActivity mMainActivity;
-    private TvProviderSearch mTvProviderSearch;
+    private SearchInterface mSearch;
     private int mMainCardWidth;
     private int mMainCardHeight;
     private SearchTask mSearchTask;
@@ -139,7 +140,11 @@ public class ProgramGuideSearchFragment extends SearchFragment {
         super.onCreate(savedInstanceState);
 
         mMainActivity = (MainActivity) getActivity();
-        mTvProviderSearch = new TvProviderSearch(mMainActivity);
+        if (PermissionUtils.hasAccessAllEpg(mMainActivity)) {
+            mSearch = new TvProviderSearch(mMainActivity);
+        } else {
+            mSearch = new DataManagerSearch(mMainActivity);
+        }
         Resources res = getResources();
         mMainCardWidth = res.getDimensionPixelSize(R.dimen.card_image_layout_width);
         mMainCardHeight = res.getDimensionPixelSize(R.dimen.card_image_layout_height);
@@ -186,7 +191,7 @@ public class ProgramGuideSearchFragment extends SearchFragment {
 
         @Override
         protected List<LocalSearchProvider.SearchResult> doInBackground(Void... params) {
-            return mTvProviderSearch.search(mQuery, SEARCH_RESULT_MAX,
+            return mSearch.search(mQuery, SEARCH_RESULT_MAX,
                     TvProviderSearch.ACTION_TYPE_AMBIGUOUS);
         }
 

@@ -135,4 +135,8 @@
     <color name="setup_description">#B3EEEEEE</color>
     <color name="setup_background">#E701579B</color>
     <color name="setup_divider">#4DEEEEEE</color>
+
+    <!-- Onboarding screen -->
+    <color name="onboarding_dot_selected">#FFFFFFFF</color>
+    <color name="onboarding_dot_unselected">#4DFFFFFF</color>
 </resources>

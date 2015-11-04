@@ -25,9 +25,9 @@ import android.database.Cursor;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
 import android.net.Uri;
-import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
+import android.test.UiThreadTest;
 import android.test.mock.MockContentProvider;
 import android.test.mock.MockContentResolver;
 import android.test.mock.MockCursor;
@@ -39,6 +39,7 @@ import android.util.SparseArray;
 import com.android.tv.analytics.StubTracker;
 import com.android.tv.testing.ChannelInfo;
 import com.android.tv.testing.Constants;
+import com.android.tv.testing.Utils;
 import com.android.tv.util.TvInputManagerHelper;
 
 import org.mockito.Matchers;
@@ -51,9 +52,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Test for {@link com.android.tv.data.ChannelDataManager}
+ * Test for {@link ChannelDataManager}
  *
  * A test method may include tests for multiple methods to minimize the DB access.
+ * Note that all the methods of {@link ChannelDataManager} should be called from the UI thread.
  */
 @SmallTest
 public class ChannelDataManagerTest extends AndroidTestCase {
@@ -68,7 +70,6 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     private static final String COLUMN_LOCKED = "locked";
 
     private ChannelDataManager mChannelDataManager;
-    private HandlerThread mHandlerThread;
     private TestChannelDataManagerListener mListener;
     private FakeContentResolver mContentResolver;
     private FakeContentProvider mContentProvider;
@@ -77,26 +78,32 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         assertTrue("More than 2 channels to test", Constants.UNIT_TEST_CHANNEL_COUNT > 2);
-        TvInputManagerHelper mockHelper = Mockito.mock(TvInputManagerHelper.class);
-        Mockito.when(mockHelper.hasTvInputInfo(Matchers.anyString())).thenReturn(true);
 
         mContentProvider = new FakeContentProvider(getContext());
         mContentResolver = new FakeContentResolver();
         mContentResolver.addProvider(TvContract.AUTHORITY, mContentProvider);
-        mHandlerThread = new HandlerThread(TAG);
-        mHandlerThread.start();
-        mChannelDataManager = new ChannelDataManager(getContext(), mockHelper, new StubTracker(),
-                mContentResolver, mHandlerThread.getLooper());
         mListener = new TestChannelDataManagerListener();
-        mChannelDataManager.addListener(mListener);
-
+        Utils.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                TvInputManagerHelper mockHelper = Mockito.mock(TvInputManagerHelper.class);
+                Mockito.when(mockHelper.hasTvInputInfo(Matchers.anyString())).thenReturn(true);
+                mChannelDataManager = new ChannelDataManager(getContext(), mockHelper,
+                        new StubTracker(), mContentResolver);
+                mChannelDataManager.addListener(mListener);
+            }
+        });
     }
 
     @Override
     protected void tearDown() throws Exception {
+        Utils.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                mChannelDataManager.stop();
+            }
+        });
         super.tearDown();
-        mHandlerThread.quitSafely();
-        mChannelDataManager.stop();
     }
 
     private void startAndWaitForComplete() throws Exception {
@@ -114,6 +121,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         startAndWaitForComplete();
     }
 
+    @UiThreadTest
     public void testIsDbLoadFinished() throws Exception {
         startAndWaitForComplete();
         assertTrue(mChannelDataManager.isDbLoadFinished());
@@ -125,6 +133,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
      *   - {@link ChannelDataManager#getChannelList}
      *   - {@link ChannelDataManager#getChannel}
      */
+    @UiThreadTest
     public void testGetChannels() throws Exception {
         startAndWaitForComplete();
 
@@ -159,6 +168,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     /**
      * Test for {@link ChannelDataManager#getChannelCount} when no channel is available.
      */
+    @UiThreadTest
     public void testGetChannels_noChannels() throws Exception {
         mContentProvider.clear();
         startAndWaitForComplete();
@@ -170,6 +180,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
      *   - {@link ChannelDataManager#updateBrowsable}
      *   - {@link ChannelDataManager#applyUpdatedValuesToDb}
      */
+    @UiThreadTest
     public void testBrowsable() throws Exception {
         startAndWaitForComplete();
 
@@ -208,6 +219,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
      *   - {@link ChannelDataManager#updateBrowsable}
      *   - {@link ChannelDataManager#applyUpdatedValuesToDb}
      */
+    @UiThreadTest
     public void testBrowsable_skipNotification() throws Exception {
         startAndWaitForComplete();
 
@@ -241,6 +253,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
      *   - {@link ChannelDataManager#updateLocked}
      *   - {@link ChannelDataManager#applyUpdatedValuesToDb}
      */
+    @UiThreadTest
     public void testLocked() throws Exception {
         startAndWaitForComplete();
 
@@ -269,6 +282,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     /**
      * Test ChannelDataManager when channels in TvContract are updated, removed, or added.
      */
+    @UiThreadTest
     public void testChannelListChanged() throws Exception {
         startAndWaitForComplete();
 
@@ -336,8 +350,8 @@ public class ChannelDataManagerTest extends AndroidTestCase {
             if (DEBUG) {
                 Log.d(TAG, "onChanged(uri=" + uri + ", observer=" + observer + ")");
             }
-            // Do not call {@link ContentObserver#onChange} directly
-            // to run it on the {@link #mHandlerThread}.
+            // Do not call {@link ContentObserver#onChange} directly to run it on the correct
+            // thread.
             if (observer != null) {
                 observer.dispatchChange(false, uri);
             } else {

@@ -146,11 +146,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Mga lisensyang open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Mga lisensyang open source"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Bersyon"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Tulungang pahusayin ang Mga Live na Channel"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Magbahagi ng anonymous na data ng paggamit at mga diagnostic sa Google upang mas mapaganda namin ang Mga Live Channel at mapigilan ang mga isyu tulad ng pagka-crash at pagfi-freeze."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Upang mapanood ang channel na ito, pindutin ang Kanan at ilagay ang iyong PIN"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Upang mapanood ang programang ito, pindutin ang Kanan at ilagay ang iyong PIN"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Ang programang ito ay na-rate na <xliff:g id="RATING">%1$s</xliff:g>.\nUpang mapanood ang programang ito, pindutin ang Kanan at ilagay ang iyong PIN."</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"Upang mapanood ang channel na ito, gamitin ang default na Live TV app."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"Upang mapanood ang programang ito, gamitin ang default na Live TV app."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Ang programang ito ay binigyan ng rating na <xliff:g id="RATING">%1$s</xliff:g>.\nUpang mapanood ang programang ito, gamitin ang default na Live TV app."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Naka-block ang programa"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Ang programang ito ay na-rate na <xliff:g id="RATING">%1$s</xliff:g>"</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Audio lang"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Walang pamagat"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Naka-block ang channel"</string>
     <string name="episode_format" msgid="4881195874563241096">"S<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Ep. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -177,4 +183,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Hindi available dahil sa mahinang signal ng video"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Hindi inaasahang hindi available ang video"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Ang BACK key ay para sa nakakonektang device. Pindutin ang HOME button upang lumabas."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"Hindi sinusuportahan ang Live TV sa device na ito na may Android Lollipop."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Kailangan ng pahintulot ng Live TV upang mabasa ang mga listahan sa TV."</string>
 </resources>

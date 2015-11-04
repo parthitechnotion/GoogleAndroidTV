@@ -50,4 +50,22 @@
         <item>Premier</item>
         <item>Tech/Science</item>
     </string-array>
+
+    <!-- Titles in the onboarding page.
+         TODO: set translatable to true. -->
+    <string-array name="welcome_page_titles" translatable="false">
+        <item>Live TV</item>
+        <item>Download new channels</item>
+        <item>Customize your channel line-up</item>
+        <item>Watch, pause, and rewind live TV</item>
+    </string-array>
+
+    <!-- Descriptions in the onboarding page.
+         TODO: set translatable to true. -->
+    <string-array name="welcome_page_descriptions" translatable="false">
+        <item>Combine broadcast TV with streaming channels provided by your apps.</item>
+        <item>Customize your channel line up by downloading apps that offer streaming channels.\nYou can find compatible apps in the Google Play Store.</item>
+        <item>Set up newly installed channels from the Channel Sources option within the TV menu</item>
+        <item>Enjoy over-the-air channels like ABC, CBS, NBC, and FOX\nwhen you add a compatible TV tuner &amp; HDTV antenna to your Nexus Player.</item>
+    </string-array>
 </resources>

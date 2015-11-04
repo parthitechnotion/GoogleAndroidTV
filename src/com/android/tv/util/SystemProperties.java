@@ -16,6 +16,8 @@
 
 package com.android.tv.util;
 
+import com.android.tv.common.BooleanSystemProperty;
+
 /**
  * A convenience class for getting TV related system properties.
  */
@@ -49,12 +51,6 @@ public final class SystemProperties {
      */
     public static final BooleanSystemProperty USE_DEBUG_KEYS = new BooleanSystemProperty(
             "tv_use_debug_keys", false);
-
-    /**
-     * When true search is available in the EPG.  Defaults to false.
-     */
-    public static final BooleanSystemProperty USE_EPG_SEARCH = new BooleanSystemProperty(
-            "tv_use_epg_search", false); // TODO: remove this flag.
 
     /**
      * Send {@link com.android.tv.analytics.Tracker} information. Defaults to {@code true}.

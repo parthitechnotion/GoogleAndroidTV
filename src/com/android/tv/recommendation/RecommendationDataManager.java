@@ -31,11 +31,14 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
+import com.android.tv.data.WatchedHistoryManager;
+import com.android.tv.util.PermissionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RecommendationDataManager {
+public class RecommendationDataManager implements WatchedHistoryManager.Listener {
     private static final String TAG = "RecommendationDataManager";
 
     private static final UriMatcher sUriMatcher;
@@ -93,8 +96,9 @@ public class RecommendationDataManager {
     private final Set<String> mInputs = new HashSet<>();
 
     private final HandlerThread mHandlerThread;
-
     private final Handler mHandler;
+    @Nullable
+    private WatchedHistoryManager mWatchedHistoryManager;
 
     private final List<ListenerRecord> mListeners = new ArrayList<>();
 
@@ -257,12 +261,19 @@ public class RecommendationDataManager {
             mCancelLoadTask = false;
             mContext.getContentResolver().registerContentObserver(
                     TvContract.Channels.CONTENT_URI, true, mContentObserver);
-            mContext.getContentResolver().registerContentObserver(
-                    TvContract.WatchedPrograms.CONTENT_URI, true, mContentObserver);
             mHandler.obtainMessage(MSG_UPDATE_CHANNELS, TvContract.Channels.CONTENT_URI)
                     .sendToTarget();
-            mHandler.obtainMessage(MSG_UPDATE_WATCH_HISTORY, TvContract.WatchedPrograms.CONTENT_URI)
-                    .sendToTarget();
+            if (!PermissionUtils.hasAccessWatchedHistory(mContext)) {
+                mWatchedHistoryManager = new WatchedHistoryManager(mContext);
+                mWatchedHistoryManager.setListener(this);
+                mWatchedHistoryManager.start();
+            } else {
+                mContext.getContentResolver().registerContentObserver(
+                        TvContract.WatchedPrograms.CONTENT_URI, true, mContentObserver);
+                mHandler.obtainMessage(MSG_UPDATE_WATCH_HISTORY,
+                        TvContract.WatchedPrograms.CONTENT_URI)
+                        .sendToTarget();
+            }
             mTvInputManager = (TvInputManager) mContext.getSystemService(Context.TV_INPUT_SERVICE);
             mTvInputManager.registerCallback(mInternalCallback, mHandler);
             for (TvInputInfo input : mTvInputManager.getTvInputList()) {
@@ -371,6 +382,41 @@ public class RecommendationDataManager {
         }
         if (!mChannelRecordMapLoaded) {
             mHandler.sendEmptyMessage(MSG_NOTIFY_CHANNEL_RECORD_MAP_LOADED);
+        }
+    }
+
+    private WatchedProgram convertFromWatchedHistoryManagerRecords(
+            WatchedHistoryManager.WatchedRecord watchedRecord) {
+        long endTime = watchedRecord.watchedStartTime + watchedRecord.duration;
+        Program program = new Program.Builder()
+                .setChannelId(watchedRecord.channelId)
+                .setTitle("")
+                .setStartTimeUtcMillis(watchedRecord.watchedStartTime)
+                .setEndTimeUtcMillis(endTime)
+                .build();
+        return new WatchedProgram(program, watchedRecord.watchedStartTime, endTime);
+    }
+
+    @Override
+    public void onLoadFinished() {
+        for (WatchedHistoryManager.WatchedRecord record
+                : mWatchedHistoryManager.getWatchedHistory()) {
+            updateChannelRecordFromWatchedProgram(
+                    convertFromWatchedHistoryManagerRecords(record));
+        }
+        mHandler.sendEmptyMessage(MSG_NOTIFY_CHANNEL_RECORD_MAP_LOADED);
+    }
+
+    @Override
+    public void onNewRecordAdded(WatchedHistoryManager.WatchedRecord watchedRecord) {
+        ChannelRecord channelRecord = updateChannelRecordFromWatchedProgram(
+                convertFromWatchedHistoryManagerRecords(watchedRecord));
+        if (mChannelRecordMapLoaded && channelRecord != null) {
+            synchronized (sListenerLock) {
+                for (ListenerRecord l : mListeners) {
+                    l.postNewWatchLog(channelRecord);
+                }
+            }
         }
     }
 

@@ -378,7 +378,7 @@ public class SetupView extends FullscreenDialogView {
                 final TvInputInfo input = mInputList.get(position);
                 viewHolder.mTitle.setText(input.loadLabel(getContext()));
                 int channelCount = mChannelDataManager.getChannelCountForInput(input.getId());
-                if (mSetupUtils.hasSetupLaunched(input.getId())) {
+                if (mSetupUtils.isSetupDone(input.getId())) {
                     if (channelCount == 0) {
                         viewHolder.mDescription.setText(R.string.setup_input_no_channels);
                     } else {

@@ -22,6 +22,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.data.Channel;
 import com.android.tv.recommendation.RecommendationUtils.ChannelRecordSortedMapHelper;
+import com.android.tv.testing.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,7 +79,7 @@ public class RecommenderTest extends AndroidTestCase {
         mChannelRecordSortedMap = new ChannelRecordSortedMapHelper(getContext());
         mDataManager = RecommendationUtils
                 .createMockRecommendationDataManager(mChannelRecordSortedMap);
-        mChannelRecordSortedMap.resetRandom(RecommendationUtils.createTestRandom());
+        mChannelRecordSortedMap.resetRandom(Utils.createTestRandom());
     }
 
     public void testRecommendChannels_includeRecommendedOnly_allChannelsHaveNoScore() {

@@ -96,13 +96,17 @@ public class ChannelCardView extends BaseCardView<Channel> implements
     @Override
     public void onBind(Channel channel, boolean selected) {
         if (DEBUG) {
-            Log.d(TAG, "onBind(channel=" + channel.getDisplayName() + ", selected=" + selected
+            Log.d(TAG, "onBind(channelName=" + channel.getDisplayName() + ", selected=" + selected
                     + ")");
         }
         mChannel = channel;
         mProgram = null;
-        mChannelNumberNameView.setText(mChannel.getDisplayNumber() + " "
-                + mChannel.getDisplayName());
+        if (TextUtils.isEmpty(mChannel.getDisplayName())) {
+            mChannelNumberNameView.setText(mChannel.getDisplayNumber());
+        } else {
+            mChannelNumberNameView.setText(mChannel.getDisplayNumber() + " "
+                    + mChannel.getDisplayName());
+        }
         mChannelNumberNameView.setVisibility(VISIBLE);
         mImageView.setImageResource(R.drawable.ic_recent_thumbnail_default);
         mImageView.setBackgroundResource(R.color.channel_card);

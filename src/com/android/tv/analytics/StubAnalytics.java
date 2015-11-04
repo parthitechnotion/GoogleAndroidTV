@@ -17,23 +17,34 @@
 package com.android.tv.analytics;
 
 import android.app.Application;
+import android.content.Context;
 
 /**
  * An implementation of {@link Analytics} that returns a {@link StubTracker}.
  */
 public final class StubAnalytics implements Analytics {
-    private static final StubAnalytics INSTANCE = new StubAnalytics();
-
     public static StubAnalytics getInstance(Application application) {
-        return INSTANCE;
+        return new StubAnalytics(application);
     }
 
     private final Tracker mTracker = new StubTracker();
+    private boolean mOptOut = OptOutPreferenceHelper.ANALYTICS_OPT_OUT_DEFAULT_VALUE;
 
-    private StubAnalytics() { }
+    private StubAnalytics(Context context) {
+    }
 
     @Override
     public Tracker getDefaultTracker() {
         return mTracker;
+    }
+
+    @Override
+    public boolean isAppOptOut() {
+        return mOptOut;
+    }
+
+    @Override
+    public void setAppOptOut(boolean optOut) {
+        mOptOut = optOut;
     }
 }

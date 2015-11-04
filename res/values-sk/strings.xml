@@ -146,11 +146,17 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licencie open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licencie open source"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Verzia"</string>
+    <string name="about_menu_improve" msgid="3712578027009311401">"Pomáhať s vylepšovaním aktívnych kanálov"</string>
+    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Zdieľať s Googlom anonymné štatistiky o používaní a diagnostické údaje, aby sme mohli Televíziu online zlepšiť a zabrániť problémom, ako sú zlyhania a zamŕzania."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Ak chcete sledovať tento kanál, stlačte šípku vpravo a zadajte kód PIN"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Ak chcete sledovať tento program, stlačte šípku doprava a zadajte kód PIN"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"Hodnotenie tohto programu je <xliff:g id="RATING">%1$s</xliff:g>.\nAk chcete sledovať tento program, stlačte šípku doprava a zadajte kód PIN."</string>
+    <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"Ak chcete sledovať tento kanál, použite predvolenú aplikáciu Live TV."</string>
+    <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"Ak chcete sledovať tento program, použite predvolenú aplikáciu Live TV."</string>
+    <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Tento program má hodnotenie <xliff:g id="RATING">%1$s</xliff:g>.\nAk ho chcete sledovať, použite predvolenú aplikáciu Live TV."</string>
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Program je zablokovaný"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Hodnotenie tohto programu je <xliff:g id="RATING">%1$s</xliff:g>."</string>
+    <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Iba zvuk"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Bez názvu"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Kanál bol zablokovaný"</string>
     <string name="episode_format" msgid="4881195874563241096">"S <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: ep. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
@@ -177,4 +183,6 @@
     <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Nedostupné z dôvodu slabého signálu videa"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Video neočakávane prestalo byť dostupné"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Kláves Späť je určený pre pripojené zariadenie. Aplikáciu ukončite stlačením tlačidla Domov."</string>
+    <string name="msg_not_supported_device" msgid="4469404625040284722">"V tomto zariadení so systémom Android Lollipop nie sú aktívne kanály podporované."</string>
+    <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Aktívne kanály potrebujú povolenie na čítanie televíznych programov."</string>
 </resources>

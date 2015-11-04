@@ -20,13 +20,12 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.LruCache;
 
-import com.android.tv.MainActivity;
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
 
 /**
  * A convenience class for caching bitmap.
  */
-public class ImageCache implements MainActivity.MemoryManageable {
+public class ImageCache implements MemoryManageable {
     private static final float MAX_CACHE_SIZE_PERCENT = 0.8f;
     private static final float MIN_CACHE_SIZE_PERCENT = 0.05f;
     private static final float DEFAULT_CACHE_SIZE_PERCENT = 0.1f;
