@@ -40,16 +40,16 @@ LOCAL_PRIVILEGED_MODULE := true
 
 LOCAL_SDK_VERSION := system_current
 LOCAL_RESOURCE_DIR := \
-    $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
-    $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
+    $(LOCAL_PATH)/local-support/v7/recyclerview/res \
+    $(LOCAL_PATH)/local-support/v17/leanback/res \
     $(LOCAL_PATH)/res
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
-    android-support-annotations \
-    android-support-v4 \
-    android-support-v7-palette \
-    android-support-v7-recyclerview \
-    android-support-v17-leanback \
+    livetv-android-support-annotations \
+    livetv-android-support-v4 \
+    livetv-android-support-v7-palette \
+    livetv-android-support-v7-recyclerview \
+    livetv-android-support-v17-leanback \
     tv-common
 
 
