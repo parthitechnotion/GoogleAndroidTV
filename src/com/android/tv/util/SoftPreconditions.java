@@ -16,10 +16,12 @@
 
 package com.android.tv.util;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.tv.BuildConfig;
+import com.android.tv.common.feature.Feature;
 
 /**
  * Simple static methods to be called at the start of your own methods to verify
@@ -113,6 +115,19 @@ public final class SoftPreconditions {
      */
     public static void checkState(final boolean expression) {
         checkState(expression, null, null);
+    }
+
+    /**
+     * Throws or logs if the Feature is not enabled
+     *
+     * @param context an android context
+     * @param feature the required feature
+     * @param tag used to identify the source of a log message.  It usually
+     *            identifies the class or activity where the log call occurs
+     * @throws IllegalStateException if {@code feature} is not enabled
+     */
+    public static void checkFeatureEnabled(Context context, Feature feature, String tag) {
+        checkState(feature.isEnabled(context), tag, feature.toString());
     }
 
     /**

@@ -49,6 +49,8 @@ import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
+import com.android.usbtuner.tvinput.UsbTunerTvInputService;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -66,6 +68,8 @@ import java.util.concurrent.TimeUnit;
 public class Utils {
     private static final String TAG = "Utils";
     private static final boolean DEBUG = false;
+
+    private static final SimpleDateFormat ISO_8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public static final String EXTRA_KEY_KEYCODE = "keycode";
     public static final String EXTRA_KEY_ACTION = "action";
@@ -390,7 +394,7 @@ public class Utils {
             throw new IllegalArgumentException("Not an audio track: " + track);
         }
         String language = context.getString(R.string.default_language);
-        if (track.getLanguage() != null) {
+        if (!TextUtils.isEmpty(track.getLanguage())) {
             language = new Locale(track.getLanguage()).getDisplayName();
         } else {
             Log.d(TAG, "No language information found for the audio track: " + track);
@@ -528,6 +532,13 @@ public class Utils {
     }
 
     /**
+     * Converts time in milliseconds to a ISO 8061 string.
+     */
+    public static String toIsoDateTimeString(long timeMillis) {
+        return ISO_8601.format(new Date(timeMillis));
+    }
+
+    /**
      * Returns a {@link String} object which contains the layout information of the {@code view}.
      */
     public static String toRectString(View view) {
@@ -562,22 +573,6 @@ public class Utils {
     @Nullable
     public static String intern(@Nullable String string) {
         return string == null ? null : string.intern();
-    }
-
-    /**
-     * Checks if this application is running in tests.
-     *
-     * <p>{@link android.app.ActivityManager#isRunningInTestHarness} doesn't return {@code true} for
-     * the usual devices even the application is running in tests. We need to figure it out by
-     * checking whether the class in tv-tests-common module can be loaded or not.
-     */
-    public static boolean isRunningInTest() {
-        try {
-            Class.forName("com.android.tv.testing.Utils");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
     }
 
     /**
@@ -640,6 +635,30 @@ public class Utils {
         }
     }
 
+    /**
+     * Returns input ID of {@link UsbTunerTvInputService}.
+     */
+    @Nullable
+    public static String getUsbTunerInputId(Context context) {
+        if (!Features.USB_TUNER.isEnabled(context)) {
+            return null;
+        }
+        return TvContract.buildInputId(new ComponentName(context.getPackageName(),
+                UsbTunerTvInputService.class.getName()));
+    }
+
+    /**
+     * Returns {@link TvInputInfo} object of {@link UsbTunerTvInputService}.
+     */
+    @Nullable
+    public static TvInputInfo getUsbTunerInputInfo(Context context) {
+        if (!Features.USB_TUNER.isEnabled(context)) {
+            return null;
+        }
+        TvInputManagerHelper helper = TvApplication.getSingletons(context)
+                .getTvInputManagerHelper();
+        return helper.getTvInputInfo(getUsbTunerInputId(context));
+    }
 
     private static final class SyncRunnable implements Runnable {
         private final Runnable mTarget;

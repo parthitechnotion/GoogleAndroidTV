@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"ഓപ്പൺ സോഴ്‌സ് ലൈസൻസുകൾ"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ഓപ്പൺ സോഴ്‌സ് ലൈസൻസുകൾ"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"പതിപ്പ്"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"ഡെവലപ്പര്‍ ഓ‌പ്ഷനുകൾ"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB ടിവി ട്യൂണർ പ്രവർത്തനക്ഷമമാക്കുക"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB ടിവി ട്യൂണറിന്റെ ശബ്ദം കേൾക്കുന്നതിന്, AC3 പാസ്‌ത്രൂവിനെ നിങ്ങളുടെ ടിവി പിന്തുണയ്ക്കേണ്ടതുണ്ട്."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 ഓഡിയോ ശേഷി"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"AC3 പാസ്‌ത്രൂവിനെ നിങ്ങളുടെ ടിവി പിന്തുണയ്ക്കുന്നു."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"AC3 പാസ്‌ത്രൂവിനെ നിങ്ങളുടെ ടിവി പിന്തുണയ്ക്കുന്നില്ല."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"തത്സമയ ചാനലുകൾ മെച്ചപ്പെടുത്താൻ സഹായിക്കുക"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"പേരുവിവരങ്ങളില്ലാത്ത ഉപയോഗ വിവരങ്ങളും പ്രശ്നനിർണ്ണയ വിവരങ്ങളും Google-മായി പങ്കിടുക, അതുവഴി ഞങ്ങൾക്ക് തത്സമയ ചാനലുകൾ കൂടുതൽ മെച്ചപ്പെടുത്താനും ക്രാഷിംഗും ഫ്രീസിംഗും പോലുള്ള പ്രശ്നങ്ങൾ തടയാനും കഴിയും."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ഈ ചാനൽ കാണുന്നതിന് വലതുവശത്ത് അമർത്തിക്കൊണ്ട് നിങ്ങളുടെ പിൻ നൽകുക"</string>

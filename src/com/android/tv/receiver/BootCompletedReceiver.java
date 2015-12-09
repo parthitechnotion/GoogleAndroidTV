@@ -21,20 +21,33 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.android.tv.Features;
 import com.android.tv.TvActivity;
+import com.android.tv.dvr.DvrRecordingService;
 import com.android.tv.recommendation.NotificationService;
 import com.android.tv.util.OnboardingUtils;
 import com.android.tv.util.SetupUtils;
 
 /**
- * Boot completed receiver. It's used to start the {@code NotificationService} for recommendation,
- * grant permission to the TIS's and enable {@code TvActivity} if necessary.
+ * Boot completed receiver for TV app.
+ *
+ * <p>It's used to
+ * <ul>
+ *     <li>start the {@link NotificationService} for recommendation</li>
+ *     <li>grant permission to the TIS's </li>
+ *     <li>enable {@link TvActivity} if necessary</li>
+ *     <li>start the {@link DvrRecordingService} </li>
+ * </ul>
  */
 public class BootCompletedReceiver extends BroadcastReceiver {
+    private static final String TAG = "BootCompletedReceiver";
+    private static final boolean DEBUG = false;
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (DEBUG) Log.d(TAG, "boot completed " + intent);
         // Start {@link NotificationService}.
         Intent notificationIntent = new Intent(context, NotificationService.class);
         notificationIntent.setAction(NotificationService.ACTION_SHOW_RECOMMENDATION);
@@ -43,8 +56,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
         // Grant permission to already set up packages after the system has finished booting.
         SetupUtils.grantEpgPermissionToSetUpPackages(context);
 
-        // On-boarding experience.
-        if (Features.ONBOARDING_EXPERIENCE.isEnabled(context)) {
+        if (Features.UNHIDE.isEnabled(context)) {
             if (OnboardingUtils.isFirstBoot(context)) {
                 // Enable the application if this is the first run after the on-boarding experience
                 // is applied just in case when the app is disabled before.
@@ -57,6 +69,11 @@ public class BootCompletedReceiver extends BroadcastReceiver {
                 }
                 OnboardingUtils.setFirstBootCompleted(context);
             }
+        }
+
+        // DVR
+        if (Features.DVR.isEnabled(context)) {
+            DvrRecordingService.startService(context);
         }
     }
 }

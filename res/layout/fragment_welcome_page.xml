@@ -16,6 +16,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/welcome_page_fragment_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -24,22 +25,24 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.4"
-        android:fontFamily="@string/condensed_font"
+        android:layout_weight="0.5"
+        android:layout_marginBottom="3dp"
+        android:fontFamily="@string/light_font"
         android:gravity="center"
-        android:text="@string/illustration_area_text"
-        android:textColor="@android:color/white"
-        android:textSize="32sp" />
+        android:textColor="#EEEEEE"
+        android:textSize="34sp"
+        android:lineSpacingExtra="14sp"/>
 
     <TextView
         android:id="@+id/description"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.6"
-        android:fontFamily="@string/condensed_font"
-        android:gravity="top|center_horizontal"
-        android:text="@string/illustration_area_text"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@string/light_font"
+        android:gravity="center"
+        android:textColor="#B3EEEEEE"
+        android:textSize="14sp"
+        android:lineSpacingExtra="10sp" />
 
 </LinearLayout>

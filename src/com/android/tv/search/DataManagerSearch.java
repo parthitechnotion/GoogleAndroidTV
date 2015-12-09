@@ -26,6 +26,7 @@ import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
@@ -60,9 +61,9 @@ public class DataManagerSearch implements SearchInterface {
     DataManagerSearch(Context context) {
         mContext = context;
         mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
-        TvApplication application = (TvApplication) context.getApplicationContext();
-        mChannelDataManager = application.getChannelDataManager();
-        mProgramDataManager = application.getProgramDataManager();
+        ApplicationSingletons appSingletons = TvApplication.getSingletons(context);
+        mChannelDataManager = appSingletons.getChannelDataManager();
+        mProgramDataManager = appSingletons.getProgramDataManager();
     }
 
     @Override

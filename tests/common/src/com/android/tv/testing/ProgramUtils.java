@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProgramUtils {
     private static final String TAG = "ProgramUtils";
+    private static final boolean DEBUG = false;
 
     // Populate program data for a week.
     private static final long PROGRAM_INSERT_DURATION_MS = TimeUnit.DAYS.toMillis(7);
@@ -77,7 +78,7 @@ public class ProgramUtils {
                     || timeMs >= targetEndTimeMs) {
                 context.getContentResolver().bulkInsert(Programs.CONTENT_URI,
                         list.toArray(new ContentValues[list.size()]));
-                Log.v(TAG, "Inserted " + list.size() + " programs for " + channelUri);
+                if (DEBUG) Log.d(TAG, "Inserted " + list.size() + " programs for " + channelUri);
                 list.clear();
             }
         }

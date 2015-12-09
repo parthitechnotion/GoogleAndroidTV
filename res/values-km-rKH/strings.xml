@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"អាជ្ញាប័ណ្ណប្រភពកូដចំហ"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"អាជ្ញាប័ណ្ណប្រភពកូដចំហ"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"កំណែ"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"ជម្រើស​សម្រាប់​​អ្នក​អភិវឌ្ឍ"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"បើកដំណើរការឧបករណ៍ចាប់ប៉ុស្តិ៍ទូរទស្សន៍ USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"ដើម្បីឮសំឡេងឧបករណ៍ចាប់ប៉ុស្តិ៍ទូរទស្សន៍ USB ទូរទស្សន៍របស់អ្នកគួរតែអាចគាំទ្ររន្ធដោត AC3។"</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"សមត្ថភាពសំឡេង AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"ទូរទស្សន៍របស់អ្នកគាំទ្ររន្ធដោត AC3"</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"ទូរទស្សន៍របស់អ្នកមិនគាំទ្ររន្ធដោត AC3 ទេ"</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"ជួយធ្វើឲ្យប៉ុស្តិ៍ផ្សាយផ្ទាល់ប្រសើងជាងមុន"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"ចែករំលែកទិន្នន័យវិនិច្ឆ័យ និងទិន្នន័យប្រើប្រាស់អនាមិកជាមួយ Google នោះយើងនឹងអាចធ្វើឲ្យប៉ុស្តិ៍ផ្សាយបន្តផ្ទាល់ប្រសើរឡើង និងទប់ស្កាត់បញ្ហាដូចជា៖ ការគាំង និងការមិនដំណើរការជាដើម។"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ដើម្បី​មើល​ឆានែល​នេះ អ្នក​ត្រូវ​ចុច​កណ្ដុរស្ដាំ រួច​បញ្ចូល​កូដ PIN របស់​អ្នក"</string>

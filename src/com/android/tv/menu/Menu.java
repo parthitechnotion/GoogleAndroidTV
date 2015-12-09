@@ -33,12 +33,12 @@ import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.DurationTimer;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.TvCommonUtils;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.menu.MenuRowFactory.PartnerRow;
 import com.android.tv.menu.MenuRowFactory.PipOptionsRow;
 import com.android.tv.menu.MenuRowFactory.TvOptionsRow;
-import com.android.tv.util.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -122,7 +122,7 @@ public class Menu {
     public Menu(Context context, IMenuView menuView, MenuRowFactory menuRowFactory,
                 OnMenuVisibilityChangeListener onMenuVisibilityChangeListener) {
         mMenuView = menuView;
-        mTracker = ((TvApplication) context.getApplicationContext()).getTracker();
+        mTracker = TvApplication.getSingletons(context).getTracker();
         Resources res = context.getResources();
         mShowDurationMillis = res.getInteger(R.integer.menu_show_duration);
         mOnMenuVisibilityChangeListener = onMenuVisibilityChangeListener;
@@ -303,7 +303,7 @@ public class Menu {
 
     @VisibleForTesting
     void disableAnimationForTest() {
-        if (!Utils.isRunningInTest()) {
+        if (!TvCommonUtils.isRunningInTest()) {
             throw new RuntimeException("Animation may only be enabled/disabled during tests.");
         }
         mAnimationDisabledForTest = true;

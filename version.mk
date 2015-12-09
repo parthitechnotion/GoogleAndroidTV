@@ -48,20 +48,17 @@
 
 base_version_major := 1
 # Change this for each branch
-base_version_minor := 07
+base_version_minor := 08
 # The date of the first commit checked in to the current branch
-base_version_since := 2015-08-23
-
+base_version_since := 2015-10-12
 
 # code_version_major will overflow at 22
 code_version_major := $(shell echo $$(($(base_version_major)+3)))
 
-git_commit_count := $(shell git --git-dir $(LOCAL_PATH)/.git rev-list --since=$(base_version_since) --no-merges --count HEAD)
-#git_commit_count_usb := $(shell git --git-dir $(LOCAL_PATH)/../UsbTunerTvInput/.git rev-list --since=$(base_version_since) --no-merges --count HEAD)
-#code_version_build := $(shell printf "%03d" $$(($(git_commit_count)+$(git_commit_count_usb))))
-# TODO http://b/22930520 version.mk sometimes goes backwards
-code_version_build=007
-
+git_commit_count := $(shell git --git-dir $(LOCAL_PATH)/.git rev-list --since=$(base_version_since) --all --count HEAD)
+# x86 and arm sometimes don't match.
+#code_version_build := $(shell printf "%03d" $(git_commit_count))
+code_version_build := 301
 #####################################################
 #####################################################
 # Collect automatic version code parameters
@@ -117,6 +114,5 @@ base_version_buildtype :=
 base_version_arch :=
 base_version_density :=
 git_commit_count :=
-git_commit_count_usb :=
 git_hash :=
 date_string :=

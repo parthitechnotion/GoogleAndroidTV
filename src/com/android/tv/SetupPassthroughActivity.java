@@ -25,6 +25,7 @@ import android.util.Log;
 
 import com.android.tv.common.TvCommonConstants;
 import com.android.tv.util.SetupUtils;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.TvInputManagerHelper;
 
 /**
@@ -33,7 +34,7 @@ import com.android.tv.util.TvInputManagerHelper;
  * <p> After setup activity is finished, all channels will be browsable.
  */
 public class SetupPassthroughActivity extends Activity {
-    private static final String TAG = "SetupPassthroughActivity";
+    private static final String TAG = "SetupPassthroughAct";
     private static final boolean DEBUG = false;
 
     private static final int REQUEST_START_SETUP_ACTIVITY = 200;
@@ -44,11 +45,12 @@ public class SetupPassthroughActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TvApplication tvApplication = (TvApplication) getApplication();
-        TvInputManagerHelper inputManager = tvApplication.getTvInputManagerHelper();
-        // It is not only for setting the variable but also for early initialization of
-        // ChannelDataManager.
-        String inputId = getIntent().getStringExtra(TvCommonConstants.EXTRA_INPUT_ID);
+        Intent intent = getIntent();
+        SoftPreconditions.checkState(
+                intent.getAction().equals(TvCommonConstants.INTENT_ACTION_INPUT_SETUP));
+        ApplicationSingletons appSingletons = TvApplication.getSingletons(this);
+        TvInputManagerHelper inputManager = appSingletons.getTvInputManagerHelper();
+        String inputId = intent.getStringExtra(TvCommonConstants.EXTRA_INPUT_ID);
         mTvInputInfo = inputManager.getTvInputInfo(inputId);
         if (DEBUG) Log.d(TAG, "TvInputId " + inputId + " / TvInputInfo " + mTvInputInfo);
         if (mTvInputInfo == null) {
@@ -56,23 +58,29 @@ public class SetupPassthroughActivity extends Activity {
             finish();
             return;
         }
-        Intent setupIntent = mTvInputInfo.createSetupIntent();
+        Intent setupIntent = intent.getExtras().getParcelable(TvCommonConstants.EXTRA_SETUP_INTENT);
+        if (DEBUG) Log.d(TAG, "Setup activity launch intent: " + setupIntent);
         if (setupIntent == null) {
             Log.w(TAG, "The input (" + mTvInputInfo.getId() + ") doesn't have setup.");
             finish();
             return;
         }
         SetupUtils.grantEpgPermission(this, mTvInputInfo.getServiceInfo().packageName);
-        mActivityAfterCompletion = getIntent().getParcelableExtra(
+        mActivityAfterCompletion = intent.getParcelableExtra(
                 TvCommonConstants.EXTRA_ACTIVITY_AFTER_COMPLETION);
         if (DEBUG) Log.d(TAG, "Activity after completion " + mActivityAfterCompletion);
-        setupIntent.putExtras(getIntent().getExtras());
+        // If EXTRA_SETUP_INTENT is not removed, an infinite recursion happens during
+        // setupIntent.putExtras(intent.getExtras()).
+        Bundle extras = intent.getExtras();
+        extras.remove(TvCommonConstants.EXTRA_SETUP_INTENT);
+        setupIntent.putExtras(extras);
         startActivityForResult(setupIntent, REQUEST_START_SETUP_ACTIVITY);
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, final int resultCode, final Intent data) {
         if (requestCode != REQUEST_START_SETUP_ACTIVITY || resultCode != Activity.RESULT_OK) {
+            setResult(resultCode, data);
             finish();
             return;
         }
@@ -86,6 +94,7 @@ public class SetupPassthroughActivity extends Activity {
                         Log.w(TAG, "Activity launch failed", e);
                     }
                 }
+                setResult(resultCode, data);
                 finish();
             }
         });

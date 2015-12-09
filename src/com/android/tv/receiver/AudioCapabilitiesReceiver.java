@@ -25,6 +25,7 @@ import android.media.AudioManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Analytics;
 import com.android.tv.analytics.Tracker;
@@ -62,9 +63,9 @@ public final class AudioCapabilitiesReceiver {
     public AudioCapabilitiesReceiver(@NonNull Context context,
             @Nullable OnAc3PassthroughCapabilityChangeListener listener) {
         mContext = context;
-        TvApplication tvApplication = (TvApplication) context.getApplicationContext();
-        mAnalytics = tvApplication.getAnalytics();
-        mTracker = tvApplication.getTracker();
+        ApplicationSingletons appSingletons = TvApplication.getSingletons(context);
+        mAnalytics = appSingletons.getAnalytics();
+        mTracker = appSingletons.getTracker();
         mListener = listener;
     }
 

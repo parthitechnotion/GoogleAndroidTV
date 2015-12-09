@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licențe open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licențe open source"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versiune"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Opțiuni dezvoltator"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Activați tunerul TV USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Pentru a auzi sunetul tunerului TV USB, este necesar ca televizorul dvs. să accepte trecerea semnalelor AC3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Compatibilitatea cu conținutul audio AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Televizorul dvs. acceptă trecerea semnalelor AC3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Televizorul dvs. nu acceptă trecerea semnalelor AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Contribuiți la îmbunătățirea aplicației „Canale live”"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Trimiteți la Google date anonime de utilizare și de diagnosticare pentru a îmbunătăți aplicația Canale live și pentru a preveni probleme cum ar blocarea."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Pentru a viziona acest canal, apăsați la dreapta și introduceți codul PIN"</string>

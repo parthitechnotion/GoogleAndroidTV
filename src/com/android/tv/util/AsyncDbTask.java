@@ -22,7 +22,6 @@ import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 import android.util.Range;
@@ -35,8 +34,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * {@link AsyncTask} that defaults to executing on its own single threaded Executor Service.
@@ -48,28 +45,6 @@ public abstract class AsyncDbTask<Params, Progress, Result>
         extends AsyncTask<Params, Progress, Result> {
     private static final String TAG = "AsyncDbTask";
     private static final boolean DEBUG = false;
-
-    private static class NamedThreadFactory implements ThreadFactory {
-        private final AtomicInteger mCount = new AtomicInteger(0);
-        private final ThreadFactory mDefaultThreadFactory;
-        private final String mPrefix;
-
-        public NamedThreadFactory(final String baseName) {
-            mDefaultThreadFactory = Executors.defaultThreadFactory();
-            mPrefix = baseName + "-";
-        }
-
-        @Override
-        public Thread newThread(@NonNull final Runnable runnable) {
-            final Thread thread = mDefaultThreadFactory.newThread(runnable);
-            thread.setName(mPrefix + mCount.getAndIncrement());
-            return thread;
-        }
-
-        public boolean namedWithPrefix(Thread thread) {
-            return thread.getName().startsWith(mPrefix);
-        }
-    }
 
     public static final NamedThreadFactory THREAD_FACTORY = new NamedThreadFactory(
             AsyncDbTask.class.getSimpleName());

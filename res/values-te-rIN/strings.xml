@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"సంస్కరణ"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"డెవలపర్ ఎంపికలు"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB టీవీ ట్యూనర్‌ను ప్రారంభించు"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB టీవీ ట్యూనర్ శబ్దం వినిపించడానికి, మీ టీవీ AC3 గుండా ప్రసరణకు మద్దతు ఇవ్వాలి."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 ఆడియో సామర్థ్యం"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"మీ టీవీ AC3 గుండా ప్రసరణకు మద్దతు ఇస్తుంది."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"మీ టీవీ AC3 గుండా ప్రసరణకు మద్దతు ఇవ్వదు."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"ప్రత్యక్ష ప్రసార ఛానెల్‌లను మెరుగుపరచడంలో సహాయపడండి"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"అనామక వినియోగ మరియు విశ్లేషణల డేటాను Googleతో భాగస్వామ్యం చేయండి, తద్వారా మేము లైవ్ ఛానెల్‌లను మెరుగ్గా చేయగలము అలాగే క్రాష్ కావడం మరియు స్తంభించడం వంటి సమస్యలను నిరోధించగలము."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ఈ ఛానెల్‌ను చూడటానికి, కుడివైపు బటన్ నొక్కి, మీ పిన్‌ని నమోదు చేయండి"</string>

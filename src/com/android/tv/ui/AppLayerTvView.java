@@ -16,8 +16,9 @@
 
 package com.android.tv.ui;
 
+import com.android.tv.common.dvr.DvrTvView;
+
 import android.content.Context;
-import android.media.tv.TvView;
 import android.util.AttributeSet;
 
 /**
@@ -29,7 +30,7 @@ import android.util.AttributeSet;
  * TODO: remove this class once the TvView.setMain() is revisited.
  * </p>
  */
-public class AppLayerTvView extends TvView {
+public class AppLayerTvView extends DvrTvView {
     public AppLayerTvView(Context context) {
         super(context);
     }

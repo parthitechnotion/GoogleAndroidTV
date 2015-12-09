@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -531,16 +532,22 @@ public class RecommendationDataManager implements WatchedHistoryManager.Listener
 
     /**
      * A listener interface to receive notification about the recommendation data.
+     *
+     * @MainThread
      */
     public interface Listener {
         /**
          * Called when loading channel record map from database is finished.
          * It will be called after RecommendationDataManager.start() is finished.
+         *
+         * <p>Note that this method is called on the main thread.
          */
         void onChannelRecordLoaded();
 
         /**
          * Called when a new watch log is added into the corresponding channelRecord.
+         *
+         * <p>Note that this method is called on the main thread.
          *
          * @param channelRecord The channel record corresponds to the new watch log.
          */
@@ -548,6 +555,8 @@ public class RecommendationDataManager implements WatchedHistoryManager.Listener
 
         /**
          * Called when the channel record map changes.
+         *
+         * <p>Note that this method is called on the main thread.
          */
         void onChannelRecordChanged();
     }

@@ -32,6 +32,10 @@ public class WelcomePageFragment extends SetupFragment {
     public static final String KEY_TITLE = "key_title";
     public static final String KEY_DESCRIPTION = "key_description";
 
+    public WelcomePageFragment() {
+        enableFragmentTransition(FRAGMENT_ENTER_TRANSITION | FRAGMENT_EXIT_TRANSITION);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -40,10 +44,15 @@ public class WelcomePageFragment extends SetupFragment {
         ((TextView) view.findViewById(R.id.title)).setText(args.getString(KEY_TITLE));
         ((TextView) view.findViewById(R.id.description)).setText(args.getString(KEY_DESCRIPTION));
         return view;
-     }
+    }
 
     @Override
     protected int getLayoutResourceId() {
         return R.layout.fragment_welcome_page;
+    }
+
+    @Override
+    protected int[] getParentIdsForDelay() {
+        return new int[] {R.id.welcome_page_fragment_root};
     }
 }

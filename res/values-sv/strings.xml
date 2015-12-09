@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Öppen källkod"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Öppen källkod"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Version"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Utvecklaralternativ"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Aktivera USB-TV-mottagare"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"TV:n måste ha stöd för AC3-vidarebefordran om ljudet ska höras från USB-TV-mottagaren."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Stöd för AC3-ljud"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Din TV har stöd för AC3-vidarebefordran."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Din TV har inte stöd för AC3-vidarebefordran."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Hjälp till att förbättra Livekanaler"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Dela anonym information om användning och diagnostik med Google så att vi kan förbättra Livekanaler och förhindra problem som att appen fastnar eller kraschar."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Tryck till höger och ange pinkoden om du vill titta på den här kanalen"</string>

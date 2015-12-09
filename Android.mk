@@ -38,10 +38,10 @@ LOCAL_PRIVILEGED_MODULE := true
 
 LOCAL_SDK_VERSION := system_current
 LOCAL_RESOURCE_DIR := \
-    $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
-    $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
+    $(LOCAL_PATH)/res \
     $(LOCAL_PATH)/common/res \
-    $(LOCAL_PATH)/res
+    $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
+    $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-annotations \
@@ -49,7 +49,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v7-palette \
     android-support-v7-recyclerview \
     android-support-v17-leanback \
-    tv-common
+    tv-common \
 
 LOCAL_JAVACFLAGS := -Xlint:deprecation -Xlint:unchecked
 
@@ -63,6 +63,16 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay \
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
+# Build directives for USB tuner
+# Ensures the apk built with platform contains the native binaries,
+# hence generates the same apk as the one built as an unbundled app.
+ifeq ($(TARGET_BUILD_APPS),)
+  LOCAL_MODULE_TAGS := samples
+endif
+LOCAL_RESOURCE_DIR += $(LOCAL_PATH)/usbtuner/res
+LOCAL_STATIC_JAVA_LIBRARIES += usbtuner-tvinput
+LOCAL_JNI_SHARED_LIBRARIES := libusbtuner_jni
+LOCAL_AAPT_FLAGS += --extra-packages com.android.usbtuner
 
 include $(BUILD_PACKAGE)
 

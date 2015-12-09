@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.tv.R;
+import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.DurationTimer;
 import com.android.tv.analytics.Tracker;
@@ -56,7 +57,6 @@ public class SelectInputView extends VerticalGridView implements
     public static final String SCREEN_NAME = "Input selection";
     private static final int TUNER_INPUT_POSITION = 0;
 
-    private final TvApplication mApplication;
     private final TvInputManagerHelper mTvInputManagerHelper;
     private final List<TvInputInfo> mInputList = new ArrayList<>();
     private final InputsComparator mComparator = new InputsComparator();
@@ -147,9 +147,9 @@ public class SelectInputView extends VerticalGridView implements
         super(context, attrs, defStyleAttr);
         setAdapter(new InputListAdapter());
 
-        mApplication = (TvApplication) context.getApplicationContext();
-        mTracker = ((TvApplication) context.getApplicationContext()).getTracker();
-        mTvInputManagerHelper = mApplication.getTvInputManagerHelper();
+        ApplicationSingletons appSingletons = TvApplication.getSingletons(context);
+        mTracker = appSingletons.getTracker();
+        mTvInputManagerHelper = appSingletons.getTvInputManagerHelper();
 
         Resources resources = context.getResources();
         mInputItemHeight = resources.getDimensionPixelSize(R.dimen.input_banner_item_height);
@@ -453,7 +453,7 @@ public class SelectInputView extends VerticalGridView implements
     /**
      * A callback interface for the input selection.
      */
-    public static interface OnInputSelectedCallback {
+    public interface OnInputSelectedCallback {
         /**
          * Called when the tuner input is selected.
          */

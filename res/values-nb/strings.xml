@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Åpen kildekode-lisenser"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Åpen kildekode-lisenser"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versjon"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Utvikleralternativer"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Slå på USB-tuneren for TV"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"For å høre lyd via USB-tuneren for TV må TV-en din støtte AC3-gjennomgang."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3-lydfunksjonalitet"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"TV-en støtter AC3-gjennomgang."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"TV-en støtter ikke AC3-gjennomgang."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Bidra til å forbedre Live TV"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Del anonyme bruksdata og diagnostikkdata med Google sånn at vi kan gjøre Direkte-TV bedre og forhindre problemer (for eksempel når appen kræsjer eller fryser)."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"For å se på denne kanalen, trykk til høyre og skriv inn PIN-koden din"</string>

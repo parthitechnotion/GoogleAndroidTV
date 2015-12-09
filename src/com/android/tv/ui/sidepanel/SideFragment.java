@@ -84,7 +84,7 @@ public abstract class SideFragment extends Fragment implements HasTrackerLabel {
         super.onAttach(activity);
         mChannelDataManager = getMainActivity().getChannelDataManager();
         mProgramDataManager = getMainActivity().getProgramDataManager();
-        mTracker = ((TvApplication) getMainActivity().getApplicationContext()).getTracker();
+        mTracker = TvApplication.getSingletons(activity).getTracker();
     }
 
     @Override

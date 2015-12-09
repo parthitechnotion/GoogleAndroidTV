@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licencje open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licencje open source"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Wersja"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Opcje programisty"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Włącz tuner TV USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Aby dźwięk z tunera TV USB był słyszalny, telewizor powinien obsługiwać przelotowe przesyłanie sygnału AC3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Obsługa dźwięku AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Twój telewizor obsługuje przelotowe przesyłanie sygnału AC3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Twój telewizor nie obsługuje przelotowego przesyłania sygnału AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Pomóż w ulepszaniu Telewizji online"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Udostępniaj Google anonimowe informacje o użytkowaniu i dane diagnostyczne, by pomóc w ulepszaniu Telewizji online i usuwaniu błędów takich jak np. zatrzymywanie obrazu."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Aby oglądać ten kanał, naciśnij Prawo i wpisz kod PIN"</string>

@@ -16,12 +16,11 @@
 
 package com.android.tv.common.ui.setup;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 
 import com.android.tv.common.R;
 
@@ -31,22 +30,32 @@ import com.android.tv.common.R;
 public abstract class SetupMultiPaneFragment extends SetupFragment {
     public static final int ACTION_DONE = 1;
 
+    public SetupMultiPaneFragment() {
+        enableFragmentTransition(FRAGMENT_ENTER_TRANSITION | FRAGMENT_EXIT_TRANSITION
+                | FRAGMENT_REENTER_TRANSITION | FRAGMENT_RETURN_TRANSITION);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        getFragmentManager().beginTransaction()
-                .replace(R.id.guided_step_fragment_container, getContentFragment()).commit();
-        View doneButton = view.findViewById(R.id.button_done);
+        SetupGuidedStepFragment contentFragment = onCreateContentFragment();
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.guided_step_fragment_container, contentFragment).commit();
         if (needsDoneButton()) {
-            doneButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View paramView) {
-                    SetupActionHelper.onActionClick(SetupMultiPaneFragment.this, ACTION_DONE);
-                }
-            });
+            setOnClickAction(view.findViewById(R.id.button_done), ACTION_DONE);
         } else {
-            doneButton.setVisibility(View.GONE);
+            View doneButtonContainer = view.findViewById(R.id.done_button_container);
+            if (view.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR) {
+                ((MarginLayoutParams) doneButtonContainer.getLayoutParams()).rightMargin =
+                        -getResources().getDimensionPixelOffset(
+                                R.dimen.setup_done_button_container_width);
+            } else {
+                ((MarginLayoutParams) doneButtonContainer.getLayoutParams()).leftMargin =
+                        -getResources().getDimensionPixelOffset(
+                                R.dimen.setup_done_button_container_width);
+            }
+            view.findViewById(R.id.button_done).setFocusable(false);
         }
         return view;
     }
@@ -56,9 +65,19 @@ public abstract class SetupMultiPaneFragment extends SetupFragment {
         return R.layout.fragment_setup_multi_pane;
     }
 
-    abstract protected Fragment getContentFragment();
+    abstract protected SetupGuidedStepFragment onCreateContentFragment();
 
     protected boolean needsDoneButton() {
         return true;
+    }
+
+    @Override
+    protected int[] getParentIdsForDelay() {
+        return new int[] {R.id.content_fragment, R.id.guidedactions_list};
+    }
+
+    @Override
+    public int[] getSharedElementIds() {
+        return new int[] {R.id.guidedactions_background, R.id.done_button_container};
     }
 }

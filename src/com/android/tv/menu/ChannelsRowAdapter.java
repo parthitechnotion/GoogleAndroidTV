@@ -88,7 +88,7 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
     public ChannelsRowAdapter(Context context, Recommender recommender,
             int minCount, int maxCount) {
         super(context);
-        mTracker = ((TvApplication) context.getApplicationContext()).getTracker();
+        mTracker = TvApplication.getSingletons(context).getTracker();
         mContext = context;
         mRecommender = recommender;
         mMinCount = minCount;

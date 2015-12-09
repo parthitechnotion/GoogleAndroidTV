@@ -32,8 +32,6 @@ import com.android.tv.data.ChannelDataManager;
 public final class OnboardingUtils {
     private static final String PREF_KEY_IS_FIRST_BOOT = "pref_onbaording_is_first_boot";
     private static final String PREF_KEY_IS_FIRST_RUN = "pref_onbaording_is_first_run";
-    private static final String PREF_KEY_ARE_CHANNELS_AVAILABLE =
-            "pref_onbaording_are_channels_available";
 
     /**
      * Checks if this is the first boot after the onboarding experience has been applied.
@@ -84,8 +82,7 @@ public final class OnboardingUtils {
      */
     @UiThread
     public static boolean areChannelsAvailable(Context context) {
-        ChannelDataManager manager = ((TvApplication) context.getApplicationContext())
-                .getChannelDataManager();
+        ChannelDataManager manager = TvApplication.getSingletons(context).getChannelDataManager();
         if (manager.isDbLoadFinished()) {
             return manager.getChannelCount() != 0;
         }

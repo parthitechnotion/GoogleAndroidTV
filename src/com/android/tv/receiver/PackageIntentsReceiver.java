@@ -21,82 +21,55 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.tv.TvInputInfo;
-import android.media.tv.TvInputManager;
-import android.os.Handler;
 
-import com.android.tv.Features;
 import com.android.tv.TvActivity;
-import com.android.tv.util.SetupUtils;
-
-import java.util.List;
+import com.android.tv.TvApplication;
+import com.android.usbtuner.TunerSetupActivity;
+import com.android.usbtuner.UsbTunerPreferences;
+import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 /**
  * A class for handling the broadcast intents from PackageManager.
  */
 public class PackageIntentsReceiver extends BroadcastReceiver {
-    // Delay before checking TvInputManager's input list.
-    // Sometimes TvInputManager's input list isn't updated yet when this receiver is called.
-    // So we should check the list after some delay.
-    private static final long TV_INPUT_UPDATE_DELAY_MS = 500;
-
-    private TvInputManager mTvInputManager;
-    private final Handler mHandler = new Handler();
-    private Runnable mOnPackageUpdatedRunnable;
     private PackageManager mPackageManager;
     private ComponentName mTvActivityComponentName;
+    private ComponentName mUsbTunerComponentName;
 
     private void init(Context context) {
-        mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
-
-        final Context applicationContext = context.getApplicationContext();
-        mOnPackageUpdatedRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!Features.ONBOARDING_EXPERIENCE.isEnabled(applicationContext)) {
-                    List<TvInputInfo> inputs = mTvInputManager.getTvInputList();
-                    // Enable the MainActivity only if there is at least one tuner type input.
-                    boolean enable = false;
-                    for (TvInputInfo input : inputs) {
-                        if (input.getType() == TvInputInfo.TYPE_TUNER) {
-                            enable = true;
-                            break;
-                        }
-                    }
-                    enableTvActivityWithinPackageManager(applicationContext, enable);
-                }
-
-                SetupUtils.getInstance(applicationContext).onInputListUpdated(mTvInputManager);
-            }
-        };
-
-        mPackageManager = applicationContext.getPackageManager();
-        mTvActivityComponentName = new ComponentName(applicationContext, TvActivity.class);
+        mPackageManager = context.getPackageManager();
+        mTvActivityComponentName = new ComponentName(context, TvActivity.class);
+        mUsbTunerComponentName = new ComponentName(context, UsbTunerTvInputService.class);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (mTvInputManager == null) {
+        if (mPackageManager == null) {
             init(context);
         }
-
-        mHandler.removeCallbacks(mOnPackageUpdatedRunnable);
-        mHandler.postDelayed(mOnPackageUpdatedRunnable, TV_INPUT_UPDATE_DELAY_MS);
-
+        ((TvApplication) context.getApplicationContext()).handleInputCountChanged();
+        // Check the component status of UsbTunerTvInputService and TvActivity here to make sure
+        // start the setup activity of USB tuner TV input service only when those components are
+        // enabled.
+        if (UsbTunerPreferences.shouldShowSetupActivity(context)
+                && Intent.ACTION_PACKAGE_CHANGED.equals(intent.getAction())
+                && mPackageManager.getComponentEnabledSetting(mTvActivityComponentName)
+                == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                && mPackageManager.getComponentEnabledSetting(mUsbTunerComponentName)
+                == PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
+            startUsbTunerSetupActivity(context);
+            UsbTunerPreferences.setShouldShowSetupActivity(context, false);
+        }
     }
 
-
     /**
-     * Enables/Disables {@link TvActivity}.
+     * Launches the setup activity of USB tuner TV input service.
+     *
+     * @param context {@link Context} instance
      */
-    private void enableTvActivityWithinPackageManager(Context context, boolean enable) {
-        PackageManager pm = context.getPackageManager();
-        ComponentName name = new ComponentName(context, TvActivity.class);
-
-        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-        if (pm.getComponentEnabledSetting(name) != newState) {
-            pm.setComponentEnabledSetting(name, newState, 0);
-        }
+    private static void startUsbTunerSetupActivity(Context context) {
+        Intent intent = TunerSetupActivity.createSetupActivity(context);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 }

@@ -48,6 +48,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.tv.R;
+import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.DurationTimer;
 import com.android.tv.analytics.Tracker;
@@ -331,9 +332,9 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         super(context, attrs, defStyleAttr, defStyleRes);
         inflate(getContext(), R.layout.tunable_tv_view, this);
 
-        TvApplication tvApplication = (TvApplication) context.getApplicationContext();
+        ApplicationSingletons appSingletons = TvApplication.getSingletons(context);
         mCanModifyParentalControls = PermissionUtils.hasModifyParentalControls(context);
-        mTracker = tvApplication.getTracker();
+        mTracker = appSingletons.getTracker();
         mBlockScreenType = BLOCK_SCREEN_TYPE_NORMAL;
         mBlockScreenView = findViewById(R.id.block_screen);
         mBlockScreenDescriptionView = findViewById(R.id.block_screen_description);

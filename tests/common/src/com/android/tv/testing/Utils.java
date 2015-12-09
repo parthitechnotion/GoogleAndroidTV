@@ -29,6 +29,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.tv.common.TvCommonUtils;
 import com.android.tv.util.MainThreadExecutor;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ import java.util.concurrent.Future;
  *
  * <p>This class is also used to check whether TV app is running in tests or not.
  *
- * @see com.android.tv.util.Utils#isRunningInTest
+ * @see TvCommonUtils#isRunningInTest
  */
 public final class Utils {
     private static final String TAG ="Utils";

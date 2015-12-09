@@ -18,8 +18,10 @@ package com.android.tv.ui.sidepanel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.android.tv.Features;
@@ -98,8 +100,7 @@ public class AboutFragment extends SideFragment {
             super(context.getResources().getString(R.string.about_menu_improve),
                     context.getResources().getString(R.string.about_menu_improve),
                     context.getResources().getString(R.string.about_menu_improve_summary));
-            mPreferenceHelper = ((TvApplication) context.getApplicationContext())
-                    .getOptPreferenceHelper();
+            mPreferenceHelper = TvApplication.getSingletons(context).getOptPreferenceHelper();
         }
 
         @Override
@@ -140,9 +141,9 @@ public class AboutFragment extends SideFragment {
             if (mMainActivity != null && mBoundView != null && mBoundView.hasFocus()) {
                 // Quick fix for accessibility
                 // TODO: Need to change the resource in the future.
-                mMainActivity.sendAccessiblityText(checked ?
-                        mMainActivity.getString(R.string.options_item_pip_on)
-                        : mMainActivity.getString(R.string.options_item_pip_off));
+                mMainActivity.sendAccessibilityText(
+                        checked ? mMainActivity.getString(R.string.options_item_pip_on)
+                                : mMainActivity.getString(R.string.options_item_pip_off));
             }
         }
     }
@@ -167,6 +168,19 @@ public class AboutFragment extends SideFragment {
         }
         if (Features.ANALYTICS_OPT_OUT.isEnabled(activity)) {
             items.add(new AllowAnalyticsItem(activity));
+        }
+        boolean developerOptionEnabled = Settings.Secure.getInt(getActivity().getContentResolver(),
+                Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
+        if (Features.DEVELOPER_OPTION.isEnabled(getActivity()) && developerOptionEnabled
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Resources res = getActivity().getResources();
+            items.add(new ActionItem(res.getString(R.string.side_panel_title_developer)) {
+                @Override
+                protected void onSelected() {
+                    getMainActivity().getOverlayManager().getSideFragmentManager().show(
+                            new DeveloperFragment());
+                }
+            });
         }
         return items;
     }

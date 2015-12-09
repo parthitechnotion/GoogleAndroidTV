@@ -29,6 +29,9 @@
     <!-- Name of application [CHAR LIMIT=NONE] -->
     <string name="app_name">Live TV</string>
 
+    <!--TODO(DVR): decide if translation needed Name of DVR service [CHAR LIMIT=NONE]  -->
+    <string name="dvr_service_name" translatable="false">DVR Service</string>
+
     <!-- Title of an application permission, listed so the user can choose
         whether they want to allow the application to do this. -->
     <string name="permlab_receiveInputEvent" translatable="false">receive input events from Live TV app</string>
@@ -403,6 +406,21 @@
     <!-- Menu item that shows the application version(eg 1.2.03-final) as a second line below this title [CHAR LIMIT=35] -->
     <string name="about_menu_version">Version</string>
 
+    <!-- menu for "Developer options" -->
+    <eat-comment />
+    <!--  Title of "Developer options" option. [CHAR LIMIT=30] -->
+    <string name="side_panel_title_developer">Developer options</string>
+    <!-- Menu switch to turn on/off USB TV tuner feature. [CHAR LIMIT=60] -->
+    <string name="developer_menu_enable_usb_tv_tuner">Enable USB TV tuner</string>
+    <!-- Menu switch description of USB TV tuner switch. [CHAR LIMIT=120] -->
+    <string name="developer_menu_enable_usb_tv_tuner_description">To hear sound of USB TV tuner, your TV should support AC3 passthrough.</string>
+    <!-- Menu item to shows AC3 passthrough capability. [CHAR LIMIT=60] -->
+    <string name="developer_menu_ac3_support">AC3 audio capability</string>
+    <!-- Menu item description when the user's TV supports AC3 passthrough. [CHAR LIMIT=120] -->
+    <string name="developer_menu_ac3_support_yes">Your TV supports AC3 passthrough.</string>
+    <!-- Menu item to shows that the user's TV doesn't support AC3 passthrough. [CHAR LIMIT=120] -->
+    <string name="developer_menu_ac3_support_no">Your TV doesn\'t support AC3 passthrough.</string>
+
     <!-- opt out preferences -->
     <eat-comment />
 
@@ -433,7 +451,7 @@
     <string name="shrunken_tvview_content_locked_format">This program is rated <xliff:g id="rating" example="TV_MA">%1$s</xliff:g></string>
 
     <!-- The text message which is shown when the current program is audio only one.
-         i.e. The program dones't have a video. [CHAR LIMIT=NONE] -->
+         i.e. The program doesn't have a video. [CHAR LIMIT=NONE] -->
     <string name="tvview_msg_audio_only">Audio only</string>
 
     <!-- Channel Banner -->
@@ -468,6 +486,17 @@
     <string name="intro_title">@string/app_name</string>
     <!-- Description of Intro Dialog [CHAR LIMIT=NONE] -->
     <string name="intro_description"><b>Press SELECT</b> to access the TV menu.</string>
+
+    <!-- DVR in EPG
+         TODO(DVR): make translatable true. -->
+    <eat-comment />
+    <!-- Item label to schedule program recording. -->
+    <string name="epg_dvr_record_program" translatable="false">Record program</string>
+    <!-- Item label to schedule whole season recording of a TV show. -->
+    <string name="epg_dvr_record_season" translatable="false">Record season</string>
+    <!-- Item label to delete a recording schedule when a recording scheduled program is
+         clicked in EPG. -->
+    <string name="epg_dvr_delete_program" translatable="false">Delete schedule</string>
 
     <!-- Toast messages -->
     <eat-comment />
@@ -524,17 +553,11 @@
 
     <!-- Onboarding experience.
          TODO: Change translatable to true.-->
-    <!-- Text for the illustration area -->
-    <string name="illustration_area_text" translatable="false">ILLUSTRATION AREA</string>
-    <!-- Text for the button which is used to navigate to the next page -->
-    <string name="welcome_next_button_text" translatable="false">Next &gt;</string>
-    <!-- Text for the button which is used to start the channel source setup. -->
-    <string name="welcome_start_button_text" translatable="false">Get started &gt;</string>
     <!-- Text for the Live TV overview screen in onboarding. -->
     <string name="app_overview_text" translatable="false">Get Live TV</string>
     <!-- Description for the Live TV overview screen in onboarding. -->
     <string name="app_overview_description_has_ac3" translatable="false">Live channels combine the experience of traditional TV channels with streaming channels provided by apps. Get started by setting up the channel sources you already have available, or browse the Google Play Store for more apps that offer live channels.
-\n\nAlso, learn about getting over-the-air broadcast channels like ABC, CBS, NBC, and FOX when you add a compatible TV tuner &amp; HDTV antenna to your Nexus Player.</string>
+\nAlso, learn about getting over-the-air broadcast channels like ABC, CBS, NBC, and FOX when you add a compatible TV tuner &amp; HDTV antenna to your Nexus Player.</string>
     <string name="app_overview_description_no_ac3" translatable="false">Live channels combine the experience of traditional TV channels with streaming channels provided by apps. Get started by setting up the channel sources you already have available, or browse the Google nPlay Store for more apps that offer live channels.</string>
     <!-- Text for the action for setting up channel sources. It will show the setup page of the channel sources. -->
     <string name="app_overview_action_text_setup_source" translatable="false">Set up your channel sources</string>
@@ -552,5 +575,5 @@
     <string name="setup_sources_text" translatable="false">Channel sources</string>
     <!-- Description for channel sources screen in onboarding. -->
     <string name="setup_sources_description" translatable="false">Set up live channels from the available sources. This may take several minutes depending on the channel source.
-\n\nGet more channels by installing compatible apps from the Google Play Store.</string>
+\nGet more channels by installing compatible apps from the Google Play Store.</string>
 </resources>

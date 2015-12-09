@@ -16,7 +16,9 @@
 
 package com.android.tv.guide;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -34,15 +36,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.tv.ApplicationSingletons;
+import com.android.tv.Features;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.data.Channel;
+import com.android.tv.data.Program;
+import com.android.tv.dvr.DvrManager;
 import com.android.tv.guide.ProgramManager.TableEntry;
 import com.android.tv.util.Utils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ProgramItemView extends TextView {
@@ -50,6 +58,9 @@ public class ProgramItemView extends TextView {
 
     private static final long FOCUS_UPDATE_FREQUENCY = TimeUnit.SECONDS.toMillis(1);
     private static final int MAX_PROGRESS = 10000; // From android.widget.ProgressBar.MAX_VALUE
+
+    private static final int ACTION_RECORD_PROGRAM = 100;
+    private static final int ACTION_RECORD_SEASON = 101;
 
     // State indicating the focused program is the current program
     private static final int[] STATE_CURRENT_PROGRAM = { R.attr.state_current_program };
@@ -77,8 +88,8 @@ public class ProgramItemView extends TextView {
         @Override
         public void onClick(View view) {
             TableEntry entry = ((ProgramItemView) view).mTableEntry;
-            Tracker tracker = ((TvApplication) view.getContext().getApplicationContext())
-                    .getTracker();
+            ApplicationSingletons singletons = TvApplication.getSingletons(view.getContext());
+            Tracker tracker = singletons.getTracker();
             tracker.sendEpgItemClicked();
             if (entry.isCurrentProgram()) {
                 final MainActivity tvActivity = (MainActivity) view.getContext();
@@ -92,6 +103,37 @@ public class ProgramItemView extends TextView {
                     }
                 }, entry.getWidth() > ((ProgramItemView) view).mMaxWidthForRipple ? 0 :
                     view.getResources().getInteger(R.integer.program_guide_ripple_anim_duration));
+            } else if (Features.DVR.isEnabled(view.getContext())) {
+                List<CharSequence> items = new ArrayList<>();
+                final List<Integer> actions = new ArrayList<>();
+                // TODO: the items can be changed by the state of the program. For example,
+                // if the program is already added in scheduler, we need to show an item to
+                // delete the recording schedule.
+                items.add(view.getResources().getString(R.string.epg_dvr_record_program));
+                actions.add(ACTION_RECORD_PROGRAM);
+                items.add(view.getResources().getString(R.string.epg_dvr_record_season));
+                actions.add(ACTION_RECORD_SEASON);
+                final MainActivity tvActivity = (MainActivity) view.getContext();
+                final DvrManager dvrManager = singletons.getDvrManager();
+                final Channel channel = tvActivity.getChannelDataManager()
+                        .getChannel(entry.channelId);
+                final Program program = entry.program;
+                // TODO: it is a tentative UI. Don't publish the UI.
+                new AlertDialog.Builder(view.getContext())
+                        .setItems(items.toArray(new CharSequence[items.size()]),
+                                new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (actions.get(which) == ACTION_RECORD_PROGRAM) {
+                                    dvrManager.addSchedule(program);
+                                } else if (actions.get(which) == ACTION_RECORD_SEASON) {
+                                    dvrManager.addSeasonSchedule(program);
+                                }
+                                dialog.dismiss();
+                            }
+                        })
+                        .create()
+                        .show();
             }
         }
     };

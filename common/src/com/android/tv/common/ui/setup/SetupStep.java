@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 public abstract class SetupStep {
     private final SetupStep mPreviousStep;
     private final int mPreviousBackStackRecordCount;
+    private Fragment mFragment;
 
     public SetupStep(FragmentManager fragmentManager, @Nullable SetupStep previousStep) {
         mPreviousStep = previousStep;
@@ -33,27 +34,17 @@ public abstract class SetupStep {
     }
 
     /**
+     * Creates and Returns a fragment for this step.
+     */
+    public Fragment createFragment() {
+        mFragment = onCreateFragment();
+        return mFragment;
+    }
+
+    /**
      * Returns fragment to represent this step.
      */
     protected abstract Fragment onCreateFragment();
-
-    /**
-     * Returns whether this step needs to be added to the back stack or not.
-     *
-     * <p>The default behavior is to add the fragment to the back stack.
-     */
-    protected boolean needsToBeAddedToBackStack() {
-        return true;
-    }
-
-    /**
-     * Returns whether this step needs fragment transition animations or not.
-     *
-     * <p>The default value is {@code} true.
-     */
-    protected boolean needsFragmentTransitionAnimation() {
-        return true;
-    }
 
     /**
      * Executes the given action.
@@ -73,5 +64,12 @@ public abstract class SetupStep {
     @Nullable
     public SetupStep getPreviousStep() {
         return mPreviousStep;
+    }
+
+    /**
+     * Returns the fragment which represents this step.
+     */
+    public Fragment getFragment() {
+        return mFragment;
     }
 }

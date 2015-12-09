@@ -48,7 +48,7 @@ public abstract class SafeDismissDialogFragment extends DialogFragment
         super.onAttach(activity);
         mAttached = true;
         mActivity = (MainActivity) activity;
-        mTracker = ((TvApplication) activity.getApplication()).getTracker();
+        mTracker = TvApplication.getSingletons(activity).getTracker();
         if (mDismissPending) {
             mDismissPending = false;
             dismiss();

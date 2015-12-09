@@ -41,6 +41,7 @@ import java.util.Map;
  */
 public class ChannelUtils {
     private static final String TAG = "ChannelUtils";
+    private static final boolean DEBUG = false;
 
     /**
      * Query and return the map of (channel_id, ChannelInfo).
@@ -115,10 +116,10 @@ public class ChannelUtils {
             Long rowId = existingChannelsMap.get(channel.originalNetworkId);
             Uri uri;
             if (rowId == null) {
-                Log.v(TAG, "Inserting "+ channel);
+                if (DEBUG) Log.d(TAG, "Inserting "+ channel);
                 uri = resolver.insert(TvContract.Channels.CONTENT_URI, values);
             } else {
-                Log.v(TAG, "Updating "+ channel);
+                if (DEBUG) Log.d(TAG, "Updating "+ channel);
                 uri = TvContract.buildChannelUri(rowId);
                 resolver.update(uri, values, null, null);
                 existingChannelsMap.remove(channel.originalNetworkId);

@@ -56,7 +56,7 @@ public abstract class OptionsRowAdapter extends ItemListRowView.ItemListAdapter<
 
     public OptionsRowAdapter(Context context) {
         super(context);
-        mTracker = ((TvApplication) context.getApplicationContext()).getTracker();
+        mTracker = TvApplication.getSingletons(context).getTracker();
     }
 
     /**

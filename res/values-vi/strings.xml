@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Giấy phép nguồn mở"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Giấy phép nguồn mở"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Phiên bản"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Tùy chọn nhà phát triển"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Bật bộ dò TV USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Để nghe được âm thanh của bộ dò TV USB, TV của bạn cần hỗ trợ chuyển qua AC3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Chức năng âm thanh AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"TV của bạn hỗ trợ chuyển qua AC3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"TV của bạn không hỗ trợ chuyển qua AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Giúp cải tiến ứng dụng Kênh trực tiếp"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Chia sẻ ẩn danh dữ liệu sử dụng và chẩn đoán với Google để chúng tôi có thể làm cho Kênh trực tiếp tốt hơn và ngăn chặn các sự cố như bị lỗi và treo."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Để xem kênh này, hãy nhấn vào Quyền và nhập mã PIN của bạn"</string>

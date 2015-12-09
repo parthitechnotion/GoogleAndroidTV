@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licenças de código aberto"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licenças de código aberto"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versão"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Opções de programador"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Ativar sintonizador de TV USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Para ouvir som do sintonizador de TV USB, a TV deve ser compatível com a passagem AC3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Capacidade de áudio AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"A sua TV é compatível com a passagem AC3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"A sua TV não é compatível com a passagem AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Ajudar a melhorar a aplicação Canais em direto"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Partilhar dados de diagnóstico e de utilização anónimos com a Google para melhorar os Canais em Direto e evitar problemas, como falhas e bloqueios."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Para ver este canal, prima Direito e introduza o PIN"</string>

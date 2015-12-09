@@ -28,7 +28,7 @@ import com.android.tv.common.WeakHandler;
  * Listener to make focus change faster over time.
  */
 public class OnRepeatedKeyInterceptListener implements VerticalGridView.OnKeyInterceptListener {
-    private static final String TAG = "OnRepeatedKeyInterceptListener";
+    private static final String TAG = "OnRepeatedKeyListener";
     private static final boolean DEBUG = false;
 
     private static final int[] THRESHOLD_FAST_FOCUS_CHANGE_TIME_MS = { 2000, 5000 };

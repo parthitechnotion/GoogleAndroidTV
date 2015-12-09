@@ -21,6 +21,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.media.tv.TvInputInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,15 +32,18 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.tv.R;
+import com.android.tv.TvApplication;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.common.ui.setup.SetupStep;
 import com.android.tv.common.ui.setup.SteppedSetupActivity;
+import com.android.tv.data.ChannelDataManager;
 import com.android.tv.receiver.AudioCapabilitiesReceiver;
 import com.android.tv.util.OnboardingUtils;
 import com.android.tv.util.SetupUtils;
 import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class OnboardingActivity extends SteppedSetupActivity {
@@ -116,6 +120,15 @@ public class OnboardingActivity extends SteppedSetupActivity {
         startInitialStep();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_SETUP_USB_TUNER && resultCode == RESULT_OK) {
+            SetupUtils.getInstance(this).onTvInputSetupFinished(Utils.getUsbTunerInputId(this),
+                    null);
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     private static class OnboardingActivityHandler extends WeakHandler<OnboardingActivity> {
         OnboardingActivityHandler(OnboardingActivity activity) {
@@ -132,9 +145,9 @@ public class OnboardingActivity extends SteppedSetupActivity {
             }
         }
     }
-    
+
     void finishActivity() {
-        Intent intentForNextActivity = (Intent) getIntent().getParcelableExtra(
+        Intent intentForNextActivity = getIntent().getParcelableExtra(
                 KEY_INTENT_AFTER_COMPLETION);
         if (intentForNextActivity != null) {
             startActivity(intentForNextActivity);
@@ -153,22 +166,12 @@ public class OnboardingActivity extends SteppedSetupActivity {
         }
 
         @Override
-        protected boolean needsToBeAddedToBackStack() {
-            return false;
-        }
-
-        @Override
-        protected boolean needsFragmentTransitionAnimation() {
-            return false;
-        }
-
-        @Override
         public void executeAction(int actionId) {
             switch (actionId) {
                 case WelcomeFragment.ACTION_NEXT:
                     OnboardingUtils.setFirstRunCompleted(OnboardingActivity.this);
                     if (!OnboardingUtils.areChannelsAvailable(OnboardingActivity.this)) {
-                        startStep(new AppOverviewStep(this));
+                        startStep(new AppOverviewStep(this), false);
                     } else {
                         // TODO: Go to the correct step.
                         finishActivity();
@@ -179,6 +182,9 @@ public class OnboardingActivity extends SteppedSetupActivity {
     }
 
     private class AppOverviewStep extends SetupStep {
+        private static final String TV_MERCHANT_COLLECTION = "https://play.google.com/store/apps/"
+                + "collection/promotion_3001bf9_ATV_livechannels?sticky_source_country=";
+
         public AppOverviewStep(@Nullable SetupStep previousStep) {
             super(getFragmentManager(), previousStep);
         }
@@ -193,21 +199,40 @@ public class OnboardingActivity extends SteppedSetupActivity {
         }
 
         @Override
-        protected boolean needsToBeAddedToBackStack() {
-            return false;
-        }
-
-        @Override
         public void executeAction(int actionId) {
             switch (actionId) {
-                case AppOverviewFragment.ACTION_SETUP_SOURCE:
-                    startStep(new SetupSourcesStep(this));
+                case AppOverviewFragment.ACTION_SETUP_SOURCE: {
+                    startStep(new SetupSourcesStep(this), true);
                     break;
+                }
                 case AppOverviewFragment.ACTION_GET_MORE_CHANNELS:
-                    // TODO: Implement this.
-                    Toast.makeText(OnboardingActivity.this, "Not implemented yet.",
-                            Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(TV_MERCHANT_COLLECTION + Locale.getDefault().getCountry())));
                     break;
+                case AppOverviewFragment.ACTION_SETUP_USB_TUNER: {
+                    Context context = OnboardingActivity.this;
+                    TvInputInfo input = Utils.getUsbTunerInputInfo(context);
+                    if (input != null) {
+                        SetupUtils.grantEpgPermission(context,
+                                input.getServiceInfo().packageName);
+                        Intent intent = input.createSetupIntent();
+                        try {
+                            startActivityForResult(intent, REQUEST_CODE_SETUP_USB_TUNER);
+                        } catch (ActivityNotFoundException e) {
+                            Toast.makeText(context, getString(
+                                    R.string.msg_unable_to_start_setup_activity,
+                                    input.loadLabel(context)), Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "Can't find activity: " + intent.getComponent(), e);
+                            break;
+                        }
+                        // TODO: Add transition animation.
+                    } else {
+                        // TODO: Implement this.
+                        Toast.makeText(OnboardingActivity.this, "Not implemented yet.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                }
             }
         }
     }
@@ -225,9 +250,16 @@ public class OnboardingActivity extends SteppedSetupActivity {
         @Override
         public void executeAction(int actionId) {
             switch (actionId) {
-                case SetupSourcesFragment.ACTION_DONE:
-                    finishActivity();
+                case SetupSourcesFragment.ACTION_DONE: {
+                    ChannelDataManager manager = TvApplication.getSingletons(
+                            OnboardingActivity.this).getChannelDataManager();
+                    if (manager.getChannelCount() == 0) {
+                        finish();
+                    } else {
+                        finishActivity();
+                    }
                     break;
+                }
             }
         }
     }

@@ -98,4 +98,9 @@ public class BooleanSystemProperty {
         }
         return mValue;
     }
+
+    @Override
+    public String toString() {
+        return "SystemProperty[" + mKey + "]=" + getValue();
+    }
 }

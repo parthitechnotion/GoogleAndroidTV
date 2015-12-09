@@ -37,5 +37,5 @@ public interface SearchInterface {
      * @param action One of {@link #ACTION_TYPE_SWITCH_CHANNEL}, {@link #ACTION_TYPE_SWITCH_INPUT},
      *               or {@link #ACTION_TYPE_AMBIGUOUS},
      */
-    public List<SearchResult> search(String query, int limit, int action);
+    List<SearchResult> search(String query, int limit, int action);
 }

@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"開放原始碼授權"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"開放原始碼授權"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"版本"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"開發人員選項"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"啟用 USB 電視調諧器"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"您的電視必須支援 AC3 傳輸功能，才能播放 USB 電視調諧器的聲音。"</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 音訊功能"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"您的電視支援 AC3 傳輸功能。"</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"您的電視不支援 AC3 傳輸功能。"</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"協助改善直播頻道"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"將匿名的使用情形資料與診斷資料提供給 Google，協助我們改善直播頻道以及避免發生當機和畫面凍結等問題。"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"如要觀看這個頻道，請按向右鍵並輸入您的 PIN"</string>

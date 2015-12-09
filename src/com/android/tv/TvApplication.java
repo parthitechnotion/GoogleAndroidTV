@@ -18,15 +18,18 @@ package com.android.tv;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
+import android.media.tv.TvInputManager.TvInputCallback;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -35,18 +38,32 @@ import com.android.tv.analytics.StubAnalytics;
 import com.android.tv.analytics.OptOutPreferenceHelper;
 import com.android.tv.analytics.StubAnalytics;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.TvCommonUtils;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.ProgramDataManager;
+import com.android.tv.dvr.DvrDataManager;
+import com.android.tv.dvr.DvrDataManagerImpl;
+import com.android.tv.dvr.DvrManager;
+import com.android.tv.dvr.DvrRecordingService;
+import com.android.tv.dvr.DvrSessionManager;
+import com.android.tv.util.SetupUtils;
 import com.android.tv.util.SystemProperties;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
 import java.util.List;
 
-public class TvApplication extends Application {
+public class TvApplication extends Application implements ApplicationSingletons {
     private static final String TAG = "TvApplication";
     private static final boolean DEBUG = false;
     private static String versionName = "";
+
+    /**
+     * Returns the @{@link ApplicationSingletons} using the application context.
+     */
+    public static ApplicationSingletons getSingletons(Context context) {
+        return (ApplicationSingletons) context.getApplicationContext();
+    }
 
     private MainActivity mMainActivity;
     private SelectInputActivity mSelectInputActivity;
@@ -56,10 +73,22 @@ public class TvApplication extends Application {
     private ChannelDataManager mChannelDataManager;
     private ProgramDataManager mProgramDataManager;
     private OptOutPreferenceHelper mOptPreferenceHelper;
+    private DvrManager mDvrManager;
+    private DvrDataManagerImpl mDvrDataManager;
+    @Nullable
+    private DvrSessionManager mDvrSessionManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.w(TAG, "Unable to get version name.", e);
+            versionName = "";
+        }
+        Log.i(TAG, "Starting Live TV " + getVersionName());
         // Only set StrictMode for ENG builds because the build server only produces userdebug
         // builds.
         if (BuildConfig.ENG && SystemProperties.ALLOW_STRICT_MODE.getValue()) {
@@ -68,7 +97,7 @@ public class TvApplication extends Application {
             StrictMode.VmPolicy.Builder vmPolicyBuilder = new StrictMode.VmPolicy.Builder()
                     .detectAll().penaltyLog();
             if (BuildConfig.ENG && SystemProperties.ALLOW_DEATH_PENALTY.getValue() &&
-                    !Utils.isRunningInTest()) {
+                    !TvCommonUtils.isRunningInTest()) {
                 // TODO turn on death penalty for tests when they stop leaking MainActivity
             }
             StrictMode.setVmPolicy(vmPolicyBuilder.build());
@@ -100,21 +129,47 @@ public class TvApplication extends Application {
                 }
             }.execute();
         }
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            versionName = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.w(TAG, "Unable to get version name.", e);
-            versionName = "";
-        }
         mTvInputManagerHelper = new TvInputManagerHelper(this);
         mTvInputManagerHelper.start();
+        mTvInputManagerHelper.addCallback(new TvInputCallback() {
+            @Override
+            public void onInputAdded(String inputId) {
+                handleInputCountChanged();
+            }
+
+            @Override
+            public void onInputRemoved(String inputId) {
+                handleInputCountChanged();
+            }
+        });
         if (DEBUG) Log.i(TAG, "Started Live TV " + versionName);
+        if (Features.DVR.isEnabled(this)) {
+            mDvrManager = new DvrManager(this);
+            //NOTE: DvrRecordingService just keeps running.
+            DvrRecordingService.startService(this);
+        }
+    }
+
+    /**
+     * Returns the {@link DvrManager}.
+     */
+    @Override
+    public DvrManager getDvrManager() {
+        return mDvrManager;
+    }
+
+    @Override
+    public DvrSessionManager getDvrSessionManger() {
+        if (mDvrSessionManager == null) {
+            mDvrSessionManager = new DvrSessionManager(this);
+        }
+        return mDvrSessionManager;
     }
 
     /**
      * Returns the {@link Analytics}.
      */
+    @Override
     public Analytics getAnalytics() {
         return mAnalytics;
     }
@@ -122,10 +177,12 @@ public class TvApplication extends Application {
     /**
      * Returns the default tracker.
      */
+    @Override
     public Tracker getTracker() {
         return mTracker;
     }
 
+    @Override
     public OptOutPreferenceHelper getOptPreferenceHelper(){
         return mOptPreferenceHelper;
     }
@@ -133,6 +190,7 @@ public class TvApplication extends Application {
     /**
      * Returns {@link ChannelDataManager}.
      */
+    @Override
     public ChannelDataManager getChannelDataManager() {
         if (mChannelDataManager == null) {
             mChannelDataManager = new ChannelDataManager(this, mTvInputManagerHelper, mTracker);
@@ -144,6 +202,7 @@ public class TvApplication extends Application {
     /**
      * Returns {@link ProgramDataManager}.
      */
+    @Override
     public ProgramDataManager getProgramDataManager() {
         if (mProgramDataManager == null) {
             mProgramDataManager = new ProgramDataManager(this);
@@ -153,8 +212,21 @@ public class TvApplication extends Application {
     }
 
     /**
+     * Returns {@link DvrDataManager}.
+     */
+    @Override
+    public DvrDataManager getDvrDataManager() {
+        if (mDvrDataManager == null) {
+            mDvrDataManager = new DvrDataManagerImpl(this);
+            mDvrDataManager.start();
+        }
+        return mDvrDataManager;
+    }
+
+    /**
      * Returns {@link TvInputManagerHelper}.
      */
+    @Override
     public TvInputManagerHelper getTvInputManagerHelper() {
         return mTvInputManagerHelper;
     }
@@ -255,4 +327,30 @@ public class TvApplication extends Application {
        return versionName;
     }
 
+    /**
+     * Checks the input counts and enable/disable TvActivity. Also updates the input list in
+     * {@link SetupUtils}.
+     */
+    public void handleInputCountChanged() {
+        TvInputManager inputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
+        if (!Features.UNHIDE.isEnabled(TvApplication.this)) {
+            List<TvInputInfo> inputs = inputManager.getTvInputList();
+            // Enable the TvActivity only if there is at least one tuner type input.
+            boolean enable = false;
+            for (TvInputInfo input : inputs) {
+                if (input.getType() == TvInputInfo.TYPE_TUNER) {
+                    enable = true;
+                    break;
+                }
+            }
+            PackageManager packageManager = getPackageManager();
+            ComponentName name = new ComponentName(this, TvActivity.class);
+            int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+            if (packageManager.getComponentEnabledSetting(name) != newState) {
+                packageManager.setComponentEnabledSetting(name, newState, 0);
+            }
+        }
+        SetupUtils.getInstance(TvApplication.this).onInputListUpdated(inputManager);
+    }
 }

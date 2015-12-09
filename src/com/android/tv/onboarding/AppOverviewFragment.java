@@ -16,7 +16,6 @@
 
 package com.android.tv.onboarding;
 
-import android.app.Fragment;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v17.leanback.widget.GuidanceStylist.Guidance;
@@ -25,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.tv.Features;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.common.ui.setup.SetupGuidedStepFragment;
@@ -54,7 +54,7 @@ public class AppOverviewFragment extends SetupMultiPaneFragment {
     }
 
     @Override
-    protected Fragment getContentFragment() {
+    protected SetupGuidedStepFragment onCreateContentFragment() {
         return new ContentFragment();
     }
 
@@ -77,8 +77,9 @@ public class AppOverviewFragment extends SetupMultiPaneFragment {
 
         @Override
         public void onCreateActions(List<GuidedAction> actions, Bundle savedInstanceState) {
-            boolean hasTvInput = ((TvApplication) getActivity().getApplicationContext())
-                    .getTvInputManagerHelper().getTunerTvInputSize() > 0;
+            boolean hasTvInput =
+                    TvApplication.getSingletons(getActivity()).getTvInputManagerHelper()
+                            .getTunerTvInputSize() > 0;
             Resources res = getResources();
             if (hasTvInput) {
                 actions.add(new GuidedAction.Builder()
@@ -88,12 +89,15 @@ public class AppOverviewFragment extends SetupMultiPaneFragment {
                                 R.string.app_overview_action_description_setup_source))
                         .build());
             }
-            actions.add(new GuidedAction.Builder()
-                    .id(ACTION_GET_MORE_CHANNELS)
-                    .title(res.getString(R.string.app_overview_action_text_play_store))
-                    .description(res.getString(R.string.app_overview_action_description_play_store))
-                    .build());
-            if (mAc3Supported) {
+            if (Features.ONBOARDING_PLAY_STORE.isEnabled(getActivity())) {
+                actions.add(new GuidedAction.Builder()
+                        .id(ACTION_GET_MORE_CHANNELS)
+                        .title(res.getString(R.string.app_overview_action_text_play_store))
+                        .description(res.getString(
+                                R.string.app_overview_action_description_play_store))
+                        .build());
+            }
+            if (Features.ONBOARDING_USB_TUNER.isEnabled(getActivity()) && mAc3Supported) {
                 actions.add(new GuidedAction.Builder()
                         .id(ACTION_SETUP_USB_TUNER)
                         .title(res.getString(R.string.app_overview_action_text_usb_tuner))

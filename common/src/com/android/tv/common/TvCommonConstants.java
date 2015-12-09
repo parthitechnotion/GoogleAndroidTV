@@ -16,6 +16,7 @@
 
 package com.android.tv.common;
 
+import android.media.tv.TvInputInfo;
 import android.os.Build;
 
 /**
@@ -39,17 +40,27 @@ public final class TvCommonConstants {
      * activity successfully finishes.
      */
     public static final String INTENT_ACTION_INPUT_SETUP =
-            "com.android.tv.intent.action.INPUT_SETUP";
+            "com.android.tv.action.LAUNCH_INPUT_SETUP";
+
     /**
-     * A constant for the key to indicate a TV input ID for the intent action
+     * A constant of the key to indicate a TV input ID for the intent action
      * {@link INTENT_ACTION_INPUT_SETUP}.
      *
      * <p>Value type: String
      */
-    public static final String EXTRA_INPUT_ID =
-            "com.android.tv.intent.extra.INPUT_ID";
+    public static final String EXTRA_INPUT_ID = TvInputInfo.EXTRA_INPUT_ID;
+
     /**
-     * A constant for the key to indicate an Activity launch intent for the intent action
+     * A constant of the key for intent to launch actual TV input setup activity used with
+     * {@link INTENT_ACTION_INPUT_SETUP}.
+     *
+     * <p>Value type: Intent (Parcelable)
+     */
+    public static final String EXTRA_SETUP_INTENT =
+            "com.android.tv.extra.SETUP_INTENT";
+
+    /**
+     * A constant of the key to indicate an Activity launch intent for the intent action
      * {@link INTENT_ACTION_INPUT_SETUP}.
      *
      * <p>Value type: Intent (Parcelable)

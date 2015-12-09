@@ -38,4 +38,9 @@ public class GServiceFeature implements Feature {
         // GServices is not available outside of Google.
         return mDefaultValue;
     }
+
+    @Override
+    public String toString() {
+        return "GService[hash=" + mKey.hashCode() + "]";
+    }
 }

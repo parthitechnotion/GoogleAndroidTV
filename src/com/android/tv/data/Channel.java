@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.tv.common.TvCommonConstants;
+import com.android.tv.dvr.provider.DvrContract;
 import com.android.tv.util.ImageLoader;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
@@ -113,6 +114,15 @@ public final class Channel {
     }
 
     /**
+     * Use this projection if you want to create {@link Channel} object using
+     * {@link #fromDvrCursor}.
+     */
+    public static final String[] PROJECTION_DVR = {
+        // Columns must match what is read in Channel.fromDvrCursor()
+        DvrContract.DvrChannels._ID
+    };
+
+    /**
      * Creates {@code Channel} object from cursor.
      *
      * <p>The query that created the cursor MUST use {@link #PROJECTION}
@@ -142,6 +152,16 @@ public final class Channel {
         return channel;
     }
 
+    /**
+     * Creates a {@link Channel} object from the DVR database.
+     */
+    public static Channel fromDvrCursor(Cursor c) {
+        Channel channel = new Channel();
+        int index = -1;
+        channel.mDvrId = c.getLong(++index);
+        return channel;
+    }
+
     /** ID of this channel. Matches to BaseColumns._ID. */
     private long mId;
 
@@ -162,6 +182,13 @@ public final class Channel {
     private String mAppLinkIntentUri;
     private Intent mAppLinkIntent;
     private int mAppLinkType;
+
+    private long mDvrId;
+
+    /**
+     * TODO(DVR): Need to fill the following data.
+     */
+    private boolean mRecordable;
 
     public interface LoadImageCallback {
         void onLoadImageFinished(Channel channel, int type, Bitmap logo);
@@ -235,6 +262,13 @@ public final class Channel {
 
     public String getAppLinkIntentUri() {
         return mAppLinkIntentUri;
+    }
+
+    /**
+     * Returns an ID in DVR database.
+     */
+    public long getDvrId() {
+        return mDvrId;
     }
 
     /**
@@ -566,6 +600,7 @@ public final class Channel {
                     return;
                 }
             } catch (URISyntaxException e) {
+                Log.w(TAG, "Unable to set app link for " + mAppLinkIntentUri, e);
                 // Do nothing.
             }
         }

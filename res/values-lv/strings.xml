@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Atklātā pirmkoda licences"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Atklātā pirmkoda licences"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versija"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Izstrādātājiem paredzētās opcijas"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Iespējot USB TV kanālu meklētāju"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Jūsu TV ir jābūt atbalstītai AC3 tālāknodošanai, lai varētu dzirdēt USB TV kanālu meklētāja skaņu."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 audio atbalsts"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Jūsu TV tiek atbalstīta AC3 tālāknodošana."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Jūsu TV netiek atbalstīta AC3 tālāknodošana."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Palīdzēt uzlabot tiešraides kanālus"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Kopīgojiet anonīmus lietojuma un diagnostikas datus ar uzņēmumu Google, lai mēs varētu uzlabot lietotni Dzīvie kanāli un novērst tādas problēmas kā avarēšana vai lēna reaģēšana."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Lai skatītos šo kanālu, nospiediet pa labi vērsto bultiņu un ievadiet PIN kodu."</string>

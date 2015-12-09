@@ -17,6 +17,18 @@
 
 <resources>
     <style name="Theme.Setup.GuidedStep" parent="Theme.Leanback.GuidedStep">
+        <item name="android:windowBackground">@color/common_tv_background</item>
+        <item name="android:windowEnterTransition">@null</item>
+        <item name="guidanceContainerStyle">@style/Widget.Setup.GuidanceContainerStyle</item>
+        <item name="guidanceTitleStyle">@style/Widget.Setup.GuidanceTitleStyle</item>
+        <item name="guidanceDescriptionStyle">@style/Widget.Setup.GuidanceDescriptionStyle</item>
+        <item name="guidanceBreadcrumbStyle">@style/Widget.Setup.GuidanceBreadcrumbStyle</item>
         <item name="guidedActionsContainerStyle">@style/Widget.Setup.GuidedActionsContainerStyle</item>
+        <item name="guidedActionsSelectorStyle">@style/Widget.Setup.GuidedActionsSelectorStyle</item>
+        <item name="guidedActionsListStyle">@style/Widget.Setup.GuidedActionsListStyle</item>
+        <item name="guidedActionItemContainerStyle">@style/Widget.Setup.GuidedActionItemContainerStyle</item>
+        <item name="guidedActionItemCheckmarkStyle">@style/Widget.Setup.GuidedActionItemCheckmarkStyle</item>
+        <item name="guidedActionItemTitleStyle">@style/Widget.Setup.GuidedActionItemTitleStyle</item>
+        <item name="guidedActionItemDescriptionStyle">@style/Widget.Setup.GuidedActionItemDescriptionStyle</item>
     </style>
 </resources>

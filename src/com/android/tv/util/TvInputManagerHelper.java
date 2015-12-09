@@ -40,6 +40,7 @@ import java.util.Set;
 
 public class TvInputManagerHelper {
     private static final String TAG = "TvInputManagerHelper";
+    private static final boolean DEBUG = false;
 
     // Hardcoded list for known bundled inputs not written by OEM/SOCs.
     // Bundled (system) inputs not in the list will get the high priority
@@ -59,6 +60,7 @@ public class TvInputManagerHelper {
     private final TvInputCallback mInternalCallback = new TvInputCallback() {
         @Override
         public void onInputStateChanged(String inputId, int state) {
+            if (DEBUG) Log.d(TAG, "onInputStateChanged " + inputId + " state=" + state);
             mInputStateMap.put(inputId, state);
             for (TvInputCallback callback : mCallbacks) {
                 callback.onInputStateChanged(inputId, state);
@@ -67,6 +69,7 @@ public class TvInputManagerHelper {
 
         @Override
         public void onInputAdded(String inputId) {
+            if (DEBUG) Log.d(TAG, "onInputAdded " + inputId);
             TvInputInfo info = mTvInputManager.getTvInputInfo(inputId);
             if (info != null) {
                 mInputMap.put(inputId, info);
@@ -81,6 +84,7 @@ public class TvInputManagerHelper {
 
         @Override
         public void onInputRemoved(String inputId) {
+            if (DEBUG) Log.d(TAG, "onInputRemoved " + inputId);
             mInputMap.remove(inputId);
             mInputStateMap.remove(inputId);
             mInputIdToPartnerInputMap.remove(inputId);
@@ -92,6 +96,7 @@ public class TvInputManagerHelper {
 
         @Override
         public void onInputUpdated(String inputId) {
+            if (DEBUG) Log.d(TAG, "onInputUpdated " + inputId);
             TvInputInfo info = mTvInputManager.getTvInputInfo(inputId);
             mInputMap.put(inputId, info);
             for (TvInputCallback callback : mCallbacks) {
@@ -108,7 +113,7 @@ public class TvInputManagerHelper {
     private final Comparator<TvInputInfo> mTvInputInfoComparator;
 
     public TvInputManagerHelper(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
         mContentRatingsManager = new ContentRatingsManager(context);
         mParentalControlSettings = new ParentalControlSettings(context);
@@ -119,11 +124,14 @@ public class TvInputManagerHelper {
         if (mStarted) {
             return;
         }
+        if (DEBUG) Log.d(TAG, "start");
         mStarted = true;
         mTvInputManager.registerCallback(mInternalCallback, mHandler);
         mInputMap.clear();
         mInputStateMap.clear();
+        mInputIdToPartnerInputMap.clear();
         for (TvInputInfo input : mTvInputManager.getTvInputList()) {
+            if (DEBUG) Log.d(TAG, "Input detected " + input);
             String inputId = input.getId();
             mInputMap.put(inputId, input);
             int state = mTvInputManager.getInputState(inputId);
@@ -143,6 +151,7 @@ public class TvInputManagerHelper {
         mStarted = false;
         mInputStateMap.clear();
         mInputMap.clear();
+        mInputIdToPartnerInputMap.clear();
     }
 
     public List<TvInputInfo> getTvInputInfos(boolean availableOnly, boolean tunerOnly) {

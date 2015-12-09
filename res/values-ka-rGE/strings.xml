@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"ღია კოდის ლიცენზიები"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ღია კოდის ლიცენზიები"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"ვერსია"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"დეველოპერთა პარამეტრები"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB TV-ტუნერის ჩართვა"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB TV-ტუნერის ხმის მოსასმენად, თქვენი ტელევიზორის მიერ მხარდაჭერილი უნდა იყოს AC3 აუდიოს გატარება."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 აუდიოს გატარების შესაძლებლობა"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"თქვენი ტელევიზორის მიერ მხარდაჭერილია AC3 აუდიოს გატარება."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"თქვენი ტელევიზორის მიერ არ არის მხარდაჭერილი AC3 აუდიოს გატარება."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"მსურს პირდაპირი არხების გაუმჯობესების ხელშეწყობა"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"პირდაპირი არხების გაუმჯობესების მიზნით და ავარიულად გათიშვებისა თუ გაჭედვების თავიდან ასაცილებლად, გამოყენების და დიაგნოსტიკური მონაცემების Google-თან გაზიარება."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ამ არხის საყურებლად დააჭირეთ „მარჯვენას“ და შეიყვანოთ თქვენი PIN"</string>

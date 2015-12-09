@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/setup_background" />
-    <!-- clipChildern:false is given for item animations in input_list view. -->
+    <!-- clipChildren:false is given for item animations in input_list view. -->
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"

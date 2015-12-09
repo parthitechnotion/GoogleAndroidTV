@@ -21,19 +21,26 @@ import android.app.Fragment;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.view.View;
 
 import com.android.tv.common.R;
+import com.android.tv.common.ui.setup.animation.SetupAnimationHelper;
 
 /**
  * Stepped setup activity for onboarding screens or setup activity for TIS.
+ *
+ * <p>The inherited class should add theme {@code Theme.Setup.GuidedStep} to its definition in
+ * AndroidManifest.xml.
  */
 public abstract class SteppedSetupActivity extends Activity implements OnActionClickListener {
     private boolean mStartedInitialStep = false;
     private SetupStep mStep;
+    private long mFragmentTransitionDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.Theme_Setup_GuidedStep);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stepped_setup);
         startInitialStep();
@@ -43,14 +50,18 @@ public abstract class SteppedSetupActivity extends Activity implements OnActionC
                 if (mStep != null) {
                     // Need to change step to the previous one if the current step is popped from
                     // the back stack.
-                    if (mStep.needsToBeAddedToBackStack()
-                            && getFragmentManager().getBackStackEntryCount()
-                                    <= mStep.getPreviousBackStackRecordCount()) {
+                    if (getFragmentManager().getBackStackEntryCount()
+                                <= mStep.getPreviousBackStackRecordCount()) {
                         mStep = mStep.getPreviousStep();
                     }
                 }
             }
         });
+        mFragmentTransitionDuration = getResources().getInteger(
+                R.integer.setup_fragment_transition_duration);
+        SetupAnimationHelper.setFragmentTransitionDuration(mFragmentTransitionDuration);
+        SetupAnimationHelper.setFragmentTransitionDistance(getResources().getDimensionPixelOffset(
+                R.dimen.setup_fragment_transition_distance));
     }
 
     /**
@@ -84,7 +95,7 @@ public abstract class SteppedSetupActivity extends Activity implements OnActionC
         }
         SetupStep step = onCreateInitialStep();
         if (step != null) {
-            startStep(step);
+            startStep(step, false);
             mStartedInitialStep = true;
         }
     }
@@ -92,22 +103,46 @@ public abstract class SteppedSetupActivity extends Activity implements OnActionC
     /**
      * Starts next step.
      */
-    protected void startStep(SetupStep step) {
+    protected FragmentTransaction startStep(SetupStep step, boolean addToBackStack) {
         mStep = step;
-        Fragment fragment = step.onCreateFragment();
+        Fragment fragment = step.createFragment();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (step.needsFragmentTransitionAnimation()) {
-            ft.setCustomAnimations(SetupFragment.ANIM_ENTER, SetupFragment.ANIM_EXIT,
-                    SetupFragment.ANIM_POP_ENTER, SetupFragment.ANIM_POP_EXIT);
+        if (fragment instanceof SetupFragment) {
+            int[] sharedElements = ((SetupFragment) fragment).getSharedElementIds();
+            if (sharedElements != null && sharedElements.length > 0) {
+                Transition sharedTransition = TransitionInflater.from(this)
+                        .inflateTransition(R.transition.transition_action_background);
+                sharedTransition.setDuration(getSharedElementTransitionDuration());
+                SetupAnimationHelper.applyAnimationTimeScale(sharedTransition);
+                fragment.setSharedElementEnterTransition(sharedTransition);
+                fragment.setSharedElementReturnTransition(sharedTransition);
+                for (int id : sharedElements) {
+                    View sharedView = findViewById(id);
+                    if (sharedView != null) {
+                        ft.addSharedElement(sharedView, sharedView.getTransitionName());
+                    }
+                }
+            }
         }
-        if (step.needsToBeAddedToBackStack()) {
+        if (addToBackStack) {
             ft.addToBackStack(null);
         }
         ft.replace(R.id.fragment_container, fragment).commit();
+
+        return ft;
     }
 
     @Override
     public void onActionClick(int actionId) {
         mStep.executeAction(actionId);
+    }
+
+    /**
+     * Returns the duration of the shared element transition.
+     *
+     * <p>It's (exit transition) + (delayed animation) + (enter transition).
+     */
+    private long getSharedElementTransitionDuration() {
+        return (mFragmentTransitionDuration + SetupAnimationHelper.DELAY_BETWEEN_SIBLINGS_MS) * 2;
     }
 }

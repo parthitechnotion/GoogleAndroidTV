@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.tv.R;
+import com.android.tv.dvr.provider.DvrContract;
 import com.android.tv.util.ImageLoader;
 import com.android.tv.util.Utils;
 
@@ -60,6 +61,15 @@ public final class Program implements Comparable<Program> {
     };
 
     /**
+     * Use this projection if you want to create {@link Program} object using
+     * {@link #fromDvrCursor}.
+     */
+    public static final String[] PROJECTION_DVR = {
+        // Columns must match what is read in Channel.fromDvrCursor()
+        DvrContract.DvrPrograms._ID
+    };
+
+    /**
      * Creates {@code Program} object from cursor.
      *
      * <p>The query that created the cursor MUST use {@link #PROJECTION}.
@@ -85,6 +95,16 @@ public final class Program implements Comparable<Program> {
         return builder.build();
     }
 
+    /**
+     * Creates a {@link Program} object from the DVR database.
+     */
+    public static Program fromDvrCursor(Cursor c) {
+        Program program = new Program();
+        int index = -1;
+        program.mDvrId = c.getLong(++index);
+        return program;
+    }
+
     private long mChannelId;
     private String mTitle;
     private String mEpisodeTitle;
@@ -99,6 +119,14 @@ public final class Program implements Comparable<Program> {
     private String mThumbnailUri;
     private int[] mCanonicalGenreIds;
     private TvContentRating[] mContentRatings;
+
+    private long mDvrId;
+
+    /**
+     * TODO(DVR): Need to fill the following data.
+     */
+    private boolean mRecordable;
+    private boolean mRecordingScheduled;
 
     public interface LoadPosterArtCallback {
         void onLoadPosterArtFinished(Program program, Bitmap posterArt);
@@ -211,6 +239,13 @@ public final class Program implements Comparable<Program> {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns an ID in DVR database.
+     */
+    public long getDvrId() {
+        return mDvrId;
     }
 
     @Override

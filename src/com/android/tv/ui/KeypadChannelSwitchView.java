@@ -111,7 +111,7 @@ public class KeypadChannelSwitchView extends LinearLayout implements
         super(context, attrs, defStyleAttr);
 
         mMainActivity = (MainActivity) context;
-        mTracker = ((TvApplication) mMainActivity.getApplication()).getTracker();
+        mTracker = TvApplication.getSingletons(context).getTracker();
         Resources resources = getResources();
         mLayoutInflater = LayoutInflater.from(context);
         mShowDurationMillis = resources.getInteger(R.integer.keypad_channel_switch_show_duration);

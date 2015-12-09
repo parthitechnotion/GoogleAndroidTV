@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"အခမဲ့ ရင်းမြစ် လိုင်စင်များ"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"အခမဲ့ ရင်းမြစ် လိုင်စင်များ"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"ဗားရှင်း"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"တီထွင်သူများရွေးစရာ"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB TV ချိန်ညှိကိရိယာကို ဖွင့်ပါ"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB TV ချိန်ညှိကိရိယာ၏ အသံကြားရန်၊ သင့် TV သည် AC3 passthrough ကိုထောက်ပံ့ရပါမည်။"</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 အသံ စွမ်းဆောင်နိုင်စွမ်း"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"သင့် TV သည် AC3 passthrough ကိုမထောက်ပံ့ပါ။"</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"သင့် TV သည် AC3 passthrough ကိုမထောက်ပံ့ပါ။"</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"တိုက်ရိုက်လွှင့်ချန်နယ်များ တိုးတက်အောင်ကူညီပါ"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"အသုံးပြုမှုနှင့် အမှားရှာဖွေမှုဒေတာများကို Google နှင့်မျှဝေခြင်းဖြင့် ပျက်စီးခြင်းနှင့် ရပ်တန့်သွားခြင်းကဲ့သို့သော ပြဿနာများကို ကာကွယ်ပြီး တိုက်ရိုက်လွှင့်နေသောချယ်နယ်များကို ပိုမိုကောင်းမွန်စေပါ။"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ဤချာနယ်ကို ကြည့်ရန်၊ ညာဘက် နှိပ်ပြီး PIN ရိုက်ထည့်ပါ"</string>

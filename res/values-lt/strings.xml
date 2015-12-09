@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Atvirojo šaltinio licencijos"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Atvirojo šaltinio licencijos"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versija"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Kūrėjo parinktys"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Įgalinti USB TV imtuvą"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Kad galėtumėte girdėti USB TV imtuvo garsą, jūsų TV turi būti palaikomas AC3 perdavimas."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 garso geba"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Jūsų TV palaikomas AC3 perdavimas."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Jūsų TV nepalaikomas AC3 perdavimas."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Padėti tobulinti „Live TV“"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Bendrinkite anoniminius naudojimo ir diagnostikos duomenis su „Google“, kad galėtume patobulinti Tiesioginius kanalus ir apsaugoti nuo problemų, pvz., užstrigimo."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Jei norite žiūrėti šį kanalą, paspauskite „Tinkamas“ ir įveskite PIN kodą"</string>

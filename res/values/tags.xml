@@ -16,5 +16,5 @@
   -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <item name="TAG_OPTION_ITEM_POSITOIN" type="id"/>
+    <item name="TAG_OPTION_ITEM_POSITION" type="id"/>
 </resources>

@@ -40,6 +40,7 @@ import android.util.SparseLongArray;
 import android.view.View;
 
 import com.android.tv.R;
+import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
@@ -141,16 +142,16 @@ public class NotificationService extends Service implements Recommender.Listener
                 getResources().getDimensionPixelOffset(R.dimen.notif_ch_logo_padding_bottom);
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        TvApplication application = ((TvApplication) getApplicationContext());
-        mTvInputManagerHelper = application.getTvInputManagerHelper();
+        ApplicationSingletons appSingletons = TvApplication.getSingletons(this);
+        mTvInputManagerHelper = appSingletons.getTvInputManagerHelper();
         mHandlerThread = new HandlerThread("tv notification");
         mHandlerThread.start();
         mHandler = new NotificationHandler(mHandlerThread.getLooper(), this);
         mHandler.sendEmptyMessage(MSG_INITIALIZE_RECOMMENDER);
 
         // Just called for early initialization.
-        application.getChannelDataManager();
-        application.getProgramDataManager();
+        appSingletons.getChannelDataManager();
+        appSingletons.getProgramDataManager();
     }
 
     private void handleInitializeRecommender() {

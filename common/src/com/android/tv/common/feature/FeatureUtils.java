@@ -18,6 +18,8 @@ package com.android.tv.common.feature;
 
 import android.content.Context;
 
+import java.util.Arrays;
+
 /**
  * Static utilities for features.
  */
@@ -39,7 +41,13 @@ public class FeatureUtils {
                 }
                 return false;
             }
+
+            @Override
+            public String toString() {
+                return "or(" + Arrays.asList(features) + ")";
+            }
         };
+
     }
 
     /**
@@ -58,6 +66,11 @@ public class FeatureUtils {
                 }
                 return true;
             }
+
+            @Override
+            public String toString() {
+                return "and(" + Arrays.asList(features) + ")";
+            }
         };
     }
 
@@ -69,6 +82,11 @@ public class FeatureUtils {
         public boolean isEnabled(Context context) {
             return true;
         }
+
+        @Override
+        public String toString() {
+            return "on";
+        }
     };
 
     /**
@@ -78,6 +96,11 @@ public class FeatureUtils {
         @Override
         public boolean isEnabled(Context context) {
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return "off";
         }
     };
 

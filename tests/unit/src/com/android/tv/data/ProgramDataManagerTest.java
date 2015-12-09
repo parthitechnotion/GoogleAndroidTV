@@ -32,7 +32,7 @@ import android.util.SparseArray;
 
 import com.android.tv.testing.Constants;
 import com.android.tv.testing.ProgramInfo;
-import com.android.tv.util.FakeClock;
+import com.android.tv.testing.FakeClock;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class ProgramDataManagerTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        mClock = new FakeClock();
+        mClock = FakeClock.createWithCurrentTime();
         mListener = new TestProgramDataManagerListener();
         mContentProvider = new FakeContentProvider(getContext());
         mContentResolver = new FakeContentResolver();

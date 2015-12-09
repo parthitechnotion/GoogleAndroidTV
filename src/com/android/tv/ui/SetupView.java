@@ -26,7 +26,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager.TvInputCallback;
-import android.support.annotation.VisibleForTesting;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -41,12 +40,12 @@ import android.widget.TextView;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.data.ChannelDataManager;
+import com.android.tv.data.TvInputNewComparator;
 import com.android.tv.util.SetupUtils;
 import com.android.tv.util.TvInputManagerHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class SetupView extends FullscreenDialogView {
@@ -206,7 +205,7 @@ public class SetupView extends FullscreenDialogView {
         mInputList = new ArrayList<>();
         mKnownInputStartIndex = 0;
         mInputList = mInputManager.getTvInputInfos(true, true);
-        Collections.sort(mInputList, new TvInputInfoComparator(mSetupUtils, mInputManager));
+        Collections.sort(mInputList, new TvInputNewComparator(mSetupUtils, mInputManager));
         for (TvInputInfo input : mInputList) {
             if (mSetupUtils.isNewInput(input.getId())) {
                 mSetupUtils.markAsKnownInput(input.getId());
@@ -415,27 +414,6 @@ public class SetupView extends FullscreenDialogView {
             super(itemView);
             mTitle = (TextView) itemView.findViewById(R.id.title);
             mDescription = (TextView) itemView.findViewById(R.id.description);
-        }
-    }
-
-    @VisibleForTesting
-    static class TvInputInfoComparator implements Comparator<TvInputInfo> {
-        private final SetupUtils mSetupUtils;
-        private final TvInputManagerHelper mInputManager;
-
-        public TvInputInfoComparator(SetupUtils setupUtils, TvInputManagerHelper inputManager) {
-            mSetupUtils = setupUtils;
-            mInputManager = inputManager;
-        }
-
-        @Override
-        public int compare(TvInputInfo lhs, TvInputInfo rhs) {
-            boolean lhsIsNewInput = mSetupUtils.isNewInput(lhs.getId());
-            boolean rhsIsNewInput = mSetupUtils.isNewInput(rhs.getId());
-            if (lhsIsNewInput != rhsIsNewInput) {
-                return lhsIsNewInput ? -1 : 1;
-            }
-            return mInputManager.getDefaultTvInputInfoComparator().compare(lhs, rhs);
         }
     }
 }

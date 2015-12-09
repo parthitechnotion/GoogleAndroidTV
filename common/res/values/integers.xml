@@ -17,5 +17,5 @@
 
 <resources>
     <!-- Setup screen -->
-    <integer name="setup_slide_anim_duration">250</integer>
+    <integer name="setup_fragment_transition_duration">333</integer>
 </resources>

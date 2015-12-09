@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Open source licences"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Open source licences"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Version"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Developer options"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Enable USB TV tuner"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"To hear sound from the USB TV tuner, your TV should support AC3 passthrough."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 audio capability"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Your TV supports AC3 passthrough."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Your TV doesn\'t support AC3 passthrough."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Help improve Live TV"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Share anonymous usage and diagnostics data with Google so we can make Live TV better and prevent issues such as crashing and freezing."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"To watch this channel, press Right and enter your PIN"</string>

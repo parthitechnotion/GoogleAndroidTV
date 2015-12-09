@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Llicències de programari lliure"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Llicències de programari lliure"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versió"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Opcions per a desenvolupadors"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Activa el sintonitzador de canals USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Per sentir el so del sintonitzador de canals USB, el teu televisor ha d\'admetre la connexió AC3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Funcions d\'àudio AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"El teu televisor admet la connexió AC3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"El teu televisor no admet la connexió AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Vull contribuir a millorar Canals en directe"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Comparteix dades d\'ús i de diagnòstic anònimes amb Google per millorar TV en directe i evitar problemes, com ara bloqueigs i errors."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Per veure aquest canal, prem el botó dret i introdueix el PIN."</string>

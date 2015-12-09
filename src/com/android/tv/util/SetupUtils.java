@@ -27,6 +27,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
@@ -54,6 +55,7 @@ public class SetupUtils {
     private final Set<String> mKnownInputs;
     private final Set<String> mSetUpInputs;
     private boolean mIsFirstTune;
+    private final String mUsbTunerInputId;
 
     private SetupUtils(TvApplication tvApplication) {
         mTvApplication = tvApplication;
@@ -63,6 +65,8 @@ public class SetupUtils {
         mKnownInputs = new HashSet<>(mSharedPreferences.getStringSet(PREF_KEY_KNOWN_INPUTS,
                 new HashSet<String>()));
         mIsFirstTune = mSharedPreferences.getBoolean(PREF_KEY_IS_FIRST_TUNE, true);
+        mUsbTunerInputId = TvContract.buildInputId(new ComponentName(tvApplication,
+                com.android.usbtuner.tvinput.UsbTunerTvInputService.class));
     }
 
     /**
@@ -107,8 +111,8 @@ public class SetupUtils {
 
     private static void updateChannelBrowsable(Context context, final String inputId,
             final Runnable postRunnable) {
-        TvApplication tvApplication = (TvApplication) context.getApplicationContext();
-        final ChannelDataManager manager = tvApplication.getChannelDataManager();
+        ApplicationSingletons appSingletons = TvApplication.getSingletons(context);
+        final ChannelDataManager manager = appSingletons.getChannelDataManager();
         manager.updateChannels(new Runnable() {
             @Override
             public void run() {
@@ -189,7 +193,16 @@ public class SetupUtils {
                     PREF_KEY_SET_UP_INPUTS, new HashSet<String>()));
             Set<String> setUpPackages = new HashSet<>();
             for (String input : setUpInputs) {
-                setUpPackages.add(ComponentName.unflattenFromString(input).getPackageName());
+                ComponentName componentName = null;
+                try {
+                    componentName = ComponentName.unflattenFromString(input);
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to unflatten string to component name (" + input + ")", e);
+                }
+                if (componentName == null) {
+                    continue;
+                }
+                setUpPackages.add(componentName.getPackageName());
             }
             for (String packageName : setUpPackages) {
                 grantEpgPermission(context, packageName);
@@ -243,6 +256,10 @@ public class SetupUtils {
         for (TvInputInfo input : manager.getTvInputList()) {
             removedInputList.remove(input.getId());
         }
+        // A USB tuner device can be temporarily unplugged. We do not remove the USB tuner input
+        // from the known inputs so that the input won't appear as a new input whenever the user
+        // plugs in the USB tuner device again.
+        removedInputList.remove(mUsbTunerInputId);
 
         if (!removedInputList.isEmpty()) {
             for (String input : removedInputList) {
@@ -260,6 +277,7 @@ public class SetupUtils {
      * for {@code inputId}.
      */
     public void onSetupDone(String inputId) {
+        SoftPreconditions.checkState(inputId != null);
         if (DEBUG) Log.d(TAG, "onSetupDone: input=" + inputId);
         if (!mKnownInputs.contains(inputId)) {
             Log.i(TAG, "An unknown input's setup has been done. inputId=" + inputId);

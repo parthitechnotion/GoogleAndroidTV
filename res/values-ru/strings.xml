@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Лицензии открытого ПО"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Лицензии открытого ПО"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Версия"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Для разработчиков"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Включить USB-тюнер"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Чтобы услышать звук при использовании USB-тюнера, телевизор должен поддерживать сквозную передачу в формате AC3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Поддержка AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Ваш телевизор поддерживает сквозную передачу в формате AC3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Ваш телевизор не поддерживает сквозную передачу в формате AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Не помогать улучшить \"Прямой эфир\""</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Разрешите отправку анонимных отчетов об использовании и данных диагностики в Google, чтобы мы могли улучшить работу Телеканалов и устранить сбои и зависания."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Чтобы смотреть этот канал, нажмите стрелку вправо и введите PIN-код."</string>

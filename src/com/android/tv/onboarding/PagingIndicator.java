@@ -82,7 +82,7 @@ public class PagingIndicator extends View {
         mUnselectingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mSelectingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         // Initialize animations.
-        int duration = res.getInteger(R.integer.setup_slide_anim_duration);
+        int duration = res.getInteger(R.integer.setup_fragment_transition_duration);
         List<Animator> animators = new ArrayList<>();
         animators.add(createColorAnimator(selectedColor, unselectedColor, duration,
                 mUnselectingPaint));

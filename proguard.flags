@@ -40,7 +40,7 @@
 }
 
 # For tests
--keep @android.support.annotation.VisibleForTesting class *
+-keep @android.support.annotation.VisibleForTesting class *  {*;}
 -keepclasseswithmembers class * {
     @android.support.annotation.VisibleForTesting <methods>;
 }

@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"开放源代码许可"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"开放源代码许可"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"版本"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"开发者选项"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"启用 USB 电视调谐器"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"要想听到 USB 电视调谐器的声音，您的电视需要支持 AC3 直通输出功能。"</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 音频功能"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"您的电视支持 AC3 直通输出功能。"</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"您的电视不支持 AC3 直通输出功能。"</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"帮助改进直播频道"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"将匿名使用情形和诊断数据提供给 Google，以协助我们改进直播频道并避免发生崩溃和死机等问题。"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"要观看此频道，请按“向右”按钮，然后输入您的PIN码"</string>

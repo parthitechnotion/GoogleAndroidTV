@@ -15,23 +15,48 @@
   ~ limitations under the License.
   -->
 
-<!-- The whole XML will be changed once it's implemented with GuidedStepFragment -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Need to disable clipping for the shared element transition. -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:orientation="horizontal">
-    <!-- The layout_width should not be 0dp for GuidedStepFragment. see b/24738452 -->
+    <!-- Guided step fragment container must be at the left of the done button at least by 1 pixel
+         for the focus navigation. If they overlap, the focus doesn't move from the button to the
+         fragment container.-->
     <FrameLayout
         android:id="@+id/guided_step_fragment_container"
-        android:layout_width="200dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="6"
-        android:background="#01579B" />
-    <Button
-        android:id="@+id/button_done"
-        android:layout_width="0dp"
+        android:layout_marginEnd="1dp"
+        android:clipChildren="false"
+        android:clipToPadding="false" />
+    <FrameLayout
+        android:id="@+id/done_button_container"
+        android:layout_width="@dimen/setup_done_button_container_width"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@drawable/setup_action_button_done"
-        android:text="@string/action_text_done" />
-</LinearLayout>
+        android:layout_gravity="end"
+        android:background="@color/common_setup_done_container_background"
+        android:transitionGroup="false"
+        android:transitionName="buttonDoneTransition">
+        <TextView
+            android:id="@+id/button_done"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginTop="190dp"
+            android:elevation="0dp"
+            android:focusable="true"
+            android:fontFamily="sans-serif-condensed"
+            android:paddingEnd="12dp"
+            android:paddingStart="12dp"
+            android:background="@drawable/setup_action_button_done"
+            android:gravity="center_vertical|start"
+            android:text="@string/action_text_done"
+            android:textColor="#EEEEEE"
+            android:textSize="14sp" />
+    </FrameLayout>
+</FrameLayout>

@@ -49,4 +49,9 @@ public final class PropertyFeature implements Feature {
     public boolean isEnabled(Context context) {
         return mProperty.getValue();
     }
+
+    @Override
+    public String toString() {
+        return mProperty.toString();
+    }
 }

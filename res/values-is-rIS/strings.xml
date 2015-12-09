@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Leyfi opins kóða"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Leyfi opins kóða"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Útgáfa"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Forritunarkostir"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Virkja USB-sjónvarpsmóttakara"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Til að það heyrist í USB-sjónvarpsmóttakaranum þarf sjónvarpið þitt að styðja AC3-tengingu."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3-hljóðeiginleiki"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Sjónvarpið þitt styður AC3-tengingu."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Sjónvarpið þitt styður ekki AC3-tengingu."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Hjálpa til við að bæta rásir í beinni"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Deila nafnlausum gögnum um notkun og greiningu með Google til að við getum gert beinar útsendingar betri og komið í veg fyrir vandamál eins og hrun og að mynd frjósi."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Til að horfa á þessa rás skaltu ýta til hægri og slá inn PIN-númerið þitt"</string>

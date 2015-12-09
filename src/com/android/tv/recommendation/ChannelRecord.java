@@ -19,8 +19,10 @@ package com.android.tv.recommendation;
 import android.content.Context;
 import android.support.annotation.VisibleForTesting;
 
+import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
+import com.android.tv.data.ProgramDataManager;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayDeque;
@@ -68,7 +70,9 @@ public class ChannelRecord {
     public Program getCurrentProgram() {
         long time = System.currentTimeMillis();
         if (mCurrentProgram == null || mCurrentProgram.getEndTimeUtcMillis() < time) {
-            mCurrentProgram = Utils.getCurrentProgram(mContext, mChannel.getId());
+            ProgramDataManager manager =
+                    TvApplication.getSingletons(mContext).getProgramDataManager();
+            mCurrentProgram = manager.getCurrentProgram(mChannel.getId());
         }
         return mCurrentProgram;
     }

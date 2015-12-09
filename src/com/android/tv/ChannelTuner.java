@@ -17,14 +17,17 @@
 package com.android.tv;
 
 import android.media.tv.TvContract;
+import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.util.CollectionUtils;
 import com.android.tv.util.SoftPreconditions;
+import com.android.tv.util.TvInputManagerHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +55,11 @@ public class ChannelTuner {
     private final Handler mHandler = new Handler();
     private final ChannelDataManager mChannelDataManager;
     private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
+    @Nullable
     private Channel mCurrentChannel;
+    private final TvInputManagerHelper mInputManager;
+    @Nullable
+    private TvInputInfo mCurrentChannelInputInfo;
 
     private final ChannelDataManager.Listener mChannelDataManagerListener =
             new ChannelDataManager.Listener() {
@@ -79,8 +86,9 @@ public class ChannelTuner {
                 }
     };
 
-    public ChannelTuner(ChannelDataManager channelDataManager) {
+    public ChannelTuner(ChannelDataManager channelDataManager, TvInputManagerHelper inputManager) {
         mChannelDataManager = channelDataManager;
+        mInputManager = inputManager;
     }
 
     /**
@@ -144,6 +152,7 @@ public class ChannelTuner {
     /**
      * Returns the current channel.
      */
+    @Nullable
     public Channel getCurrentChannel() {
         return mCurrentChannel;
     }
@@ -177,6 +186,14 @@ public class ChannelTuner {
         } else {
             return TvContract.buildChannelUri(mCurrentChannel.getId());
         }
+    }
+
+    /**
+     * Returns the current {@link TvInputInfo}.
+     */
+    @Nullable
+    public TvInputInfo getCurrentInputInfo() {
+        return mCurrentChannelInputInfo;
     }
 
     /**
@@ -336,6 +353,9 @@ public class ChannelTuner {
         }
         Channel previousChannel = mCurrentChannel;
         mCurrentChannel = channel;
+        if (mCurrentChannel != null) {
+            mCurrentChannelInputInfo = mInputManager.getTvInputInfo(mCurrentChannel.getInputId());
+        }
         for (Listener l : mListeners) {
             l.onChannelChanged(previousChannel, mCurrentChannel);
         }

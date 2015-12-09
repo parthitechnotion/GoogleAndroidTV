@@ -33,9 +33,9 @@ public class CollectionUtils {
      */
     public static <T> Set<T> createSmallSet() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return new ArraySet<T>();
+            return new ArraySet<>();
         } else {
-            return new HashSet<T>();
+            return new HashSet<>();
         }
     }
 }

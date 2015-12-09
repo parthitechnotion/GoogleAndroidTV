@@ -246,13 +246,15 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
     // 5) Application icon, and 6) default image.
     private void setCardImageWithBanner(ApplicationInfo appInfo) {
         Drawable banner = null;
-        try {
-            banner = mPackageManager.getActivityBanner(mIntent);
-            if (banner == null) {
-                banner = mPackageManager.getActivityIcon(mIntent);
+        if (mIntent != null) {
+            try {
+                banner = mPackageManager.getActivityBanner(mIntent);
+                if (banner == null) {
+                    banner = mPackageManager.getActivityIcon(mIntent);
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                // do nothing.
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            // do nothing.
         }
 
         if (banner == null && appInfo != null) {

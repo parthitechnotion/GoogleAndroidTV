@@ -19,12 +19,13 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android" >
     <item android:state_focused="true">
         <shape>
-            <solid android:color="#01278B"/>
+            <solid android:color="@color/common_setup_button_done_selected"/>
+            <corners android:radius="2dp" />
         </shape>
     </item>
     <item>
         <shape>
-            <solid android:color="#01274B"/>
+            <solid android:color="@android:color/transparent"/>
         </shape>
     </item>
 </selector>

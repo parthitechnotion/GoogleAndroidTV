@@ -37,8 +37,8 @@ public class UtilsTest_GetMultiAudioString extends AndroidTestCase {
                 Utils.getMultiAudioString(context, createAudioTrackInfo("eng"), false));
         assertEquals("Unknown language",
                 Utils.getMultiAudioString(context, createAudioTrackInfo(null), false));
-        // TODO: Check whether the following tests are expected.
-        assertEquals("", Utils.getMultiAudioString(context, createAudioTrackInfo(""), false));
+        assertEquals("Unknown language",
+                Utils.getMultiAudioString(context, createAudioTrackInfo(""), false));
         assertEquals("abc", Utils.getMultiAudioString(context, createAudioTrackInfo("abc"), false));
     }
 

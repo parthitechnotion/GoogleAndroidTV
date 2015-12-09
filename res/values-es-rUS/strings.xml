@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Licencias de código abierto"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licencias de código abierto"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Versión"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Opciones para programador"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Habilitar sintonizador de TV USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Para escuchar el sonido del sintonizador de TV USB, la TV debe ser compatible con el formato AC-3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Compatibilidad con audio AC-3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"La TV es compatible con el formato AC-3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"La TV no es compatible con el formato AC-3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Ayudar a mejorar Canales en vivo"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Comparte datos anónimos acerca del uso y el diagnóstico con Google para que podamos mejorar Canales en vivo y evitar problemas como el bloqueo o el congelamiento de la imagen."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Para mirar este canal, presiona la tecla hacia la derecha e ingresa el PIN."</string>

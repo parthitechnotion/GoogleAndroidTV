@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 
+import com.android.tv.ApplicationSingletons;
 import com.android.tv.ChannelTuner;
 import com.android.tv.MainActivity;
 import com.android.tv.MainActivity.KeyHandlerResultType;
@@ -133,7 +134,8 @@ public class TvOverlayManager {
         mKeypadChannelSwitchView = keypadChannelSwitchView;
         mSelectInputView = selectInputView;
         mSearchFragment = searchFragment;
-        mTracker = ((TvApplication) mainActivity.getApplication()).getTracker();
+        ApplicationSingletons singletons = TvApplication.getSingletons(mainActivity);
+        mTracker = singletons.getTracker();
         mTransitionManager = new TvTransitionManager(mainActivity, sceneContainer,
                 channelBannerView, inputBannerView, mKeypadChannelSwitchView, selectInputView);
         mTransitionManager.setListener(new TvTransitionManager.Listener() {
@@ -179,22 +181,22 @@ public class TvOverlayManager {
                     }
                 });
         // Program Guide
+        Runnable preShowRunnable = new Runnable() {
+            @Override
+            public void run() {
+                onOverlayOpened(OVERLAY_TYPE_GUIDE);
+            }
+        };
+        Runnable postHideRunnable = new Runnable() {
+            @Override
+            public void run() {
+                onOverlayClosed(OVERLAY_TYPE_GUIDE);
+            }
+        };
         mProgramGuide = new ProgramGuide(mainActivity, channelTuner,
-                mainActivity.getTvInputManagerHelper(), mainActivity.getChannelDataManager(),
-                mainActivity.getProgramDataManager(),
-                ((TvApplication) mainActivity.getApplication()).getTracker(),
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        onOverlayOpened(OVERLAY_TYPE_GUIDE);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        onOverlayClosed(OVERLAY_TYPE_GUIDE);
-                    }
-                });
+                singletons.getTvInputManagerHelper(), singletons.getChannelDataManager(),
+                singletons.getProgramDataManager(), singletons.getTracker(), preShowRunnable,
+                postHideRunnable);
     }
 
     /**

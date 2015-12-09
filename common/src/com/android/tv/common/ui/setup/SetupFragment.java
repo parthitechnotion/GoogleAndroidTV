@@ -16,32 +16,40 @@
 
 package com.android.tv.common.ui.setup;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.app.Fragment;
-import android.content.Context;
-import android.graphics.Point;
-import android.hardware.display.DisplayManager;
 import android.os.Bundle;
-import android.support.v4.view.animation.LinearOutSlowInInterpolator;
-import android.view.Display;
+import android.support.annotation.IntDef;
+import android.transition.Transition;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-import com.android.tv.common.R;
+import com.android.tv.common.ui.setup.animation.FadeAndShortSlide;
+import com.android.tv.common.ui.setup.animation.SetupAnimationHelper;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * A fragment which slides when it is entering/exiting.
  */
 public abstract class SetupFragment extends Fragment {
-    public static final int ANIM_ENTER = 1;
-    public static final int ANIM_EXIT = 2;
-    public static final int ANIM_POP_ENTER = 3;
-    public static final int ANIM_POP_EXIT = 4;
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(flag = true,
+            value = {FRAGMENT_ENTER_TRANSITION, FRAGMENT_EXIT_TRANSITION,
+                    FRAGMENT_REENTER_TRANSITION, FRAGMENT_RETURN_TRANSITION})
+    public @interface FragmentTransitionType {}
+    protected static final int FRAGMENT_ENTER_TRANSITION = 0x01;
+    protected static final int FRAGMENT_EXIT_TRANSITION = FRAGMENT_ENTER_TRANSITION << 1;
+    protected static final int FRAGMENT_REENTER_TRANSITION = FRAGMENT_ENTER_TRANSITION << 2;
+    protected static final int FRAGMENT_RETURN_TRANSITION = FRAGMENT_ENTER_TRANSITION << 3;
 
-    private static int sScreenWidth;
+    public SetupFragment() {
+        setAllowEnterTransitionOverlap(false);
+        setAllowReturnTransitionOverlap(false);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,39 +66,6 @@ public abstract class SetupFragment extends Fragment {
      */
     protected abstract int getLayoutResourceId();
 
-    @Override
-    public Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
-        if (sScreenWidth == 0) {
-            DisplayManager displayManager =
-                    (DisplayManager) getActivity().getSystemService(Context.DISPLAY_SERVICE);
-            Display display = displayManager.getDisplay(Display.DEFAULT_DISPLAY);
-            Point size = new Point();
-            display.getSize(size);
-            sScreenWidth = size.x;
-        }
-
-        switch (nextAnim) {
-            case ANIM_ENTER:
-                return createTranslateAnimator(sScreenWidth, 0);
-            case ANIM_EXIT:
-                return createTranslateAnimator(0, -sScreenWidth);
-            case ANIM_POP_ENTER:
-                return createTranslateAnimator(-sScreenWidth, 0);
-            case ANIM_POP_EXIT:
-                return createTranslateAnimator(0, sScreenWidth);
-        }
-        return super.onCreateAnimator(transit, enter, nextAnim);
-    }
-
-    private Animator createTranslateAnimator(int start, int end) {
-        ObjectAnimator animator = new ObjectAnimator();
-        animator.setProperty(View.TRANSLATION_X);
-        animator.setFloatValues(start, end);
-        animator.setDuration(getResources().getInteger(R.integer.setup_slide_anim_duration));
-        animator.setInterpolator(new LinearOutSlowInInterpolator());
-        return animator;
-    }
-
     protected void setOnClickAction(View view, final int actionId) {
         view.setOnClickListener(new OnClickListener() {
             @Override
@@ -102,5 +77,125 @@ public abstract class SetupFragment extends Fragment {
 
     protected void onActionClick(int actionId) {
         SetupActionHelper.onActionClick(this, actionId);
+    }
+
+    /**
+     * Enables fragment transition according to the given {@code mask}.
+     *
+     * @param mask This value is the combination of {@link #FRAGMENT_ENTER_TRANSITION},
+     * {@link #FRAGMENT_EXIT_TRANSITION}, {@link #FRAGMENT_REENTER_TRANSITION}, and
+     * {@link #FRAGMENT_RETURN_TRANSITION}.
+     */
+    public void enableFragmentTransition(@FragmentTransitionType int mask) {
+        setEnterTransition((mask & FRAGMENT_ENTER_TRANSITION) == 0 ? null
+                : createTransition(Gravity.END));
+        setExitTransition((mask & FRAGMENT_EXIT_TRANSITION) == 0 ? null
+                : createTransition(Gravity.START));
+        setReenterTransition((mask & FRAGMENT_REENTER_TRANSITION) == 0 ? null
+                : createTransition(Gravity.START));
+        setReturnTransition((mask & FRAGMENT_RETURN_TRANSITION) == 0 ? null
+                : createTransition(Gravity.END));
+    }
+
+    /**
+     * Sets the transition with the given {@code slidEdge}.
+     */
+    protected void setFragmentTransition(@FragmentTransitionType int transitionType,
+            int slideEdge) {
+        switch (transitionType) {
+            case FRAGMENT_ENTER_TRANSITION:
+                setEnterTransition(createTransition(slideEdge));
+                break;
+            case FRAGMENT_EXIT_TRANSITION:
+                setExitTransition(createTransition(slideEdge));
+                break;
+            case FRAGMENT_REENTER_TRANSITION:
+                setReenterTransition(createTransition(slideEdge));
+                break;
+            case FRAGMENT_RETURN_TRANSITION:
+                setReturnTransition(createTransition(slideEdge));
+                break;
+        }
+    }
+
+    private Transition createTransition(int slideEdge) {
+        return new SetupAnimationHelper.TransitionBuilder()
+                .setSlideEdge(slideEdge)
+                .setParentIdsForDelay(getParentIdsForDelay())
+                .setExcludeIds(getExcludedTargetIds())
+                .build();
+    }
+
+    /**
+     * Sets the distance of the fragment transition.
+     */
+    public void setTransitionDistance(int distance) {
+        Transition transition = getEnterTransition();
+        if (transition instanceof FadeAndShortSlide) {
+            ((FadeAndShortSlide) transition).setDistance(distance);
+        }
+        transition = getExitTransition();
+        if (transition instanceof FadeAndShortSlide) {
+            ((FadeAndShortSlide) transition).setDistance(distance);
+        }
+        transition = getReenterTransition();
+        if (transition instanceof FadeAndShortSlide) {
+            ((FadeAndShortSlide) transition).setDistance(distance);
+        }
+        transition = getReturnTransition();
+        if (transition instanceof FadeAndShortSlide) {
+            ((FadeAndShortSlide) transition).setDistance(distance);
+        }
+    }
+
+    /**
+     * Sets the duration of the fragment transition.
+     */
+    public void setTransitionDuration(long duration) {
+        Transition transition = getEnterTransition();
+        if (transition != null) {
+            transition.setDuration(duration);
+        }
+        transition = getExitTransition();
+        if (transition != null) {
+            transition.setDuration(duration);
+        }
+        transition = getReenterTransition();
+        if (transition != null) {
+            transition.setDuration(duration);
+        }
+        transition = getReturnTransition();
+        if (transition != null) {
+            transition.setDuration(duration);
+        }
+    }
+
+    /**
+     * Returns the ID's of the view's whose descendants will perform delayed move.
+     *
+     * @see com.android.tv.common.ui.setup.animation.SetupAnimationHelper.TransitionBuilder
+     * #setParentIdsForDelay
+     */
+    protected int[] getParentIdsForDelay() {
+        return null;
+    }
+
+    /**
+     * Sets the ID's of the views which will not be included in the transition.
+     *
+     * @see com.android.tv.common.ui.setup.animation.SetupAnimationHelper.TransitionBuilder
+     * #setExcludeIds
+     */
+    protected int[] getExcludedTargetIds() {
+        return null;
+    }
+
+    /**
+     * Returns the ID's of the shared elements.
+     *
+     * <p>Note that the shared elements should have their own transition names.
+     */
+    public int[] getSharedElementIds() {
+        return null;
     }
 }

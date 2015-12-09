@@ -32,7 +32,7 @@ public class MainThreadExecutor extends AbstractExecutorService {
 
     private final static MainThreadExecutor INSTANCE = new MainThreadExecutor();
 
-    public final static MainThreadExecutor getInstance() {
+    public static MainThreadExecutor getInstance() {
         return INSTANCE;
     }
 

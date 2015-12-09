@@ -146,6 +146,12 @@
     <string name="about_menu_licenses" msgid="4831892908710402185">"Açık kaynak lisansları"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Açık kaynak lisansları"</string>
     <string name="about_menu_version" msgid="6303769835664868129">"Sürüm"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Geliştirici seçenekleri"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB TV kanal ayarlayıcıyı etkinleştir"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB TV kanal ayarlayıcıdan ses alabilmek için TV\'nizin AC3 geçişini desteklemesi gerekir."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 ses özelliği"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"TV\'niz AC3 geçişini destekliyor."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"TV\'niz AC3 geçişini desteklemiyor."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Live TV\'ı iyileştirmeye yardımcı ol"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Canlı Kanallar\'ı daha iyi hale getirebilmemiz ve kilitlenme, donma gibi sorunları önleyebilmemeiz için anonim kullanım ve teşhis verilerini Google ile paylaşın."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Bu kanalı izlemek için Sağ tuşuna basın ve PIN\'inizi girin"</string>
