@@ -19,6 +19,7 @@ package com.android.usbtuner;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.tv.common.AutoCloseableUtils;
 import com.android.usbtuner.ChannelScanFileParser.ScanChannel;
 import com.android.usbtuner.data.Channel;
 import com.android.usbtuner.data.TunerChannel;
@@ -41,18 +42,18 @@ public class UsbTunerTsScannerSource implements InputStreamSource {
 
     private boolean mStreaming;
 
-    private final UsbTunerInterface mUsbTunerInterface;
+    private final TunerHal mTunerHal;
     private Thread mStreamingThread;
     private boolean mDeviceConfigured;
     private final EventDetector mEventDetector;
     private final AtomicLong mBytesFetched = new AtomicLong();
 
     public UsbTunerTsScannerSource(Context context, EventListener eventListener) {
-        mUsbTunerInterface = new UsbTunerInterface(context);
-        if (!mUsbTunerInterface.openFirstAvailable()) {
+        mTunerHal = TunerHal.getInstance(context);
+        if (mTunerHal == null) {
             throw new RuntimeException("Failed to open a DVB device");
         }
-        mEventDetector = new EventDetector(mUsbTunerInterface, eventListener);
+        mEventDetector = new EventDetector(mTunerHal, eventListener);
     }
 
     /**
@@ -74,7 +75,7 @@ public class UsbTunerTsScannerSource implements InputStreamSource {
 
     @Override
     public boolean setScanChannel(ScanChannel channel) {
-        if (mUsbTunerInterface.tuneAtsc(channel.frequency, channel.modulation)) {
+        if (mTunerHal.tune(channel.frequency, channel.modulation)) {
             mEventDetector.startDetecting(channel.frequency, channel.modulation);
             mDeviceConfigured = true;
             return true;
@@ -119,8 +120,8 @@ public class UsbTunerTsScannerSource implements InputStreamSource {
     }
 
     @Override
-    public void release() {
-        mUsbTunerInterface.close();
+    public void close() {
+        AutoCloseableUtils.closeQuietly(mTunerHal);
     }
 
     private class StreamingThread extends Thread {
@@ -135,7 +136,7 @@ public class UsbTunerTsScannerSource implements InputStreamSource {
                     break;
                 }
                 int bytesWritten;
-                bytesWritten = mUsbTunerInterface.readTsStream(dataBuffer, dataBuffer.length);
+                bytesWritten = mTunerHal.readTsStream(dataBuffer, dataBuffer.length);
                 if (bytesWritten <= 0) {
                     continue;
                 }
@@ -145,9 +146,6 @@ public class UsbTunerTsScannerSource implements InputStreamSource {
             }
 
             Log.i(TAG, "Streaming stopped");
-
-            // Once the stream stops we perform cleanup with the DVB API.
-            mUsbTunerInterface.stopStreaming();
         }
     }
 

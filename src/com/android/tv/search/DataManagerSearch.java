@@ -22,7 +22,7 @@ import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Programs;
 import android.media.tv.TvInputManager;
-import android.support.annotation.UiThread;
+import android.support.annotation.MainThread;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -87,7 +87,7 @@ public class DataManagerSearch implements SearchInterface {
         }
     }
 
-    @UiThread
+    @MainThread
     private List<SearchResult> searchFromDataManagers(String query, int limit, int action) {
         List<SearchResult> results = new ArrayList<>();
         if (!mChannelDataManager.isDbLoadFinished()) {

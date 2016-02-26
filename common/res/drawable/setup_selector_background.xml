@@ -14,11 +14,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-      <shape>
-          <solid android:color="#26FFFFFF"/>
-          <corners android:radius="2dp" />
-      </shape>
+
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight">
+    <!-- Note that android:start and android:end is not supported in L platform. -->
+    <item android:id="@android:id/mask" android:left="24dp" android:right="24dp">
+        <shape>
+            <solid android:color="@android:color/white"/>
+            <corners android:radius="2dp" />
+        </shape>
     </item>
-</selector>
+</ripple>

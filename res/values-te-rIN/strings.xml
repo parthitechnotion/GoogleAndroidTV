@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"ఆన్‌లో ఉంది"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"ఆఫ్‌లో ఉంది"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"బహుళ-ఆడియో"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"ఛానెల్ సెటప్"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"పేరెం. నియంత్ర."</string>
-    <string name="options_item_about" msgid="3023532413252052050">"పరిచయం"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"మరిన్ని ఛానెల్‌లను పొందండి"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"సెట్టింగ్‌లు"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"మూలం"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"మార్చు"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"ఆన్‌లో ఉంది"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"ఈ ప్రకారం సమూహం చేయి"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"ఛానెల్ సెటప్"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"ఈ కార్యక్రమం బ్లాక్ చేయబడింది"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"ఈ కార్యక్రమం <xliff:g id="RATING">%1$s</xliff:g> అని రేట్ చేయబడింది"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"ఛానెల్ సోర్స్‌లు"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"కొత్త ఛానెల్‌లు అందుబాటులో ఉన్నప్పుడు"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"ఛానెల్‌ జాబితాను అనుకూలీకరించండి"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"మీ ప్రోగ్రామ్ గైడ్ కోసం ఛానె. ఎంచుకోండి"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"సెటప్ చేయలేదు"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"స్వయంచాలకంగా స్కాన్ చేయడానికి ఇన్‌పుట్ మద్దతు ఇవ్వలేదు"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"\'<xliff:g id="TV_INPUT">%s</xliff:g>\' కోసం ఆటో-స్కాన్‌ని ప్రారంభించడం సాధ్యపడలేదు"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"సంవృత శీర్షికల కోసం సిస్టమ్-వ్యాప్త ప్రాధాన్యతలను ప్రారంభించడం సాధ్యపడలేదు."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d ఛానెల్ జోడించబడింది"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d ఛానెల్‌లు జోడించబ."</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">%1$d ఛానెల్‌లు జోడించబడ్డాయి</item>
+      <item quantity="one">%1$d ఛానెల్ జోడించబడింది</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"ఛానెల్‌లు జోడించబడలేదు"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"ట్యూనర్"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"తల్లిదండ్రుల నియంత్రణలు"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"కొత్త పిన్‌ని నమోదు చేయండి"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"మీ పిన్‌ను నిర్ధారించండి"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"మీ ప్రస్తుత పిన్‌ని నమోదు చేయండి"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"మీరు 5 సార్లు తప్పు PIN నమోదు చేసారు.\n<xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> సెకనులో మళ్లీ ప్రయత్నించండి."</item>
-    <item quantity="other" msgid="8829550842387756054">"మీరు 5 సార్లు తప్పు PIN నమోదు చేసారు.\n<xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> సెకన్లలో మళ్లీ ప్రయత్నించండి."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">మీరు 5 సార్లు తప్పు PIN నమోదు చేసారు.\n<xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> సెకన్లు ఆగి, ఆ తర్వాత మళ్లీ ప్రయత్నించండి.</item>
+      <item quantity="one">మీరు 5 సార్లు తప్పు PIN నమోదు చేసారు.\n<xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> సెకను ఆగి, ఆ తర్వాత మళ్లీ ప్రయత్నించండి.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"ఆ పిన్ తప్పు. మళ్లీ ప్రయత్నించండి."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"మళ్లీ ప్రయత్నించండి, పిన్ సరిపోలలేదు"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"పరిచయం"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"సెట్టింగ్‌లు"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"ఛానెల్‌ జాబితా అనుకూలీకరించండి"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"మీ ప్రోగ్రామ్ గైడ్ కోసం ఛానెల్‌లను ఎంచుకోండి"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"ఛానెల్ సోర్స్‌లు"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"కొత్త ఛానెల్‌లు అందుబాటులో ఉన్నాయి"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"తల్లిదండ్రుల నియంత్రణలు"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"సంస్కరణ"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"సంస్కరణ"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"డెవలపర్ ఎంపికలు"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB టీవీ ట్యూనర్‌ను ప్రారంభించు"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB టీవీ ట్యూనర్ శబ్దం వినిపించడానికి, మీ టీవీ AC3 గుండా ప్రసరణకు మద్దతు ఇవ్వాలి."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"శీర్షిక లేదు"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"ఛానెల్ బ్లాక్ చేయబడింది"</string>
     <string name="episode_format" msgid="4881195874563241096">"సీ.<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: ఎపి. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"ఛానెల్ సోర్స్‌లు"</string>
-    <string name="setup_description" msgid="8728423605912915099">"అందుబాటులో ఉన్న సోర్స్‌ల నుండి లైవ్ ఛానెల్‌లను సెటప్ చేయండి. ఛానెల్ సోర్స్‌ను బట్టి దీనికి కొన్ని నిమిషాలు పట్టవచ్చు."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"పూర్తయింది"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d ఛానెల్ అందుబాటులో ఉంది"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d ఛానెల్‌లు అందుబాటులో ఉన్నాయి"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"కొత్తవి"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"మూలాలు"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">%1$d ఛానెల్‌లు</item>
+      <item quantity="one">%1$d ఛానెల్</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"ఛానెల్‌లు ఏవీ అందుబాటులో లేవు"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"కొత్తవి"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"సెటప్ చేయలేదు"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"మరిన్ని మూలాలను పొందండి"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"ప్రత్యక్ష ప్రసార ఛానెల్‌లను అందించే అనువర్తనాలను బ్రౌజ్ చేయండి"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"కొత్త ఛానెల్ మూలాలు అందుబాటులో ఉన్నాయి"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"కొత్త ఛానెల్ మూలాలు అందించడానికి ఛానెల్‌లను కలిగి ఉన్నాయి.\nవాటిని ఇప్పుడే సెటప్ చేయండి లేదా ఛానెల్ మూలాల సెట్టింగ్‌లో దీన్ని తర్వాత చేయండి."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"ఇప్పుడే సెటప్ చేయి"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"సరే, అర్థమైంది"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307">"టీవీ మెనుని ప్రాప్యత చేయడానికి "<b>"ఎంచుకోండి నొక్కండి"</b>"."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"BACK కీ కనెక్ట్ చేయబడిన పరికరం కోసం ఉద్దేశించినది. నిష్క్రమించడానికి HOME బటన్‌ను నొక్కండి."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Android Lollipop అమలులో ఉన్న ఈ పరికరంలో ప్రత్యక్ష ప్రసార ఛానెల్‌లకు మద్దతు లేదు."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"టీవీ జాబితాలను చదవడానికి ప్రత్యక్ష ప్రసార ఛానెల్‌లకు అనుమతి అవసరం."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"మీ మూలాధారాలను సెటప్ చేయండి"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"ప్రత్యక్ష ప్రసార ఛానెల్‌లు అనువర్తనాల ద్వారా అందించబడే ప్రసార ఛానెల్‌ల్లో సాంప్రదాయక టీవీ ఛానెల్‌ల అనుభూతి కలగలిపి అందించబడతాయి. \n\nఇప్పటికే ఇన్‌స్టాల్ చేసుకున్న ఛానెల్ మూలాధారాలను సెటప్ చేయడం ద్వారా ప్రారంభించండి. లేదా ప్రత్యక్ష ప్రసార ఛానెల్‌లను ఆఫర్ చేసే మరిన్ని అనువర్తనాల కోసం Google Play స్టోర్‌లో బ్రౌజ్ చేయండి."</string>
 </resources>

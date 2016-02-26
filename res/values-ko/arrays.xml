@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"프리미엄"</item>
     <item msgid="8215762047341133299">"기술/과학"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"실시간 채널"</item>
+    <item msgid="7307688057853449735">"콘텐츠를 찾는 간단한 방법"</item>
+    <item msgid="7566838222783641942">"앱을 다운로드하여 더 많은 채널 보기"</item>
+    <item msgid="8646630833216197238">"채널 구성 맞춤설정"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"TV에서 채널을 시청하는 것처럼 앱에서 콘텐츠를 시청합니다."</item>
+    <item msgid="1855708984677953238">"익숙한 가이드와 사용하기 쉬운 인터페이스로 앱에서 콘텐츠를 탐색합니다. \nTV에서 채널을 탐색하는 것과 같습니다."</item>
+    <item msgid="3420760668363283731">"실시간 채널을 제공하는 앱을 설치하여 더 많은 채널을 추가합니다. \nTV 메뉴에 있는 링크를 사용하여 Google Play 스토어에서 호환되는 앱을 찾습니다."</item>
+    <item msgid="8974157841656828507">"새로 설치한 채널 소스를 설정하여 채널 목록을 맞춤설정합니다. \n설정 메뉴에서 채널 소스를 선택하여 시작합니다."</item>
+  </string-array>
 </resources>

@@ -50,19 +50,25 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"USB kanalų imtuvo sąranka"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Tai gali užtrukti kelias minutes"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Surasta kanalų: %1$d"</item>
-    <item quantity="other" msgid="7340557317633613">"Surasta kanalų: %1$d"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="one">Rastas %1$d kanalas</item>
+      <item quantity="few">Rasti %1$d kanalai</item>
+      <item quantity="many">Rasta %1$d kanalo</item>
+      <item quantity="other">Rasta %1$d kanalų</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"SUSTABDYTI KANALŲ NUSKAITYMĄ"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Surasta kanalų: %1$d"</item>
-    <item quantity="other" msgid="4331542666115153576">"Surasta kanalų: %1$d"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Puiku! Atlikę kanalų nuskaitymą radome %1$d kanal. Jei tai neatrodo tinkamas rezultatas, pabandykite pakoreguoti antenos padėtį ir nuskaityti dar kartą."</item>
-    <item quantity="other" msgid="8098777464551209564">"Puiku! Atlikę kanalų nuskaitymą radome %1$d kanal. Jei tai neatrodo tinkamas rezultatas, pabandykite pakoreguoti antenos padėtį ir nuskaityti dar kartą."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="one">Rastas %1$d kanalas</item>
+      <item quantity="few">Rasti %1$d kanalai</item>
+      <item quantity="many">Rasta %1$d kanalo</item>
+      <item quantity="other">Rasta %1$d kanalų</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="one">Puiku! Nuskaitant kanalus rastas %1$d kanalas. Jei tai neatrodo tinkamas rezultatas, pabandykite pakoreguoti antenos padėtį ir nuskaityti dar kartą.</item>
+      <item quantity="few">Puiku! Nuskaitant kanalus rasti %1$d kanalai. Jei tai neatrodo tinkamas rezultatas, pabandykite pakoreguoti antenos padėtį ir nuskaityti dar kartą.</item>
+      <item quantity="many">Puiku! Nuskaitant kanalus rasta %1$d kanalo. Jei tai neatrodo tinkamas rezultatas, pabandykite pakoreguoti antenos padėtį ir nuskaityti dar kartą.</item>
+      <item quantity="other">Puiku! Nuskaitant kanalus rasta %1$d kanalų. Jei tai neatrodo tinkamas rezultatas, pabandykite pakoreguoti antenos padėtį ir nuskaityti dar kartą.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Atlikta"</item>
     <item msgid="496688122303154468">"Nuskaityti dar kartą"</item>

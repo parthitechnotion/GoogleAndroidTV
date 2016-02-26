@@ -21,11 +21,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
+import android.content.Context;
 import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.android.tv.common.R;
 
 /**
  * A helper class for setup animation.
@@ -33,33 +36,44 @@ import android.widget.ImageView;
 public final class SetupAnimationHelper {
     public static final long DELAY_BETWEEN_SIBLINGS_MS = applyAnimationTimeScale(33);
 
-    private static final float ANIMATION_SCALE = 1.0f;
+    private static final float ANIMATION_TIME_SCALE = 1.0f;
 
+    private static boolean sInitialized;
     private static long sFragmentTransitionDuration;
-    private static int sFragmentTransitionDistance;
+    private static int sFragmentTransitionLongDistance;
+    private static int sFragmentTransitionShortDistance;
 
     private SetupAnimationHelper() { }
 
     /**
-     * Sets the duration of the fragment transition.
+     * Load initial parameters. This method should be called before using this class.
      */
-    public static void setFragmentTransitionDuration(long duration) {
-        sFragmentTransitionDuration = duration;
+    public static void initialize(Context context) {
+        sFragmentTransitionDuration = context.getResources()
+                .getInteger(R.integer.setup_fragment_transition_duration);
+        sFragmentTransitionLongDistance = context.getResources()
+                .getDimensionPixelOffset(R.dimen.setup_fragment_transition_long_distance);
+        sFragmentTransitionShortDistance = context.getResources()
+                .getDimensionPixelOffset(R.dimen.setup_fragment_transition_short_distance);
+        sInitialized = true;
     }
 
-    /**
-     * Sets the distance of the fragment transition.
-     */
-    public static void setFragmentTransitionDistance(int distance) {
-        sFragmentTransitionDistance = distance;
+    private static void checkInitialized() {
+        if (!sInitialized) {
+            throw new IllegalStateException("SetupAnimationHelper not initialized");
+        }
     }
 
     public static class TransitionBuilder {
         private int mSlideEdge = Gravity.START;
-        private int mDistance = sFragmentTransitionDistance;
+        private int mDistance = sFragmentTransitionLongDistance;
         private long mDuration = sFragmentTransitionDuration;
         private int[] mParentIdForDelay;
         private int[] mExcludeIds;
+
+        public TransitionBuilder() {
+            checkInitialized();
+        }
 
         /**
          * Sets the edge of the slide transition.
@@ -114,6 +128,22 @@ public final class SetupAnimationHelper {
     }
 
     /**
+     * Changes the move distance of the {@code transition} to long distance.
+     */
+    public static void setLongDistance(FadeAndShortSlide transition) {
+        checkInitialized();
+        transition.setDistance(sFragmentTransitionLongDistance);
+    }
+
+    /**
+     * Changes the move distance of the {@code transition} to short distance.
+     */
+    public static void setShortDistance(FadeAndShortSlide transition) {
+        checkInitialized();
+        transition.setDistance(sFragmentTransitionShortDistance);
+    }
+
+    /**
      * Applies the animation scale to the given {@code animator}.
      */
     public static Animator applyAnimationTimeScale(Animator animator) {
@@ -123,9 +153,9 @@ public final class SetupAnimationHelper {
             }
         }
         if (animator.getDuration() > 0) {
-            animator.setDuration((long) (animator.getDuration() * ANIMATION_SCALE));
+            animator.setDuration((long) (animator.getDuration() * ANIMATION_TIME_SCALE));
         }
-        animator.setStartDelay((long) (animator.getStartDelay() * ANIMATION_SCALE));
+        animator.setStartDelay((long) (animator.getStartDelay() * ANIMATION_TIME_SCALE));
         return animator;
     }
 
@@ -141,9 +171,9 @@ public final class SetupAnimationHelper {
             }
         }
         if (transition.getDuration() > 0) {
-            transition.setDuration((long) (transition.getDuration() * ANIMATION_SCALE));
+            transition.setDuration((long) (transition.getDuration() * ANIMATION_TIME_SCALE));
         }
-        transition.setStartDelay((long) (transition.getStartDelay() * ANIMATION_SCALE));
+        transition.setStartDelay((long) (transition.getStartDelay() * ANIMATION_TIME_SCALE));
         return transition;
     }
 
@@ -151,11 +181,11 @@ public final class SetupAnimationHelper {
      * Applies the animation scale to the given {@code time}.
      */
     public static long applyAnimationTimeScale(long time) {
-        return (long) (time * ANIMATION_SCALE);
+        return (long) (time * ANIMATION_TIME_SCALE);
     }
 
     /**
-     * Returns an animator which animate the source image of the {@link ImageView}.
+     * Returns an animator which animates the source image of the {@link ImageView}.
      *
      * <p>The frame rate is 60 fps.
      */
@@ -164,7 +194,7 @@ public final class SetupAnimationHelper {
     }
 
     /**
-     * Returns an animator which animate the source image of the {@link ImageView} with start delay.
+     * Returns an animator which animates the source image of the {@link ImageView} with start delay.
      *
      * <p>The frame rate is 60 fps.
      */
@@ -192,9 +222,10 @@ public final class SetupAnimationHelper {
      * @param makeVisibleAfterAnimation If {@code true}, the view will become visible after the
      * animation ends.
      */
-    public static Animator createFadeOutAnimator(final View view, int duration,
+    public static Animator createFadeOutAnimator(final View view, long duration,
             boolean makeVisibleAfterAnimation) {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.ALPHA, 1.0f, 0.0f);
+        ObjectAnimator animator =
+                ObjectAnimator.ofFloat(view, View.ALPHA, 1.0f, 0.0f).setDuration(duration);
         if (makeVisibleAfterAnimation) {
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override

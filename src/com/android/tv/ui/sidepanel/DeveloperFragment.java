@@ -18,18 +18,10 @@ package com.android.tv.ui.sidepanel;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
-import android.provider.Settings;
 import android.view.View;
-import android.widget.TextView;
 
 import com.android.tv.Features;
-import com.android.tv.MainActivity;
 import com.android.tv.R;
-import com.android.tv.TvApplication;
-import com.android.tv.analytics.OptOutPreferenceHelper;
-import com.android.tv.dialog.WebDialogFragment;
-import com.android.tv.license.LicenseUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,32 +59,6 @@ public class DeveloperFragment extends SideFragment {
         }
     }
 
-    /**
-     * Shows AC3 capability of the connected TV.
-     */
-    private static final class Ac3CapabilityItem extends Item {
-        @Override
-        protected int getResourceId() {
-            return R.layout.option_item_simple;
-        }
-
-        @Override
-        protected void onBind(View view) {
-            super.onBind(view);
-            TextView titleView = (TextView) view.findViewById(R.id.title);
-            titleView.setText(R.string.developer_menu_ac3_support);
-            TextView descriptionView = (TextView) view.findViewById(R.id.description);
-            Resources res = view.getContext().getResources();
-            boolean ac3Support = ((MainActivity) view.getContext()).isAc3PassthroughSupported();
-            descriptionView.setText(ac3Support ? R.string.developer_menu_ac3_support_yes
-                    : R.string.developer_menu_ac3_support_no);
-        }
-
-        @Override
-        protected void onSelected() {
-        }
-    }
-
     @Override
     protected String getTitle() {
         return getResources().getString(R.string.side_panel_title_developer);
@@ -108,7 +74,11 @@ public class DeveloperFragment extends SideFragment {
         List<Item> items = new ArrayList<>();
         Activity activity = getActivity();
         items.add(new UsbTvTunerItem(activity));
-        items.add(new Ac3CapabilityItem());
+        boolean ac3Support = getMainActivity().isAc3PassthroughSupported();
+        // Show AC3 passthrough availability.
+        items.add(new SimpleItem(getString(R.string.developer_menu_ac3_support),
+                getString(ac3Support ? R.string.developer_menu_ac3_support_yes
+                        : R.string.developer_menu_ac3_support_no)));
         return items;
     }
 }

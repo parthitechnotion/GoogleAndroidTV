@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premiere"</item>
     <item msgid="8215762047341133299">"Technik/Wissenschaft"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Live-TV"</item>
+    <item msgid="7307688057853449735">"Einfache Inhaltssuche"</item>
+    <item msgid="7566838222783641942">"Apps herunterladen und mehr Kanäle erhalten"</item>
+    <item msgid="8646630833216197238">"Kanalliste personalisieren"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Sie können sich Inhalte aus Ihren Apps genauso wie Fernsehsender ansehen."</item>
+    <item msgid="1855708984677953238">"Dank der bekannten Programmübersicht und einer benutzerfreundlichen Oberfläche können Sie in der App genauso nach Inhalten suchen,\nwie Sie auf Ihrem Fernseher nach Sendern suchen."</item>
+    <item msgid="3420760668363283731">"Sie können weitere Kanäle hinzufügen, indem Sie Apps installieren, die Live-TV anbieten.\nÜber den Link im TV-Menü können Sie im Google Play Store nach kompatiblen Apps suchen."</item>
+    <item msgid="8974157841656828507">"Richten Sie die neu installierten Kanalquellen ein, um Ihre Kanalliste zu personalisieren.\nWählen Sie dazu zuerst im Menü \"Einstellungen\" Ihre Kanalquellen aus."</item>
+  </string-array>
 </resources>

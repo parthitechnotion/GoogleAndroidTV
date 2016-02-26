@@ -29,9 +29,6 @@
     <!-- Name of application [CHAR LIMIT=NONE] -->
     <string name="app_name">Live TV</string>
 
-    <!--TODO(DVR): decide if translation needed Name of DVR service [CHAR LIMIT=NONE]  -->
-    <string name="dvr_service_name" translatable="false">DVR Service</string>
-
     <!-- Title of an application permission, listed so the user can choose
         whether they want to allow the application to do this. -->
     <string name="permlab_receiveInputEvent" translatable="false">receive input events from Live TV app</string>
@@ -115,12 +112,10 @@
     <string name="options_item_pip_off">Off</string>
     <!-- Label of "Multi audio" item in the TV option row. [CHAR LIMIT=17] -->
     <string name="options_item_multi_audio">Multi-audio</string>
-    <!-- Label of "Channel Setup" item in the TV option row. [CHAR LIMIT=17] -->
-    <string name="options_item_channel_sources">Channel setup</string>
-    <!-- Label of "Parental controls" item in the TV option row. [CHAR LIMIT=17] -->
-    <string name="options_item_parental_controls">Parental controls</string>
-    <!-- Label of "About the Live TV application" item in the TV option row. [CHAR LIMIT=17] -->
-    <string name="options_item_about">About</string>
+    <!-- Label of "Get more channels" item in the TV option row. [CHAR LIMIT=17] -->
+    <string name="options_item_more_channels">Get more channels</string>
+    <!-- Label of "Settings" item in the TV option row. [CHAR LIMIT=17] -->
+    <string name="options_item_settings">Settings</string>
 
     <!-- Label of "Source" item in the PIP option row. The item enables the user to select
          a specific input (e.g. HDMI 1) for the PIP window. [CHAR LIMIT=17] -->
@@ -240,11 +235,6 @@
     <!-- Title of "Group by" side panel to set grouping type [CHAR LIMIT=30] -->
     <string name="side_panel_title_group_by">Group by</string>
 
-    <!-- Inside "Channel setup" option side panel -->
-    <eat-comment />
-    <!-- Title of "Channel setup" option. [CHAR LIMIT=30] -->
-    <string name="side_panel_title_channel_sources">Channel setup</string>
-
     <!-- Inside full EPG -->
     <eat-comment />
     <!-- Description in the TV guide when the rating of the current content is restricted by parental control. [CHAR LIMIT=NONE] -->
@@ -252,22 +242,6 @@
     <!-- Description in the TV guide with the rating when the rating of the current content is restricted by parental control. [CHAR LIMIT=NONE] -->
     <string name="program_guide_content_locked_format">This program is rated <xliff:g id="rating" example="TV_MA">%1$s</xliff:g></string>
 
-    <!-- Inside menu for each input after selecting one input in "Channels" option -->
-    <eat-comment />
-    <!-- Label of "Channel sources" item to setup channels. [CHAR LIMIT=30] -->
-    <string name="channel_source_item_setup">Channel sources</string>
-    <!-- Description of "Channel sources" item only when new inputs are available.
-         [CHAR LIMIT=NONE] -->
-    <string name="channel_source_item_setup_new_inputs">New channels available</string>
-    <!-- Label of "Customize channels list" item to select and deselect channels.
-         [CHAR LIMIT=30] -->
-    <string name="channel_source_item_customize_channels">Customize channel list</string>
-    <!-- Description of "Customize channels list" item. [CHAR LIMIT=NONE] -->
-    <string name="channel_source_item_customize_channels_description">Choose channels for your program guide</string>
-
-    <!-- Channel description: channel scan is needed, because the input is just installed.
-         [CHAR LIMIT=40] -->
-    <string name="channel_description_setup_now">Not set up</string>
     <!-- Message when a channel item is clicked for channel auto-scan, but the input doesn't
          have auto-scan function. [CHAR LIMIT=NONE] -->
     <string name="msg_no_setup_activity">The input doesn\'t support auto-scan</string>
@@ -395,16 +369,28 @@
     <!-- Toast message when an user couldn't pass the PIN confirmation. [CHAR LIMIT=NONE] -->
     <string name="pin_toast_not_match">Try again, PIN doesn\'t match</string>
 
-    <!--  menu for "About" option -->
+    <!-- menu for "Settings" option -->
     <eat-comment />
-    <!--  Title of "About the Live TV application" option. [CHAR LIMIT=30] -->
-    <string name="side_panel_title_about">About</string>
+    <!--  Title of "Settings" option. [CHAR LIMIT=30] -->
+    <string name="side_panel_title_settings">Settings</string>
+    <!-- Label of "Customize channels list" item to select and deselect channels.
+         [CHAR LIMIT=30] -->
+    <string name="settings_channel_source_item_customize_channels">Customize channel list</string>
+    <!-- Description of "Customize channels list" item. [CHAR LIMIT=NONE] -->
+    <string name="settings_channel_source_item_customize_channels_description">Choose channels for your program guide</string>
+    <!-- Label of "Channel sources" item to setup channels. [CHAR LIMIT=30] -->
+    <string name="settings_channel_source_item_setup">Channel sources</string>
+    <!-- Description of "Channel sources" item only when new inputs are available.
+         [CHAR LIMIT=NONE] -->
+    <string name="settings_channel_source_item_setup_new_inputs">New channels available</string>
+    <!-- Label of "Parental controls" item. [CHAR LIMIT=30] -->
+    <string name="settings_parental_controls">Parental controls</string>
     <!-- Menu item to show licenses for open source code used in the app [CHAR LIMIT=35] -->
-    <string name="about_menu_licenses">Open source licenses</string>
+    <string name="settings_menu_licenses">Open source licenses</string>
     <!--Title for a dialog box that shows licenses for open source code used in the app [CHAR LIMIT=35] -->
     <string name="dialog_title_licenses">Open source licenses</string>
     <!-- Menu item that shows the application version(eg 1.2.03-final) as a second line below this title [CHAR LIMIT=35] -->
-    <string name="about_menu_version">Version</string>
+    <string name="settings_menu_version">Version</string>
 
     <!-- menu for "Developer options" -->
     <eat-comment />
@@ -463,40 +449,44 @@
     <!-- The episode title format displayed on the info banner. For example, "S1: Ep. 1 Winter is coming". -->
     <string name="episode_format">S<xliff:g id="season_number" example="1">%1$d</xliff:g>: Ep. <xliff:g id="episode_number" example="1">%2$d</xliff:g> <xliff:g id="episode_title" example="Winder is coming">%3$s</xliff:g></string>
 
-    <!-- Setup dialog -->
+    <!-- Setup Sources Fragment -->
     <eat-comment />
-    <!-- Title of Setup Dialog [CHAR LIMIT=30] -->
-    <string name="setup_title">Channel sources</string>
-    <!-- Description of Setup Dialog. [CHAR LIMIT=NONE] -->
-    <string name="setup_description">Set up live channels from the available sources. This may take several minutes depending on the channel source.</string>
-    <!-- Label of done button [CHAR LIMIT=30] -->
-    <string name="setup_done_button_label">Done</string>
+    <!-- Category name for the newly installed channel sources(inputs).-->
+    <string name="setup_category_new">New</string>
+    <!-- Category name for the installed channel sources(inputs). -->
+    <string name="setup_category_done">Sources</string>
     <!-- Description of an input to describe its channel count. [CHAR LIMIT=40] -->
     <plurals name="setup_input_channels">
-        <item quantity="one">%1$d channel available</item>
-        <item quantity="other">%1$d channels available</item>
+        <item quantity="one">%1$d channel</item>
+        <item quantity="other">%1$d channels</item>
     </plurals>
     <!-- Description of an input with 0 channels. [CHAR LIMIT=40] -->
     <string name="setup_input_no_channels">No channels available</string>
     <!-- Description of newly installed inputs. [CHAR LIMIT=40] -->
     <string name="setup_input_new">New</string>
+    <!-- Description of an input which was installed but not setup yet. [CHAR LIMIT=40] -->
+    <string name="setup_input_setup_now">Not set up</string>
+    <!-- Title for the link to the play store to get more channel sources. -->
+    <string name="setup_play_store_action_title">Get more sources</string>
+    <!-- Description for the link to the play store to get more channel sources. -->
+    <string name="setup_play_store_action_description">Browse apps that offer live channels</string>
+
+    <!-- New Sources Fragment -->
+    <eat-comment />
+    <!-- Title for the new sources fragment -->
+    <string name="new_sources_title">New channel sources available</string>
+    <!-- Description for the new sources fragment -->
+    <string name="new_sources_description">New channel sources have channels to offer.\nSet them up now, or do this later in the channel sources setting.</string>
+    <!-- String for the "Set up now" action -->
+    <string name="new_sources_action_setup">Set up now</string>
+    <!-- String for the "skip" action -->
+    <string name="new_sources_action_skip">Ok, got it</string>
 
     <!-- Intro dialog -->
     <eat-comment />
     <string name="intro_title">@string/app_name</string>
     <!-- Description of Intro Dialog [CHAR LIMIT=NONE] -->
     <string name="intro_description"><b>Press SELECT</b> to access the TV menu.</string>
-
-    <!-- DVR in EPG
-         TODO(DVR): make translatable true. -->
-    <eat-comment />
-    <!-- Item label to schedule program recording. -->
-    <string name="epg_dvr_record_program" translatable="false">Record program</string>
-    <!-- Item label to schedule whole season recording of a TV show. -->
-    <string name="epg_dvr_record_season" translatable="false">Record season</string>
-    <!-- Item label to delete a recording schedule when a recording scheduled program is
-         clicked in EPG. -->
-    <string name="epg_dvr_delete_program" translatable="false">Delete schedule</string>
 
     <!-- Toast messages -->
     <eat-comment />
@@ -553,27 +543,52 @@
 
     <!-- Onboarding experience.
          TODO: Change translatable to true.-->
-    <!-- Text for the Live TV overview screen in onboarding. -->
-    <string name="app_overview_text" translatable="false">Get Live TV</string>
-    <!-- Description for the Live TV overview screen in onboarding. -->
-    <string name="app_overview_description_has_ac3" translatable="false">Live channels combine the experience of traditional TV channels with streaming channels provided by apps. Get started by setting up the channel sources you already have available, or browse the Google Play Store for more apps that offer live channels.
-\nAlso, learn about getting over-the-air broadcast channels like ABC, CBS, NBC, and FOX when you add a compatible TV tuner &amp; HDTV antenna to your Nexus Player.</string>
-    <string name="app_overview_description_no_ac3" translatable="false">Live channels combine the experience of traditional TV channels with streaming channels provided by apps. Get started by setting up the channel sources you already have available, or browse the Google nPlay Store for more apps that offer live channels.</string>
-    <!-- Text for the action for setting up channel sources. It will show the setup page of the channel sources. -->
-    <string name="app_overview_action_text_setup_source" translatable="false">Set up your channel sources</string>
-    <!-- Description for the action for setting up channel sources. It will show the setup page of the channel sources. -->
-    <string name="app_overview_action_description_setup_source" translatable="false">View the channel sources already installed</string>
-    <!-- Text for the action for getting more channels from play store. It will show the play store page. -->
-    <string name="app_overview_action_text_play_store" translatable="false">Get streaming channels</string>
-    <!-- Description for the action for getting more channels from play store. It will show the play store page. -->
-    <string name="app_overview_action_description_play_store" translatable="false">Browse apps that offer live channels</string>
-    <!-- Text for the action for setting up channel of USB tuner. It  will show the channel scan page. -->
-    <string name="app_overview_action_text_usb_tuner" translatable="false">Get over-the-air TV channels</string>
-    <!-- Description for the action for setting up channel of USB tuner. It  will show the channel scan page. -->
-    <string name="app_overview_action_description_usb_tuner" translatable="false">Learn about compatible TV tuners</string>
+    <eat-comment />
     <!-- Text for the channel sources screen in onboarding. -->
-    <string name="setup_sources_text" translatable="false">Channel sources</string>
+    <string name="setup_sources_text">Set up your sources</string>
     <!-- Description for channel sources screen in onboarding. -->
-    <string name="setup_sources_description" translatable="false">Set up live channels from the available sources. This may take several minutes depending on the channel source.
-\nGet more channels by installing compatible apps from the Google Play Store.</string>
+    <string name="setup_sources_description">Live channels combines the experience of traditional TV channels with streaming channels provided by apps.
+\n\nGet started by setting up the channel sources already installed. Or browse Google Play Store for more apps that offer live channels.</string>
+
+    <!-- DVR TODO(DVR): make translatable true. -->
+    <eat-comment />
+    <!-- Item label to schedule program recording. -->
+    <string name="epg_dvr_record_program" translatable="false">Record program</string>
+    <!-- Item label to schedule whole season recording of a TV show. -->
+    <string name="epg_dvr_record_season" translatable="false">Record season</string>
+    <!-- Item label to delete a recording schedule when a recording scheduled program is
+         clicked in EPG. -->
+    <string name="epg_dvr_delete_program" translatable="false">Delete schedule</string>
+
+    <!-- Menu item label to start DVR manager UI. -->
+    <string name="channels_item_dvr" translatable="false">DVR</string>
+
+    <!--TODO(DVR): decide if translation needed Name of DVR service [CHAR LIMIT=NONE]  -->
+    <string name="dvr_service_name" translatable="false">DVR Service</string>
+
+    <!-- DVR Menu strings. -->
+    <eat-comment />
+    <string name="dvr_main_current_recordings" translatable="false">Current Recordings</string>
+    <string name="dvr_main_scheduled_recordings" translatable="false">Scheduled Recordings</string>
+    <string name="dvr_main_recorded_programs" translatable="false">Recorded Programs</string>
+    <string name="dvr_main_settings" translatable="false">Settings</string>
+    <string name="dvr_msg_no_recording_on_the_row" translatable="false">None</string>
+    <string name="dvr_msg_program_title_unknown" translatable="false">Unknown</string>
+    <string name="dvr_msg_channel_unknown" translatable="false">Channel unknown</string>
+
+    <!-- DVR detailed page -->
+    <eat-comment />
+    <string name="dvr_detail_cancel" translatable="false">Cancel recording</string>
+    <string name="dvr_detail_stop_keep" translatable="false">Stop and keep recording</string>
+    <string name="dvr_detail_stop_delete" translatable="false">Stop and delete recording</string>
+    <string name="dvr_detail_play" translatable="false">Play recording</string>
+    <string name="dvr_detail_delete" translatable="false">Delete recording</string>
+
+    <!-- DVR epg strings -->
+    <eat-comment />
+    <string name="dvr_epg_record" translatable="false">Record</string>
+    <string name="dvr_epg_do_not_record" translatable="false">Do not record</string>
+    <string name="dvr_epg_conflict_dialog_title" translatable="false">Recording this program will
+        prevent the recording of the following programs:</string>
+
 </resources>

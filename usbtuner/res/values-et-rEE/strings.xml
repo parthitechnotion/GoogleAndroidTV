@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"USB-kanalituuneri seadistus"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"See võib võtta mitu minutit"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Leiti %1$d kanal"</item>
-    <item quantity="other" msgid="7340557317633613">"Leiti %1$d kanalit"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">Leiti %1$d kanalit</item>
+      <item quantity="one">Leiti %1$d kanal</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"PEATA KANALITE OTSIMINE"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Leiti %1$d kanal"</item>
-    <item quantity="other" msgid="4331542666115153576">"Leiti %1$d kanalit"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Suurepärane! Kanalite otsimisel leiti %1$d kanal. Kui see ei tundu õige, kohandage antenni asendit ja otsige uuesti."</item>
-    <item quantity="other" msgid="8098777464551209564">"Suurepärane! Kanalite otsimisel leiti %1$d kanalit. Kui see ei tundu õige, kohandage antenni asendit ja otsige uuesti."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">Leiti %1$d kanalit</item>
+      <item quantity="one">Leiti %1$d kanal</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">Hästi! Kanalite otsimisel leiti %1$d kanalit. Kui see ei tundu õige, kohandage antenni asendit ja otsige uuesti.</item>
+      <item quantity="one">Hästi! Kanalite otsimisel leiti %1$d kanal. Kui see ei tundu õige, kohandage antenni asendit ja otsige uuesti.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Valmis"</item>
     <item msgid="496688122303154468">"Otsi uuesti"</item>

@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"​ເປີດ"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"ປິດ"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"ຫຼາຍສຽງ"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"ຕັ້ງ​ຊ່ອງ"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"ການ​ຄວບຄຸມ​ຂອງ​ຜູ່​ປົກ​ຄອງ"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"ກ່ຽວກັບ"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"ເອົາຊ່ອງເພີ່ມເຕີມ"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"ການ​ຕັ້ງ​ຄ່າ"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"ທີ່​ມາ"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"ສະຫຼັບ"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"​ເປີດ"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"ຈັດກຸ່ມຕາມ"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"ຕັ້ງ​ຊ່ອງ"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"ໂປ​ຣ​ແກ​ຣມ​ນີ້​ຖືກບ​ລັອກ​ແລ້ວ"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"​ລາຍ​ການ​ນີ້​ຖືກ​ຈັດ​ປະ​ເພດ <xliff:g id="RATING">%1$s</xliff:g>"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"ທີ່ມາ​ຂອງ​ຊ່ອງ"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"ມີ​ຊ່ອງ​ໃໝ່​ໃຫ້​ຢູ່"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"ປັບແຕ່ງລາຍ​ຊື່​ຊ່ອງ"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"ເລືອກ​ຊ່ອງ​ສຳລັບ​ແນະນຳ​ລາຍການ​ຂອງ​ທ່ານ"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"ບໍ່ໄດ້​ຕິດ​ຕັ້ງ"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"ອິນ​ພຸດ​ນີ້ບໍ່​ຮອງ​ຮັບ​ການ​ສະ​ແກນ​ອັດ​ຕະ​ໂນ​ມັດ"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"ບໍ່​ສາ​ມາດ​ເລີ່ມ​ການ​ສະ​ແກນ​ອັດ​ຕະ​ໂນ​ມັດ​ສຳ​ລັບ \'<xliff:g id="TV_INPUT">%s</xliff:g>\' ໄດ້"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"ບໍ່​ສາ​ມາດ​ເລີ່ມ​ການ​ຕັ້ງ​ຄ່າ​ທົ່ວ​ລະ​ບົບ​ສຳ​ລັບ​ຄຳ​ບັນ​ຍາຍ​ແບບ​ປິດ​ໄດ້."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"ເພີ່ມ​ %1$d ​ຊ່ອງແລ້ວ"</item>
-    <item quantity="other" msgid="1078861616751739285">"​ເພີ່ມ %1$d ຊ່ອງ​ແລ້ວ"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">ເພີ່ມ %1$d ຊ່ອງແລ້ວ</item>
+      <item quantity="one">ເພີ່ມ %1$d ຊ່ອງແລ້ວ</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"ບໍ່​ໄດ້​ເພີ່ມ​ຊ່ອງ"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"​ທູນ​ເນີ"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"ການ​ຄວບຄຸມ​ຂອງ​ຜູ່​ປົກ​ຄອງ"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"ໃສ່ລະຫັດ PIN ໂຕໃຫມ່"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"ຢືນຢັນ​ລະຫັດ PIN ຂອງທ່ານ"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"ປ້ອນ​ລະ​ຫັດ PIN ປັດ​ຈຸ​ບັນ​ຂອງ​ທ່ານ"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"ທ່ານ​ໄດ້​ປ້ອນ​ລະ​ຫັດ PIN ຜິດ 5 ຄັ້ງ.\nລອງ​ໃໝ່​ອີກ​ໃນ <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> ວິ​ນາ​ທີ."</item>
-    <item quantity="other" msgid="8829550842387756054">"ທ່ານ​ໄດ້​ປ້ອນ​ລະ​ຫັດ PIN ຜິດ 5 ຄັ້ງ.\nລອງ​ໃໝ່​ອີກ​ໃນ <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> ວິ​ນາ​ທີ."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">ທ່ານປ້ອນ PIN ບໍ່ຖືກຕ້ອງ 5 ເທື່ອແລ້ວ.\nລອງອີກເທື່ອໃນ <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> ວິນາທີ.</item>
+      <item quantity="one">ທ່ານປ້ອນ PIN ບໍ່ຖືກຕ້ອງ 5 ເທື່ອແລ້ວ.\nລອງອີກເທື່ອໃນ <xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> ວິນາທີ.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"ລະຫັດ PIN ນັ້ນບໍ່​ຖືກ​ຕ້ອງ, ກະ​ລຸ​ນາລອງ​ໃຫມ່​ອີກ​ຄັ້ງ."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"ລະ​ຫັດ PIN ບໍ່​ກົງ​ກັນ, ກະ​ລຸ​ນາ​ລອງ​ໃໝ່."</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"ກ່ຽວກັບ"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"​ໃບ​ອະ​ນຸ​ຍາດ​ແຫຼ່ງ​ເປີດ"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"ການ​ຕັ້ງ​ຄ່າ"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"ປັບແຕ່ງ​ລາຍ​ຊື່​ຊ່ອງ"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"ເລືອກ​ຊ່ອງ​ສຳລັບການ​ແນະນຳລາຍການ​ຂອງ​ທ່ານ"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"ແຫຼ່ງທີ່ມາ​ຂອງ​ຊ່ອງ"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"ມີ​ຊ່ອງ​ໃໝ່​"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"ການ​ຄວບຄຸມ​ຂອງພໍ່ແມ່"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"​ໃບ​ອະ​ນຸ​ຍາດ​ Open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"​ໃບ​ອະ​ນຸ​ຍາດ​ແຫຼ່ງ​ເປີດ"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"ເວີຊັນ"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"ເວີຊັນ"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"ຕົວ​ເລືອກ​ນັກພັດທະນາ"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"​ເປີດ​ໃຊ້ຕົວ​ຮັບ​ສັນຍານ​ໂທລະພາບ​ແບບ USB"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"​ເພື່ອ​ຟັງສຽງ​ຂອງ​ຕົວ​ຮັບ​ສັນຍານ​ໂທລະພາບ​ແບບ USB, ​ໂທລະພາບ​ຂອງ​ທ່ານ​ຄວນ​ຮອງ​ຮັບ​ການ​ສົ່ງ​ຜ່ານ AC3."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"ບໍ່ມີຫົວຂໍ້"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"​ຊ່ອງ​ຖືກບລັອກ"</string>
     <string name="episode_format" msgid="4881195874563241096">"S<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: ຕອນ <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"ທີ່ມາ​ຂອງ​ຊ່ອງ"</string>
-    <string name="setup_description" msgid="8728423605912915099">"ຕັ້ງ​ຊ່ອງ​ສົດ​ຈາກ​ແຫຼ່ງ​ທີ່​ມີ​ຢູ່. ອັນ​ນີ້​ອາດ​ຈະໃຊ້​ເວ​ລາ​ຫຼາຍ​ນາ​ທີ ຂຶ້ນ​ກັບ​ແຫຼ່ງ​ທີ່​ມາ​ຂອງ​ຊ່ອງ."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"ແລ້ວໆ"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d ຊ່ອງ​ພ້ອມ​ໃຊ້​ງານ​ໄດ້"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d ຊ່ອງ​ພ້ອມ​ໃຊ້​ງານ​ໄດ້"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"ໃໝ່"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"ແຫຼ່ງທີ່ມາຂອງຊ່ອງ"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">%1$d ຊ່ອງ</item>
+      <item quantity="one">%1$d ຊ່ອງ</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"ບໍ່​ມີ​ຊ່ອງ​ພ້ອມ​ໃຊ້​ງານ​ໄດ້​ຢູ່"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"ໃໝ່"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"ບໍ່ໄດ້​ຕິດ​ຕັ້ງ"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"ເອົາແຫຼ່ງທີ່ມາຂອງຊ່ອງເພີ່ມເຕີມ"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"ທ່ອງເບິ່ງແອັບທີ່ໃຫ້ຊ່ອງຖ່າຍທອດສົດ"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"ມີແຫຼ່ງ​ຊ່ອງ​ໃໝ່"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"ແຫຼ່ງຊ່ອງໃໝ່ມີຊ່ອງຕ່າງໆໄວ້ໃຫ້ບໍລິການ.\nຕັ້ງພວກມັນດຽວນີ້, ຫຼືເຮັດສິ່ງນີ້ໃນພາຍຫຼັງໃນການຕັ້ງຄ່າແຫຼ່ງຊ່ອງ."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"ຕັ້ງດຽວນີ້"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"ຕົກລົງ, ເຂົ້າ​ໃຈ​ແລ້ວ"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"ກົດ SELECT"</b>" ເພື່ອ​ເຂົ້າ​ຫາ​ເມ​ນູ TV."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"ປຸ່ມ Back ແມ່ນ​ສຳ​ລັບ​ອຸ​ປະ​ກອນ​ທີ່​ເຊື່ອມ​ຕໍ່​ແລ້ວ. ໃຫ້​ກົດ​ປຸ່ມ Home ເພື່ອອອກ."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"ຊ່ອງ​ສົດ​ບໍ່​ຖືກ​ຮອງ​ຮັບ​ຢູ່​ໃນ​ອຸ​ປະ​ກອນ​ນີ້​ດ້ວຍ Android Lollipop."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"ຊ່ອງ​ສົດ​ຕ້ອງ​ມີ​ການ​ອະ​ນຸ​ຍາດ​ເພື່ອ​ອ່ານ​ການ​ຈັດ​ລາຍ​ການ TV."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"ຕັ້ງຄ່າແຫຼ່ງຊ່ອງຂອງທ່ານ"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"ຊ່ອງອອກອາກາດສົດລວມເອົາປະສົບການຂອງຊ່ອງໂທລະພາບແບບເດີມເຂົ້າກັບຊ່ອງທີ່ໃຊ້ການສະຕຣີມທີ່ສະໜອງໃຫ້ໂດຍແອັບ. \n\nເລີ່ມຕົ້ນນຳໃຊ້ໂດຍການຕັ້ງຄ່າແຫຼ່ງຊ່ອງທີ່ຕິດຕັ້ງແລ້ວ. ຫຼື ຊອກຫາແອັບເພີ່ມເຕີມທີ່ໃຫ້ຊ່ອງອອກອາກາດສົດໃນ Google Play Store."</string>
 </resources>

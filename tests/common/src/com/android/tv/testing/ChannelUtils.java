@@ -96,7 +96,7 @@ public class ChannelUtils {
             } else {
                 values.putNull(Channels.COLUMN_VIDEO_FORMAT);
             }
-            if (Build.VERSION.SDK_INT >= 23) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (!TextUtils.isEmpty(channel.appLinkText)) {
                     values.put(Channels.COLUMN_APP_LINK_TEXT, channel.appLinkText);
                 }

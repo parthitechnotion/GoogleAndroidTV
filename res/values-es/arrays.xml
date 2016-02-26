@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"De primera línea"</item>
     <item msgid="8215762047341133299">"Ciencia y tecnología"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"TV en directo"</item>
+    <item msgid="7307688057853449735">"Una forma sencilla de descubrir contenido"</item>
+    <item msgid="7566838222783641942">"Descarga aplicaciones, obtén más canales"</item>
+    <item msgid="8646630833216197238">"Personaliza la lista de canales"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Ve el contenido de tus aplicaciones como si vieses canales en la TV."</item>
+    <item msgid="1855708984677953238">"Explora el contenido de las aplicaciones con una guía familiar y una interfaz intuitiva \nsimilar a los canales de la TV."</item>
+    <item msgid="3420760668363283731">"Instala aplicaciones que ofrezcan TV en directo para añadir más canales. \nUtiliza el enlace del menú de TV para encontrar aplicaciones compatibles en Google Play Store."</item>
+    <item msgid="8974157841656828507">"Configura las nuevas fuentes de canales para personalizar la lista de canales. \nPara empezar, selecciona las fuentes de canales en el menú Ajustes."</item>
+  </string-array>
 </resources>

@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premier"</item>
     <item msgid="8215762047341133299">"Techniek/wetenschap"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Live tv"</item>
+    <item msgid="7307688057853449735">"Een eenvoudige manier om content te vinden"</item>
+    <item msgid="7566838222783641942">"Apps downloaden, meer kanalen krijgen"</item>
+    <item msgid="8646630833216197238">"Je kanaalprogrammering aanpassen"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Bekijk content uit je apps op dezelfde manier als je kanalen op tv bekijkt."</item>
+    <item msgid="1855708984677953238">"Browse door content uit je apps met een bekende gids en gebruikersvriendelijke interface, \nop dezelfde manier als kanalen op tv."</item>
+    <item msgid="3420760668363283731">"Voeg meer kanalen toe door apps te installeren die live tv aanbieden. \nZoek compatibele apps in de Google Play Store via de link in het tv-menu."</item>
+    <item msgid="8974157841656828507">"Configureer je net geïnstalleerde kanaalbronnen om je kanaallijst aan te passen. \nKies de kanaalbronnen in het menu Instellingen om aan de slag te gaan."</item>
+  </string-array>
 </resources>

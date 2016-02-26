@@ -18,41 +18,41 @@ package com.android.tv.onboarding;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.os.Bundle;
-import android.transition.TransitionValues;
+import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.android.tv.R;
-import com.android.tv.common.ui.setup.SetupFragment;
-import com.android.tv.common.ui.setup.animation.CustomTransition;
-import com.android.tv.common.ui.setup.animation.CustomTransitionProvider;
+import com.android.tv.common.ui.setup.SetupActionHelper;
 import com.android.tv.common.ui.setup.animation.SetupAnimationHelper;
+import com.android.tv.common.ui.setup.leanback.OnboardingFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A fragment for the onboarding screen.
+ * A fragment for the onboarding welcome screen.
  */
-public class WelcomeFragment extends SetupFragment {
+public class WelcomeFragment extends OnboardingFragment {
+    public static final String ACTION_CATEGORY = "comgoogle.android.tv.onboarding.WelcomeFragment";
     public static final int ACTION_NEXT = 1;
 
-    private static final long LOGO_SPLASH_PAUSE_DURATION_MS = 333;
-    private static final long LOGO_SPLASH_DURATION_MS = 1000;
-    private static final long START_DELAY_PAGE_INDICATOR_MS = LOGO_SPLASH_DURATION_MS;
-    private static final long START_DELAY_TITLE_MS = LOGO_SPLASH_DURATION_MS + 33;
-    private static final long START_DELAY_DESCRIPTION_MS = LOGO_SPLASH_DURATION_MS + 33;
-    private static final long START_DELAY_CLOUD_MS = LOGO_SPLASH_DURATION_MS + 33;
-    private static final long START_DELAY_TV_MS = LOGO_SPLASH_DURATION_MS + 567;
-    private static final long START_DELAY_TV_CONTENTS_MS = 266;
-    private static final long START_DELAY_SHADOW_MS = LOGO_SPLASH_DURATION_MS + 567;
+    private static final long START_DELAY_CLOUD_MS = 33;
+    private static final long START_DELAY_TV_MS = 567;
+    private static final long START_DELAY_TV_CONTENTS_MS = 833;
+    private static final long START_DELAY_SHADOW_MS = 567;
 
-    private static final long WELCOME_PAGE_TRANSITION_DURATION_MS = 417;
+    private static final long VIDEO_FADE_OUT_DURATION_MS = 333;
 
     private static final long BLUE_SCREEN_HOLD_DURATION_MS = 1500;
 
+    // TODO: Use animator list xml.
     private static final int[] TV_FRAMES_1_START = {
             R.drawable.tv_1a_01,
             R.drawable.tv_1a_02,
@@ -73,8 +73,7 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.tv_1a_17,
             R.drawable.tv_1a_18,
             R.drawable.tv_1a_19,
-            R.drawable.tv_1a_20,
-            0
+            R.drawable.tv_1a_20
     };
 
     private static final int[] TV_FRAMES_1_END = {
@@ -88,11 +87,238 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.tv_1b_08,
             R.drawable.tv_1b_09,
             R.drawable.tv_1b_10,
-            R.drawable.tv_1b_11,
-            0
+            R.drawable.tv_1b_11
     };
 
-    private static final int[] TV_FRAMES_2_BLUE_ARROW = {
+    private static final int[] TV_FRAMES_2_START = {
+            R.drawable.tv_5a_0,
+            R.drawable.tv_5a_1,
+            R.drawable.tv_5a_2,
+            R.drawable.tv_5a_3,
+            R.drawable.tv_5a_4,
+            R.drawable.tv_5a_5,
+            R.drawable.tv_5a_6,
+            R.drawable.tv_5a_7,
+            R.drawable.tv_5a_8,
+            R.drawable.tv_5a_9,
+            R.drawable.tv_5a_10,
+            R.drawable.tv_5a_11,
+            R.drawable.tv_5a_12,
+            R.drawable.tv_5a_13,
+            R.drawable.tv_5a_14,
+            R.drawable.tv_5a_15,
+            R.drawable.tv_5a_16,
+            R.drawable.tv_5a_17,
+            R.drawable.tv_5a_18,
+            R.drawable.tv_5a_19,
+            R.drawable.tv_5a_20,
+            R.drawable.tv_5a_21,
+            R.drawable.tv_5a_22,
+            R.drawable.tv_5a_23,
+            R.drawable.tv_5a_24,
+            R.drawable.tv_5a_25,
+            R.drawable.tv_5a_26,
+            R.drawable.tv_5a_27,
+            R.drawable.tv_5a_28,
+            R.drawable.tv_5a_29,
+            R.drawable.tv_5a_30,
+            R.drawable.tv_5a_31,
+            R.drawable.tv_5a_32,
+            R.drawable.tv_5a_33,
+            R.drawable.tv_5a_34,
+            R.drawable.tv_5a_35,
+            R.drawable.tv_5a_36,
+            R.drawable.tv_5a_37,
+            R.drawable.tv_5a_38,
+            R.drawable.tv_5a_39,
+            R.drawable.tv_5a_40,
+            R.drawable.tv_5a_41,
+            R.drawable.tv_5a_42,
+            R.drawable.tv_5a_43,
+            R.drawable.tv_5a_44,
+            R.drawable.tv_5a_45,
+            R.drawable.tv_5a_46,
+            R.drawable.tv_5a_47,
+            R.drawable.tv_5a_48,
+            R.drawable.tv_5a_49,
+            R.drawable.tv_5a_50,
+            R.drawable.tv_5a_51,
+            R.drawable.tv_5a_52,
+            R.drawable.tv_5a_53,
+            R.drawable.tv_5a_54,
+            R.drawable.tv_5a_55,
+            R.drawable.tv_5a_56,
+            R.drawable.tv_5a_57,
+            R.drawable.tv_5a_58,
+            R.drawable.tv_5a_59,
+            R.drawable.tv_5a_60,
+            R.drawable.tv_5a_61,
+            R.drawable.tv_5a_62,
+            R.drawable.tv_5a_63,
+            R.drawable.tv_5a_64,
+            R.drawable.tv_5a_65,
+            R.drawable.tv_5a_66,
+            R.drawable.tv_5a_67,
+            R.drawable.tv_5a_68,
+            R.drawable.tv_5a_69,
+            R.drawable.tv_5a_70,
+            R.drawable.tv_5a_71,
+            R.drawable.tv_5a_72,
+            R.drawable.tv_5a_73,
+            R.drawable.tv_5a_74,
+            R.drawable.tv_5a_75,
+            R.drawable.tv_5a_76,
+            R.drawable.tv_5a_77,
+            R.drawable.tv_5a_78,
+            R.drawable.tv_5a_79,
+            R.drawable.tv_5a_80,
+            R.drawable.tv_5a_81,
+            R.drawable.tv_5a_82,
+            R.drawable.tv_5a_83,
+            R.drawable.tv_5a_84,
+            R.drawable.tv_5a_85,
+            R.drawable.tv_5a_86,
+            R.drawable.tv_5a_87,
+            R.drawable.tv_5a_88,
+            R.drawable.tv_5a_89,
+            R.drawable.tv_5a_90,
+            R.drawable.tv_5a_91,
+            R.drawable.tv_5a_92,
+            R.drawable.tv_5a_93,
+            R.drawable.tv_5a_94,
+            R.drawable.tv_5a_95,
+            R.drawable.tv_5a_96,
+            R.drawable.tv_5a_97,
+            R.drawable.tv_5a_98,
+            R.drawable.tv_5a_99,
+            R.drawable.tv_5a_100,
+            R.drawable.tv_5a_101,
+            R.drawable.tv_5a_102,
+            R.drawable.tv_5a_103,
+            R.drawable.tv_5a_104,
+            R.drawable.tv_5a_105,
+            R.drawable.tv_5a_106,
+            R.drawable.tv_5a_107,
+            R.drawable.tv_5a_108,
+            R.drawable.tv_5a_109,
+            R.drawable.tv_5a_110,
+            R.drawable.tv_5a_111,
+            R.drawable.tv_5a_112,
+            R.drawable.tv_5a_113,
+            R.drawable.tv_5a_114,
+            R.drawable.tv_5a_115,
+            R.drawable.tv_5a_116,
+            R.drawable.tv_5a_117,
+            R.drawable.tv_5a_118,
+            R.drawable.tv_5a_119,
+            R.drawable.tv_5a_120,
+            R.drawable.tv_5a_121,
+            R.drawable.tv_5a_122,
+            R.drawable.tv_5a_123,
+            R.drawable.tv_5a_124,
+            R.drawable.tv_5a_125,
+            R.drawable.tv_5a_126,
+            R.drawable.tv_5a_127,
+            R.drawable.tv_5a_128,
+            R.drawable.tv_5a_129,
+            R.drawable.tv_5a_130,
+            R.drawable.tv_5a_131,
+            R.drawable.tv_5a_132,
+            R.drawable.tv_5a_133,
+            R.drawable.tv_5a_134,
+            R.drawable.tv_5a_135,
+            R.drawable.tv_5a_136,
+            R.drawable.tv_5a_137,
+            R.drawable.tv_5a_138,
+            R.drawable.tv_5a_139,
+            R.drawable.tv_5a_140,
+            R.drawable.tv_5a_141,
+            R.drawable.tv_5a_142,
+            R.drawable.tv_5a_143,
+            R.drawable.tv_5a_144,
+            R.drawable.tv_5a_145,
+            R.drawable.tv_5a_146,
+            R.drawable.tv_5a_147,
+            R.drawable.tv_5a_148,
+            R.drawable.tv_5a_149,
+            R.drawable.tv_5a_150,
+            R.drawable.tv_5a_151,
+            R.drawable.tv_5a_152,
+            R.drawable.tv_5a_153,
+            R.drawable.tv_5a_154,
+            R.drawable.tv_5a_155,
+            R.drawable.tv_5a_156,
+            R.drawable.tv_5a_157,
+            R.drawable.tv_5a_158,
+            R.drawable.tv_5a_159,
+            R.drawable.tv_5a_160,
+            R.drawable.tv_5a_161,
+            R.drawable.tv_5a_162,
+            R.drawable.tv_5a_163,
+            R.drawable.tv_5a_164,
+            R.drawable.tv_5a_165,
+            R.drawable.tv_5a_166,
+            R.drawable.tv_5a_167,
+            R.drawable.tv_5a_168,
+            R.drawable.tv_5a_169,
+            R.drawable.tv_5a_170,
+            R.drawable.tv_5a_171,
+            R.drawable.tv_5a_172,
+            R.drawable.tv_5a_173,
+            R.drawable.tv_5a_174,
+            R.drawable.tv_5a_175,
+            R.drawable.tv_5a_176,
+            R.drawable.tv_5a_177,
+            R.drawable.tv_5a_178,
+            R.drawable.tv_5a_179,
+            R.drawable.tv_5a_180,
+            R.drawable.tv_5a_181,
+            R.drawable.tv_5a_182,
+            R.drawable.tv_5a_183,
+            R.drawable.tv_5a_184,
+            R.drawable.tv_5a_185,
+            R.drawable.tv_5a_186,
+            R.drawable.tv_5a_187,
+            R.drawable.tv_5a_188,
+            R.drawable.tv_5a_189,
+            R.drawable.tv_5a_190,
+            R.drawable.tv_5a_191,
+            R.drawable.tv_5a_192,
+            R.drawable.tv_5a_193,
+            R.drawable.tv_5a_194,
+            R.drawable.tv_5a_195,
+            R.drawable.tv_5a_196,
+            R.drawable.tv_5a_197,
+            R.drawable.tv_5a_198,
+            R.drawable.tv_5a_199,
+            R.drawable.tv_5a_200,
+            R.drawable.tv_5a_201,
+            R.drawable.tv_5a_202,
+            R.drawable.tv_5a_203,
+            R.drawable.tv_5a_204,
+            R.drawable.tv_5a_205,
+            R.drawable.tv_5a_206,
+            R.drawable.tv_5a_207,
+            R.drawable.tv_5a_208,
+            R.drawable.tv_5a_209,
+            R.drawable.tv_5a_210,
+            R.drawable.tv_5a_211,
+            R.drawable.tv_5a_212,
+            R.drawable.tv_5a_213,
+            R.drawable.tv_5a_214,
+            R.drawable.tv_5a_215,
+            R.drawable.tv_5a_216,
+            R.drawable.tv_5a_217,
+            R.drawable.tv_5a_218,
+            R.drawable.tv_5a_219,
+            R.drawable.tv_5a_220,
+            R.drawable.tv_5a_221,
+            R.drawable.tv_5a_222,
+            R.drawable.tv_5a_223,
+            R.drawable.tv_5a_224
+    };
+
+    private static final int[] TV_FRAMES_3_BLUE_ARROW = {
             R.drawable.arrow_blue_00,
             R.drawable.arrow_blue_01,
             R.drawable.arrow_blue_02,
@@ -153,11 +379,10 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.arrow_blue_57,
             R.drawable.arrow_blue_58,
             R.drawable.arrow_blue_59,
-            R.drawable.arrow_blue_60,
-            0
+            R.drawable.arrow_blue_60
     };
 
-    private static final int[] TV_FRAMES_2_BLUE_START = {
+    private static final int[] TV_FRAMES_3_BLUE_START = {
             R.drawable.tv_2a_01,
             R.drawable.tv_2a_02,
             R.drawable.tv_2a_03,
@@ -176,11 +401,10 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.tv_2a_16,
             R.drawable.tv_2a_17,
             R.drawable.tv_2a_18,
-            R.drawable.tv_2a_19,
-            0
+            R.drawable.tv_2a_19
     };
 
-    private static final int[] TV_FRAMES_2_BLUE_END = {
+    private static final int[] TV_FRAMES_3_BLUE_END = {
             R.drawable.tv_2b_01,
             R.drawable.tv_2b_02,
             R.drawable.tv_2b_03,
@@ -199,11 +423,10 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.tv_2b_16,
             R.drawable.tv_2b_17,
             R.drawable.tv_2b_18,
-            R.drawable.tv_2b_19,
-            0
+            R.drawable.tv_2b_19
     };
 
-    private static final int[] TV_FRAMES_2_ORANGE_ARROW = {
+    private static final int[] TV_FRAMES_3_ORANGE_ARROW = {
             R.drawable.arrow_orange_180,
             R.drawable.arrow_orange_181,
             R.drawable.arrow_orange_182,
@@ -264,11 +487,10 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.arrow_orange_237,
             R.drawable.arrow_orange_238,
             R.drawable.arrow_orange_239,
-            R.drawable.arrow_orange_240,
-            0
+            R.drawable.arrow_orange_240
     };
 
-    private static final int[] TV_FRAMES_2_ORANGE_START = {
+    private static final int[] TV_FRAMES_3_ORANGE_START = {
             R.drawable.tv_2c_01,
             R.drawable.tv_2c_02,
             R.drawable.tv_2c_03,
@@ -284,11 +506,10 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.tv_2c_13,
             R.drawable.tv_2c_14,
             R.drawable.tv_2c_15,
-            R.drawable.tv_2c_16,
-            0
+            R.drawable.tv_2c_16
     };
 
-    private static final int[] TV_FRAMES_3_START = {
+    private static final int[] TV_FRAMES_4_START = {
             R.drawable.tv_3a_01,
             R.drawable.tv_3a_02,
             R.drawable.tv_3a_03,
@@ -349,439 +570,198 @@ public class WelcomeFragment extends SetupFragment {
             R.drawable.tv_3b_115,
             R.drawable.tv_3b_116,
             R.drawable.tv_3b_117,
-            R.drawable.tv_3b_118,
-            0
+            R.drawable.tv_3b_118
     };
 
-    private static final int[] TV_FRAMES_4_START = {
-            R.drawable.tv_4a_15,
-            R.drawable.tv_4a_16,
-            R.drawable.tv_4a_17,
-            R.drawable.tv_4a_18,
-            R.drawable.tv_4a_19,
-            R.drawable.tv_4a_20,
-            R.drawable.tv_4a_21,
-            R.drawable.tv_4a_22,
-            R.drawable.tv_4a_23,
-            R.drawable.tv_4a_24,
-            R.drawable.tv_4a_25,
-            R.drawable.tv_4a_26,
-            R.drawable.tv_4a_27,
-            R.drawable.tv_4a_28,
-            R.drawable.tv_4a_29,
-            R.drawable.tv_4a_30,
-            R.drawable.tv_4a_31,
-            R.drawable.tv_4a_32,
-            R.drawable.tv_4a_33,
-            R.drawable.tv_4a_34,
-            R.drawable.tv_4a_35,
-            R.drawable.tv_4a_36,
-            R.drawable.tv_4a_37,
-            R.drawable.tv_4a_38,
-            R.drawable.tv_4a_39,
-            R.drawable.tv_4a_40,
-            R.drawable.tv_4a_41,
-            R.drawable.tv_4a_42,
-            R.drawable.tv_4a_43,
-            R.drawable.tv_4a_44,
-            R.drawable.tv_4a_45,
-            R.drawable.tv_4a_46,
-            R.drawable.tv_4a_47,
-            R.drawable.tv_4a_48,
-            R.drawable.tv_4a_49,
-            R.drawable.tv_4a_50,
-            R.drawable.tv_4a_51,
-            R.drawable.tv_4a_52,
-            R.drawable.tv_4a_53,
-            R.drawable.tv_4a_54,
-            R.drawable.tv_4a_55,
-            R.drawable.tv_4a_56,
-            R.drawable.tv_4a_57,
-            R.drawable.tv_4a_58,
-            R.drawable.tv_4a_59,
-            R.drawable.tv_4a_60,
-            R.drawable.tv_4a_61,
-            R.drawable.tv_4a_62,
-            R.drawable.tv_4a_63,
-            R.drawable.tv_4a_64,
-            R.drawable.tv_4a_65,
-            R.drawable.tv_4a_66,
-            R.drawable.tv_4a_67,
-            R.drawable.tv_4a_68,
-            R.drawable.tv_4a_69,
-            R.drawable.tv_4a_70,
-            R.drawable.tv_4a_71,
-            R.drawable.tv_4a_72,
-            R.drawable.tv_4a_73,
-            R.drawable.tv_4a_74,
-            R.drawable.tv_4a_75,
-            R.drawable.tv_4a_76,
-            R.drawable.tv_4a_77,
-            R.drawable.tv_4a_78,
-            R.drawable.tv_4a_79,
-            R.drawable.tv_4a_80,
-            R.drawable.tv_4a_81,
-            R.drawable.tv_4a_82,
-            R.drawable.tv_4a_83,
-            R.drawable.tv_4a_84,
-            R.drawable.tv_4a_85,
-            R.drawable.tv_4a_86,
-            R.drawable.tv_4a_87,
-            R.drawable.tv_4a_88,
-            R.drawable.tv_4a_89,
-            R.drawable.tv_4a_90,
-            R.drawable.tv_4a_91,
-            R.drawable.tv_4a_92,
-            R.drawable.tv_4a_93,
-            R.drawable.tv_4a_94,
-            R.drawable.tv_4a_95,
-            R.drawable.tv_4a_96,
-            R.drawable.tv_4a_97,
-            R.drawable.tv_4a_98,
-            R.drawable.tv_4a_99,
-            R.drawable.tv_4a_100,
-            R.drawable.tv_4a_101,
-            R.drawable.tv_4a_102,
-            R.drawable.tv_4a_103,
-            R.drawable.tv_4a_104,
-            R.drawable.tv_4a_105,
-            R.drawable.tv_4a_106,
-            R.drawable.tv_4a_107,
-            R.drawable.tv_4a_108,
-            R.drawable.tv_4a_109,
-            R.drawable.tv_4a_110,
-            R.drawable.tv_4a_111,
-            R.drawable.tv_4a_112,
-            R.drawable.tv_4a_113,
-            R.drawable.tv_4a_114,
-            R.drawable.tv_4a_115,
-            R.drawable.tv_4a_116,
-            R.drawable.tv_4a_117,
-            R.drawable.tv_4a_118,
-            R.drawable.tv_4a_119,
-            R.drawable.tv_4a_120,
-            R.drawable.tv_4a_121,
-            R.drawable.tv_4a_122,
-            R.drawable.tv_4a_123,
-            R.drawable.tv_4a_124,
-            R.drawable.tv_4a_125,
-            R.drawable.tv_4a_126,
-            R.drawable.tv_4a_127,
-            R.drawable.tv_4a_128,
-            R.drawable.tv_4a_129,
-            R.drawable.tv_4a_130,
-            R.drawable.tv_4a_131,
-            R.drawable.tv_4a_132,
-            R.drawable.tv_4a_133,
-            R.drawable.tv_4a_134,
-            R.drawable.tv_4a_135,
-            R.drawable.tv_4a_136,
-            R.drawable.tv_4a_137,
-            R.drawable.tv_4a_138,
-            R.drawable.tv_4a_139,
-            R.drawable.tv_4a_140,
-            R.drawable.tv_4a_141,
-            R.drawable.tv_4a_142,
-            R.drawable.tv_4a_143,
-            R.drawable.tv_4a_144,
-            R.drawable.tv_4a_145,
-            R.drawable.tv_4a_146,
-            R.drawable.tv_4a_147,
-            R.drawable.tv_4a_148,
-            R.drawable.tv_4a_149,
-            R.drawable.tv_4a_150,
-            R.drawable.tv_4a_151,
-            R.drawable.tv_4a_152,
-            R.drawable.tv_4a_153,
-            R.drawable.tv_4a_154,
-            R.drawable.tv_4a_155,
-            R.drawable.tv_4a_156,
-            R.drawable.tv_4a_157,
-            R.drawable.tv_4a_158,
-            R.drawable.tv_4a_159,
-            R.drawable.tv_4a_160,
-            R.drawable.tv_4a_161,
-            R.drawable.tv_4a_162,
-            R.drawable.tv_4a_163,
-            R.drawable.tv_4a_164,
-            R.drawable.tv_4a_165,
-            R.drawable.tv_4a_166,
-            R.drawable.tv_4a_167,
-            R.drawable.tv_4a_168,
-            R.drawable.tv_4a_169,
-            R.drawable.tv_4a_170,
-            R.drawable.tv_4a_171,
-            R.drawable.tv_4a_172,
-            R.drawable.tv_4a_173,
-            R.drawable.tv_4a_174,
-            R.drawable.tv_4a_175,
-            R.drawable.tv_4a_176,
-            R.drawable.tv_4a_177,
-            R.drawable.tv_4a_178,
-            R.drawable.tv_4a_179,
-            R.drawable.tv_4a_180,
-            R.drawable.tv_4a_181,
-            R.drawable.tv_4a_182,
-            R.drawable.tv_4a_183,
-            R.drawable.tv_4a_184,
-            R.drawable.tv_4a_185,
-            R.drawable.tv_4a_186,
-            R.drawable.tv_4a_187,
-            R.drawable.tv_4a_188,
-            R.drawable.tv_4a_189,
-            R.drawable.tv_4a_190,
-            R.drawable.tv_4a_191,
-            R.drawable.tv_4a_192,
-            R.drawable.tv_4a_193,
-            R.drawable.tv_4a_194,
-            R.drawable.tv_4a_195,
-            R.drawable.tv_4a_196,
-            R.drawable.tv_4a_197,
-            R.drawable.tv_4a_198,
-            R.drawable.tv_4a_199,
-            R.drawable.tv_4a_200,
-            R.drawable.tv_4a_201,
-            R.drawable.tv_4a_202,
-            R.drawable.tv_4a_203,
-            R.drawable.tv_4a_204,
-            R.drawable.tv_4a_205,
-            R.drawable.tv_4a_206,
-            R.drawable.tv_4a_207,
-            R.drawable.tv_4a_208,
-            R.drawable.tv_4a_209,
-            R.drawable.tv_4a_210,
-            R.drawable.tv_4a_211,
-            R.drawable.tv_4a_212,
-            R.drawable.tv_4a_213,
-            R.drawable.tv_4a_214,
-            R.drawable.tv_4a_215,
-            R.drawable.tv_4a_216,
-            R.drawable.tv_4a_217,
-            R.drawable.tv_4a_218,
-            R.drawable.tv_4a_219,
-            R.drawable.tv_4a_220,
-            R.drawable.tv_4a_221,
-            R.drawable.tv_4a_222,
-            R.drawable.tv_4a_223,
-            R.drawable.tv_4a_224,
-            R.drawable.tv_4a_225,
-            R.drawable.tv_4a_226,
-            R.drawable.tv_4a_227,
-            R.drawable.tv_4a_228,
-            R.drawable.tv_4a_229,
-            R.drawable.tv_4a_230,
-            R.drawable.tv_4a_231,
-            R.drawable.tv_4a_232,
-            R.drawable.tv_4a_233,
-            R.drawable.tv_4a_234,
-            R.drawable.tv_4a_235,
-            R.drawable.tv_4a_236,
-            R.drawable.tv_4a_237,
-            R.drawable.tv_4a_238,
-            R.drawable.tv_4a_239,
-            0
-    };
-
-    private int mNumPages;
     private String[] mPageTitles;
     private String[] mPageDescriptions;
-    private int mCurrentPageIndex;
-    private int mPageTransitionDistance;
 
     private ImageView mTvContentView;
-    private PagingIndicator mPageIndicator;
     private ImageView mArrowView;
-    private View mLogoView;
 
     private Animator mAnimator;
+    private boolean mNeedToEndAnimator;
 
     public WelcomeFragment() {
-        enableFragmentTransition(FRAGMENT_EXIT_TRANSITION);
-        setEnterTransition(new CustomTransition(new CustomTransitionProvider() {
-            @Override
-            public Animator onAppear(ViewGroup sceneRoot, View view, TransitionValues startValues,
-                    TransitionValues endValues) {
-                Animator animator = null;
-                switch (endValues.view.getId()) {
-                    case R.id.logo: {
-                        Animator inAnimator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_logo_enter);
-                        Animator outAnimator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_logo_exit);
-                        outAnimator.setStartDelay(LOGO_SPLASH_PAUSE_DURATION_MS);
-                        animator = new AnimatorSet();
-                        ((AnimatorSet) animator).playSequentially(inAnimator, outAnimator);
-                        animator.setTarget(view);
-                        break;
-                    }
-                    case R.id.page_indicator:
-                        view.setAlpha(0);
-                        animator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_page_indicator_enter);
-                        animator.setStartDelay(START_DELAY_PAGE_INDICATOR_MS);
-                        animator.setTarget(view);
-                        break;
-                    case R.id.title:
-                        view.setAlpha(0);
-                        animator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_title_enter);
-                        animator.setStartDelay(START_DELAY_TITLE_MS);
-                        animator.setTarget(view);
-                        break;
-                    case R.id.description:
-                        view.setAlpha(0);
-                        animator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_description_enter);
-                        animator.setStartDelay(START_DELAY_DESCRIPTION_MS);
-                        animator.setTarget(view);
-                        break;
-                    case R.id.cloud1:
-                    case R.id.cloud2:
-                        view.setAlpha(0);
-                        animator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_cloud_enter);
-                        animator.setStartDelay(START_DELAY_CLOUD_MS);
-                        animator.setTarget(view);
-                        break;
-                    case R.id.tv_container: {
-                        view.setAlpha(0);
-                        Animator tvAnimator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_tv_enter);
-                        tvAnimator.setTarget(view);
-                        Animator frameAnimator = SetupAnimationHelper.createFrameAnimator(
-                                mTvContentView, TV_FRAMES_1_START);
-                        frameAnimator.setStartDelay(START_DELAY_TV_CONTENTS_MS);
-                        frameAnimator.setTarget(mTvContentView);
-                        animator = new AnimatorSet();
-                        ((AnimatorSet) animator).playTogether(tvAnimator, frameAnimator);
-                        animator.setStartDelay(START_DELAY_TV_MS);
-                        break;
-                    }
-                    case R.id.shadow:
-                        view.setAlpha(0);
-                        animator = AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.onboarding_welcome_shadow_enter);
-                        animator.setStartDelay(START_DELAY_SHADOW_MS);
-                        animator.setTarget(view);
-                        break;
-                }
-                return animator;
-            }
+        setExitTransition(new SetupAnimationHelper.TransitionBuilder()
+                .setSlideEdge(Gravity.START)
+                .setParentIdsForDelay(new int[]{R.id.onboarding_fragment_root})
+                .build());
+    }
 
-            @Override
-            public Animator onDisappear(ViewGroup sceneRoot, View view,
-                    TransitionValues startValues, TransitionValues endValues) {
-                return null;
-            }
-        }));
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mPageTitles = getResources().getStringArray(R.array.welcome_page_titles);
+        mPageDescriptions = getResources().getStringArray(R.array.welcome_page_descriptions);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        mAnimator = null;
-        mPageTransitionDistance = getResources().getDimensionPixelOffset(
-                R.dimen.onboarding_welcome_page_transition_distance);
-        mPageTitles = getResources().getStringArray(R.array.welcome_page_titles);
-        mPageDescriptions = getResources().getStringArray(R.array.welcome_page_descriptions);
-        mNumPages = mPageTitles.length;
-        mCurrentPageIndex = 0;
+    protected void onStartEnterAnimation() {
+        List<Animator> animators = new ArrayList<>();
+        // Cloud 1
+        View view = getActivity().findViewById(R.id.cloud1);
+        view.setAlpha(0);
+        Animator animator = AnimatorInflater.loadAnimator(getActivity(),
+                R.animator.onboarding_welcome_cloud_enter);
+        animator.setStartDelay(START_DELAY_CLOUD_MS);
+        animator.setTarget(view);
+        animators.add(animator);
+        // Cloud 2
+        view = getActivity().findViewById(R.id.cloud2);
+        view.setAlpha(0);
+        animator = AnimatorInflater.loadAnimator(getActivity(),
+                R.animator.onboarding_welcome_cloud_enter);
+        animator.setStartDelay(START_DELAY_CLOUD_MS);
+        animator.setTarget(view);
+        animators.add(animator);
+        // TV container
+        view = getActivity().findViewById(R.id.tv_container);
+        view.setAlpha(0);
+        animator = AnimatorInflater.loadAnimator(getActivity(),
+                R.animator.onboarding_welcome_tv_enter);
+        animator.setStartDelay(START_DELAY_TV_MS);
+        animator.setTarget(view);
+        animators.add(animator);
+        // TV content
+        view = getActivity().findViewById(R.id.tv_content);
+        animator = SetupAnimationHelper.createFrameAnimator((ImageView) view, TV_FRAMES_1_START);
+        animator.setStartDelay(START_DELAY_TV_CONTENTS_MS);
+        animator.setTarget(view);
+        animators.add(animator);
+        // Shadow
+        view = getActivity().findViewById(R.id.shadow);
+        view.setAlpha(0);
+        animator = AnimatorInflater.loadAnimator(getActivity(),
+                R.animator.onboarding_welcome_shadow_enter);
+        animator.setStartDelay(START_DELAY_SHADOW_MS);
+        animator.setTarget(view);
+        animators.add(animator);
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(animators);
+        mAnimator = set;
+        mAnimator.start();
+        mNeedToEndAnimator = true;
+    }
+
+    @Nullable
+    @Override
+    protected View onCreateBackgroundView(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.onboarding_welcome_background, container, false);
+    }
+
+    @Nullable
+    @Override
+    protected View onCreateContentView(LayoutInflater inflater, ViewGroup container) {
+        View view = inflater.inflate(R.layout.onboarding_welcome_content, container, false);
         mTvContentView = (ImageView) view.findViewById(R.id.tv_content);
-        mPageIndicator = (PagingIndicator) view.findViewById(R.id.page_indicator);
-        mPageIndicator.setPageCount(mNumPages);
-        mPageIndicator.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mCurrentPageIndex == mNumPages - 1) {
-                    onActionClick(ACTION_NEXT);
-                } else {
-                    showPage(++mCurrentPageIndex);
-                    startTvFrameAnimation(mCurrentPageIndex);
-                }
-            }
-        });
-        mArrowView = (ImageView) view.findViewById(R.id.arrow);
-        mLogoView = view.findViewById(R.id.logo);
-        showPage(mCurrentPageIndex);
         return view;
     }
 
+    @Nullable
     @Override
-    protected int getLayoutResourceId() {
-        return R.layout.fragment_welcome;
-    }
-
-    /*
-     * Should return {@link SetupFragment} for the custom animations.
-     */
-    private SetupFragment getPage(int index) {
-        Bundle args = new Bundle();
-        args.putString(WelcomePageFragment.KEY_TITLE, mPageTitles[index]);
-        args.putString(WelcomePageFragment.KEY_DESCRIPTION, mPageDescriptions[index]);
-        SetupFragment fragment = new WelcomePageFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    private void showPage(final int pageIndex) {
-        SetupFragment fragment = getPage(pageIndex);
-        if (pageIndex == 0) {
-            fragment.enableFragmentTransition(FRAGMENT_EXIT_TRANSITION);
-        }
-        if (pageIndex == mNumPages - 1) {
-            fragment.enableFragmentTransition(FRAGMENT_ENTER_TRANSITION);
-        }
-        fragment.setTransitionDistance(mPageTransitionDistance);
-        fragment.setTransitionDuration(WELCOME_PAGE_TRANSITION_DURATION_MS);
-        getChildFragmentManager().beginTransaction().replace(R.id.page_container, fragment)
-                .commit();
-        mPageIndicator.onPageSelected(pageIndex, pageIndex != 0);
+    protected View onCreateForegroundView(LayoutInflater inflater, ViewGroup container) {
+        mArrowView = (ImageView) inflater.inflate(R.layout.onboarding_welcome_foreground, container,
+                false);
+        return mArrowView;
     }
 
     @Override
-    protected int[] getParentIdsForDelay() {
-        return new int[] {R.id.welcome_fragment_root};
+    protected int getPageCount() {
+        return mPageTitles.length;
     }
 
-    private void startTvFrameAnimation(int newPageIndex) {
+    @Override
+    protected String getPageTitle(int pageIndex) {
+        return mPageTitles[pageIndex];
+    }
+
+    @Override
+    protected String getPageDescription(int pageIndex) {
+        return mPageDescriptions[pageIndex];
+    }
+
+    @Override
+    protected int getLogoResourceId() {
+        return R.drawable.splash_logo;
+    }
+
+    @Override
+    protected void onFinishFragment() {
+        SetupActionHelper.onActionClick(WelcomeFragment.this, ACTION_CATEGORY, ACTION_NEXT);
+    }
+
+    @Override
+    protected void onStartPageChangeAnimation(int previousPage) {
         if (mAnimator != null) {
-            mAnimator.cancel();
+            if (mNeedToEndAnimator) {
+                mAnimator.end();
+            } else {
+                mAnimator.cancel();
+            }
         }
-        // TODO: Change the magic numbers to constants once the animation specification is given.
+        mArrowView.setVisibility(View.GONE);
+        // TV screen hiding animator.
+        Animator hideAnimator = previousPage == 0
+                ? SetupAnimationHelper.createFrameAnimator(mTvContentView, TV_FRAMES_1_END)
+                : SetupAnimationHelper.createFadeOutAnimator(mTvContentView,
+                VIDEO_FADE_OUT_DURATION_MS, true);
+        // TV screen showing animator.
         AnimatorSet animatorSet = new AnimatorSet();
-        switch (newPageIndex) {
+        int firstFrame;
+        switch (getCurrentPageIndex()) {
+            case 0:
+                animatorSet.playSequentially(hideAnimator,
+                        SetupAnimationHelper.createFrameAnimator(mTvContentView,
+                                TV_FRAMES_1_START));
+                firstFrame = TV_FRAMES_1_START[0];
+                break;
             case 1:
-                mLogoView.setVisibility(View.GONE);
-                animatorSet.playSequentially(
-                        SetupAnimationHelper.createFrameAnimator(mTvContentView, TV_FRAMES_1_END),
-                        SetupAnimationHelper.createFrameAnimator(mArrowView,
-                                TV_FRAMES_2_BLUE_ARROW),
+                animatorSet.playSequentially(hideAnimator,
                         SetupAnimationHelper.createFrameAnimator(mTvContentView,
-                                TV_FRAMES_2_BLUE_START),
-                        SetupAnimationHelper.createFrameAnimatorWithDelay(mTvContentView,
-                                TV_FRAMES_2_BLUE_END, BLUE_SCREEN_HOLD_DURATION_MS),
-                        SetupAnimationHelper.createFrameAnimator(mArrowView,
-                                TV_FRAMES_2_ORANGE_ARROW),
-                        SetupAnimationHelper.createFrameAnimator(mTvContentView,
-                                TV_FRAMES_2_ORANGE_START));
-                mArrowView.setVisibility(View.VISIBLE);
+                                TV_FRAMES_2_START));
+                firstFrame = TV_FRAMES_2_START[0];
                 break;
             case 2:
-                mArrowView.setVisibility(View.GONE);
-                animatorSet.playSequentially(
-                        SetupAnimationHelper.createFadeOutAnimator(mTvContentView, 333, true),
+                mArrowView.setVisibility(View.VISIBLE);
+                animatorSet.playSequentially(hideAnimator,
+                        SetupAnimationHelper.createFrameAnimator(mArrowView,
+                                TV_FRAMES_3_BLUE_ARROW),
                         SetupAnimationHelper.createFrameAnimator(mTvContentView,
-                                TV_FRAMES_3_START));
+                                TV_FRAMES_3_BLUE_START),
+                        SetupAnimationHelper.createFrameAnimatorWithDelay(mTvContentView,
+                                TV_FRAMES_3_BLUE_END, BLUE_SCREEN_HOLD_DURATION_MS),
+                        SetupAnimationHelper.createFrameAnimator(mArrowView,
+                                TV_FRAMES_3_ORANGE_ARROW),
+                        SetupAnimationHelper.createFrameAnimator(mTvContentView,
+                                TV_FRAMES_3_ORANGE_START));
+                animatorSet.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mArrowView.setImageResource(TV_FRAMES_3_BLUE_ARROW[0]);
+                    }
+                });
+                firstFrame = TV_FRAMES_3_BLUE_START[0];
                 break;
             case 3:
-                animatorSet.playSequentially(
-                        SetupAnimationHelper.createFadeOutAnimator(mTvContentView, 333, true),
+            default:
+                animatorSet.playSequentially(hideAnimator,
                         SetupAnimationHelper.createFrameAnimator(mTvContentView,
                                 TV_FRAMES_4_START));
+                firstFrame = TV_FRAMES_4_START[0];
                 break;
         }
+        final int firstImageResource = firstFrame;
+        hideAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // Shows the first frame of show animation when the hide animator is canceled.
+                mTvContentView.setImageResource(firstImageResource);
+            }
+        });
         mAnimator = SetupAnimationHelper.applyAnimationTimeScale(animatorSet);
         mAnimator.start();
+        mNeedToEndAnimator = false;
     }
 }

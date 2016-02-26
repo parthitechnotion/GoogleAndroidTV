@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Esilinastus"</item>
     <item msgid="8215762047341133299">"Tehnika/teadus"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Reaalajakanalid"</item>
+    <item msgid="7307688057853449735">"Lihtne viis sisu avastamiseks"</item>
+    <item msgid="7566838222783641942">"Rakenduste allalaadimine ja kanalite hankimine"</item>
+    <item msgid="8646630833216197238">"Kanalivaliku kohandamine"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Vaadake oma rakendustest sisu, nagu vaataksite telekanaleid."</item>
+    <item msgid="1855708984677953238">"Sirvige oma rakendustes sisu tuttava kava ja kasutajasõbraliku liidesega (\njust nagu telekanalite puhul)."</item>
+    <item msgid="3420760668363283731">"Lisage rohkem kanaleid, installides rakendusi, mis pakuvad reaalajakanaleid. \nLeidke ühilduvaid rakendusi Google Play poest, kasutades TV-menüüs olevat linki."</item>
+    <item msgid="8974157841656828507">"Seadistage kanaliloendi kohandamiseks oma äsja installitud kanaliallikad. \nAlustamiseks tehke menüüs Seaded valik Kanaliallikad."</item>
+  </string-array>
 </resources>

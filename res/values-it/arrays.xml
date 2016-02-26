@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Il meglio"</item>
     <item msgid="8215762047341133299">"Scienza/tecnica"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Dirette TV"</item>
+    <item msgid="7307688057853449735">"Un modo facile per trovare contenuti"</item>
+    <item msgid="7566838222783641942">"Scarica app e trova altri canali"</item>
+    <item msgid="8646630833216197238">"Personalizza il tuo elenco canali"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Guarda i contenuti dalle tue app nello stesso modo in cui guardi i programmi alla TV."</item>
+    <item msgid="1855708984677953238">"Consulta i contenuti delle tue app con una guida familiare e un\'interfaccia facile da utilizzare, \nproprio come i programmi alla TV."</item>
+    <item msgid="3420760668363283731">"Aggiungi altri canali installando app di dirette TV. \nTrova app compatibili nel Google Play Store utilizzando il link disponibile nel menu TV."</item>
+    <item msgid="8974157841656828507">"Configura le tue fonti di canali appena installate per personalizzare il tuo elenco di canali. \nInnanzitutto, scegli le fonti di canali nel menu Impostazioni."</item>
+  </string-array>
 </resources>

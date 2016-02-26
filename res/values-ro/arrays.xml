@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premiere"</item>
     <item msgid="8215762047341133299">"Tehnică/Știință"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Canale live"</item>
+    <item msgid="7307688057853449735">"Un mod simplu de a descoperi conținut"</item>
+    <item msgid="7566838222783641942">"Descărcați aplicații, obțineți mai multe canale"</item>
+    <item msgid="8646630833216197238">"Personalizați lista de canale"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Vizionați conținutul din aplicațiile dvs. așa cum ați viziona canalele pe televizor."</item>
+    <item msgid="1855708984677953238">"Căutați conținut în aplicațiile dvs. folosind un ghid familiar și o interfață plăcută,\nla fel ca în cazul canalelor pe televizor."</item>
+    <item msgid="3420760668363283731">"Adăugați mai multe canale instalând aplicații care oferă canale live. \nGăsiți aplicații compatibile în Magazinul Google Play folosind linkul din meniul televizorului."</item>
+    <item msgid="8974157841656828507">"Configurați noile surse de canale instalate ca să personalizați lista de canale. \nPentru a începe, alegeți Sursele canalelor din meniul Setări."</item>
+  </string-array>
 </resources>

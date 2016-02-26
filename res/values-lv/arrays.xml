@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Svarīgākais"</item>
     <item msgid="8215762047341133299">"Tehnoloģijas/zinātne"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Dzīvie kanāli"</item>
+    <item msgid="7307688057853449735">"Vienkāršs veids, kā atklāt jaunu saturu"</item>
+    <item msgid="7566838222783641942">"Lejupielādējiet lietotnes, iegūstiet vairāk kanālu"</item>
+    <item msgid="8646630833216197238">"Pielāgojiet savu kanālu sarakstu"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Skatieties saturu no lietotnēm tāpat kā kanālus televizorā."</item>
+    <item msgid="1855708984677953238">"Pārlūkojiet lietotņu saturu, izmantojot pierastu ceļvedi un vienkāršu saskarni, —\ngluži kā skatoties televīzijas kanālus."</item>
+    <item msgid="3420760668363283731">"Pievienojiet kanālus, instalējot lietotnes, kas piedāvā dzīvos kanālus. \nAtrodiet saderīgas lietotnes Google Play veikalā, izmantojot televizora izvēlnē pieejamo saiti."</item>
+    <item msgid="8974157841656828507">"Iestatiet instalētos kanālu avotus, lai pielāgotu kanālu sarakstu.\nLai sāktu, izvēlieties kanālu avotus izvēlnē Iestatījumi."</item>
+  </string-array>
 </resources>

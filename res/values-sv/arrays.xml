@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premiär"</item>
     <item msgid="8215762047341133299">"Teknik/vetenskap"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Livekanaler"</item>
+    <item msgid="7307688057853449735">"Ett enkelt sätt att upptäcka innehåll"</item>
+    <item msgid="7566838222783641942">"Ladda ned appar och få fler kanaler"</item>
+    <item msgid="8646630833216197238">"Anpassa din kanallista"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Titta på innehåll från appar precis som du bläddrar mellan TV-kanaler."</item>
+    <item msgid="1855708984677953238">"Bläddra bland innehållet i appar med en guide du känner igen och ett användarvänligt gränssnitt, \nprecis som du gör med TV-kanaler."</item>
+    <item msgid="3420760668363283731">"Lägg till fler kanaler genom att installera appar som erbjuder livekanaler. \nDu hittar kompatibla appar i Google Play Butik när du klickar på länken i TV-menyn."</item>
+    <item msgid="8974157841656828507">"Anpassa din kanallista genom att konfigurera de nyinstallerade kanalkällorna. \nVälj Kanalkällor i menyn Inställningar om du vill komma igång."</item>
+  </string-array>
 </resources>

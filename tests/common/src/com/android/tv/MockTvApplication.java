@@ -16,11 +16,9 @@
 
 package com.android.tv;
 
-import android.app.Application;
 import android.test.mock.MockApplication;
 
 import com.android.tv.analytics.Analytics;
-import com.android.tv.analytics.OptOutPreferenceHelper;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.ProgramDataManager;
@@ -60,11 +58,6 @@ public class MockTvApplication extends MockApplication implements ApplicationSin
     }
 
     @Override
-    public OptOutPreferenceHelper getOptPreferenceHelper() {
-        return mDelegate.getOptPreferenceHelper();
-    }
-
-    @Override
     public ChannelDataManager getChannelDataManager() {
         return mDelegate.getChannelDataManager();
     }
@@ -82,5 +75,10 @@ public class MockTvApplication extends MockApplication implements ApplicationSin
     @Override
     public TvInputManagerHelper getTvInputManagerHelper() {
         return mDelegate.getTvInputManagerHelper();
+    }
+
+    @Override
+    public MainActivityWrapper getMainActivityWrapper() {
+        return mDelegate.getMainActivityWrapper();
     }
 }

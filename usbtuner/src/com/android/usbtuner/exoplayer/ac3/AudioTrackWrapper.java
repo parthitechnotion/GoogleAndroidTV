@@ -70,7 +70,6 @@ public class AudioTrackWrapper {
         } else {
             mAudioSessionID = mAudioTrack.initialize();
         }
-        return;
     }
 
     public void reset() {

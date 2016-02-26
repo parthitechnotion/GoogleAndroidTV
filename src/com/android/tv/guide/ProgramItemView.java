@@ -37,14 +37,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.tv.ApplicationSingletons;
-import com.android.tv.Features;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.dvr.DvrManager;
+import com.android.tv.dvr.Recording;
 import com.android.tv.guide.ProgramManager.TableEntry;
 import com.android.tv.util.Utils;
 
@@ -86,7 +87,7 @@ public class ProgramItemView extends TextView {
 
     private static final View.OnClickListener ON_CLICKED = new View.OnClickListener() {
         @Override
-        public void onClick(View view) {
+        public void onClick(final View view) {
             TableEntry entry = ((ProgramItemView) view).mTableEntry;
             ApplicationSingletons singletons = TvApplication.getSingletons(view.getContext());
             Tracker tracker = singletons.getTracker();
@@ -101,42 +102,81 @@ public class ProgramItemView extends TextView {
                         tvActivity.tuneToChannel(channel);
                         tvActivity.hideOverlaysForTune();
                     }
-                }, entry.getWidth() > ((ProgramItemView) view).mMaxWidthForRipple ? 0 :
-                    view.getResources().getInteger(R.integer.program_guide_ripple_anim_duration));
-            } else if (Features.DVR.isEnabled(view.getContext())) {
-                List<CharSequence> items = new ArrayList<>();
-                final List<Integer> actions = new ArrayList<>();
-                // TODO: the items can be changed by the state of the program. For example,
-                // if the program is already added in scheduler, we need to show an item to
-                // delete the recording schedule.
-                items.add(view.getResources().getString(R.string.epg_dvr_record_program));
-                actions.add(ACTION_RECORD_PROGRAM);
-                items.add(view.getResources().getString(R.string.epg_dvr_record_season));
-                actions.add(ACTION_RECORD_SEASON);
+                }, entry.getWidth() > ((ProgramItemView) view).mMaxWidthForRipple ? 0
+                        : view.getResources()
+                                .getInteger(R.integer.program_guide_ripple_anim_duration));
+            } else if (CommonFeatures.DVR.isEnabled(view.getContext())) {
                 final MainActivity tvActivity = (MainActivity) view.getContext();
                 final DvrManager dvrManager = singletons.getDvrManager();
                 final Channel channel = tvActivity.getChannelDataManager()
                         .getChannel(entry.channelId);
-                final Program program = entry.program;
-                // TODO: it is a tentative UI. Don't publish the UI.
-                new AlertDialog.Builder(view.getContext())
-                        .setItems(items.toArray(new CharSequence[items.size()]),
-                                new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (actions.get(which) == ACTION_RECORD_PROGRAM) {
-                                    dvrManager.addSchedule(program);
-                                } else if (actions.get(which) == ACTION_RECORD_SEASON) {
-                                    dvrManager.addSeasonSchedule(program);
-                                }
-                                dialog.dismiss();
-                            }
-                        })
-                        .create()
-                        .show();
+                if (dvrManager.canRecord(channel.getInputId())) {
+                    showDvrDialog(view, entry, dvrManager);
+                }
             }
         }
+
+        private void showDvrDialog(final View view, TableEntry entry, final DvrManager dvrManager) {
+            List<CharSequence> items = new ArrayList<>();
+            final List<Integer> actions = new ArrayList<>();
+            // TODO: the items can be changed by the state of the program. For example,
+            // if the program is already added in scheduler, we need to show an item to
+            // delete the recording schedule.
+            items.add(view.getResources().getString(R.string.epg_dvr_record_program));
+            actions.add(ACTION_RECORD_PROGRAM);
+            items.add(view.getResources().getString(R.string.epg_dvr_record_season));
+            actions.add(ACTION_RECORD_SEASON);
+
+            final Program program = entry.program;
+            final List<Recording> conflicts = dvrManager
+                    .getScheduledRecordingsThatConflict(program);
+            // TODO: it is a tentative UI. Don't publish the UI.
+            DialogInterface.OnClickListener onClickListener
+                    = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, int which) {
+                    if (actions.get(which) == ACTION_RECORD_PROGRAM) {
+                        if (conflicts.isEmpty()) {
+                            dvrManager.addSchedule(program, conflicts);
+                        } else {
+                            showConflictDialog(view, dvrManager, program, conflicts);
+                        }
+                    } else if (actions.get(which) == ACTION_RECORD_SEASON) {
+                        dvrManager.addSeasonSchedule(program);
+                    }
+                    dialog.dismiss();
+                }
+            };
+            new AlertDialog.Builder(view.getContext())
+                    .setItems(items.toArray(new CharSequence[items.size()]), onClickListener)
+                    .create()
+                    .show();
+        }
     };
+
+    private static void showConflictDialog(final View view, final DvrManager dvrManager,
+            final Program program, final List<Recording> conflicts) {
+        DialogInterface.OnClickListener conflictClickListener
+                = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == AlertDialog.BUTTON_POSITIVE) {
+                    dvrManager.addSchedule(program, conflicts);
+                    dialog.dismiss();
+                }
+            }
+        };
+        StringBuilder sb = new StringBuilder();
+        for (Recording r : conflicts) {
+            sb.append(r.toString()).append('\n');
+        }
+        new AlertDialog.Builder(view.getContext()).setTitle(R.string.dvr_epg_conflict_dialog_title)
+                .setMessage(sb.toString())
+                .setPositiveButton(R.string.dvr_epg_record, conflictClickListener)
+                .setNegativeButton(R.string.dvr_epg_do_not_record, conflictClickListener)
+                .create()
+                .show();
+    }
 
     private static final View.OnFocusChangeListener ON_FOCUS_CHANGED =
             new View.OnFocusChangeListener() {
@@ -218,6 +258,7 @@ public class ProgramItemView extends TextView {
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         initIfNeeded();
     }
 

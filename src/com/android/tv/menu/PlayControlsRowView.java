@@ -54,6 +54,7 @@ public class PlayControlsRowView extends MenuRowView {
     private View mUnavailableMessageText;
     private TimeShiftManager mTimeShiftManager;
 
+    private final java.text.DateFormat mTimeFormat;
     private long mProgramStartTimeMs;
     private long mProgramEndTimeMs;
 
@@ -78,6 +79,7 @@ public class PlayControlsRowView extends MenuRowView {
         mTimeTextLeftMargin =
                 - res.getDimensionPixelOffset(R.dimen.play_controls_time_width) / 2;
         mTimelineWidth = res.getDimensionPixelSize(R.dimen.play_controls_width);
+        mTimeFormat = DateFormat.getTimeFormat(context);
     }
 
     @Override
@@ -188,7 +190,7 @@ public class PlayControlsRowView extends MenuRowView {
             }
 
             @Override
-            public void onRecordStartTimeChanged() {
+            public void onRecordTimeRangeChanged() {
                 if (!mTimeShiftManager.isAvailable()) {
                     return;
                 }
@@ -355,6 +357,14 @@ public class PlayControlsRowView extends MenuRowView {
             mTimeIndicator.setVisibility(View.INVISIBLE);
             return;
         }
+        if (mTimeShiftManager.isPlayForRecording()) {
+            mProgramStartTimeMs = mTimeShiftManager.getRecordStartTimeMs();
+            mProgramEndTimeMs = Math.max(mProgramStartTimeMs,
+                    mTimeShiftManager.getRecordEndTimeMs());
+            if (mProgramStartTimeMs > mProgramEndTimeMs) {
+                mProgramEndTimeMs = mProgramStartTimeMs;
+            }
+        }
         long currentPositionMs = mTimeShiftManager.getCurrentPositionMs();
         ViewGroup.MarginLayoutParams params =
                 (ViewGroup.MarginLayoutParams) mTimeText.getLayoutParams();
@@ -387,11 +397,11 @@ public class PlayControlsRowView extends MenuRowView {
         }
 
         long progressStartTimeMs = Math.min(mProgramEndTimeMs,
-                Math.max(mProgramStartTimeMs, mTimeShiftManager.getRecordStartTimeMs()));
+                    Math.max(mProgramStartTimeMs, mTimeShiftManager.getRecordStartTimeMs()));
         long currentPlayingTimeMs = Math.min(mProgramEndTimeMs,
-                Math.max(mProgramStartTimeMs, mTimeShiftManager.getCurrentPositionMs()));
+                    Math.max(mProgramStartTimeMs, mTimeShiftManager.getCurrentPositionMs()));
         long progressEndTimeMs = Math.min(mProgramEndTimeMs,
-                Math.max(mProgramStartTimeMs, System.currentTimeMillis()));
+                    Math.max(mProgramStartTimeMs, mTimeShiftManager.getRecordEndTimeMs()));
 
         layoutProgress(mProgressEmptyBefore, mProgramStartTimeMs, progressStartTimeMs);
         layoutProgress(mProgressWatched, progressStartTimeMs, currentPlayingTimeMs);
@@ -468,7 +478,7 @@ public class PlayControlsRowView extends MenuRowView {
     }
 
     private String getTimeString(long timeMs) {
-        return DateFormat.getTimeFormat(getContext()).format(timeMs);
+        return mTimeFormat.format(timeMs);
     }
 
     private int convertDurationToPixel(long duration) {

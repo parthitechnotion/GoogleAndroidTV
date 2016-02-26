@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"I-Premier"</item>
     <item msgid="8215762047341133299">"Ubuchwepheshe/isayensi"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Iziteshi ezibukhoma"</item>
+    <item msgid="7307688057853449735">"Indlela elula yokuthola okuqukethwe"</item>
+    <item msgid="7566838222783641942">"Landa izinhlelo zokusebenza, thola iziteshi eziningi"</item>
+    <item msgid="8646630833216197238">"Enza ngendlela oyifisayo okuzayo kwesiteshi sakho"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Buka okuqukethwe kusukela kuzinhlelo zakho zokusebenza njengokubukela iziteshi ku-TV."</item>
+    <item msgid="1855708984677953238">"Dlulisa amehlo kokuqukethwe kusukela kuzinhlelo zakho zokusebenza ngomhlahlandlela ojwayelekile onesixhumi esibonakalayo esinobungane, \nnjengeziteshi ku-TV."</item>
+    <item msgid="3420760668363283731">"Engeza iziteshi eziningi ngokufaka izinhlelo zokusebenza ezinikeza iziteshi ezibukhoma. \nThola izinhlelo zokusebenza ezihambisanayo ku-Google Play Isitolo ngokusebenzisa isixhumanisi esingaphakathi kwemenyu ye-TV."</item>
+    <item msgid="8974157841656828507">"Setha imithombo yakho yesiteshi emisha efakiwe ukuze wenze ngendlela oyifisayo uhlu lwakho lwesiteshi. \nKhetha imithombo yesiteshi ngaphakathi kwemenyu yezilungiselelo ukuze uqalise."</item>
+  </string-array>
 </resources>

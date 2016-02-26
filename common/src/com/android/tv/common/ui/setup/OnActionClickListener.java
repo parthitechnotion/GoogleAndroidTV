@@ -23,7 +23,8 @@ public interface OnActionClickListener {
     /**
      * Called when the action is clicked.
      *
+     * @param category action category.
      * @param id action id.
      */
-    void onActionClick(int id);
+    void onActionClick(String category, int id);
 }

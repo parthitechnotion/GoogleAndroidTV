@@ -16,6 +16,8 @@
 
 package com.android.tv.guide;
 
+import static com.android.tv.util.ImageLoader.ImageLoaderCallback;
+
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
@@ -25,6 +27,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.media.tv.TvContentRating;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.RecycledViewPool;
 import android.text.Spannable;
@@ -177,9 +180,8 @@ public class ProgramTableAdapter extends
     }
 
     // TODO: make it static
-    public class ProgramRowHolder extends RecyclerView.ViewHolder implements
-            ProgramRow.ChildFocusListener, Program.LoadPosterArtCallback,
-            Channel.LoadImageCallback {
+    public class ProgramRowHolder extends RecyclerView.ViewHolder
+            implements ProgramRow.ChildFocusListener {
 
         private final ViewGroup mContainer;
         private final ProgramRow mProgramRow;
@@ -288,8 +290,8 @@ public class ProgramTableAdapter extends
                 mChannelNumberView.setText(displayNumber);
                 mChannelNumberView.setVisibility(View.VISIBLE);
             }
-            mChannelNumberView.setTextColor(isChannelLocked(channel)
-                    ? mChannelBlockedTextColor : mChannelTextColor);
+            mChannelNumberView.setTextColor(
+                    isChannelLocked(channel) ? mChannelBlockedTextColor : mChannelTextColor);
 
             mChannelLogoView.setImageBitmap(null);
             mChannelLogoView.setVisibility(View.GONE);
@@ -302,7 +304,8 @@ public class ProgramTableAdapter extends
                 mChannelBlockView.setVisibility(View.GONE);
 
                 mChannel.loadBitmap(itemView.getContext(), Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO,
-                        mChannelLogoWidth, mChannelLogoHeight, this);
+                        mChannelLogoWidth, mChannelLogoHeight,
+                        createChannelLogoLoadedCallback(this, channel.getId()));
             }
         }
 
@@ -386,10 +389,10 @@ public class ProgramTableAdapter extends
 
                 TvContentRating blockedRating = getProgramBlock(program);
 
-                mImageView.setImageBitmap(null);
-                mImageView.setVisibility(View.GONE);
+                updatePosterArt(null);
                 if (blockedRating == null) {
-                    program.loadPosterArt(context, mImageWidth, mImageHeight, this);
+                    program.loadPosterArt(context, mImageWidth, mImageHeight,
+                            createProgramPosterArtCallback(this, program));
                 }
 
                 if (TextUtils.isEmpty(program.getEpisodeTitle())) {
@@ -473,27 +476,12 @@ public class ProgramTableAdapter extends
             }
         }
 
-        @Override
-        public void onLoadPosterArtFinished(Program program, Bitmap posterArt) {
-            if (posterArt == null || mSelectedEntry == null || mSelectedEntry.program == null) {
-                return;
-            }
-
-            String posterArtUri = mSelectedEntry.program.getPosterArtUri();
-            if (posterArtUri == null || !posterArtUri.equals(program.getPosterArtUri())) {
-                return;
-            }
-
+        private void updatePosterArt(@Nullable Bitmap posterArt) {
             mImageView.setImageBitmap(posterArt);
-            mImageView.setVisibility(View.VISIBLE);
+            mImageView.setVisibility(posterArt == null ? View.GONE : View.VISIBLE);
         }
 
-        @Override
-        public void onLoadImageFinished(Channel channel, int type, Bitmap logo) {
-            if (logo == null || mChannel == null || mChannel.getId() != channel.getId()) {
-                return;
-            }
-
+        private void updateChannelLogo(@Nullable Bitmap logo) {
             mChannelLogoView.setImageBitmap(logo);
             mChannelNameView.setVisibility(View.GONE);
             mChannelLogoView.setVisibility(View.VISIBLE);
@@ -505,5 +493,37 @@ public class ProgramTableAdapter extends
                 mHandler.postDelayed(mDetailInStarter, mAnimationDuration);
             }
         }
+    }
+
+    private static ImageLoaderCallback<ProgramRowHolder> createProgramPosterArtCallback(
+            ProgramRowHolder holder, final Program program) {
+        return new ImageLoaderCallback<ProgramRowHolder>(holder) {
+            @Override
+            public void onBitmapLoaded(ProgramRowHolder holder, @Nullable Bitmap posterArt) {
+                if (posterArt == null || holder.mSelectedEntry == null
+                        || holder.mSelectedEntry.program == null) {
+                    return;
+                }
+                String posterArtUri = holder.mSelectedEntry.program.getPosterArtUri();
+                if (posterArtUri == null || !posterArtUri.equals(program.getPosterArtUri())) {
+                    return;
+                }
+                holder.updatePosterArt(posterArt);
+            }
+        };
+    }
+
+    private static ImageLoaderCallback<ProgramRowHolder> createChannelLogoLoadedCallback(
+            ProgramRowHolder holder, final long channelId) {
+        return new ImageLoaderCallback<ProgramRowHolder>(holder) {
+            @Override
+            public void onBitmapLoaded(ProgramRowHolder holder, @Nullable Bitmap logo) {
+                if (logo == null || holder.mChannel == null
+                        || holder.mChannel.getId() != channelId) {
+                    return;
+                }
+                holder.updateChannelLogo(logo);
+            }
+        };
     }
 }

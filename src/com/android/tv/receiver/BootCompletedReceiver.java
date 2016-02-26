@@ -25,6 +25,7 @@ import android.util.Log;
 
 import com.android.tv.Features;
 import com.android.tv.TvActivity;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.dvr.DvrRecordingService;
 import com.android.tv.recommendation.NotificationService;
 import com.android.tv.util.OnboardingUtils;
@@ -58,8 +59,8 @@ public class BootCompletedReceiver extends BroadcastReceiver {
 
         if (Features.UNHIDE.isEnabled(context)) {
             if (OnboardingUtils.isFirstBoot(context)) {
-                // Enable the application if this is the first run after the on-boarding experience
-                // is applied just in case when the app is disabled before.
+                // Enable the application if this is the first "unhide" feature is enabled just in
+                // case when the app has been disabled before.
                 PackageManager pm = context.getPackageManager();
                 ComponentName name = new ComponentName(context, TvActivity.class);
                 if (pm.getComponentEnabledSetting(name)
@@ -72,7 +73,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
         }
 
         // DVR
-        if (Features.DVR.isEnabled(context)) {
+        if (CommonFeatures.DVR.isEnabled(context)) {
             DvrRecordingService.startService(context);
         }
     }

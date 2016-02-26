@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Úrvalsefni"</item>
     <item msgid="8215762047341133299">"Tækni og vísindi"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Beinar útsendingar"</item>
+    <item msgid="7307688057853449735">"Einföld leið til að uppgötva nýtt efni"</item>
+    <item msgid="7566838222783641942">"Sæktu forrit, fáðu fleiri rásir"</item>
+    <item msgid="8646630833216197238">"Breyttu uppröðun rása eftir þínu höfði"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Horfðu á efni úr forritunum þínum eins og þú sért að horfa á sjónvarpið."</item>
+    <item msgid="1855708984677953238">"Flettu í gegnum efni úr forritunum þínum með þægilegri leiðsögn og vinalegu notandaviðmóti, \nalveg eins og þú sért að skipta milli sjónvarpsrása."</item>
+    <item msgid="3420760668363283731">"Bættu við fleiri rásum með því að setja upp forrit sem bjóða upp á beinar útsendingar. \nFinndu samhæfð forrit í Google Play Store með því að nota tengilinn í sjónvarpsvalmyndinni."</item>
+    <item msgid="8974157841656828507">"Settu upp nýlega sótt inntök rása til að raða rásalistanum eftir eigin höfði. \nVeldu Inntak rása í stillingavalmyndinni til að hefjast handa."</item>
+  </string-array>
 </resources>

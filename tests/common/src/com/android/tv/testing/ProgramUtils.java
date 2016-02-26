@@ -25,6 +25,8 @@ import android.media.tv.TvContract.Programs;
 import android.net.Uri;
 import android.util.Log;
 
+import com.android.tv.common.TvContentRatingCache;
+
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +50,7 @@ public class ProgramUtils {
         values.put(Programs.COLUMN_CHANNEL_ID, channelId);
         values.put(Programs.COLUMN_SHORT_DESCRIPTION, program.description);
         values.put(Programs.COLUMN_CONTENT_RATING,
-                Utils.contentRatingsToString(program.contentRatings));
+                TvContentRatingCache.contentRatingsToString(program.contentRatings));
 
         long currentTimeMs = System.currentTimeMillis();
         long targetEndTimeMs = currentTimeMs + PROGRAM_INSERT_DURATION_MS;

@@ -18,7 +18,6 @@ package com.android.usbtuner.exoplayer;
 
 import android.media.MediaCodec;
 import android.media.MediaDataSource;
-import android.media.MediaExtractor;
 import android.os.ConditionVariable;
 import android.os.SystemClock;
 import android.util.Log;
@@ -41,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CachedSampleSourceExtractor extends BaseSampleSourceExtractor implements
         CacheManager.EvictListener {
-    private static final String TAG = "CachedSampleSourceExtractor";
+    private static final String TAG = "CachedSampleSourceExt";
     private static final boolean DEBUG = false;
 
     public static final long CHUNK_DURATION_US = TimeUnit.MILLISECONDS.toMicros(500);
@@ -79,7 +78,7 @@ public class CachedSampleSourceExtractor extends BaseSampleSourceExtractor imple
         }
 
         public boolean maybeReadSample() {
-            if (!isEmpty() && getEndPositionUs() - getStartPositionUs() > CHUNK_DURATION_US) {
+            if (isDurationGreaterThan(CHUNK_DURATION_US)) {
                 return false;
             }
             SampleHolder sample = mCache.maybeReadSample();
@@ -255,8 +254,8 @@ public class CachedSampleSourceExtractor extends BaseSampleSourceExtractor imple
     private boolean isLiveLocked(long positionUs) {
         Long livePositionUs = null;
         for (SampleCache cache : mSampleCaches) {
-            if (livePositionUs == null || livePositionUs < cache.getLastWrittenPositionUs()) {
-                livePositionUs = cache.getLastWrittenPositionUs();
+            if (livePositionUs == null || livePositionUs < cache.getEndPositionUs()) {
+                livePositionUs = cache.getEndPositionUs();
             }
         }
         return (livePositionUs == null

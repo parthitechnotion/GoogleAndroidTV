@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premiera"</item>
     <item msgid="8215762047341133299">"Tehnika/znanost"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Kanali v živo"</item>
+    <item msgid="7307688057853449735">"Preprost način odkrivanja vsebine"</item>
+    <item msgid="7566838222783641942">"Prenos aplikacij, več kanalov"</item>
+    <item msgid="8646630833216197238">"Prilagajanje izbora kanalov"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Gledanje vsebine iz aplikacij, kot bi gledali TV-kanale."</item>
+    <item msgid="1855708984677953238">"Brskanje po vsebini iz aplikacij z znanim vodnikom in preprostim vmesnikom, \ntako kot pri TV-kanalih."</item>
+    <item msgid="3420760668363283731">"Dodajanje več kanalov, tako da namestite aplikacije, ki omogočajo kanale v živo. \nIskanje združljivih aplikacij v Trgovini Google Play, tako da uporabite povezavo v TV-meniju."</item>
+    <item msgid="8974157841656828507">"Nastavitev novo nameščenih virov kanalov za prilagajanje seznama kanalov. \nČe želite začeti, v meniju z nastavitvami izberite vire kanalov."</item>
+  </string-array>
 </resources>

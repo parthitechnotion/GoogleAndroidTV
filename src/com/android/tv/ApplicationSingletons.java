@@ -17,7 +17,6 @@
 package com.android.tv;
 
 import com.android.tv.analytics.Analytics;
-import com.android.tv.analytics.OptOutPreferenceHelper;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.ProgramDataManager;
@@ -41,11 +40,11 @@ public interface ApplicationSingletons {
 
     DvrSessionManager getDvrSessionManger();
 
-    OptOutPreferenceHelper getOptPreferenceHelper();
-
     ProgramDataManager getProgramDataManager();
 
     Tracker getTracker();
 
     TvInputManagerHelper getTvInputManagerHelper();
+
+    MainActivityWrapper getMainActivityWrapper();
 }

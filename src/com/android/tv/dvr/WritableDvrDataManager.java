@@ -16,12 +16,15 @@
 
 package com.android.tv.dvr;
 
+import android.support.annotation.MainThread;
+
 /**
  * Full data manager.
  *
  * <p>The following operations need to be synced with permanent storage. The following commands are
  * for internal use only. Do not call them from UI directly.
  */
+@MainThread
 interface WritableDvrDataManager extends DvrDataManager {
     /**
      * Add a new recording.

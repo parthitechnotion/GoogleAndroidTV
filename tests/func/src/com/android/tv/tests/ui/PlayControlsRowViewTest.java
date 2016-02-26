@@ -30,12 +30,13 @@ import android.view.KeyEvent;
 import com.android.tv.R;
 import com.android.tv.testing.testinput.TvTestInputConstants;
 import com.android.tv.testing.uihelper.DialogHelper;
-import com.android.tv.testing.uihelper.SidePanelHelper;
 
 @SmallTest
 @SdkSuppress(minSdkVersion = 23)
 public class PlayControlsRowViewTest extends LiveChannelsTestCase {
     private static final int BUTTON_INDEX_PLAY_PAUSE = 2;
+
+    private BySelector mBySettingsSidePanel;
 
     @Override
     protected void setUp() throws Exception {
@@ -45,6 +46,8 @@ public class PlayControlsRowViewTest extends LiveChannelsTestCase {
         // Tune to a new channel to ensure that the channel is changed.
         mDevice.pressDPadUp();
         getInstrumentation().waitForIdleSync();
+        mBySettingsSidePanel = mSidePanelHelper.bySidePanelTitled(
+                R.string.side_panel_title_settings);
     }
 
     /**
@@ -110,16 +113,20 @@ public class PlayControlsRowViewTest extends LiveChannelsTestCase {
         mMenuHelper.assertWaitForMenu();
         assertButtonHasFocus(BUTTON_INDEX_PLAY_PAUSE);
         // Show parental controls fragment.
-        mMenuHelper.assertPressOptionsParentalControls();
+        mMenuHelper.assertPressOptionsSettings();
+        assertWaitForCondition(mDevice, Until.hasObject(mBySettingsSidePanel));
+        mSidePanelHelper.assertNavigateToItem(R.string.settings_parental_controls);
+        mDevice.pressDPadCenter();
         DialogHelper dialogHelper = new DialogHelper(mDevice, mTargetResources);
         dialogHelper.assertWaitForPinDialogOpen();
         dialogHelper.enterPinCodes();
         dialogHelper.assertWaitForPinDialogClose();
-        SidePanelHelper sidePanelHelper = new SidePanelHelper(mDevice, mTargetResources);
-        BySelector bySidePanel = sidePanelHelper.bySidePanelTitled(R.string.menu_parental_controls);
+        BySelector bySidePanel = mSidePanelHelper.bySidePanelTitled(
+                R.string.menu_parental_controls);
         assertWaitForCondition(mDevice, Until.hasObject(bySidePanel));
         mDevice.pressEnter();
         mDevice.pressEnter();
+        mDevice.pressBack();
         mDevice.pressBack();
         // Return to the main menu.
         mMenuHelper.assertWaitForMenu();

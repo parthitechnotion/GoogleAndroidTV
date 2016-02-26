@@ -18,7 +18,9 @@ package com.android.tv.menu;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -49,7 +51,6 @@ public class ChannelsPosterPrefetcher {
 
     private boolean isCanceled;
 
-
     /**
      * Create {@link ChannelsPosterPrefetcher} object with given parameters.
      */
@@ -72,16 +73,14 @@ public class ChannelsPosterPrefetcher {
         if (isCanceled) {
             return;
         }
-        if (DEBUG) {
-            Log.d(TAG, "startPrefetching()");
-        }
+        if (DEBUG) Log.d(TAG, "startPrefetching()");
         /*
          * When a user browse channels, this method could be called many times. We don't need to
          * prefetch the intermediate channels. So ignore previous schedule.
          */
         mHandler.removeMessages(MSG_PREFETCH_IMAGE);
-        mHandler.sendMessageDelayed(
-                mHandler.obtainMessage(MSG_PREFETCH_IMAGE), ONDEMAND_POSTER_PREFETCH_DELAY_MILLIS);
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_PREFETCH_IMAGE),
+                ONDEMAND_POSTER_PREFETCH_DELAY_MILLIS);
     }
 
     /**
@@ -92,11 +91,12 @@ public class ChannelsPosterPrefetcher {
         mHandler.removeCallbacksAndMessages(null);
     }
 
+    @MainThread // ProgramDataManager.getCurrentProgram must be called from the main thread
     private void doPrefetchImages() {
-        if (DEBUG) {
-            Log.d(TAG, "doPrefetchImages()");
-        }
+        if (DEBUG) Log.d(TAG, "doPrefetchImages() started");
 
+        // This executes on the main thread, but since the item list is expected to be about 5 items
+        // and ImageLoader spawns an async task so this is fast enough. 1 ms in local testing.
         List<Channel> channelList = mChannelsAdapter.getItemList();
         if (channelList != null) {
             for (Channel channel : channelList) {
@@ -114,14 +114,20 @@ public class ChannelsPosterPrefetcher {
                 }
             }
         }
+        if (DEBUG) {
+            Log.d(TAG, "doPrefetchImages() finished. ImageLoader may still have async tasks for "
+                            + "channels " + channelList);
+        }
     }
 
     private static class PrefetchHandler extends WeakHandler<ChannelsPosterPrefetcher> {
         public PrefetchHandler(ChannelsPosterPrefetcher ref) {
-            super(ref);
+            // doPrefetchImages must be called from the main thread.
+            super(Looper.getMainLooper(), ref);
         }
 
         @Override
+        @MainThread
         public void handleMessage(Message msg, @NonNull ChannelsPosterPrefetcher prefetcher) {
             switch (msg.what) {
                 case MSG_PREFETCH_IMAGE:

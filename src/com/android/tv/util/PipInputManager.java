@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.android.tv.ChannelTuner;
 import com.android.tv.R;
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 
 import java.util.ArrayList;

@@ -50,8 +50,10 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
 import com.android.usbtuner.tvinput.UsbTunerTvInputService;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -75,6 +77,7 @@ public class Utils {
     public static final String EXTRA_KEY_ACTION = "action";
     public static final String EXTRA_ACTION_SHOW_TV_INPUT ="show_tv_input";
     public static final String EXTRA_KEY_FROM_LAUNCHER = "from_launcher";
+    public static final String EXTRA_KEY_RECORDING_URI = "recording_uri";
 
     // Query parameter in the intent of starting MainActivity.
     public static final String PARAM_SOURCE = "source";
@@ -448,36 +451,6 @@ public class Utils {
         }
         return context.getString(R.string.multi_audio_display_string_with_channel, language,
                 metadata.toString());
-    }
-
-    public static TvContentRating[] stringToContentRatings(String commaSeparatedRatings) {
-        if (TextUtils.isEmpty(commaSeparatedRatings)) {
-            return null;
-        }
-        String[] ratings = commaSeparatedRatings.split("\\s*,\\s*");
-        List<TvContentRating> contentRatings = new ArrayList<>();
-        for (String rating : ratings) {
-            try {
-                contentRatings.add(TvContentRating.unflattenFromString(rating));
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Can't parse the content rating: '" + rating + "'", e);
-            }
-        }
-        return contentRatings.size() == 0 ?
-                null : contentRatings.toArray(new TvContentRating[contentRatings.size()]);
-    }
-
-    public static String contentRatingsToString(TvContentRating[] contentRatings) {
-        if (contentRatings == null || contentRatings.length == 0) {
-            return null;
-        }
-        final String DELIMITER = ",";
-        StringBuilder ratings = new StringBuilder(contentRatings[0].flattenToString());
-        for (int i = 1; i < contentRatings.length; ++i) {
-            ratings.append(DELIMITER);
-            ratings.append(contentRatings[i].flattenToString());
-        }
-        return ratings.toString();
     }
 
     public static boolean isEqualLanguage(String lang1, String lang2) {

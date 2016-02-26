@@ -19,9 +19,11 @@ package com.android.usbtuner;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 
 import com.android.usbtuner.UsbTunerPreferenceProvider.Preferences;
+import com.android.usbtuner.util.TisConfiguration;
 
 /**
  * A helper class for the USB tuner preferences.
@@ -32,36 +34,91 @@ public class UsbTunerPreferences {
     private static final String PREFS_KEY_SCAN_DONE = "scan_done";
     private static final String PREFS_KEY_LAUNCH_SETUP = "launch_setup";
 
+    private static final String SHARED_PREFS_NAME = "com.android.usbtuner.preferences";
+
+    private static boolean useContentProvider(Context context) {
+        // If TIS is a part of LC, it should use ContentProvider to resolve multiple process access.
+        return TisConfiguration.isPackagedWithLiveChannels(context);
+    }
+
     public static int getChannelDataVersion(Context context) {
-        return getPreferenceInt(context, PREFS_KEY_CHANNEL_DATA_VERSION);
+        if (useContentProvider(context)) {
+            return getPreferenceInt(context, PREFS_KEY_CHANNEL_DATA_VERSION);
+        } else {
+            return getSharedPreferences(context)
+                    .getInt(UsbTunerPreferences.PREFS_KEY_CHANNEL_DATA_VERSION, 0);
+        }
     }
 
     public static void setChannelDataVersion(Context context, int version) {
-        setPreference(context, PREFS_KEY_CHANNEL_DATA_VERSION, version);
+        if (useContentProvider(context)) {
+            setPreference(context, PREFS_KEY_CHANNEL_DATA_VERSION, version);
+        } else {
+            getSharedPreferences(context).edit()
+                    .putInt(UsbTunerPreferences.PREFS_KEY_CHANNEL_DATA_VERSION, version)
+                    .apply();
+        }
     }
 
     public static int getScannedChannelCount(Context context) {
-        return getPreferenceInt(context, PREFS_KEY_SCANNED_CHANNEL_COUNT);
+        if (useContentProvider(context)) {
+            return getPreferenceInt(context, PREFS_KEY_SCANNED_CHANNEL_COUNT);
+        } else {
+            return getSharedPreferences(context)
+                    .getInt(UsbTunerPreferences.PREFS_KEY_SCANNED_CHANNEL_COUNT, 0);
+        }
     }
 
     public static void setScannedChannelCount(Context context, int channelCount) {
-        setPreference(context, PREFS_KEY_SCANNED_CHANNEL_COUNT, channelCount);
+        if (useContentProvider(context)) {
+            setPreference(context, PREFS_KEY_SCANNED_CHANNEL_COUNT, channelCount);
+        } else {
+            getSharedPreferences(context).edit()
+                    .putInt(UsbTunerPreferences.PREFS_KEY_SCANNED_CHANNEL_COUNT, channelCount)
+                    .apply();
+        }
     }
 
     public static boolean isScanDone(Context context) {
-        return getPreferenceBoolean(context, PREFS_KEY_SCAN_DONE);
+        if (useContentProvider(context)) {
+            return getPreferenceBoolean(context, PREFS_KEY_SCAN_DONE);
+        } else {
+            return getSharedPreferences(context)
+                    .getBoolean(UsbTunerPreferences.PREFS_KEY_SCAN_DONE, false);
+        }
     }
 
     public static void setScanDone(Context context) {
-        setPreference(context, PREFS_KEY_SCAN_DONE, true);
+        if (useContentProvider(context)) {
+            setPreference(context, PREFS_KEY_SCAN_DONE, true);
+        } else {
+            getSharedPreferences(context).edit()
+                    .putBoolean(UsbTunerPreferences.PREFS_KEY_SCAN_DONE, true)
+                    .apply();
+        }
     }
 
     public static boolean shouldShowSetupActivity(Context context) {
-        return getPreferenceBoolean(context, PREFS_KEY_LAUNCH_SETUP);
+        if (useContentProvider(context)) {
+            return getPreferenceBoolean(context, PREFS_KEY_LAUNCH_SETUP);
+        } else {
+            return getSharedPreferences(context)
+                    .getBoolean(UsbTunerPreferences.PREFS_KEY_LAUNCH_SETUP, false);
+        }
     }
 
     public static void setShouldShowSetupActivity(Context context, boolean need) {
-        setPreference(context, PREFS_KEY_LAUNCH_SETUP, need);
+        if (useContentProvider(context)) {
+            setPreference(context, PREFS_KEY_LAUNCH_SETUP, need);
+        } else {
+            getSharedPreferences(context).edit()
+                    .putBoolean(UsbTunerPreferences.PREFS_KEY_LAUNCH_SETUP, need)
+                    .apply();
+        }
+    }
+
+    private static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
     }
 
     // Content provider helpers
@@ -72,7 +129,7 @@ public class UsbTunerPreferences {
         String[] selectionArgs = new String[] { key };
         try (Cursor cursor = resolver.query(UsbTunerPreferenceProvider.buildPreferenceUri(key),
                 projection, selection, selectionArgs, null)) {
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 return cursor.getString(0);
             }
         }

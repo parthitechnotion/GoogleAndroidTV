@@ -24,6 +24,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.os.Looper;
+import android.support.test.filters.SdkSuppress;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
@@ -39,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  * Tests for {@link Scheduler}.
  */
 @SmallTest
+@SdkSuppress(minSdkVersion = 23)
 public class SchedulerTest extends AndroidTestCase {
     private FakeClock mClock;
     private DvrDataManagerInMemoryImpl mDataManager;
@@ -52,8 +55,8 @@ public class SchedulerTest extends AndroidTestCase {
         MockitoAnnotations.initMocks(this);
         mClock = FakeClock.createWithCurrentTime();
         mDataManager = new DvrDataManagerInMemoryImpl(getContext());
-        mScheduler = new Scheduler(mSessionManager, mDataManager, getContext(), mClock,
-                mMockAlarmManager);
+        mScheduler = new Scheduler(Looper.myLooper(), mSessionManager, mDataManager, getContext(),
+                mClock, mMockAlarmManager);
     }
 
     public void testUpdate_none() throws Exception {
@@ -64,7 +67,7 @@ public class SchedulerTest extends AndroidTestCase {
     public void testUpdate_nextIn12Hours() throws Exception {
         long now = mClock.currentTimeMillis();
         long startTime = now + TimeUnit.HOURS.toMillis(12);
-        Recording r = RecordingTestUtils.createTestRecordingWithPeriod(1, startTime,
+        Recording r = RecordingTestUtils.createTestRecordingWithPeriod(startTime,
                 startTime + TimeUnit.HOURS.toMillis(1));
         mDataManager.addRecording(r);
         mScheduler.update();
@@ -78,7 +81,7 @@ public class SchedulerTest extends AndroidTestCase {
         long now = mClock.currentTimeMillis();
         long startTime = now + 3;
         Recording r = RecordingTestUtils
-                .createTestRecordingWithPeriod(1, startTime, startTime + 100);
+                .createTestRecordingWithPeriod(startTime, startTime + 100);
         assertFalse(mScheduler.startsWithin(r, 2));
         assertTrue(mScheduler.startsWithin(r, 3));
     }

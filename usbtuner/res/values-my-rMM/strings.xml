@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"USB ချန်နယ် တျူနား စဖွင့်သတ်မှတ်ပါ"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"မိနစ် အနည်းငယ်ကြာနိုင်ပါသည်"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"ချန်နယ် %1$d ခု တွေ့ခဲ့သည်"</item>
-    <item quantity="other" msgid="7340557317633613">"ချန်နယ် %1$d ခု တွေ့ခဲ့သည်"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">ချန်နယ် %1$d ခုတွေ့သည်</item>
+      <item quantity="one">ချန်နယ် %1$d ခုတွေ့သည်</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"ချန်နယ် ရှာဖွေမှုကို ရပ်စဲပါ"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"ချန်နယ် %1$d ခု တွေ့ခဲ့သည်"</item>
-    <item quantity="other" msgid="4331542666115153576">"ချန်နယ် %1$d ခု တွေ့ခဲ့သည်"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"ကောင်းသည်။ ချန်နယ်များကို စကင် လုပ်စဉ် ချန်နယ် %1$d ကို တွေ့ခဲ့ပါသည်။ မမှန်ဘူးထင်လျှင်၊ ဧရီယာ အနေအထားကို ချိန်ညှိလျက် ထပ်စမ်းကြည့်ပါ။"</item>
-    <item quantity="other" msgid="8098777464551209564">"ကောင်းသည်။ ချန်နယ်များကို စကင် လုပ်စဉ် ချန်နယ် %1$d ကို တွေ့ခဲ့ပါသည်။ မမှန်ဘူးထင်လျှင်၊ ဧရီယာ အနေအထားကို ချိန်ညှိလျက် ထပ်စမ်းကြည့်ပါ။"</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">ချန်နယ် %1$d ခုတွေ့သည်</item>
+      <item quantity="one">ချန်နယ် %1$d ခုတွေ့သည်</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">ကောင်းသည်။ ချန်နယ်ရှာဖွေချိန်တွင် ချန်နယ် %1$d ခုတွေ့သည်။ မှားယွင်းနေသည်ဟုထင်လျှင်၊ အင်တန်နာတည်နေရာကို ချိန်ညှိကာ ထပ်ရှာပါ။</item>
+      <item quantity="one">ကောင်းသည်။ ချန်နယ်ရှာဖွေချိန်တွင် ချန်နယ် %1$d ခုတွေ့သည်။ မှားယွင်းနေသည်ဟုထင်လျှင်၊ အင်တန်နာတည်နေရာကို ချိန်ညှိကာ ထပ်ရှာပါ။</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"လုပ်ပြီး"</item>
     <item msgid="496688122303154468">"ထပ်ပြီး စကင်လုပ်ပါ"</item>

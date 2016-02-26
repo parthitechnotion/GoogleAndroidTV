@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"បើក"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"បិទ"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"ពហុ​អូឌីយ៉ូ"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"ការដំឡើងប៉ុស្តិ៍"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"ការពិនិត្យរបស់ឪពុកម្ដាយ"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"អំពី"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"ទទួលយកប៉ុស្តិ៍ជាច្រើនទៀត"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"ការកំណត់"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"ប្រភព"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"ប្ដូរ"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"បើក"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"ដាក់​ជា​ក្រុម​តាម"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"ការដំឡើងប៉ុស្តិ៍"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"កម្មវិធីនេះត្រូវបានរារាំង"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"កម្មវិធីនេះត្រូវបានវាយតម្លៃ <xliff:g id="RATING">%1$s</xliff:g>"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"ប្រភពប៉ុស្តិ៍"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"មានប៉ុស្តិ៍ថ្មី"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"ប្ដូរបញ្ជីឆានែលតាមបំណង"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"ជ្រើស​ឆានែល​សម្រាប់​ការណែនាំ​កម្មវិធី"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"មិន​បាន​កំណត់"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"ការ​បញ្ចូល​មិន​គាំទ្រ​ការ​វិភាគ​រក​ស្វ័យ​ប្រវត្តិ"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"មិន​អាច​ចាប់ផ្ដើម​ការ​វិភាគ​ស្វ័យប្រវត្តិ​សម្រាប់ \'<xliff:g id="TV_INPUT">%s</xliff:g>\'"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"មិន​អាច​ចាប់ផ្ដើម​ចំណូល​ចិត្ត​ប្រព័ន្ធ​ទូលាយ​សម្រាប់​ចំណងជើង​បិទ​ជិត​។"</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"បាន​បន្ថែម​ឆានែល %1$d"</item>
-    <item quantity="other" msgid="1078861616751739285">"បាន​បន្ថែម​ឆានែល %1$d"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">បានបន្ថែមប៉ុស្តិ៍ %1$d</item>
+      <item quantity="one">បានបន្ថែមប៉ុស្តិ៍ %1$d</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"គ្មាន​ឆា​នែ​ល​បាន​បន្ថែម"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Tuner"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"ការ​ត្រួតពិនិត្យមេ"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"បញ្ចូល​កូដ PIN ថ្មី"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"បញ្ជាក់​កូដ PIN របស់​អ្នក"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"បញ្ចូល​កូដ PIN បច្ចុប្បន្ន​របស់​អ្នក"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"អ្នកបានបញ្ចូលកូដ PIN ខុស ៥ដង។\nព្យាយាមម្ដងទៀតក្នុងរយៈពេល <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> វិនាទីទៀត។"</item>
-    <item quantity="other" msgid="8829550842387756054">"អ្នកបានបញ្ចូលកូដ PIN ខុស ៥ដង។\nព្យាយាមម្ដងទៀតក្នុងរយៈពេល <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> វិនាទីទៀត។"</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">អ្នកបានបញ្ចូលកូដ PIN ខុស 5 ដង។\nសូមព្យាយាមម្តងទៀតក្នុងរយៈពេល <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> វិនាទី។</item>
+      <item quantity="one">អ្នកបានបញ្ចូលកូដ PIN ខុស 5 ដង។\nសូមព្យាយាមម្តងទៀតក្នុងរយៈពេល <xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> វិនាទី។</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"កូដ PIN មិន​ត្រឹមត្រូវ។ ព្យាយាម​ម្ដងទៀត។"</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"ព្យាយាម​ម្ដង​ទៀត កូដ​ PIN មិន​ដូច​គ្នា"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"អំពី"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"អាជ្ញាប័ណ្ណប្រភពកូដចំហ"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"ការកំណត់"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"ប្ដូរបញ្ជីប៉ុស្តិ៍តាមបំណង"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"ជ្រើសប៉ុស្តិ៍សម្រាប់ការណែនាំកម្មវិធីរបស់អ្នក"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"ប្រភពប៉ុស្តិ៍"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"មានប៉ុស្តិ៍ថ្មី"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"ការគ្រប់គ្រងដោយមាតាបិតា"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"អាជ្ញាប័ណ្ណប្រភពកូដបើកចំហ"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"អាជ្ញាប័ណ្ណប្រភពកូដចំហ"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"កំណែ"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"កំណែ"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"ជម្រើស​សម្រាប់​​អ្នក​អភិវឌ្ឍ"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"បើកដំណើរការឧបករណ៍ចាប់ប៉ុស្តិ៍ទូរទស្សន៍ USB"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"ដើម្បីឮសំឡេងឧបករណ៍ចាប់ប៉ុស្តិ៍ទូរទស្សន៍ USB ទូរទស្សន៍របស់អ្នកគួរតែអាចគាំទ្ររន្ធដោត AC3។"</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"គ្មាន​ចំណងជើង"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"បាន​ទប់​ស្កាត់​ឆានែល"</string>
     <string name="episode_format" msgid="4881195874563241096">"រដូវកាល <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>៖ វគ្គ <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"ប្រភពប៉ុស្តិ៍"</string>
-    <string name="setup_description" msgid="8728423605912915099">"ដំឡើងប៉ុស្តិ៍ផ្សាយផ្ទាល់ចេញពីប្រភពដែលមានផ្តល់ជូន។ វាអាចចំណាយពេលប៉ុន្មាននាទីអាស្រ័យលើប្រភពរបស់ប៉ុស្តិ៍នោះ។"</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"រួចរាល់"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"មានប៉ុស្តិ៍ %1$d"</item>
-    <item quantity="other" msgid="2386588423841837714">"មានប៉ុស្តិ៍ %1$d"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"ថ្មី"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"ប្រភព"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">ប៉ុស្តិ៍ %1$d</item>
+      <item quantity="one">ប៉ុស្តិ៍ %1$d</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"មិនមានប៉ុស្តិ៍ទេ"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"ថ្មី"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"មិន​បាន​កំណត់"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"ទទួលយកប្រភពច្រើនទៀត"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"រុករកកម្មវិធីដែលមានផ្តល់ជូនប៉ុស្តិ៍ផ្សាយផ្ទាល់"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"មានផ្តល់ជូនប្រភពប៉ុស្តិ៍ថ្មី"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"ប្រភពប៉ុស្តិ៍ថ្មីមានប៉ុស្តិ៍ដែលត្រូវផ្តល់ជូន។\nដំឡើងប៉ុស្តិ៍ទាំងនោះឥឡូវនេះ ឬដំឡើងពេលក្រោយនៅក្នុងការកំណត់ប្រភពប៉ុស្តិ៍។"</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"ដំឡើងឥឡូវនេះ"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"យល់​ហើយ"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"ចុច ជ្រើសរើស"</b>" ដើម្បីចូលប្រើម៉ឺនុយទូរទស្សន៍។"</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"ប៊ូតុង​ថយក្រោយ​សម្រាប់​ឧបករណ៍​ដែល​បាន​ភ្ជាប់។ ចុច​ប៊ូតុង​ដើម ដើម្បី​ចាកចេញ។"</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"ប៉ុស្តិ៍ផ្សាយផ្ទាល់មិនត្រូវបានគាំទ្រលើឧបករណ៍ដែលដំណើរការដោយ Android Lollipop នេះទេ។"</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"ប៉ុស្តិ៍ផ្សាយផ្ទាល់ត្រូវការសិទ្ធិអនុញ្ញាតដើម្បីអានបញ្ជីទូរទស្សន៍។"</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"កំណត់ប្រភពរបស់អ្នក"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"ប៉ុស្តិ៍ផ្សាយផ្ទាល់ផ្សាភ្ជាប់បទពិសោធន៍ប្រើប្រាស់ប៉ុស្តិ៍ទូរទស្សន៍លក្ខណៈបុរាណជាមួយប៉ុស្តិ៍ស្រ្ទីមដែលផ្តល់ដោយកម្មវិធី។ \n\nចាប់ផ្តើមដោយកំណត់ប្រភពប៉ុស្តិ៍ដែលបានដំឡើងរួចហើយ។ ឬរុករកក្នុងហាង Google Play ដើម្បីរកកម្មវិធីច្រើនទៀតដែលផ្តល់ជូនប៉ុស្តិ៍ផ្សាយផ្ទាល់។"</string>
 </resources>

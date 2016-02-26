@@ -17,23 +17,32 @@
 package com.android.tv.dvr;
 
 import android.content.Context;
+import android.support.annotation.MainThread;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import android.util.Range;
 
 import com.android.tv.dvr.Recording.RecordingState;
+import com.android.tv.dvr.provider.AsyncDvrDbTask;
 import com.android.tv.dvr.provider.AsyncDvrDbTask.AsyncDvrQueryTask;
+import com.android.tv.util.SoftPreconditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * DVR Data manager to handle recordings and schedules.
  */
+@MainThread
 public class DvrDataManagerImpl extends BaseDvrDataManager {
+    private static final String TAG = "DvrDataManagerImpl";
+
     private Context mContext;
     private boolean mLoadFinished;
-    private final List<Recording> mRecordings = new ArrayList<>();
+    private final HashMap<Long, Recording> mRecordings = new HashMap<>();
     private AsyncDvrQueryTask mQueryTask;
 
     public DvrDataManagerImpl(Context context) {
@@ -47,8 +56,9 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
             protected void onPostExecute(List<Recording> result) {
                 mQueryTask = null;
                 mLoadFinished = true;
-                mRecordings.addAll(result);
-                Collections.sort(mRecordings, Recording.START_TIME_COMPARATOR);
+                for (Recording r : result) {
+                    mRecordings.put(r.getId(), r);
+                }
             }
         };
         mQueryTask.executeOnDbThread();
@@ -71,7 +81,10 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
         if (!mLoadFinished) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList(mRecordings);
+        ArrayList<Recording> list = new ArrayList<>(mRecordings.size());
+        list.addAll(mRecordings.values());
+        Collections.sort(list, Recording.START_TIME_COMPARATOR);
+        return Collections.unmodifiableList(list);
     }
 
     @Override
@@ -91,7 +104,7 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
 
     private List<Recording> getRecordingsWithState(@RecordingState int state) {
         List<Recording> result = new ArrayList<>();
-        for (Recording r : mRecordings) {
+        for (Recording r : mRecordings.values()) {
             if (r.getState() == state) {
                 result.add(r);
             }
@@ -107,7 +120,7 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
 
     @Override
     public long getNextScheduledStartTimeAfter(long startTime) {
-        return getNextStartTimeAfter(mRecordings, startTime);
+        return getNextStartTimeAfter(getRecordings(), startTime);
     }
 
     @VisibleForTesting
@@ -129,7 +142,7 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
     @Override
     public List<Recording> getRecordingsThatOverlapWith(Range<Long> period) {
         List<Recording> result = new ArrayList<>();
-        for (Recording r : mRecordings) {
+        for (Recording r : mRecordings.values()) {
             if (r.isOverLapping(period)) {
                 result.add(r);
             }
@@ -137,18 +150,80 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
         return result;
     }
 
+    @Nullable
     @Override
-    public void addRecording(Recording recording) { }
+    public Recording getRecording(long recordingId) {
+        if (mLoadFinished) {
+            return mRecordings.get(recordingId);
+        }
+        return null;
+    }
+
+    @Override
+    public void addRecording(final Recording recording) {
+        new AsyncDvrDbTask.AsyncAddRecordingTask(mContext) {
+            @Override
+            protected void onPostExecute(List<Recording> recordings) {
+                super.onPostExecute(recordings);
+                SoftPreconditions.checkArgument(recordings.size() == 1);
+                for (Recording r : recordings) {
+                    if (r.getId() != -1) {
+                        mRecordings.put(r.getId(), r);
+                        notifyRecordingAdded(r);
+                    } else {
+                        Log.w(TAG, "Error adding " + r);
+                    }
+                }
+
+            }
+        }.executeOnDbThread(recording);
+    }
 
     @Override
     public void addSeasonRecording(SeasonRecording seasonRecording) { }
 
     @Override
-    public void removeRecording(Recording recording) { }
+    public void removeRecording(final Recording recording) {
+        new AsyncDvrDbTask.AsyncDeleteRecordingTask(mContext) {
+            @Override
+            protected void onPostExecute(List<Integer> counts) {
+                super.onPostExecute(counts);
+                SoftPreconditions.checkArgument(counts.size() == 1);
+                for (Integer c : counts) {
+                    if (c == 1) {
+                        mRecordings.remove(recording.getId());
+                        //TODO change to notifyRecordingUpdated
+                        notifyRecordingRemoved(recording);
+                    } else {
+                        Log.w(TAG, "Error removing " + recording);
+                    }
+                }
+
+            }
+        }.executeOnDbThread(recording);
+    }
 
     @Override
     public void removeSeasonSchedule(SeasonRecording seasonSchedule) { }
 
     @Override
-    public void updateRecording(Recording r) { }
+    public void updateRecording(final Recording recording) {
+        new AsyncDvrDbTask.AsyncUpdateRecordingTask(mContext) {
+            @Override
+            protected void onPostExecute(List<Integer> counts) {
+                super.onPostExecute(counts);
+                SoftPreconditions.checkArgument(counts.size() == 1);
+                for (Integer c : counts) {
+                    if (c == 1) {
+                        mRecordings.put(recording.getId(), recording);
+                        //TODO change to notifyRecordingUpdated
+                        notifyRecordingStatusChanged(recording);
+                    } else {
+                        Log.w(TAG, "Error updating " + recording);
+                    }
+                }
+
+            }
+        }.executeOnDbThread(recording);
+    }
 }

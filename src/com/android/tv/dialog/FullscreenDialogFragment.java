@@ -32,25 +32,34 @@ import com.android.tv.R;
  */
 public class FullscreenDialogFragment extends SafeDismissDialogFragment {
     public static final String DIALOG_TAG = FullscreenDialogFragment.class.getSimpleName();
-
-    private final int mViewLayoutResId;
-    private final String mTrackerLabel;
-    private DialogView mDialogView;
+    public static final String VIEW_LAYOUT_ID = "viewLayoutId";
+    public static final String TRACKER_LABEL = "trackerLabel";
 
     /**
-     * Constructor of FullscreenDialogFragment. View class of viewLayoutResId should
+     * Creates a FullscreenDialogFragment. View class of viewLayoutResId should
      * implement {@link DialogView}.
      */
-    public FullscreenDialogFragment(int viewLayoutResId, String trackerLabel) {
-        mViewLayoutResId = viewLayoutResId;
-        mTrackerLabel = trackerLabel;
+    public static FullscreenDialogFragment newInstance(int viewLayoutResId, String trackerLabel) {
+        FullscreenDialogFragment f = new FullscreenDialogFragment();
+        Bundle args = new Bundle();
+        args.putInt(VIEW_LAYOUT_ID, viewLayoutResId);
+        args.putString(TRACKER_LABEL, trackerLabel);
+        f.setArguments(args);
+        return f;
     }
+
+    private int mViewLayoutResId;
+    private String mTrackerLabel;
+    private DialogView mDialogView;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         FullscreenDialog dialog =
                 new FullscreenDialog(getActivity(), R.style.Theme_TV_dialog_Fullscreen);
         LayoutInflater inflater = LayoutInflater.from(getActivity());
+        Bundle args = getArguments();
+        mViewLayoutResId = args.getInt(VIEW_LAYOUT_ID);
+        mTrackerLabel = args.getString(TRACKER_LABEL);
         View v = inflater.inflate(mViewLayoutResId, null);
         dialog.setContentView(v);
         mDialogView = (DialogView) v;

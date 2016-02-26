@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Поставување на УСБ-приемникот за канали"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Ова може да трае неколку минути"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Пронајден е %1$d канал"</item>
-    <item quantity="other" msgid="7340557317633613">"Пронајдени се %1$d канали"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="one">Пронајден е %1$d канал</item>
+      <item quantity="other">Пронајдени се %1$d канали</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"СОПРИ ГО СКЕНИРАЊЕТО КАНАЛИ"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Пронајден е %1$d канал"</item>
-    <item quantity="other" msgid="4331542666115153576">"Пронајдени се %1$d канали"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Одлично! Се пронајде %1$d канал во текот на скенирањето канали. Ако се чини дека тоа не е во ред, обидете се со приспособување на антената и скенирајте повторно."</item>
-    <item quantity="other" msgid="8098777464551209564">"Одлично! Се пронајдоа %1$d канали во текот на скенирањето канали. Ако се чини дека тоа не е во ред, обидете се со приспособување на антената и скенирајте повторно."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="one">Пронајден е %1$d канал</item>
+      <item quantity="other">Пронајдени се %1$d канали</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="one">Фино! Пронајден е %1$d канал во текот на скенирањето канали. Ако се чини дека тоа не е во ред, обидете се со приспособување на позицијата на антената и скенирајте повторно.</item>
+      <item quantity="other">Фино! Пронајдени се %1$d канали во текот на скенирањето канали. Ако се чини дека тоа не е во ред, обидете се со приспособување на позицијата на антената и скенирајте повторно.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Готово"</item>
     <item msgid="496688122303154468">"Скенирај пак"</item>

@@ -18,6 +18,7 @@ package com.android.tv.menu;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -32,12 +33,12 @@ import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.parental.ParentalControlSettings;
+import com.android.tv.util.ImageLoader;
 
 /**
  * A view to render channel card.
  */
-public class ChannelCardView extends BaseCardView<Channel> implements
-        Program.LoadPosterArtCallback {
+public class ChannelCardView extends BaseCardView<Channel> {
     private static final String TAG = MenuView.TAG;
     private static final boolean DEBUG = MenuView.DEBUG;
 
@@ -85,6 +86,7 @@ public class ChannelCardView extends BaseCardView<Channel> implements
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         mImageView = (ImageView) findViewById(R.id.image);
         mGradientView = findViewById(R.id.image_gradient);
         mChannelNumberNameView = (TextView) findViewById(R.id.channel_number_and_name);
@@ -136,13 +138,22 @@ public class ChannelCardView extends BaseCardView<Channel> implements
         super.onBind(channel, selected);
     }
 
-    @Override
-    public void onLoadPosterArtFinished(Program program, Bitmap posterArt) {
-        if (posterArt == null || mProgram == null
-                || program.getChannelId() != mProgram.getChannelId()
-                || program.getChannelId() != mChannel.getId()) {
-            return;
-        }
+    private static ImageLoader.ImageLoaderCallback<ChannelCardView> createProgramPosterArtCallback(
+            ChannelCardView cardView, final Program program) {
+        return new ImageLoader.ImageLoaderCallback<ChannelCardView>(cardView) {
+            @Override
+            public void onBitmapLoaded(ChannelCardView cardView, @Nullable Bitmap posterArt) {
+                if (posterArt == null || cardView.mProgram == null
+                        || program.getChannelId() != cardView.mProgram.getChannelId()
+                        || program.getChannelId() != cardView.mChannel.getId()) {
+                    return;
+                }
+                cardView.updatePosterArt(posterArt);
+            }
+        };
+    }
+
+    private void updatePosterArt(Bitmap posterArt) {
         mImageView.setImageBitmap(posterArt);
         mGradientView.setVisibility(View.VISIBLE);
     }
@@ -208,7 +219,7 @@ public class ChannelCardView extends BaseCardView<Channel> implements
                 || !parental.isRatingBlocked(mProgram.getContentRatings()))
                 && !TextUtils.isEmpty(mProgram.getPosterArtUri())) {
             mProgram.loadPosterArt(getContext(), mCardImageWidth, mCardImageHeight,
-                    ChannelCardView.this);
+                    createProgramPosterArtCallback(this, mProgram));
         }
     }
 

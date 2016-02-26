@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -37,13 +38,14 @@ import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.data.Channel;
 import com.android.tv.util.BitmapUtils;
+import com.android.tv.util.ImageLoader;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
 /**
  * A view to render an app link card.
  */
-public class AppLinkCardView extends BaseCardView<Channel> implements Channel.LoadImageCallback {
+public class AppLinkCardView extends BaseCardView<Channel> {
     private static final String TAG = MenuView.TAG;
     private static final boolean DEBUG = MenuView.DEBUG;
 
@@ -126,7 +128,8 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
                 mAppInfoView.setText(mPackageManager.getApplicationLabel(appInfo));
                 if (!TextUtils.isEmpty(mChannel.getAppLinkIconUri())) {
                     mChannel.loadBitmap(getContext(), Channel.LOAD_IMAGE_TYPE_APP_LINK_ICON,
-                            mIconWidth, mIconHeight, this);
+                            mIconWidth, mIconHeight, createChannelLogoCallback(this, mChannel,
+                                    Channel.LOAD_IMAGE_TYPE_APP_LINK_ICON));
                 } else if (appInfo.icon != 0) {
                     Drawable appIcon = mPackageManager.getApplicationIcon(appInfo);
                     BitmapUtils.setColorFilterToDrawable(mIconColorFilter, appIcon);
@@ -156,7 +159,8 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
         if (!TextUtils.isEmpty(mChannel.getAppLinkPosterArtUri())) {
             mImageView.setImageResource(R.drawable.ic_recent_thumbnail_default);
             mChannel.loadBitmap(getContext(), Channel.LOAD_IMAGE_TYPE_APP_LINK_POSTER_ART,
-                    mCardImageWidth, mCardImageHeight, this);
+                    mCardImageWidth, mCardImageHeight, createChannelLogoCallback(this, mChannel,
+                            Channel.LOAD_IMAGE_TYPE_APP_LINK_POSTER_ART));
         } else {
             setCardImageWithBanner(appInfo);
         }
@@ -174,12 +178,21 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
         super.onBind(channel, selected);
     }
 
-    @Override
-    public void onLoadImageFinished(Channel channel, int type, Bitmap bitmap) {
-        // mChannel can be changed before the image load finished.
-        if (!mChannel.hasSameReadOnlyInfo(channel)) {
-            return;
-        }
+    private static ImageLoader.ImageLoaderCallback<AppLinkCardView> createChannelLogoCallback(
+            AppLinkCardView cardView, final Channel channel, final int type) {
+        return new ImageLoader.ImageLoaderCallback<AppLinkCardView>(cardView) {
+            @Override
+            public void onBitmapLoaded(AppLinkCardView cardView, @Nullable Bitmap bitmap) {
+                // mChannel can be changed before the image load finished.
+                if (!cardView.mChannel.hasSameReadOnlyInfo(channel)) {
+                    return;
+                }
+                cardView.updateChannelLogo(bitmap, type);
+            }
+        };
+    }
+
+    private void updateChannelLogo(@Nullable Bitmap bitmap, int type) {
         if (type == Channel.LOAD_IMAGE_TYPE_APP_LINK_ICON) {
             BitmapDrawable drawable = null;
             if (bitmap != null) {
@@ -188,7 +201,8 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
                     drawable.setBounds(0, 0, mIconWidth,
                             mIconWidth * bitmap.getHeight() / bitmap.getWidth());
                 } else {
-                    drawable.setBounds(0, 0, mIconHeight * bitmap.getWidth() / bitmap.getHeight(),
+                    drawable.setBounds(0, 0,
+                            mIconHeight * bitmap.getWidth() / bitmap.getHeight(),
                             mIconHeight);
                 }
             }
@@ -209,6 +223,7 @@ public class AppLinkCardView extends BaseCardView<Channel> implements Channel.Lo
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         mImageView = (ImageView) findViewById(R.id.image);
         mGradientView = findViewById(R.id.image_gradient);
         mAppInfoView = (TextView) findViewById(R.id.app_info);

@@ -36,7 +36,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.android.tv.analytics.StubTracker;
 import com.android.tv.testing.ChannelInfo;
 import com.android.tv.testing.Constants;
 import com.android.tv.testing.Utils;
@@ -89,7 +88,7 @@ public class ChannelDataManagerTest extends AndroidTestCase {
                 TvInputManagerHelper mockHelper = Mockito.mock(TvInputManagerHelper.class);
                 Mockito.when(mockHelper.hasTvInputInfo(Matchers.anyString())).thenReturn(true);
                 mChannelDataManager = new ChannelDataManager(getContext(), mockHelper,
-                        new StubTracker(), mContentResolver);
+                        mContentResolver);
                 mChannelDataManager.addListener(mListener);
             }
         });

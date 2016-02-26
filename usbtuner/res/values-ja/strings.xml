@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"USB チャンネル チューナーのセットアップ"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"この処理には数分かかることがあります"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"%1$d 件のチャンネルが見つかりました"</item>
-    <item quantity="other" msgid="7340557317633613">"%1$d 件のチャンネルが見つかりました"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">%1$d 件のチャンネルが見つかりました</item>
+      <item quantity="one">%1$d 件のチャンネルが見つかりました</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"チャンネルのスキャンを停止"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"%1$d 件のチャンネルが見つかりました"</item>
-    <item quantity="other" msgid="4331542666115153576">"%1$d 件のチャンネルが見つかりました"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"チャンネルのスキャン中に %1$d 件のチャンネルが見つかりました。この件数が正しくないと思われる場合は、アンテナの位置を調整してもう一度スキャンしてください。"</item>
-    <item quantity="other" msgid="8098777464551209564">"チャンネルのスキャン中に %1$d 件のチャンネルが見つかりました。この件数が正しくないと思われる場合は、アンテナの位置を調整してもう一度スキャンしてください。"</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">%1$d 件のチャンネルが見つかりました</item>
+      <item quantity="one">%1$d 件のチャンネルが見つかりました</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">チャンネルのスキャン中に %1$d 件のチャンネルが見つかりました。この件数が正しくないと思われる場合は、アンテナの位置を調整してもう一度スキャンしてください。</item>
+      <item quantity="one">チャンネルのスキャン中に %1$d 件のチャンネルが見つかりました。この件数が正しくないと思われる場合は、アンテナの位置を調整してもう一度スキャンしてください。</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"完了"</item>
     <item msgid="496688122303154468">"再スキャン"</item>

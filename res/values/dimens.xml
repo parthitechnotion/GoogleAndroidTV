@@ -144,10 +144,6 @@
     <dimen name="option_item_divider_text_margin_top">18dp</dimen>
     <dimen name="option_item_channel_check_spacing">12dp</dimen>
 
-    <!-- Setup -->
-    <!-- 62.5 % is a position for top padding + non-padding area's height / 2. -->
-    <item name="setup_item_window_alignment_offset_percent" format="float" type="dimen">62.5</item>
-
     <!-- Program guide -->
     <dimen name="program_guide_shift_start_to_end_x">238dp</dimen>
     <dimen name="program_guide_shift_end_to_start_x">-238dp</dimen>
@@ -303,9 +299,16 @@
     <dimen name="pin_number_picker_text_view_width">48dp</dimen>
     <dimen name="pin_number_picker_text_view_height">48dp</dimen>
 
-    <!-- Onboarding welcome screen -->
-    <dimen name="onboarding_welcome_content_width">536dp</dimen>
-    <dimen name="onboarding_dot_radius">4dp</dimen>
-    <dimen name="onboarding_dot_gap">12dp</dimen>
-    <dimen name="onboarding_welcome_page_transition_distance">60dp</dimen>
+    <!-- Onboarding screens -->
+    <eat-comment />
+    <dimen name="onboarding_welcome_content_margin_top">67dp</dimen>
+    <dimen name="onboarding_welcome_content_margin_bottom">50dp</dimen>
+    <dimen name="onboarding_welcome_shadow_height">9dp</dimen>
+    <dimen name="onboarding_welcome_shadow_margin_top">16dp</dimen>
+    <!-- This value is lb_onboarding_content_margin_bottom(98dp)
+         + lb_onboarding_welcome_content_margin_bottom(50dp)
+         + lb_onboarding_welcome_shadow_height(9dp)
+         + lb_onboarding_welcome_shadow_margin_top(16dp)
+         + margin from tv_container(70dp) -->
+    <dimen name="onboarding_welcome_arrow_margin_bottom">243dp</dimen>
 </resources>

@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premiéra"</item>
     <item msgid="8215762047341133299">"Veda a technika"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Televízia online"</item>
+    <item msgid="7307688057853449735">"Jednoduchý spôsob, ako nájsť obsah"</item>
+    <item msgid="7566838222783641942">"Získajte viac kanálov sťahovaním aplikácií"</item>
+    <item msgid="8646630833216197238">"Prispôsobte si poradie kanálov"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Pozerajte obsah z aplikácií, ako keby ste pozerali kanály v televízii."</item>
+    <item msgid="1855708984677953238">"Prehliadajte obsah aplikácií pomocou známeho sprievodcu a priateľského rozhrania, \nskoro ako kanály v televízii."</item>
+    <item msgid="3420760668363283731">"Pridajte si ďalšie kanály inštalovaním aplikácií, ktoré poskytujú televíziu online. \nNájdite kompatibilné aplikácie v Obchode Google Play pomocou odkazu v ponuke televízie."</item>
+    <item msgid="8974157841656828507">"Nastavte novonainštalované zdroje kanálov a prispôsobte si tak zoznam kanálov. \nZačnite výberom zdrojov kanálov v ponuke Nastavenia."</item>
+  </string-array>
 </resources>

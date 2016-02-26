@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Thiết lập bộ dò kênh USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Quá trình này có thể mất vài phút"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Đã tìm thấy %1$d kênh"</item>
-    <item quantity="other" msgid="7340557317633613">"Đã tìm thấy %1$d kênh"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">Đã tìm thấy %1$d kênh</item>
+      <item quantity="one">Đã tìm thấy %1$d kênh</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"NGỪNG QUÉT KÊNH"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Đã tìm thấy %1$d kênh"</item>
-    <item quantity="other" msgid="4331542666115153576">"Đã tìm thấy %1$d kênh"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Thật tuyệt! Đã tìm thấy %1$d kênh trong quá trình quét kênh. Nếu kết quả này có vẻ chưa chính xác, hãy thử điều chỉnh vị trí của ăng-ten và quét lại."</item>
-    <item quantity="other" msgid="8098777464551209564">"Thật tuyệt! Đã tìm thấy %1$d kênh trong quá trình quét kênh. Nếu kết quả này có vẻ chưa chính xác, hãy thử điều chỉnh vị trí của ăng-ten và quét lại."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">Đã tìm thấy %1$d kênh</item>
+      <item quantity="one">Đã tìm thấy %1$d kênh</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">Tuyệt! Đã tìm thấy %1$d kênh trong quá trình quét kênh. Nếu điều này có vẻ không ổn, hãy thử điều chỉnh vị trí ăng-ten và quét lại.</item>
+      <item quantity="one">Tuyệt! Đã tìm thấy %1$d kênh trong quá trình quét kênh. Nếu điều này có vẻ không ổn, hãy thử điều chỉnh vị trí ăng-ten và quét lại.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Xong"</item>
     <item msgid="496688122303154468">"Quét lại"</item>

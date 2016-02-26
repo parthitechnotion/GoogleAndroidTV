@@ -18,7 +18,6 @@ package com.android.tv.data;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.support.annotation.NonNull;
@@ -27,6 +26,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.tv.R;
+import com.android.tv.common.BuildConfig;
+import com.android.tv.common.TvContentRatingCache;
 import com.android.tv.dvr.provider.DvrContract;
 import com.android.tv.util.ImageLoader;
 import com.android.tv.util.Utils;
@@ -87,7 +88,8 @@ public final class Program implements Comparable<Program> {
         builder.setPosterArtUri(cursor.getString(index++));
         builder.setThumbnailUri(cursor.getString(index++));
         builder.setCanonicalGenres(cursor.getString(index++));
-        builder.setContentRatings(Utils.stringToContentRatings(cursor.getString(index++)));
+        builder.setContentRatings(TvContentRatingCache.getInstance()
+                .getRatings(cursor.getString(index++)));
         builder.setStartTimeUtcMillis(cursor.getLong(index++));
         builder.setEndTimeUtcMillis(cursor.getLong(index++));
         builder.setVideoWidth((int) cursor.getLong(index++));
@@ -127,10 +129,6 @@ public final class Program implements Comparable<Program> {
      */
     private boolean mRecordable;
     private boolean mRecordingScheduled;
-
-    public interface LoadPosterArtCallback {
-        void onLoadPosterArtFinished(Program program, Bitmap posterArt);
-    }
 
     private Program() {
         // Do nothing.
@@ -296,7 +294,8 @@ public final class Program implements Comparable<Program> {
                 .append(", endTimeUtcSec=").append(Utils.toTimeString(mEndTimeUtcMillis))
                 .append(", videoWidth=").append(mVideoWidth)
                 .append(", videoHeight=").append(mVideoHeight)
-                .append(", contentRatings=").append(Utils.contentRatingsToString(mContentRatings))
+                .append(", contentRatings=")
+                .append(TvContentRatingCache.contentRatingsToString(mContentRatings))
                 .append(", posterArtUri=").append(mPosterArtUri)
                 .append(", thumbnailUri=").append(mThumbnailUri)
                 .append(", canonicalGenres=").append(Arrays.toString(mCanonicalGenreIds));
@@ -446,7 +445,6 @@ public final class Program implements Comparable<Program> {
     /**
      * Prefetches the program poster art.<p>
      */
-    @UiThread
     public void prefetchPosterArt(Context context, int posterArtWidth, int posterArtHeight) {
         if (mPosterArtUri == null) {
             return;
@@ -461,21 +459,25 @@ public final class Program implements Comparable<Program> {
      */
     @UiThread
     public void loadPosterArt(Context context, int posterArtWidth, int posterArtHeight,
-            final LoadPosterArtCallback callback) {
+            ImageLoader.ImageLoaderCallback callback) {
         if (mPosterArtUri == null) {
             return;
         }
-        ImageLoader.loadBitmap(context, mPosterArtUri, posterArtWidth, posterArtHeight,
-                new ImageLoader.ImageLoaderCallback() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap) {
-                        if (DEBUG) {
-                            Log.i(TAG, "Loaded poster art for " + Program.this + ": " + bitmap);
-                        }
-                        if (callback != null) {
-                            callback.onLoadPosterArtFinished(Program.this, bitmap);
-                        }
-                    }
-                });
+        ImageLoader.loadBitmap(context, mPosterArtUri, posterArtWidth, posterArtHeight, callback);
     }
+
+    public static boolean isDuplicate(Program p1, Program p2) {
+        if (p1 == null || p2 == null) {
+            return false;
+        }
+        boolean isDuplicate = p1.getChannelId() == p2.getChannelId()
+                && p1.getStartTimeUtcMillis() == p2.getStartTimeUtcMillis()
+                && p1.getEndTimeUtcMillis() == p2.getEndTimeUtcMillis();
+        if (BuildConfig.ENG && isDuplicate) {
+            Log.w(TAG, "Duplicate programs detected! - \"" + p1.getTitle() + "\" and \""
+                    + p2.getTitle() + "\"");
+        }
+        return isDuplicate;
+    }
+
 }

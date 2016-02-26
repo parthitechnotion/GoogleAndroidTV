@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Estreia"</item>
     <item msgid="8215762047341133299">"Tecnologia/ciência"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Canais em direto"</item>
+    <item msgid="7307688057853449735">"Uma forma mais simples de descobrir conteúdo"</item>
+    <item msgid="7566838222783641942">"Transferir aplicações, obter mais canais"</item>
+    <item msgid="8646630833216197238">"Personalizar a grelha de canais"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Veja o conteúdo das suas aplicações como se estivesse a ver canais de TV."</item>
+    <item msgid="1855708984677953238">"Procure o conteúdo das suas aplicações com um guia familiar e uma interface prática, \ntal como nos canais de TV."</item>
+    <item msgid="3420760668363283731">"Adicione mais canais ao instalar aplicações que ofereçam canais em direto. \nEncontre aplicações compatíveis na Google Play Store através do link no menu de TV."</item>
+    <item msgid="8974157841656828507">"Configure as novas fontes de canais instaladas para personalizar a lista de canais. \nEscolha as fontes de canais no menu Definições para começar."</item>
+  </string-array>
 </resources>

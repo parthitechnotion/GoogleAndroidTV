@@ -33,6 +33,7 @@ import com.google.protobuf.nano.MessageNano;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -95,8 +96,8 @@ public class TunerChannel implements Comparable<TunerChannel>, TvTracksInterface
         mProto.frequency = INVALID_FREQUENCY;
         mProto.videoPid = INVALID_PID;
         mProto.videoStreamType = INVALID_STREAMTYPE;
-        List<Integer> audioPids = new ArrayList<Integer>();
-        List<Integer> audioStreamTypes = new ArrayList<Integer>();
+        List<Integer> audioPids = new ArrayList<>();
+        List<Integer> audioStreamTypes = new ArrayList<>();
         for (PsiData.PmtItem pmt : pmtItems) {
             switch (pmt.getStreamType()) {
                 // MPEG ES stream video types
@@ -299,7 +300,7 @@ public class TunerChannel implements Comparable<TunerChannel>, TvTracksInterface
 
     @Override
     public List<AtscAudioTrack> getAudioTracks() {
-        return Arrays.asList(mProto.audioTracks);
+        return Collections.unmodifiableList(Arrays.asList(mProto.audioTracks));
     }
 
     public void setAudioTracks(List<AtscAudioTrack> audioTracks) {
@@ -308,7 +309,7 @@ public class TunerChannel implements Comparable<TunerChannel>, TvTracksInterface
 
     @Override
     public List<AtscCaptionTrack> getCaptionTracks() {
-        return Arrays.asList(mProto.captionTracks);
+        return Collections.unmodifiableList(Arrays.asList(mProto.captionTracks));
     }
 
     public void setCaptionTracks(List<AtscCaptionTrack> captionTracks) {

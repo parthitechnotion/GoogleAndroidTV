@@ -23,6 +23,8 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.android.tv.common.recording.RecordingCapability;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.InvocationTargetException;
@@ -111,10 +113,28 @@ public class DvbDeviceAccessor {
         return null;
     }
 
+    /**
+     * Returns the current recording capability for USB tuner.
+     * @param inputId the input id to use.
+     */
+    public RecordingCapability getRecordingCapability(String inputId) {
+        List<DvbDeviceInfoWrapper> deviceList = getDvbDeviceList();
+        // TODO(DVR) implement accurate capabilities and updating values when needed.
+        return RecordingCapability.builder()
+                .setInputId(inputId)
+                .setMaxConcurrentPlayingSessions(1)
+                .setMaxConcurrentTunedSessions(deviceList.size())
+                .setMaxConcurrentSessionsOfAllTypes(deviceList.size() + 1)
+                .build();
+    }
+
     public static class DvbDeviceInfoWrapper implements Comparable<DvbDeviceInfoWrapper> {
         private static Method sGetAdapterIdMethod;
         private static Method sGetDeviceIdMethod;
         private final Object mDvbDeviceInfo;
+        private final int mAdapterId;
+        private final int mDeviceId;
+        private final long mId;
 
         static {
             try {
@@ -132,13 +152,20 @@ public class DvbDeviceAccessor {
 
         public DvbDeviceInfoWrapper(Object dvbDeviceInfo) {
             mDvbDeviceInfo = dvbDeviceInfo;
+            mAdapterId = initAdapterId();
+            mDeviceId = initDeviceId();
+            mId = (((long) getAdapterId()) << 32) | (getDeviceId() & 0xffffffffL);
         }
 
         public long getId() {
-            return (((long) getAdapterId()) << 32) | (getDeviceId() & 0xffffffffL);
+            return mId;
         }
 
         public int getAdapterId() {
+            return mAdapterId;
+        }
+
+        private int initAdapterId() {
             try {
                 return (int) sGetAdapterIdMethod.invoke(mDvbDeviceInfo);
             } catch (InvocationTargetException e) {
@@ -150,6 +177,10 @@ public class DvbDeviceAccessor {
         }
 
         public int getDeviceId() {
+            return mDeviceId;
+        }
+
+        private int initDeviceId() {
             try {
                 return (int) sGetDeviceIdMethod.invoke(mDvbDeviceInfo);
             } catch (InvocationTargetException e) {

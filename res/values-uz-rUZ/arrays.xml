@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premyera"</item>
     <item msgid="8215762047341133299">"Fan va texnika"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Jonli efir"</item>
+    <item msgid="7307688057853449735">"Kontent bilan tanishishning sodda yo‘li"</item>
+    <item msgid="7566838222783641942">"Qo‘chimcha kanallarni ko‘rish uchun ilovalar yuklab olish"</item>
+    <item msgid="8646630833216197238">"Kanallar tartibini sozlang"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Televizorda kanallarni ko‘rgandek, ilovalaringizda ham kontentni shunday tomosha qiling."</item>
+    <item msgid="1855708984677953238">"Televizordagi kanallardek, ilovalaringizdagi kontentlarni \no‘zinga tanish teledasturlar va qulay interfeys yordamida ko‘ring."</item>
+    <item msgid="3420760668363283731">"Jonli efirlarni taklif qiluvchi qo‘shimcha kanallarni qo‘shish uchun ilovalar o‘rnating. \nTV menyusidagi havolalar yordamida Google Play Marketda mos ilovalarni toping."</item>
+    <item msgid="8974157841656828507">"Kanallar ro‘yxatini moslashtirish uchun yangi o‘rnatilgan manbalarni sozlang. \nBoshlash uchun “Sozlamalar” menyusida “Kanal manbalari” bandini tanlang."</item>
+  </string-array>
 </resources>

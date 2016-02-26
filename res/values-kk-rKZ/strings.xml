@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"Қосулы"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"Өшірулі"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Мультиаудио"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"Арнаны реттеу"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"Ата-аналық бақылау"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"Ақпарат"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"Басқа арналар"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"Параметрлер"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"Көз"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"Алмастыру"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"Қосулы"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"Топтау шарты"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"Арнаны реттеу"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"Бұл бағдарламаға тыйым салынған"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"Бұл бағдарламаға <xliff:g id="RATING">%1$s</xliff:g> бағасы қойылған"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"Арна көздері"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"Жаңа арналар қосылды"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"Арналар тіз. тең."</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"Бағ-лар нұсқаулығы үшін арналарды таңдау"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"Реттелмеген"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"Кіріс автоматты түрде іздеуді қолдамайды"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"«<xliff:g id="TV_INPUT">%s</xliff:g>» үшін автоматты түрде іздеуді бастау мүмкін болмады"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"Жасырын титрлер үшін жүйелік параметрлерді іске қосу мүмкін болмады."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d арна қосылды"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d арна қосылды"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">%1$d арна қосылды</item>
+      <item quantity="one">%1$d арна қосылды</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"Арналар қосылмаған"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Тюнер"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"Ата-аналық бақылау"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"Жаңа PIN кодын енгізіңіз"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"PIN кодын растау"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"Ағымдағы PIN кодын енгізіңіз"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"Қате PIN кодын 5 рет енгіздіңіз.\n<xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> секундтан кейін әрекетті қайталаңыз."</item>
-    <item quantity="other" msgid="8829550842387756054">"Қате PIN кодын 5 рет енгіздіңіз.\n<xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> секундтан кейін әрекетті қайталаңыз."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">Қате PIN кодын 5 рет қате енгіздіңіз.\n<xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> секундтан кейін қайталап көріңіз.</item>
+      <item quantity="one">Қате PIN кодын 5 рет қате енгіздіңіз.\n<xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> секундтан кейін қайталап көріңіз.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"Бұл PIN қате болды. Әрекетті қайталаңыз."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Әрекетті қайталаңыз, PIN кодтары сәйкес емес"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"Ақпарат"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"Ашық бастапқы код лицензиялары"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"Параметрлер"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"Арналар тізімін теңшеу"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Бағдарлама нұсқаулығына арналған арналарды таңдау"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"Арна көздері"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"Жаңа арналар қосылды"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"Ата-аналық бақылау"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"Ашық бастапқы код лицензиялары"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Ашық бастапқы код лицензиялары"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"Нұсқа"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"Нұсқа"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"Әзірлеуші опциялары"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB ТД тюнерін қосу"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB ТД тюнерінің дауысын есіту үшін теледидар AC3 транзиттік өткізуді қолдауы тиіс."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Тақырыпсыз"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Арна бөгелген"</string>
     <string name="episode_format" msgid="4881195874563241096">"<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>-маусым: <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g>-эпизод <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"Арна көздері"</string>
-    <string name="setup_description" msgid="8728423605912915099">"Қолжетімді көздерден тікелей эфирдегі арналарды реттеңіз. Арна көзіне байланысты бұған бірнеше минут кетуі мүмкін."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"Орындалды"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d арна қолжетімді"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d арна қолжетімді"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"Жаңа"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"Дереккөздер"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">%1$d арна</item>
+      <item quantity="one">%1$d арна</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"Қолжетімді арна жоқ"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"Жаңа"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"Реттелмеген"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"Қосымша дереккөздерді алу"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"Тікелей эфир арналарын ұсынатын қолданбаларды шолу"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"Жаңа арна көздері қолжетімді"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"Жаңа арна көздерінде ұсынатын арналар бар.\nОларды қазір орнатыңыз немесе арна көздері параметрінде кейінірек орындаңыз."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"Қазір орнату"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"Жарайды, түсіндім"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"Теледидар мәзіріне кіру үшін ТАҢДАУ"</b>" түймесін басыңыз."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"КЕРІ пернесі қосылған құрылғыға арналған. Шығу үшін НЕГІЗГІ пернесін басыңыз."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Android Lollipop жүйесі орнатылған құрылғыларда Live TV қолданбасына қолдау көрсетілмейді."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Live TV үшін ТД тізімдерін оқу рұқсаты қажет."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"Дерек көздерін орнату"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"Live арналары қолданбалардағы ағынды арналармен қатар дәстүрлі теледидар арналарын да ұсынады. \n\nІсті бұрын орнатылған арна көздерін реттеуден бастаңыз. Тікелей эфир арналарын ұсынатын басқа қолданбаларды Google Play Store дүкенінен алуға болады."</string>
 </resources>

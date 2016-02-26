@@ -86,7 +86,17 @@ public class SideFragmentManager {
         return mHideAnimator.isStarted();
     }
 
+    /**
+     * Shows the given {@link SideFragment}.
+     */
     public void show(SideFragment sideFragment) {
+        show(sideFragment, true);
+    }
+
+    /**
+     * Shows the given {@link SideFragment}.
+     */
+    public void show(SideFragment sideFragment, boolean showEnterAnimation) {
         SideFragment.preloadRecycledViews(mActivity);
         if (isHiding()) {
             mHideAnimator.end();
@@ -101,7 +111,7 @@ public class SideFragmentManager {
         FragmentTransaction ft = mFragmentManager.beginTransaction();
         if (!isFirst) {
             ft.setCustomAnimations(
-                    R.animator.side_panel_fragment_enter,
+                    showEnterAnimation ? R.animator.side_panel_fragment_enter : 0,
                     R.animator.side_panel_fragment_exit,
                     R.animator.side_panel_fragment_pop_enter,
                     R.animator.side_panel_fragment_pop_exit);

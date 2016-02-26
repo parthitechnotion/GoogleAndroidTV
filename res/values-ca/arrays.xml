@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Principal"</item>
     <item msgid="8215762047341133299">"Ciència i tecnologia"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"TV en directe"</item>
+    <item msgid="7307688057853449735">"Una manera senzilla de descobrir contingut"</item>
+    <item msgid="7566838222783641942">"Baixa aplicacions i obtén més canals"</item>
+    <item msgid="8646630833216197238">"Personalitza la teva llista de canals"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Mira contingut de les teves aplicacions de la mateixa manera que mires els canals en un televisor."</item>
+    <item msgid="1855708984677953238">"Navega pel contingut de les teves aplicacions mitjançant una guia coneguda i una interfície senzilla, \nigual que ho fas amb els canals en un televisor."</item>
+    <item msgid="3420760668363283731">"Instal·la aplicacions que ofereixin TV en directe per afegir més canals. \nCerca aplicacions compatibles a Google Play Store utilitzant l\'enllaç que hi ha al menú de TV."</item>
+    <item msgid="8974157841656828507">"Configura les fonts de canals que acabes d\'instal·lar per personalitzar la llista de canals. \nPer començar, tria les fonts de canals al menú Configuració."</item>
+  </string-array>
 </resources>

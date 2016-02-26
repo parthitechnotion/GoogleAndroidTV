@@ -34,17 +34,14 @@
     <application
         android:allowBackup="true">
         <activity
-            android:name="com.android.usbtuner.TunerSetupActivity"
+            android:name=".setup.TunerSetupActivity"
             android:label="@string/ut_app_name"
-            android:theme="@style/Theme.UsbTunerSetup.Leanback.GuidedStep"
+            android:theme="@style/Theme.Setup.GuidedStep"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.android.usbtuner.ScanActivity"
-            android:process="com.android.usbtuner" />
         <service
             android:name="com.android.usbtuner.tvinput.UsbTunerTvInputService"
             android:permission="android.permission.BIND_TV_INPUT" >

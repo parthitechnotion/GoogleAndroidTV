@@ -40,7 +40,17 @@ public class TvInputNewComparator implements Comparator<TvInputInfo> {
         boolean lhsIsNewInput = mSetupUtils.isNewInput(lhs.getId());
         boolean rhsIsNewInput = mSetupUtils.isNewInput(rhs.getId());
         if (lhsIsNewInput != rhsIsNewInput) {
+            // New input first.
             return lhsIsNewInput ? -1 : 1;
+        }
+        if (!lhsIsNewInput) {
+            // Checks only when the inputs are not new.
+            boolean lhsSetupDone = mSetupUtils.isSetupDone(lhs.getId());
+            boolean rhsSetupDone = mSetupUtils.isSetupDone(rhs.getId());
+            if (lhsSetupDone != rhsSetupDone) {
+                // An input which has not been setup comes first.
+                return lhsSetupDone ? 1 : -1;
+            }
         }
         return mInputManager.getDefaultTvInputInfoComparator().compare(lhs, rhs);
     }

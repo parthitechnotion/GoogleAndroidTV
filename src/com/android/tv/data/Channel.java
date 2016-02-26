@@ -16,11 +16,11 @@
 
 package com.android.tv.data;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
@@ -31,6 +31,7 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.common.TvCommonConstants;
 import com.android.tv.dvr.provider.DvrContract;
 import com.android.tv.util.ImageLoader;
@@ -38,8 +39,6 @@ import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,6 +89,7 @@ public final class Channel {
     };
 
     // Additional fields added in MNC.
+    @SuppressLint("InlinedApi")
     private static final String[] PROJECTION_ADDED_IN_MNC = {
             // Columns should match what is read in Channel.fromCursor()
             TvContract.Channels.COLUMN_APP_LINK_TEXT,
@@ -102,12 +102,8 @@ public final class Channel {
     public static final String[] PROJECTION = createProjection();
 
     private static String[] createProjection() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            ArrayList<String> temp = new ArrayList<>(
-                    PROJECTION_BASE.length + PROJECTION_ADDED_IN_MNC.length);
-            temp.addAll(Arrays.asList(PROJECTION_BASE));
-            temp.addAll(Arrays.asList(PROJECTION_ADDED_IN_MNC));
-            return temp.toArray(new String[temp.size()]);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return CollectionUtils.concatAll(PROJECTION_BASE, PROJECTION_ADDED_IN_MNC);
         } else {
             return PROJECTION_BASE;
         }
@@ -142,7 +138,7 @@ public final class Channel {
         channel.mVideoFormat = Utils.intern(cursor.getString(index++));
         channel.mBrowsable = cursor.getInt(index++) == 1;
         channel.mLocked = cursor.getInt(index++) == 1;
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             channel.mAppLinkText = cursor.getString(index++);
             channel.mAppLinkColor = cursor.getInt(index++);
             channel.mAppLinkIconUri = cursor.getString(index++);
@@ -189,10 +185,6 @@ public final class Channel {
      * TODO(DVR): Need to fill the following data.
      */
     private boolean mRecordable;
-
-    public interface LoadImageCallback {
-        void onLoadImageFinished(Channel channel, int type, Bitmap logo);
-    }
 
     private Channel() {
         // Do nothing.
@@ -523,7 +515,6 @@ public final class Channel {
     /**
      * Prefetches the images for this channel.
      */
-    @UiThread
     public void prefetchImage(Context context, int type, int maxWidth, int maxHeight) {
         String uriString = getImageUriString(type);
         if (!TextUtils.isEmpty(uriString)) {
@@ -547,17 +538,9 @@ public final class Channel {
      */
     @UiThread
     public void loadBitmap(Context context, final int type, int maxWidth, int maxHeight,
-            final LoadImageCallback callback) {
+            ImageLoader.ImageLoaderCallback callback) {
         String uriString = getImageUriString(type);
-        ImageLoader.loadBitmap(context, uriString, maxWidth, maxHeight,
-                new ImageLoader.ImageLoaderCallback() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap) {
-                        if (callback != null) {
-                            callback.onLoadImageFinished(Channel.this, type, bitmap);
-                        }
-                    }
-                });
+        ImageLoader.loadBitmap(context, uriString, maxWidth, maxHeight, callback);
     }
 
     /**

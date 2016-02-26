@@ -17,43 +17,58 @@
 package com.android.tv.dvr;
 
 import android.content.Context;
+import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.Range;
 
 import com.android.tv.ApplicationSingletons;
-import com.android.tv.Features;
 import com.android.tv.TvApplication;
+import com.android.tv.common.feature.CommonFeatures;
+import com.android.tv.common.recording.RecordingCapability;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.Program;
 import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * DVR manager class to add and remove recordings. UI can modify recording list through this class,
  * instead of modifying them directly through {@link DvrDataManager}.
  */
+@MainThread
 public class DvrManager {
     private final static String TAG = "DvrManager";
     private final WritableDvrDataManager mDataManager;
     private final ChannelDataManager mChannelDataManager;
+    private final DvrSessionManager mDvrSessionManager;
 
     public DvrManager(Context context) {
-        SoftPreconditions.checkFeatureEnabled(context, Features.DVR, TAG);
+        SoftPreconditions.checkFeatureEnabled(context, CommonFeatures.DVR, TAG);
         ApplicationSingletons appSingletons = TvApplication.getSingletons(context);
         mDataManager = (WritableDvrDataManager) appSingletons.getDvrDataManager();
         mChannelDataManager = appSingletons.getChannelDataManager();
+        mDvrSessionManager = appSingletons.getDvrSessionManger();
     }
 
     /**
-     * Adds a recording schedule for {@code program}.
+     * Schedules a recording for {@code program} instead of the list of recording that conflict.
+     * @param program the program to record
+     * @param recordingsToOverride the possible empty list of recordings that will not be recorded
      */
-    public void addSchedule(Program program) {
-        Log.i(TAG, "Adding scheduled recording of " + program);
-        //TODO: handle error cases
+    public void addSchedule(Program program, List<Recording> recordingsToOverride) {
+        Log.i(TAG,
+                "Adding scheduled recording of " + program + " instead of " + recordingsToOverride);
+        Collections.sort(recordingsToOverride, Recording.PRIORITY_COMPARATOR);
         Channel c = mChannelDataManager.getChannel(program.getChannelId());
-        Recording r = Recording.builder(c, program).build();
+        long priority = recordingsToOverride.isEmpty() ? Long.MAX_VALUE
+                : recordingsToOverride.get(0).getPriority() - 1;
+        Recording r = Recording.builder(c, program)
+                .setPriority(priority)
+                .build();
         mDataManager.addRecording(r);
     }
 
@@ -81,16 +96,40 @@ public class DvrManager {
      */
     public void removeRecording(Recording recording) {
         Log.i(TAG, "Removing " + recording);
+        // TODO(DVR): ask the TIS to delete the recording and respond to the result.
         mDataManager.removeRecording(recording);
     }
 
     /**
-     * Checks whether {@code program} can be recorded without any conflict. If there is any
-     * conflict, {@code outConflictRecordings} will be filled.
+     * Returns priority ordered list of all scheduled recording that will not be recorded if
+     * this program is.
+     *
+     * <p>Any empty list means there is no conflicts.  If there is conflict the program must be
+     * scheduled to record with a Priority lower than the first Recording in the list returned.
      */
-    public boolean canAddSchedule(Program program, List<Recording> outConflictRecordings) {
-        // TODO: implement
-        return true;
+    public List<Recording> getScheduledRecordingsThatConflict(Program program) {
+        //TODO(DVR): move to scheduler.
+        //TODO(DVR): deal with more than one DvrInputService
+        List<Recording> overLap = mDataManager.getRecordingsThatOverlapWith(getPeriod(program));
+        if (!overLap.isEmpty()) {
+            // TODO(DVR): ignore shows that already won't record.
+            Channel channel = mChannelDataManager.getChannel(program.getChannelId());
+            if (channel != null) {
+                RecordingCapability recordingCapability = mDvrSessionManager
+                        .getRecordingCapability(channel.getInputId());
+                int remove = Math.max(0, recordingCapability.maxConcurrentTunedSessions - 1);
+                if (remove >= overLap.size()) {
+                    return Collections.EMPTY_LIST;
+                }
+                overLap = overLap.subList(remove, overLap.size() - 1);
+            }
+        }
+        return overLap;
+    }
+
+    @NonNull
+    private static Range getPeriod(Program program) {
+        return new Range(program.getStartTimeUtcMillis(), program.getEndTimeUtcMillis());
     }
 
     /**
@@ -100,5 +139,14 @@ public class DvrManager {
     public boolean canTuneTo(Channel channel, List<Recording> outConflictRecordings) {
         // TODO: implement
         return true;
+    }
+
+    /**
+     * Returns true is the inputId supports recording.
+     */
+    public boolean canRecord(String inputId) {
+        RecordingCapability recordingCapability = mDvrSessionManager
+                .getRecordingCapability(inputId);
+        return recordingCapability != null && recordingCapability.maxConcurrentTunedSessions > 0;
     }
 }

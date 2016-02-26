@@ -16,6 +16,8 @@
 
 package com.android.tv.dvr;
 
+import android.support.annotation.MainThread;
+import android.support.annotation.Nullable;
 import android.util.Range;
 
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.List;
 /**
  * Read only data manager.
  */
+@MainThread
 public interface DvrDataManager {
     long NEXT_START_TIME_NOT_FOUND = -1;
 
@@ -81,6 +84,12 @@ public interface DvrDataManager {
      * Remove a {@link Listener}.
      */
     void removeListener(Listener listener);
+
+    /**
+     * Returns the recording with the given recordingId or null if is not found
+     */
+    @Nullable
+    Recording getRecording(long recordingId);
 
     interface Listener {
         void onRecordingAdded(Recording recording);

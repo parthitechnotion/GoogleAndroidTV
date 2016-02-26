@@ -20,6 +20,7 @@ import android.content.pm.ResolveInfo;
 import android.media.tv.TvInputInfo;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.util.Pair;
 
 import com.android.tv.testing.ComparatorTester;
 import com.android.tv.util.SetupUtils;
@@ -40,12 +41,14 @@ import java.util.LinkedHashMap;
 @SmallTest
 public class TvInputNewComparatorTest extends AndroidTestCase {
     public void testComparator() throws Exception {
-        final LinkedHashMap<String, Boolean> INPUT_ID_TO_NEW_INPUT = new LinkedHashMap<>();
-        INPUT_ID_TO_NEW_INPUT.put("2_new_input", true);
-        INPUT_ID_TO_NEW_INPUT.put("4_new_input", true);
-        INPUT_ID_TO_NEW_INPUT.put("0_old_input", false);
-        INPUT_ID_TO_NEW_INPUT.put("1_old_input", false);
-        INPUT_ID_TO_NEW_INPUT.put("3_old_input", false);
+        final LinkedHashMap<String, Pair<Boolean, Boolean>> INPUT_ID_TO_NEW_INPUT =
+                new LinkedHashMap<>();
+        INPUT_ID_TO_NEW_INPUT.put("2_new_input", new Pair(true, false));
+        INPUT_ID_TO_NEW_INPUT.put("4_new_input", new Pair(true, false));
+        INPUT_ID_TO_NEW_INPUT.put("4_old_input", new Pair(false, false));
+        INPUT_ID_TO_NEW_INPUT.put("0_old_input", new Pair(false, true));
+        INPUT_ID_TO_NEW_INPUT.put("1_old_input", new Pair(false, true));
+        INPUT_ID_TO_NEW_INPUT.put("3_old_input", new Pair(false, true));
 
         SetupUtils setupUtils = Mockito.mock(SetupUtils.class);
         Mockito.when(setupUtils.isNewInput(Matchers.anyString())).thenAnswer(
@@ -53,7 +56,16 @@ public class TvInputNewComparatorTest extends AndroidTestCase {
                     @Override
                     public Boolean answer(InvocationOnMock invocation) throws Throwable {
                         String inputId = (String) invocation.getArguments()[0];
-                        return INPUT_ID_TO_NEW_INPUT.get(inputId);
+                        return INPUT_ID_TO_NEW_INPUT.get(inputId).first;
+                    }
+                }
+        );
+        Mockito.when(setupUtils.isSetupDone(Matchers.anyString())).thenAnswer(
+                new Answer<Boolean>() {
+                    @Override
+                    public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                        String inputId = (String) invocation.getArguments()[0];
+                        return INPUT_ID_TO_NEW_INPUT.get(inputId).second;
                     }
                 }
         );

@@ -354,7 +354,26 @@ public final class AudioTrack {
       audioTrack = new android.media.AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
           channelConfig, encoding, bufferSize, android.media.AudioTrack.MODE_STREAM, sessionId);
     }
-    checkAudioTrackInitialized();
+    try {
+      checkAudioTrackInitialized();
+    } catch (InitializationException e) {
+      if (encoding != C.ENCODING_AC3 || channelConfig != AudioFormat.CHANNEL_OUT_MONO) {
+        throw e;
+      }
+      // This workarounds b/25955476.
+      channelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+      if (sessionId == SESSION_ID_NOT_SET) {
+        audioTrack = new android.media.AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
+            channelConfig, encoding, bufferSize, android.media.AudioTrack.MODE_STREAM);
+      } else {
+        // Re-attach to the same audio session.
+        audioTrack = new android.media.AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
+            channelConfig, encoding, bufferSize, android.media.AudioTrack.MODE_STREAM,
+            sessionId);
+      }
+      checkAudioTrackInitialized();
+      Log.w(TAG, "AC3 Mono passthrough AudioTrack reinitialized as Stereo");
+    }
 
     sessionId = audioTrack.getAudioSessionId();
     if (enablePreV21AudioSessionWorkaround) {

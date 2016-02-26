@@ -64,8 +64,6 @@ public class LocalSearchProvider extends ContentProvider {
     static final String SUGGEST_PARAMETER_ACTION = "action";
     static final int DEFAULT_SEARCH_ACTION = SearchInterface.ACTION_TYPE_AMBIGUOUS;
 
-    private SearchInterface mSearch;
-
     @Override
     public boolean onCreate() {
         return true;
@@ -78,10 +76,11 @@ public class LocalSearchProvider extends ContentProvider {
             Log.d(TAG, "query(" + uri + ", " + Arrays.toString(projection) + ", " + selection + ", "
                     + Arrays.toString(selectionArgs) + ", " + sortOrder + ")");
         }
+        SearchInterface search;
         if (PermissionUtils.hasAccessAllEpg(getContext())) {
-            mSearch = new TvProviderSearch(getContext());
+            search = new TvProviderSearch(getContext());
         } else {
-            mSearch = new DataManagerSearch(getContext());
+            search = new DataManagerSearch(getContext());
         }
         String query = uri.getLastPathSegment();
         int limit = DEFAULT_SEARCH_LIMIT;
@@ -94,7 +93,7 @@ public class LocalSearchProvider extends ContentProvider {
         }
         List<SearchResult> results = new ArrayList<>();
         if (!TextUtils.isEmpty(query)) {
-            results.addAll(mSearch.search(query, limit, action));
+            results.addAll(search.search(query, limit, action));
         }
         return createSuggestionsCursor(results);
     }

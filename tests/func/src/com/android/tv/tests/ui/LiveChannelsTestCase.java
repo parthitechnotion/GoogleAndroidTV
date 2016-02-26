@@ -31,6 +31,7 @@ import com.android.tv.testing.testinput.TestInputControlUtils;
 import com.android.tv.testing.uihelper.Constants;
 import com.android.tv.testing.uihelper.LiveChannelsUiDeviceHelper;
 import com.android.tv.testing.uihelper.MenuHelper;
+import com.android.tv.testing.uihelper.SidePanelHelper;
 import com.android.tv.testing.uihelper.UiDeviceUtils;
 
 /**
@@ -42,6 +43,7 @@ public abstract class LiveChannelsTestCase extends InstrumentationTestCase {
     protected UiDevice mDevice;
     protected Resources mTargetResources;
     protected MenuHelper mMenuHelper;
+    protected SidePanelHelper mSidePanelHelper;
     protected LiveChannelsUiDeviceHelper mLiveChannelsHelper;
 
     @Override
@@ -53,6 +55,7 @@ public abstract class LiveChannelsTestCase extends InstrumentationTestCase {
         mDevice = UiDevice.getInstance(getInstrumentation());
         mTargetResources = getInstrumentation().getTargetContext().getResources();
         mMenuHelper = new MenuHelper(mDevice, mTargetResources);
+        mSidePanelHelper = new SidePanelHelper(mDevice, mTargetResources);
         mLiveChannelsHelper = new LiveChannelsUiDeviceHelper(mDevice, mTargetResources, context);
     }
 

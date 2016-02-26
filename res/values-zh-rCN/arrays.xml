@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"首映"</item>
     <item msgid="8215762047341133299">"科技"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"直播频道"</item>
+    <item msgid="7307688057853449735">"轻松探索各种精彩内容"</item>
+    <item msgid="7566838222783641942">"下载应用，获取更多频道"</item>
+    <item msgid="8646630833216197238">"定制您的频道节目单"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"像观看电视频道一样浏览您应用中的内容。"</item>
+    <item msgid="1855708984677953238">"通过熟悉的指南和好用的界面浏览您应用中的内容，\n就像观看电视频道一样。"</item>
+    <item msgid="3420760668363283731">"安装可提供直播频道的应用即可添加更多频道。\n您可以使用电视菜单中的链接在 Google Play 商店中查找兼容的应用。"</item>
+    <item msgid="8974157841656828507">"设置新安装的频道来源即可定制您的频道列表。\n在“设置”菜单中选择“频道来源”即可开始进行设置。"</item>
+  </string-array>
 </resources>

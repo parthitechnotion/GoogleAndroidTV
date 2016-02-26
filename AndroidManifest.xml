@@ -100,6 +100,10 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.Setup.GuidedStep" />
 
+        <activity android:name=".dvr.ui.DvrActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Leanback.Browse" />
+
         <provider android:name="com.android.tv.search.LocalSearchProvider"
             android:authorities="com.android.tv.search"
             android:exported="true"
@@ -142,18 +146,16 @@
         </receiver>
 
         <!-- USB tuner components definition -->
-        <activity android:name="com.android.usbtuner.TunerSetupActivity"
+        <activity android:name="com.android.usbtuner.setup.TunerSetupActivity"
             android:label="@string/ut_app_name"
             android:launchMode="singleInstance"
             android:process="com.android.usbtuner"
-            android:theme="@style/Theme.UsbTunerSetup.Leanback.GuidedStep" >
+            android:theme="@style/Theme.Setup.GuidedStep" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name="com.android.usbtuner.ScanActivity"
-            android:process="com.android.usbtuner"
-            android:theme="@style/Theme.Leanback" />
+        <activity android:name=".dvr.DvrPlayActivity"/>
         <service android:name="com.android.usbtuner.tvinput.UsbTunerTvInputService"
             android:enabled="false"
             android:process="com.android.usbtuner"

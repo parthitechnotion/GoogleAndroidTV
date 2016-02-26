@@ -17,10 +17,11 @@
 package com.android.tv.dvr;
 
 import android.content.Context;
+import android.support.annotation.MainThread;
 import android.util.Log;
 
-import com.android.tv.Features;
-import com.android.tv.util.CollectionUtils;
+import com.android.tv.common.CollectionUtils;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.util.SoftPreconditions;
 
 import java.util.Set;
@@ -28,6 +29,7 @@ import java.util.Set;
 /**
  * Base implementation of @{link DataManagerInternal}.
  */
+@MainThread
 public abstract class BaseDvrDataManager implements WritableDvrDataManager {
     private final static String TAG = "BaseDvrDataManager";
     private final static boolean DEBUG = false;
@@ -35,7 +37,7 @@ public abstract class BaseDvrDataManager implements WritableDvrDataManager {
     private final Set<DvrDataManager.Listener> mListeners = CollectionUtils.createSmallSet();
 
     BaseDvrDataManager (Context context){
-        SoftPreconditions.checkFeatureEnabled(context,Features.DVR, TAG);
+        SoftPreconditions.checkFeatureEnabled(context, CommonFeatures.DVR, TAG);
     }
 
     @Override

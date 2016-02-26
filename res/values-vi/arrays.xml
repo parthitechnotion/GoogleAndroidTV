@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Cao cấp"</item>
     <item msgid="8215762047341133299">"Công nghệ/Khoa học"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Kênh trực tiếp"</item>
+    <item msgid="7307688057853449735">"Một cách đơn giản để khám phá nội dung"</item>
+    <item msgid="7566838222783641942">"Tải ứng dụng xuống, nhận nhiều kênh hơn"</item>
+    <item msgid="8646630833216197238">"Tùy chỉnh danh sách kênh của bạn"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Xem nội dung từ các ứng dụng của bạn giống như xem các kênh trên TV."</item>
+    <item msgid="1855708984677953238">"Duyệt qua nội dung từ các ứng dụng của bạn với hướng dẫn quen thuộc và giao diện thân thiện, \ngiống như các kênh trên TV."</item>
+    <item msgid="3420760668363283731">"Thêm nhiều kênh hơn bằng cách cài đặt các ứng dụng cung cấp kênh trực tiếp. \nTìm các ứng dụng tương thích trong Cửa hàng Google Play bằng cách sử dụng liên kết trong menu TV."</item>
+    <item msgid="8974157841656828507">"Hãy thiết lập các nguồn kênh mới được cài đặt để tùy chỉnh danh sách kênh của bạn. \nChọn các nguồn Kênh trong menu Cài đặt để bắt đầu."</item>
+  </string-array>
 </resources>

@@ -28,7 +28,7 @@
 -dontwarn com.google.android.common.**
 
 # Keep the methods called from native code.
--keepclasseswithmembers class com.android.usbtuner.UsbTunerInterface {
+-keepclasseswithmembers class com.android.usbtuner.TunerHal {
     int openDvbFrontEndFd();
     int openDvbDemuxFd();
     int openDvbDvrFd();
@@ -37,6 +37,12 @@
     int readAt(long, byte[], int, int);
     long getSize();
     void close();
+}
+
+# Keep method which is used for reflection.
+-keep @com.android.tv.common.annotation.UsedByReflection class *  {*;}
+-keepclasseswithmembers class * {
+    @com.android.tv.common.annotation.UsedByReflection <methods>;
 }
 
 # For tests

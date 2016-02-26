@@ -71,21 +71,14 @@ public class ProgramGuideSearchFragment extends SearchFragment {
 
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, Object o) {
-            final ImageCardView cardView = (ImageCardView) viewHolder.view;
+            ImageCardView cardView = (ImageCardView) viewHolder.view;
             LocalSearchProvider.SearchResult result = (LocalSearchProvider.SearchResult) o;
             if (DEBUG) Log.d(TAG, "onBindViewHolder result:" + result);
 
             cardView.setTitleText(result.title);
             if (!TextUtils.isEmpty(result.imageUri)) {
-                ImageLoader.loadBitmap(mMainActivity, result.imageUri,
-                        mMainCardWidth, mMainCardHeight,
-                        new ImageLoader.ImageLoaderCallback() {
-                            @Override
-                            public void onBitmapLoaded(Bitmap bitmap) {
-                                cardView.setMainImage(
-                                        new BitmapDrawable(mMainActivity.getResources(), bitmap));
-                            }
-                        });
+                ImageLoader.loadBitmap(mMainActivity, result.imageUri, mMainCardWidth,
+                        mMainCardHeight, createImageLoaderCallback(cardView));
             } else {
                 cardView.setMainImage(mMainActivity.getDrawable(R.drawable.ic_launcher));
             }
@@ -96,6 +89,17 @@ public class ProgramGuideSearchFragment extends SearchFragment {
             // Do nothing here.
         }
     };
+
+    private static ImageLoader.ImageLoaderCallback<ImageCardView> createImageLoaderCallback(
+            ImageCardView cardView) {
+        return new ImageLoader.ImageLoaderCallback<ImageCardView>(cardView) {
+            @Override
+            public void onBitmapLoaded(ImageCardView cardView, Bitmap bitmap) {
+                cardView.setMainImage(
+                        new BitmapDrawable(cardView.getContext().getResources(), bitmap));
+            }
+        };
+    }
 
     private final SearchResultProvider mSearchResultProvider = new SearchResultProvider() {
         @Override

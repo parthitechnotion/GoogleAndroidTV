@@ -20,6 +20,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.transition.Transition;
+import android.transition.Transition.TransitionListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,14 +42,54 @@ public abstract class SetupFragment extends Fragment {
             value = {FRAGMENT_ENTER_TRANSITION, FRAGMENT_EXIT_TRANSITION,
                     FRAGMENT_REENTER_TRANSITION, FRAGMENT_RETURN_TRANSITION})
     public @interface FragmentTransitionType {}
-    protected static final int FRAGMENT_ENTER_TRANSITION = 0x01;
-    protected static final int FRAGMENT_EXIT_TRANSITION = FRAGMENT_ENTER_TRANSITION << 1;
-    protected static final int FRAGMENT_REENTER_TRANSITION = FRAGMENT_ENTER_TRANSITION << 2;
-    protected static final int FRAGMENT_RETURN_TRANSITION = FRAGMENT_ENTER_TRANSITION << 3;
+    public static final int FRAGMENT_ENTER_TRANSITION = 0x01;
+    public static final int FRAGMENT_EXIT_TRANSITION = FRAGMENT_ENTER_TRANSITION << 1;
+    public static final int FRAGMENT_REENTER_TRANSITION = FRAGMENT_ENTER_TRANSITION << 2;
+    public static final int FRAGMENT_RETURN_TRANSITION = FRAGMENT_ENTER_TRANSITION << 3;
+
+    private OnActionClickListener mOnActionClickListener;
+
+    private boolean mEnterTransitionRunning;
+
+    private TransitionListener mTransitionListener = new TransitionListener() {
+        @Override
+        public void onTransitionStart(Transition transition) {
+            mEnterTransitionRunning = true;
+        }
+
+        @Override
+        public void onTransitionEnd(Transition transition) {
+            mEnterTransitionRunning = false;
+            onEnterTransitionEnd();
+        }
+
+        @Override
+        public void onTransitionCancel(Transition transition) { }
+
+        @Override
+        public void onTransitionPause(Transition transition) { }
+
+        @Override
+        public void onTransitionResume(Transition transition) { }
+    };
+
+    /**
+     * Returns {@code true} if the enter/reenter transition is running.
+     */
+    protected boolean isEnterTransitionRunning() {
+        return mEnterTransitionRunning;
+    }
+
+    /**
+     * Called when the enter/reenter transition ends.
+     */
+    protected void onEnterTransitionEnd() { }
 
     public SetupFragment() {
         setAllowEnterTransitionOverlap(false);
         setAllowReturnTransitionOverlap(false);
+        enableFragmentTransition(FRAGMENT_ENTER_TRANSITION | FRAGMENT_EXIT_TRANSITION
+                | FRAGMENT_REENTER_TRANSITION | FRAGMENT_RETURN_TRANSITION);
     }
 
     @Override
@@ -62,21 +103,51 @@ public abstract class SetupFragment extends Fragment {
     }
 
     /**
+     * Returns action click listener.
+     */
+    public OnActionClickListener getOnActionClickListener() {
+        return mOnActionClickListener;
+    }
+
+    /**
+     * Sets action click listener.
+     */
+    public void setOnActionClickListener(OnActionClickListener onActionClickListener) {
+        mOnActionClickListener = onActionClickListener;
+    }
+
+    /**
      * Returns the layout resource ID for this fragment.
      */
-    protected abstract int getLayoutResourceId();
+    abstract protected int getLayoutResourceId();
 
-    protected void setOnClickAction(View view, final int actionId) {
+    protected void setOnClickAction(View view, final String category, final int actionId) {
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                onActionClick(actionId);
+                onActionClick(category, actionId);
             }
         });
     }
 
-    protected void onActionClick(int actionId) {
-        SetupActionHelper.onActionClick(this, actionId);
+    protected void onActionClick(String category, int actionId) {
+        SetupActionHelper.onActionClick(this, category, actionId);
+    }
+
+    @Override
+    public void setEnterTransition(Transition transition) {
+        super.setEnterTransition(transition);
+        if (transition != null) {
+            transition.addListener(mTransitionListener);
+        }
+    }
+
+    @Override
+    public void setReenterTransition(Transition transition) {
+        super.setReenterTransition(transition);
+        if (transition != null) {
+            transition.addListener(mTransitionListener);
+        }
     }
 
     /**
@@ -100,8 +171,7 @@ public abstract class SetupFragment extends Fragment {
     /**
      * Sets the transition with the given {@code slidEdge}.
      */
-    protected void setFragmentTransition(@FragmentTransitionType int transitionType,
-            int slideEdge) {
+    public void setFragmentTransition(@FragmentTransitionType int transitionType, int slideEdge) {
         switch (transitionType) {
             case FRAGMENT_ENTER_TRANSITION:
                 setEnterTransition(createTransition(slideEdge));
@@ -127,46 +197,32 @@ public abstract class SetupFragment extends Fragment {
     }
 
     /**
-     * Sets the distance of the fragment transition.
+     * Changes the move distance of the transitions to short distance.
      */
-    public void setTransitionDistance(int distance) {
-        Transition transition = getEnterTransition();
-        if (transition instanceof FadeAndShortSlide) {
-            ((FadeAndShortSlide) transition).setDistance(distance);
+    public void setShortDistance(@FragmentTransitionType int mask) {
+        if ((mask & FRAGMENT_ENTER_TRANSITION) != 0) {
+            Transition transition = getEnterTransition();
+            if (transition instanceof FadeAndShortSlide) {
+                SetupAnimationHelper.setShortDistance((FadeAndShortSlide) transition);
+            }
         }
-        transition = getExitTransition();
-        if (transition instanceof FadeAndShortSlide) {
-            ((FadeAndShortSlide) transition).setDistance(distance);
+        if ((mask & FRAGMENT_EXIT_TRANSITION) != 0) {
+            Transition transition = getExitTransition();
+            if (transition instanceof FadeAndShortSlide) {
+                SetupAnimationHelper.setShortDistance((FadeAndShortSlide) transition);
+            }
         }
-        transition = getReenterTransition();
-        if (transition instanceof FadeAndShortSlide) {
-            ((FadeAndShortSlide) transition).setDistance(distance);
+        if ((mask & FRAGMENT_REENTER_TRANSITION) != 0) {
+            Transition transition = getReenterTransition();
+            if (transition instanceof FadeAndShortSlide) {
+                SetupAnimationHelper.setShortDistance((FadeAndShortSlide) transition);
+            }
         }
-        transition = getReturnTransition();
-        if (transition instanceof FadeAndShortSlide) {
-            ((FadeAndShortSlide) transition).setDistance(distance);
-        }
-    }
-
-    /**
-     * Sets the duration of the fragment transition.
-     */
-    public void setTransitionDuration(long duration) {
-        Transition transition = getEnterTransition();
-        if (transition != null) {
-            transition.setDuration(duration);
-        }
-        transition = getExitTransition();
-        if (transition != null) {
-            transition.setDuration(duration);
-        }
-        transition = getReenterTransition();
-        if (transition != null) {
-            transition.setDuration(duration);
-        }
-        transition = getReturnTransition();
-        if (transition != null) {
-            transition.setDuration(duration);
+        if ((mask & FRAGMENT_RETURN_TRANSITION) != 0) {
+            Transition transition = getReturnTransition();
+            if (transition instanceof FadeAndShortSlide) {
+                SetupAnimationHelper.setShortDistance((FadeAndShortSlide) transition);
+            }
         }
     }
 

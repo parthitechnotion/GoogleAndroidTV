@@ -21,15 +21,7 @@ LOCAL_MODULE_TAGS := optional
 
 include $(LOCAL_PATH)/version.mk
 
-LOCAL_BUILDCONFIG_CLASS := src/com/android/tv/BuildConfig.java
-BC_OUT_DIR := $(LOCAL_PATH)
-BC_APPLICATION_ID := "com.android.tv"
-BC_VERSION_CODE := $(version_code_package)
-BC_VERSION_NAME := "$(version_name_package)"
-include $(LOCAL_PATH)/buildconfig.mk
-
-LOCAL_SRC_FILES := $(call all-java-files-under, src) \
-   $(LOCAL_BUILDCONFIG_CLASS)
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := LiveTv
 
@@ -40,6 +32,7 @@ LOCAL_SDK_VERSION := system_current
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res \
     $(LOCAL_PATH)/common/res \
+    $(LOCAL_PATH)/common/res_leanback \
     $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
     $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
 
@@ -71,7 +64,7 @@ ifeq ($(TARGET_BUILD_APPS),)
 endif
 LOCAL_RESOURCE_DIR += $(LOCAL_PATH)/usbtuner/res
 LOCAL_STATIC_JAVA_LIBRARIES += usbtuner-tvinput
-LOCAL_JNI_SHARED_LIBRARIES := libusbtuner_jni
+LOCAL_JNI_SHARED_LIBRARIES := libtunertvinput_jni
 LOCAL_AAPT_FLAGS += --extra-packages com.android.usbtuner
 
 include $(BUILD_PACKAGE)

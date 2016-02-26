@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"Միացված է"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"Անջատված է"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Բազմաուդիո"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"Կարգավորում"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"Ծնողական հսկում"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"Ընտրանքի մասին"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"Ավելացնել ալիքներ"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"Կարգավորումներ"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"Աղբյուր"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"Փոխել"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"Միացված է"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"Խմբավորել"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"Կարգավորում"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"Այս ծրագիրը արգելափակված է"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"Այս ծրագրի վարկանիշը <xliff:g id="RATING">%1$s</xliff:g> է"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"Ալիքի աղբյուրները"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"Նոր ալիքներ"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"Հարմարեցնել ցանկը"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"Ընտրեք կապուղիներ ձեր ուղեցույցի համար"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"Կարգավորված չէ"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"Մուտքը ինքնասկանավարում չի աջակցում"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"Չի հաջողվում սկսել «<xliff:g id="TV_INPUT">%s</xliff:g>»-ի ավտոմատ սկանավորումը"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"Չհաջողվեց բացել խորագրերի համակարգի կարգավորումները:"</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d ալիք ավելացվեց"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d ալիք ավելացվեց"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="one">Ավելացվեց %1$d ալիք</item>
+      <item quantity="other">Ավելացվեց %1$d ալիք</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"Ալիքներ չեն ավելացվել"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Tuner"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"Ծնողական հսկում"</string>
@@ -136,20 +129,25 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"Մուտքագրեք նոր PIN"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"Հաստատեք ձեր PIN-ը"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"Մուտքագրեք ձեր ներկայիս PIN-ը"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"PIN կոդը 5 անգամ սխալ է մուտքագրվել:\nՓորձեք նորից <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> վայրկյանից:"</item>
-    <item quantity="other" msgid="8829550842387756054">"PIN կոդը 5 անգամ սխալ է մուտքագրվել:\nՓորձեք նորից <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> վայրկյանից:"</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="one">Դուք 5 անգամ մուտքագրել եք սխալ PIN կոդ:\nՓորձեք նորից <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> վայրկյանից:</item>
+      <item quantity="other">Դուք 5 անգամ մուտքագրել եք սխալ PIN կոդ:\nՓորձեք նորից <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> վայրկյանից:</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"PIN-ը սխալ էր: Կրկին փորձեք:"</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Փորձեք կրկին, PIN-ը չի համապատասխանում"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"Ընտրանքի մասին"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"Բաց կոդով ծրագրաշարի լիցենզիաներ"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"Կարգավորումներ"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"Հարմարեցնել ալիքների ցանկը"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Ընտրեք ալիքներ հեռուստահաղորդումների ծրագրի համար"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"Ալիքների աղբյուրներ"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"Առկա են նոր ալիքներ"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"Ծնողական վերահսկողություն"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"Բաց կոդով ծրագրակազմի արտոնագրեր"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Բաց կոդով ծրագրաշարի լիցենզիաներ"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"Տարբերակ"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"Տարբերակ"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"Մշակողի ընտրանքներ"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Միացնել USB հեռուստակարգավորիչը"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB հեռուստակարգավորիչի ձայնը լսելու համար անհրաժեշտ է, որ ձեր հեռուստացույցն աջակցի AC3 տարանցումը:"</string>
-    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3-ի աուդիո հնարավորությունները"</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 ձայնի աջակցում"</string>
     <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Ձեր հեռուստացույցն աջակցում է AC3 տարանցումը:"</string>
     <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Ձեր հեռուստացույցը չի աջակցում AC3 տարանցումը:"</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Օգնել բարելավել «Ուղիղ եթերը»"</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Անվերնագիր"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Ալիքն արգելափակված է"</string>
     <string name="episode_format" msgid="4881195874563241096">"Ս<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Դրվ.՝ <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"Ալիքների աղբյուրներ"</string>
-    <string name="setup_description" msgid="8728423605912915099">"Ուղիղ եթերի ալիքների կարգավորում: Սա կարող է մի քանի րոպե տևել՝ կախված ալիքի աղբյուրից:"</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"Պատրաստ է"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d ալիք"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d ալիք"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"Նոր"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"Աղբյուրներ"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="one">%1$d ալիք</item>
+      <item quantity="other">%1$d ալիք</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"Ալիքներ չկան"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"Նոր"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"Կարգավորված չէ"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"Ավելացնել այլ աղբյուրներ"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"Որոնեք ուղիղ եթեր առաջարկող հավելվածներ"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"Հասանելի են ալիքների նոր աղբյուրներ"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"Ալիքների նոր աղբյուրները պարունակում են նոր ալիքներ:\nԿարգավորեք դրանք հիմա կամ ավելի ուշ՝ ալիքների աղբյուրների կարգավորումների միջոցով:"</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"Կարգավորել հիմա"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"Լավ, հասկացա"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307">"Հեռուստացույցի ընտրացանկից օգտվելու համար "<b>"սեղմեք ԸՆՏՐԵԼ"</b>":"</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"«Հետ» կոճակը միացված սարքի համար է: Դուս գալու համար սեղմեք «Գլխավոր» կոճակը:"</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Ուղիղ եթերը չի աջակցվում Android Lollipop համակարգով սարքի վրա:"</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Հեռուստատեսային ծրագրերը կարդալու համար ուղիղ եթերին թույլտվություն է անհրաժեշտ:"</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"Կարգավորեք աղբյուրները"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"Ուղիղ եթերը համատեղում է ավանդական հեռուստաալիքները և հավելվածների կողմից հոսքային եղանակով հեռարձակվող ալիքները: \n\nՍկսեք արդեն իսկ տեղադրված ալիքների աղբյուրները կարգավորելուց կամ Google Play Խանութում որոնեք ուղիղ եթեր առաջարկող այլ հավելվածներ:"</string>
 </resources>

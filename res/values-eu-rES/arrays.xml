@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Onenak"</item>
     <item msgid="8215762047341133299">"Zientzia/Teknologia"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Telebista zuzenean"</item>
+    <item msgid="7307688057853449735">"Edukia ezagutzeko modu erraza"</item>
+    <item msgid="7566838222783641942">"Deskargatu aplikazioak eta lortu kanal gehiago"</item>
+    <item msgid="8646630833216197238">"Pertsonalizatu kanalen antolakuntza"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Ikusi aplikazioetako edukia, telebistan kanalak ikusten dituzun moduan."</item>
+    <item msgid="1855708984677953238">"Arakatu aplikazioetako edukia gida ezagun eta interfaze lagungarri batekin\n, telebistako kanalak bezala."</item>
+    <item msgid="3420760668363283731">"Kanalak gehitzeko, instalatu zuzeneko kanalak eskaintzen dituzten aplikazioak.\nBilatu aplikazio bateragarriak Google Play Store dendan, telebistako menuko estekaren bidez."</item>
+    <item msgid="8974157841656828507">"Konfiguratu instalatu berri dituzun kanal-iturburuak kanalen zerrenda pertsonalizatzeko.\nLehen urratsak emateko, aukeratu kanal-iturburuak Ezarpenak menuan."</item>
+  </string-array>
 </resources>

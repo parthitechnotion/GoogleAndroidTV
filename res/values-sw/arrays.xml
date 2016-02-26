@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Zinazoongoza"</item>
     <item msgid="8215762047341133299">"Teknolojia/Sayansi"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Televisheni Mtandaoni"</item>
+    <item msgid="7307688057853449735">"Njia rahisi ya kugundua maudhui"</item>
+    <item msgid="7566838222783641942">"Pakua programu na upate vituo zaidi"</item>
+    <item msgid="8646630833216197238">"Badilisha mpangilio wa vituo vyako jinsi upendavyo"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Tazama maudhui kwenye programu zako jinsi unavyotazama vituo vya TV."</item>
+    <item msgid="1855708984677953238">"Kagua maudhui kwenye programu zako ukitumia mwongozo unaoufahamu na kiolesura rahisi, \njinsi ilivyo kwenye vituo vya TV."</item>
+    <item msgid="3420760668363283731">"Ongeza vituo zaidi kwa kusakinisha programu zinazotoa huduma za televisheni mtandaoni. \nTafuta programu zinazoweza kutumika katika Duka la Google Play kwa kutumia kiungo kilicho ndani ya menyu ya TV."</item>
+    <item msgid="8974157841656828507">"Weka mipangilio ya vyanzo vya vituo ulivyosakinisha hivi karibuni ili ubadilishe orodha ya vituo vyako jinsi upendavyo. \n Chagua vyanzo vya vituo katika menyu ya Mipangilio ili uanze kutumia."</item>
+  </string-array>
 </resources>

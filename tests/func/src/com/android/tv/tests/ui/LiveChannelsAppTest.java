@@ -28,28 +28,28 @@ import com.android.tv.testing.testinput.ChannelStateData;
 import com.android.tv.testing.testinput.TvTestInputConstants;
 import com.android.tv.testing.uihelper.Constants;
 import com.android.tv.testing.uihelper.DialogHelper;
-import com.android.tv.testing.uihelper.SidePanelHelper;
 
 /**
  * Basic tests for the LiveChannels app.
  */
 @LargeTest
 public class LiveChannelsAppTest extends LiveChannelsTestCase {
-    private SidePanelHelper mSidePanelHelper;
+    private BySelector mBySettingsSidePanel;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mSidePanelHelper = new SidePanelHelper(mDevice, mTargetResources);
         mLiveChannelsHelper.assertAppStarted();
         pressKeysForChannel(TvTestInputConstants.CH_1_DEFAULT_DONT_MODIFY);
         getInstrumentation().waitForIdleSync();
+        mBySettingsSidePanel = mSidePanelHelper.bySidePanelTitled(
+                R.string.side_panel_title_settings);
     }
 
-    public void testChannelSourcesCancel() {
-        mMenuHelper.assertPressOptionsChannelSources();
+    public void testSettingsCancel() {
+        mMenuHelper.assertPressOptionsSettings();
         BySelector byChannelSourcesSidePanel = mSidePanelHelper
-                .bySidePanelTitled(R.string.channel_source_item_customize_channels);
+                .bySidePanelTitled(R.string.settings_channel_source_item_customize_channels);
         assertWaitForCondition(mDevice, Until.hasObject(byChannelSourcesSidePanel));
         mDevice.pressBack();
         assertWaitForCondition(mDevice, Until.gone(byChannelSourcesSidePanel));
@@ -105,7 +105,10 @@ public class LiveChannelsAppTest extends LiveChannelsTestCase {
 
     public void testPinCancel() {
         mMenuHelper.showMenu();
-        mMenuHelper.assertPressOptionsParentalControls();
+        mMenuHelper.assertPressOptionsSettings();
+        assertWaitForCondition(mDevice, Until.hasObject(mBySettingsSidePanel));
+        mSidePanelHelper.assertNavigateToItem(R.string.settings_parental_controls);
+        mDevice.pressDPadCenter();
         DialogHelper dialogHelper = new DialogHelper(mDevice, mTargetResources);
         dialogHelper.assertWaitForPinDialogOpen();
         mDevice.pressBack();

@@ -31,7 +31,12 @@
     <dimen name="setup_guidedactions_item_container_padding_end">40dp</dimen>
     <dimen name="setup_guidedactions_vertical_padding">12dp</dimen>
     <dimen name="setup_guidedactions_vertical_spacing">5dp</dimen>
+    <item name="setup_guidedactions_width_weight" format="float" type="string">1</item>
+    <dimen name="setup_guidedactions_item_delimiter_padding">10dp</dimen>
 
     <!-- Transition -->
-    <dimen name="setup_fragment_transition_distance">80dp</dimen>
+    <dimen name="setup_fragment_transition_long_distance">80dp</dimen>
+    <dimen name="setup_fragment_transition_short_distance">48dp</dimen>
+    <!-- This values should be less then or equal to -1 * setup_fragment_transition_long_distance. -->
+    <dimen name="setup_common_guidance_background_margin_start">-100dp</dimen>
 </resources>

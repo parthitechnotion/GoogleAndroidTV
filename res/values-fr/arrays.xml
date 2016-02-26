@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Haut de gamme"</item>
     <item msgid="8215762047341133299">"Technologie/Science"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"TV en direct"</item>
+    <item msgid="7307688057853449735">"Découvrez de nouveaux contenus en toute simplicité"</item>
+    <item msgid="7566838222783641942">"Téléchargez des applications et découvrez de nouvelles chaînes"</item>
+    <item msgid="8646630833216197238">"Personnalisez votre bouquet de chaînes"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Regardez le contenu de vos applications comme s\'il s\'agissait des chaînes de votre téléviseur."</item>
+    <item msgid="1855708984677953238">"Parcourez le contenu de vos applications comme s\'il s\'agissait des chaînes de votre téléviseur, \nà l\'aide d\'un guide que vous connaissez déjà et dans une interface conviviale."</item>
+    <item msgid="3420760668363283731">"Ajoutez des chaînes en installant des applications qui proposent des chaînes en direct. \nRecherchez les applications compatibles sur le Google Play Store à l\'aide du lien dans le menu du téléviseur."</item>
+    <item msgid="8974157841656828507">"Configurez les sources de chaînes que vous avez installées récemment pour personnaliser votre liste de chaînes. \nPour commencer, sélectionnez \"Sources des chaînes\" dans le menu \"Paramètres\"."</item>
+  </string-array>
 </resources>

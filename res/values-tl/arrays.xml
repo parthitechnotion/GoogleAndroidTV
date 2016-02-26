@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premier"</item>
     <item msgid="8215762047341133299">"Teknolohiya/Agham"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Mga Live na Channel"</item>
+    <item msgid="7307688057853449735">"Isang simpleng paraan upang tumuklas ng content"</item>
+    <item msgid="7566838222783641942">"Mag-download ng mga app, makakuha ng higit pang mga channel"</item>
+    <item msgid="8646630833216197238">"I-customize ang iyong listahan ng channel"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Manood ng content mula sa iyong mga app tulad ng panonood ng mga channel sa TV."</item>
+    <item msgid="1855708984677953238">"Mag-browse ng content mula sa iyong mga app gamit ang isang pamilyar na gabay at madaling gamitin na interface, \ntulad ng mga channel sa TV."</item>
+    <item msgid="3420760668363283731">"Magdagdag ng higit pang mga channel sa pamamagitan ng pag-i-install ng mga app na nag-aalok ng mga live na channel. \nMaghanap ng mga tumutugmang app sa Google Play Store sa pamamagitan ng paggamit sa link sa loob ng menu ng TV."</item>
+    <item msgid="8974157841656828507">"I-set up ang iyong bagong na-install na mga pinagmulan ng channel upang i-customize ang iyong listahan ng channel. \nPiliin ang Mga pinagmulan ng channel sa loob ng menu ng Mga Setting upang magsimula."</item>
+  </string-array>
 </resources>

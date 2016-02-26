@@ -28,12 +28,7 @@ import com.android.tv.common.R;
  * A fragment for channel source info/setup.
  */
 public abstract class SetupMultiPaneFragment extends SetupFragment {
-    public static final int ACTION_DONE = 1;
-
-    public SetupMultiPaneFragment() {
-        enableFragmentTransition(FRAGMENT_ENTER_TRANSITION | FRAGMENT_EXIT_TRANSITION
-                | FRAGMENT_REENTER_TRANSITION | FRAGMENT_RETURN_TRANSITION);
-    }
+    public static final int ACTION_DONE = Integer.MAX_VALUE;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,10 +38,12 @@ public abstract class SetupMultiPaneFragment extends SetupFragment {
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.guided_step_fragment_container, contentFragment).commit();
         if (needsDoneButton()) {
-            setOnClickAction(view.findViewById(R.id.button_done), ACTION_DONE);
+            setOnClickAction(view.findViewById(R.id.button_done), getActionCategory(), ACTION_DONE);
         } else {
             View doneButtonContainer = view.findViewById(R.id.done_button_container);
-            if (view.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR) {
+            // Use content view to check layout direction while view is being created.
+            if (getResources().getConfiguration().getLayoutDirection()
+                    == View.LAYOUT_DIRECTION_LTR) {
                 ((MarginLayoutParams) doneButtonContainer.getLayoutParams()).rightMargin =
                         -getResources().getDimensionPixelOffset(
                                 R.dimen.setup_done_button_container_width);
@@ -67,6 +64,8 @@ public abstract class SetupMultiPaneFragment extends SetupFragment {
 
     abstract protected SetupGuidedStepFragment onCreateContentFragment();
 
+    abstract protected String getActionCategory();
+
     protected boolean needsDoneButton() {
         return true;
     }
@@ -78,6 +77,6 @@ public abstract class SetupMultiPaneFragment extends SetupFragment {
 
     @Override
     public int[] getSharedElementIds() {
-        return new int[] {R.id.guidedactions_background, R.id.done_button_container};
+        return new int[] {R.id.action_fragment_background, R.id.done_button_container};
     }
 }

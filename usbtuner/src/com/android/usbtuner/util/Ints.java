@@ -19,7 +19,7 @@ public class Ints {
     }
 
     public static List<Integer> asList(int[] intArray) {
-        List<Integer> integerList = new ArrayList<Integer>(intArray.length);
+        List<Integer> integerList = new ArrayList<>(intArray.length);
         for (int data : intArray) {
             integerList.add(data);
         }

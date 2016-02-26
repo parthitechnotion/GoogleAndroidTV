@@ -29,11 +29,6 @@ public final class TvCommonConstants {
     public static final String EXTRA_APP_LINK_CHANNEL_URI = "app_link_channel_uri";
 
     /**
-     * A flag whether this platform supports time shifting API or not.
-     */
-    public static final boolean HAS_TIME_SHIFT_API = Build.VERSION.SDK_INT >= 23;
-
-    /**
      * An intent action to launch setup activity of a TV input. The intent should include
      * TV input ID in the value of {@link EXTRA_INPUT_ID}. Optionally, given the value of
      * {@link EXTRA_ACTIVITY_AFTER_COMPLETION}, the activity will be launched after the setup

@@ -35,6 +35,8 @@ import java.nio.ByteBuffer;
 public final class MpegTsSampleSourceExtractor implements SampleExtractor {
     public static final String MIMETYPE_TEXT_CEA_708 = "text/cea-708";
 
+    private static final int CC_BUFFER_SIZE_IN_BYTES = 9600 / 8;
+
     private final SampleExtractor mSampleExtractor;
     private TrackInfo[] mTrackInfos;
     private boolean[] mGotEos;
@@ -46,18 +48,28 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
     private long mCea708PresentationTimeUs;
     private CcParser mCcParser;
 
-    public MpegTsSampleSourceExtractor(MediaDataSource source, CacheManager cacheManager,
-            PlaybackCacheListener cacheListener) {
+    private void init() {
+        mVideoTrackIndex = -1;
+        mCea708TextTrackIndex = -1;
+        mCea708CcBuffer = ByteBuffer.allocate(CC_BUFFER_SIZE_IN_BYTES);
+        mCea708PresentationTimeUs = -1;
+        mCea708TextTrackSelected = false;
+    }
+
+    public MpegTsSampleSourceExtractor(MediaDataSource source,
+            CacheManager cacheManager, PlaybackCacheListener cacheListener) {
         if (cacheManager == null || cacheManager.isDisabled()) {
             mSampleExtractor = new SimpleSampleSourceExtractor(source, cacheListener);
         } else {
             mSampleExtractor = new CachedSampleSourceExtractor(source, cacheManager, cacheListener);
         }
-        mVideoTrackIndex = -1;
-        mCea708TextTrackIndex = -1;
-        mCea708CcBuffer = ByteBuffer.allocate(9600 / 8);
-        mCea708PresentationTimeUs = -1;
-        mCea708TextTrackSelected = false;
+        init();
+    }
+
+    public MpegTsSampleSourceExtractor(CacheManager cacheManager,
+            PlaybackCacheListener cacheListener) {
+        mSampleExtractor = new ReplaySampleSourceExtractor(cacheManager, cacheListener);
+        init();
     }
 
     @Override
@@ -83,11 +95,10 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
             mCea708TextTrackIndex = trackCount;
         }
         mTrackInfos = new TrackInfo[mCea708TextTrackIndex < 0 ? trackCount : trackCount + 1];
-        for (int i = 0; i < trackCount; ++i) {
-            mTrackInfos[i] = trackInfos[i];
-        }
+        System.arraycopy(trackInfos, 0, mTrackInfos, 0, trackCount);
         if (mCea708TextTrackIndex >= 0) {
-            mTrackInfos[trackCount] = new TrackInfo(MIMETYPE_TEXT_CEA_708, C.UNKNOWN_TIME_US);
+            mTrackInfos[trackCount] = new TrackInfo(MIMETYPE_TEXT_CEA_708,
+                    trackCount > 0 ? mTrackInfos[0].durationUs : C.UNKNOWN_TIME_US);
         }
         return true;
     }

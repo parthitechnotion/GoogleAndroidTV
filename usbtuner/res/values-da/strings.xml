@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Konfiguration af USB-kanaltuneren"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Dette kan tage flere minutter"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"%1$d kanal blev fundet"</item>
-    <item quantity="other" msgid="7340557317633613">"%1$d kanaler blev fundet"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="one">Der blev fundet %1$d kanal</item>
+      <item quantity="other">Der blev fundet %1$d kanaler</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"STOP KANALSCANNINGEN"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"%1$d kanal blev fundet"</item>
-    <item quantity="other" msgid="4331542666115153576">"%1$d kanaler blev fundet"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Sådan! %1$d kanal blev fundet under kanalscanningen. Hvis du mener, at antallet er forkert, kan du prøve at justere antennens position og scanne igen."</item>
-    <item quantity="other" msgid="8098777464551209564">"Sådan! %1$d kanaler blev fundet under kanalscanningen. Hvis du mener, at antallet er forkert, kan du prøve at justere antennens position og scanne igen."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="one">Der blev fundet %1$d kanal</item>
+      <item quantity="other">Der blev fundet %1$d kanaler</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="one">Sådan! Der blev fundet %1$d kanal ved kanalsøgningen. Hvis du mener, det er forkert, kan du prøve at justere antennens position og søge igen.</item>
+      <item quantity="other">Sådan! Der blev fundet %1$d kanaler ved kanalsøgningen. Hvis du mener, det er forkert, kan du prøve at justere antennens position og søge igen.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Udført"</item>
     <item msgid="496688122303154468">"Scan igen"</item>

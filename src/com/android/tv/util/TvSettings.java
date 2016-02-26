@@ -103,6 +103,7 @@ public final class TvSettings {
      *         {@link #PIP_LAYOUT_SIDE_BY_SIDE}. If the preference value does not exist,
      *         {@link #PIP_LAYOUT_BOTTOM_RIGHT} is returned.
      */
+    @SuppressWarnings("ResourceType")
     @PipLayout
     public static int getPipLayout(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(
@@ -128,6 +129,7 @@ public final class TvSettings {
      *         {@link #PIP_SIZE_SMALL} and {@link #PIP_SIZE_BIG}. If the preference value does not
      *         exist, {@link #PIP_SIZE_SMALL} is returned.
      */
+    @SuppressWarnings("ResourceType")
     @PipSize
     public static int getPipSize(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(
@@ -227,6 +229,7 @@ public final class TvSettings {
     }
 
     @ContentRatingLevel
+    @SuppressWarnings("ResourceType")
     public static int getContentRatingLevel(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(
                 PREF_CONTENT_RATING_LEVEL, CONTENT_RATING_LEVEL_NONE);

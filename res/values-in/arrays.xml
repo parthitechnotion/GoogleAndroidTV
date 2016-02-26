@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Tayang Perdana"</item>
     <item msgid="8215762047341133299">"Teknologi/Sains"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Saluran TV Langsung"</item>
+    <item msgid="7307688057853449735">"Cara sederhana untuk menemukan konten"</item>
+    <item msgid="7566838222783641942">"Unduh aplikasi, dapatkan lebih banyak saluran"</item>
+    <item msgid="8646630833216197238">"Sesuaikan urutan saluran Anda"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Tonton konten dari aplikasi Anda seperti menonton saluran di TV."</item>
+    <item msgid="1855708984677953238">"Jelajahi konten dari aplikasi dengan panduan yang familier dan antarmuka yang ramah, \nseperti saluran di TV."</item>
+    <item msgid="3420760668363283731">"Tambahkan lebih banyak saluran dengan memasang aplikasi yang menawarkan saluran TV langsung. \nTemukan aplikasi yang kompatibel di Google Play Store dengan menggunakan tautan dalam menu TV."</item>
+    <item msgid="8974157841656828507">"Siapkan sumber saluran yang baru terpasang untuk menyesuaikan daftar saluran Anda. \nPilih sumber Saluran dalam menu Setelan untuk memulai."</item>
+  </string-array>
 </resources>

@@ -26,8 +26,14 @@ import android.transition.Visibility;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Execute horizontal slide of 1/4 width and fade (to workaround bug 23718734)
@@ -76,12 +82,15 @@ public class FadeAndShortSlide extends Visibility {
         }
     };
 
+    private static final ViewPositionComparator sViewPositionComparator =
+            new ViewPositionComparator();
+
+    private int mSlideEdge;
     private CalculateSlide mSlideCalculator = sCalculateEnd;
     private Visibility mFade = new Fade();
 
     // TODO: Consider using TransitionPropagation.
     private int[] mParentIdsForDelay;
-    private boolean mDelayChildFound;
     private int mDistance = DEFAULT_DISTANCE;
 
     public FadeAndShortSlide() {
@@ -110,16 +119,23 @@ public class FadeAndShortSlide extends Visibility {
         transitionValues.values.put(PROPNAME_SCREEN_POSITION, position);
     }
 
-    private int getDelayOrder(View view) {
+    private int getDelayOrder(View view, boolean appear) {
         if (mParentIdsForDelay == null) {
             return -1;
         }
-        View parentForDelay = findParentForDelay(view);
+        final View parentForDelay = findParentForDelay(view);
         if (parentForDelay == null || !(parentForDelay instanceof ViewGroup)) {
             return -1;
         }
-        mDelayChildFound = false;
-        return getTransitionTargetIndex((ViewGroup) parentForDelay, view, 0);
+        List<View> transitionTargets = new ArrayList<>();
+        getTransitionTargets((ViewGroup) parentForDelay, transitionTargets);
+        sViewPositionComparator.mParentForDelay = parentForDelay;
+        sViewPositionComparator.mIsLtr = view.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR;
+        sViewPositionComparator.mToLeft = sViewPositionComparator.mIsLtr
+                ? mSlideEdge == (appear ? Gravity.END : Gravity.START)
+                : mSlideEdge == (appear ? Gravity.START : Gravity.END);
+        Collections.sort(transitionTargets, sViewPositionComparator);
+        return transitionTargets.indexOf(view);
     }
 
     private View findParentForDelay(View view) {
@@ -145,28 +161,16 @@ public class FadeAndShortSlide extends Visibility {
         return false;
     }
 
-    private int getTransitionTargetIndex(ViewGroup parent, View view, int delayIndex) {
-        int checked = 0;
+    private void getTransitionTargets(ViewGroup parent, List<View> transitionTargets) {
         int count = parent.getChildCount();
         for (int i = 0; i < count; ++i) {
             View child = parent.getChildAt(i);
             if (child instanceof ViewGroup && !((ViewGroup) child).isTransitionGroup()) {
-                int result = getTransitionTargetIndex((ViewGroup) child, view, delayIndex);
-                if (mDelayChildFound) {
-                    return delayIndex + result;
-                }
-                delayIndex += result;
-                checked += result;
+                getTransitionTargets((ViewGroup) child, transitionTargets);
             } else {
-                if (child == view) {
-                    mDelayChildFound = true;
-                    return delayIndex;
-                }
-                ++delayIndex;
-                ++checked;
+                transitionTargets.add(child);
             }
         }
-        return checked;
     }
 
     @Override
@@ -174,7 +178,7 @@ public class FadeAndShortSlide extends Visibility {
         super.captureStartValues(transitionValues);
         mFade.captureStartValues(transitionValues);
         captureValues(transitionValues);
-        int delayIndex = getDelayOrder(transitionValues.view);
+        int delayIndex = getDelayOrder(transitionValues.view, false);
         if (delayIndex > 0) {
             transitionValues.values.put(PROPNAME_DELAY,
                     delayIndex * SetupAnimationHelper.DELAY_BETWEEN_SIBLINGS_MS);
@@ -186,7 +190,7 @@ public class FadeAndShortSlide extends Visibility {
         super.captureEndValues(transitionValues);
         mFade.captureEndValues(transitionValues);
         captureValues(transitionValues);
-        int delayIndex = getDelayOrder(transitionValues.view);
+        int delayIndex = getDelayOrder(transitionValues.view, true);
         if (delayIndex > 0) {
             transitionValues.values.put(PROPNAME_DELAY,
                     delayIndex * SetupAnimationHelper.DELAY_BETWEEN_SIBLINGS_MS);
@@ -194,6 +198,7 @@ public class FadeAndShortSlide extends Visibility {
     }
 
     public void setSlideEdge(int slideEdge) {
+        mSlideEdge = slideEdge;
         switch (slideEdge) {
             case Gravity.START:
                 mSlideCalculator = sCalculateStart;
@@ -272,8 +277,7 @@ public class FadeAndShortSlide extends Visibility {
 
     @Override
     public Transition clone() {
-        FadeAndShortSlide clone = null;
-        clone = (FadeAndShortSlide) super.clone();
+        FadeAndShortSlide clone = (FadeAndShortSlide) super.clone();
         clone.mFade = (Visibility) mFade.clone();
         return clone;
     }
@@ -290,5 +294,79 @@ public class FadeAndShortSlide extends Visibility {
      */
     public void setDistance(int distance) {
         mDistance = distance;
+    }
+
+    private static class ViewPositionComparator implements Comparator<View> {
+        View mParentForDelay;
+        boolean mIsLtr;
+        boolean mToLeft;
+
+        @Override
+        public int compare(View lhs, View rhs) {
+            int start1;
+            int start2;
+            if (mIsLtr) {
+                start1 = getRelativeLeft(lhs, mParentForDelay);
+                start2 = getRelativeLeft(rhs, mParentForDelay);
+            } else {
+                start1 = getRelativeRight(lhs, mParentForDelay);
+                start2 = getRelativeRight(rhs, mParentForDelay);
+            }
+            if (mToLeft) {
+                if (start1 > start2) {
+                    return 1;
+                } else if (start1 < start2) {
+                    return -1;
+                }
+            } else {
+                if (start1 > start2) {
+                    return -1;
+                } else if (start1 < start2) {
+                    return 1;
+                }
+            }
+            int top1 = getRelativeTop(lhs, mParentForDelay);
+            int top2 = getRelativeTop(rhs, mParentForDelay);
+            return Integer.compare(top1, top2);
+        }
+
+        private int getRelativeLeft(View child, View ancestor) {
+            ViewParent parent = child.getParent();
+            int left = child.getLeft();
+            while (parent instanceof View) {
+                if (parent == ancestor) {
+                    break;
+                }
+                left += ((View) parent).getLeft();
+                parent = parent.getParent();
+            }
+            return left;
+        }
+
+        private int getRelativeRight(View child, View ancestor) {
+            ViewParent parent = child.getParent();
+            int right = child.getRight();
+            while (parent instanceof View) {
+                if (parent == ancestor) {
+                    break;
+                }
+                right += ((View) parent).getLeft();
+                parent = parent.getParent();
+            }
+            return right;
+        }
+
+        private int getRelativeTop(View child, View ancestor) {
+            ViewParent parent = child.getParent();
+            int top = child.getTop();
+            while (parent instanceof View) {
+                if (parent == ancestor) {
+                    break;
+                }
+                top += ((View) parent).getTop();
+                parent = parent.getParent();
+            }
+            return top;
+        }
     }
 }

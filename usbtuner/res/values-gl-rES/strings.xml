@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Configuración do sintonizador de canles USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Esta acción pode tardar varios minutos"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Atopouse %1$d canle"</item>
-    <item quantity="other" msgid="7340557317633613">"Atopáronse %1$d canles"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">Atopáronse %1$d canles</item>
+      <item quantity="one">Atopouse %1$d canle</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"DETER BUSCA DE CANLES"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Atopouse %1$d canle"</item>
-    <item quantity="other" msgid="4331542666115153576">"Atopáronse %1$d canles"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Estupendo! Atopouse %1$d canle durante a busca de canles. Se non che parece correcto, tenta axustar a posición da antena e realiza a busca de novo."</item>
-    <item quantity="other" msgid="8098777464551209564">"Estupendo! Atopáronse %1$d canles durante a busca de canles. Se non che parece correcto, tenta axustar a posición da antena e realiza a busca de novo."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">Atopáronse %1$d canles</item>
+      <item quantity="one">Atopouse %1$d canle</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">Estupendo! Atopáronse %1$d canles durante a busca de canles. Se non che parece correcto, tenta axustar a posición da antena e realiza a busca de novo.</item>
+      <item quantity="one">Estupendo! Atopouse %1$d canle durante a busca de canles. Se non che parece correcto, tenta axustar a posición da antena e realiza a busca de novo.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Feito"</item>
     <item msgid="496688122303154468">"Buscar de novo"</item>

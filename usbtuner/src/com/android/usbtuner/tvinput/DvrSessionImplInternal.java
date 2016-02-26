@@ -29,8 +29,10 @@ import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
+import com.android.tv.common.recording.RecordingCapability;
+import com.android.usbtuner.DvbDeviceAccessor;
+import com.android.usbtuner.TunerHal;
 import com.android.usbtuner.UsbTunerDataSource;
-import com.android.usbtuner.UsbTunerInterface;
 import com.android.usbtuner.data.PsipData;
 import com.android.usbtuner.data.TunerChannel;
 import com.android.usbtuner.exoplayer.CacheManager;
@@ -50,11 +52,19 @@ import java.util.concurrent.CountDownLatch;
 public class DvrSessionImplInternal implements PlaybackCacheListener, EventDetector.EventListener,
         Handler.Callback {
     private static String TAG = "DvrSessionImplInternal";
+    private static final boolean DEBUG = true;  // STOPSHIP(DVR)
+
 
     private static final int MSG_START_RECORDING = 1;
     private static final int MSG_STOP_RECORDING = 2;
     private static final int MSG_DELETE_RECORDING = 3;
     private static final int MSG_RELEASE = 4;
+    private final String mInputId;
+    private RecordingCapability mCapabilities;
+
+    public RecordingCapability getCapabilities() {
+        return mCapabilities;
+    }
 
     @IntDef({STATE_IDLE, STATE_RECORDING})
     @Retention(RetentionPolicy.SOURCE)
@@ -69,7 +79,7 @@ public class DvrSessionImplInternal implements PlaybackCacheListener, EventDetec
     private final Handler mHandler;
     private final CountDownLatch mReleaseLatch = new CountDownLatch(1);
 
-    private UsbTunerInterface mUsbTunerInterface;
+    private TunerHal mTunerHal;
     private UsbTunerDataSource mTunerSource;
     private CacheManager mCacheManager;
     private RecordSampleSourceExtractor mRecorder;
@@ -84,13 +94,16 @@ public class DvrSessionImplInternal implements PlaybackCacheListener, EventDetec
         void onDeleteFailed(Uri mediaUri, int reason);
     }
 
-    public DvrSessionImplInternal(Context context, ChannelDataManager dataManager) {
+    public DvrSessionImplInternal(Context context, String inputId, ChannelDataManager dataManager) {
         mContext = context;
+        mInputId = inputId;
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         mHandler = new Handler(handlerThread.getLooper(), this);
         mChannelDataManager = dataManager;
         mChannelDataManager.checkDataVersion(context);
+        mCapabilities = new DvbDeviceAccessor(context).getRecordingCapability(mInputId);
+        if (DEBUG) Log.d(TAG, mCapabilities.toString());
     }
 
     // PlaybackCacheListener
@@ -197,16 +210,12 @@ public class DvrSessionImplInternal implements PlaybackCacheListener, EventDetec
     }
 
     private File getMediaDir(Uri mediaUri) {
-        // TODO: Since this is temporary, re-implement this after LiveChannels has APIs.
-        String path =  mContext.getCacheDir().getAbsolutePath() + "/dvr/";
-        String channel = mediaUri.toString().substring(mediaUri.toString().lastIndexOf("/") + 1);
-        if (channel.length() == 0) {
-            channel = "unknown";
+        String mediaPath = mediaUri.getPath();
+        if (mediaPath == null || mediaPath.length() == 0) {
+            return null;
         }
-        path += channel;
-        path += "/";
-
-        return new File(path, String.valueOf(System.currentTimeMillis()));
+        return new File(mContext.getCacheDir().getAbsolutePath() + "/recording" +
+                mediaUri.getPath());
     }
 
     private void resetRecorder() {
@@ -222,9 +231,13 @@ public class DvrSessionImplInternal implements PlaybackCacheListener, EventDetec
             mTunerSource.stopStream();
             mTunerSource = null;
         }
-        if (mUsbTunerInterface != null) {
-            mUsbTunerInterface.close();
-            mUsbTunerInterface = null;
+        if (mTunerHal != null) {
+            try {
+                mTunerHal.close();
+            } catch (Exception ex) {
+                Log.e(TAG, "Error on closing tuner HAL.", ex);
+            }
+            mTunerHal = null;
         }
     }
 
@@ -237,20 +250,27 @@ public class DvrSessionImplInternal implements PlaybackCacheListener, EventDetec
             Log.w(TAG, "Failed to start recording. Couldn't find the channel for " + channelUri);
             return false;
         }
-        mUsbTunerInterface = new UsbTunerInterface(mContext);
-        if (!mUsbTunerInterface.openFirstAvailable()) {
+        mTunerHal = TunerHal.getInstance(mContext);
+        if (mTunerHal == null) {
             Log.w(TAG, "Failed to start recording. Couldn't open a DVB device");
             resetRecorder();
             return false;
         }
-        mTunerSource = new UsbTunerDataSource(mUsbTunerInterface, this);
+        mTunerSource = new UsbTunerDataSource(mTunerHal, this);
         if (!mTunerSource.tuneToChannel(channel)) {
             Log.w(TAG, "Failed to start recording. Couldn't tune to the channel for " + channel);
             resetRecorder();
             return false;
         }
+        File mediaDir = getMediaDir(mediaUri);
+        if (mediaDir == null) {
+            Log.w(TAG, "Failed to start recording. mediaUri is not provided properly " +
+                    mediaUri.toString());
+            resetRecorder();
+            return false;
+        }
         mTunerSource.startStream();
-        mCacheManager = new CacheManager(new DvrStorageManager(getMediaDir(mediaUri), true));
+        mCacheManager = new CacheManager(new DvrStorageManager(mediaDir, true));
         mRecorder = new RecordSampleSourceExtractor((MediaDataSource) mTunerSource,
                 mCacheManager, this);
         try {
@@ -271,12 +291,14 @@ public class DvrSessionImplInternal implements PlaybackCacheListener, EventDetec
         }
         resetRecorder();
         mSessionState = STATE_IDLE;
-        return;
     }
 
     private void onDeleteRecording(Uri mediaUri) {
         // TODO: notify the deletion result to LiveChannels
         File mediaDir = getMediaDir(mediaUri);
+        if (mediaDir == null) {
+            return;
+        }
         for(File file: mediaDir.listFiles()) {
             file.delete();
         }

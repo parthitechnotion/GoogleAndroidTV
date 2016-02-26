@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Ensiesitys"</item>
     <item msgid="8215762047341133299">"Tekniikka/tiede"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Live-kanavat"</item>
+    <item msgid="7307688057853449735">"Löydä sisältöä helposti"</item>
+    <item msgid="7566838222783641942">"Lisää kanavia lataamalla sovelluksia"</item>
+    <item msgid="8646630833216197238">"Personoi kanavavalikoimasi"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Katso sisältöä sovelluksista, aivan kuin katsoisit TV-kanavia."</item>
+    <item msgid="1855708984677953238">"Selaa sovellusten sisältöä oppaan ja selkeän käyttöliittymän avulla, \naivan kuin katsoisit TV-kanavia."</item>
+    <item msgid="3420760668363283731">"Saat lisää kanavia asentamalla live-kanavia tarjoavia sovelluksia. \nHae yhteensopivia sovelluksia Google Play Kaupasta TV-valikon linkillä."</item>
+    <item msgid="8974157841656828507">"Luo personoitu kanavaluettelo määrittämällä asentamasi kanavalähteet. \nAloita valitsemalla kanavalähteet Asetukset-valikosta."</item>
+  </string-array>
 </resources>

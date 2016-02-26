@@ -116,14 +116,9 @@ public class MenuHelper extends BaseUiDeviceHelper {
                 Direction.RIGHT);
     }
 
-    public UiObject2 assertPressOptionsChannelSources() {
+    public UiObject2 assertPressOptionsSettings() {
         return assertPressMenuItem(R.string.menu_title_options,
-                R.string.options_item_channel_sources);
-    }
-
-    public UiObject2 assertPressOptionsAbout() {
-        return assertPressMenuItem(R.string.menu_title_options,
-                R.string.options_item_about);
+                R.string.options_item_settings);
     }
 
     public UiObject2 assertPressOptionsClosedCaptions() {
@@ -137,11 +132,6 @@ public class MenuHelper extends BaseUiDeviceHelper {
 
     public UiObject2 assertPressOptionsMultiAudio() {
         return assertPressMenuItem(R.string.menu_title_options, R.string.options_item_multi_audio);
-    }
-
-    public UiObject2 assertPressOptionsParentalControls() {
-        return assertPressMenuItem(R.string.menu_title_options,
-                R.string.options_item_parental_controls);
     }
 
     public UiObject2 assertPressProgramGuide() {

@@ -43,7 +43,7 @@ import java.nio.ByteBuffer;
  */
 @TargetApi(16)
 public class MediaCodecVideoTrackRenderer extends MediaCodecTrackRenderer {
-    private static final String TAG = "MediaCodecVideoTrackRenderer";
+    private static final String TAG = "MediaCodecVideoTrackRen";
     private static final boolean DEBUG = false;
 
     /**

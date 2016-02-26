@@ -115,6 +115,7 @@ public abstract class MenuRowView extends LinearLayout {
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         mTitleView = (TextView) findViewById(R.id.title);
         mContentsView = findViewById(getContentsViewId());
         if (mContentsView.isFocusable()) {

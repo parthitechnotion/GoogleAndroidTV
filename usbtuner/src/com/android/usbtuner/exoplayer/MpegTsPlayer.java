@@ -133,7 +133,6 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
     @PlaybackState private int mLastReportedPlaybackState;
     private boolean mLastReportedPlayWhenReady;
 
-    private MediaDataSource mDataSource;
     private Surface mSurface;
     private InternalRendererBuilderCallback mBuilderCallback;
     private TrackRenderer mVideoRenderer;
@@ -159,10 +158,6 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         mRendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
         mSelectedTracks = new int[RENDERER_COUNT];
         mCcListener = new MpegTsCcListener();
-    }
-
-    public void setDataSource(MediaDataSource dataSource) {
-        mDataSource = dataSource;
     }
 
     public void addListener(Listener listener) {
@@ -215,7 +210,7 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         pushTrackSelection(type, true);
     }
 
-    public void prepare() {
+    public void prepare(MediaDataSource source) {
         if (mRendererBuildingState == RENDERER_BUILDING_STATE_BUILT) {
             mPlayer.stop();
         }
@@ -225,7 +220,7 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         mRendererBuildingState = RENDERER_BUILDING_STATE_BUILDING;
         maybeReportPlayerState();
         mBuilderCallback = new InternalRendererBuilderCallback();
-        mRendererBuilder.buildRenderers(this, mDataSource, mBuilderCallback);
+        mRendererBuilder.buildRenderers(this, source, mBuilderCallback);
     }
 
     /* package */ void onRenderers(String[][] trackNames,
@@ -334,10 +329,8 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
     }
 
     public boolean isAc3Playable() {
-        if (mAudioCapabilities != null) {
-            return mAudioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3);
-        }
-        return false;
+        return mAudioCapabilities != null
+                && mAudioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3);
     }
 
     public void onAudioUnplayable() {

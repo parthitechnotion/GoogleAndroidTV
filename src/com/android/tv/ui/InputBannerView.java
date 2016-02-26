@@ -38,7 +38,8 @@ public class InputBannerView extends LinearLayout implements TvTransitionManager
                     TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
                     | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
                     | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
-                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_FRAGMENT);
         }
     };
 

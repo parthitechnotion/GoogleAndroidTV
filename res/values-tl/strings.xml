@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"Naka-on"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"Naka-off"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Multi-audio"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"Channel setup"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"Parental controls"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"Tungkol dito"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"Higit pa channel"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"Mga Setting"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"Pinagmulan"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"Pagpalitin"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"Naka-on"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"Ipangkat ayon sa"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"Setup ng channel"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"Naka-block ang programang ito"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"Ang programang ito ay na-rate na <xliff:g id="RATING">%1$s</xliff:g>"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"Mga channel source"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"Available ang mga bagong channel"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"Customize channel list"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"Pumili ng mga channel para sa gabay sa programa"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"Hindi naka-set up"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"Hindi sinusuportahan ng input ang auto-scan"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"Hindi maumpisahan ang auto-scan para sa \'<xliff:g id="TV_INPUT">%s</xliff:g>\'"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"Hindi masimulan ang mga kagustuhan sa buong system para sa mga closed caption."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d channel ang nadagdag"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d channel ang nadagdag"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="one">Nagdagdag ng %1$d channel</item>
+      <item quantity="other">Nagdagdag ng %1$d na channel</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"Wala naidagdag na channel"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Tuner"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"Parental controls"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"Ilagay ang bagong PIN"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"Kumpirmahin ang iyong PIN"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"Ilagay ang iyong kasalukuyang PIN"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"5 beses kang naglagay ng maling PIN.\nSubukang muli sa loob ng <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> segundo."</item>
-    <item quantity="other" msgid="8829550842387756054">"5 beses kang naglagay ng maling PIN.\nSubukang muli sa loob ng <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> (na) segundo."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="one">Inilagay mo ang maling PIN nang 5 beses.\nSubukang muli sa loob ng <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> segundo.</item>
+      <item quantity="other">Inilagay mo ang maling PIN nang 5 beses.\nSubukang muli sa loob ng <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> na segundo.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"Mali ang PIN na iyon. Subukang muli."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Subukang muli, hindi tumutugma ang PIN"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"Tungkol dito"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"Mga lisensyang open source"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"Mga Setting"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"I-customize lista ng channel"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Pumili ng mga channel para sa gabay sa programa"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"Mga pinagmulan ng channel"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"May mga bagong channel"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"Mga kontrol ng magulang"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"Mga open source na lisensya"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Mga lisensyang open source"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"Bersyon"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"Bersyon"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"Mga opsyon ng developer"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"I-enable ang USB TV tuner"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Upang marinig ang tunog ng USB TV tuner, dapat suportahan ng iyong TV ang AC3 passthrough."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Walang pamagat"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Naka-block ang channel"</string>
     <string name="episode_format" msgid="4881195874563241096">"S<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Ep. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"Mga pinagmumulan ng channel"</string>
-    <string name="setup_description" msgid="8728423605912915099">"Mag-set up ng mga live na channel mula sa mga available na pinagmulan. Maaari itong umabot ng ilang minuto depende sa pinagmulan ng channel."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"Tapos na"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d channel ang available"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d (na) channel ang available"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"Bago"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"Mga Pinagmumulan"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="one">%1$d channel</item>
+      <item quantity="other">%1$d na channel</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"Walang mga channel na available"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"Bago"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"Hindi naka-set up"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"Kumuha ng higit pang mga mapagkukunan"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"Mag-browse ng mga app na nag-aalok ng mga live channel"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"May mga bagong mapagkukunan ng channel"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"May mga inaalok na channel ang mga bagong mapagkukunan ng channel.\nI-set up na ang mga ito ngayon, o gawin ito sa ibang pagkakataon sa setting ng mga pinagkukunan ng channel."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"I-set up ngayon"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"Ok, nakuha ko"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"Pindutin ang SELECT"</b>" upang i-access ang menu ng TV."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Ang BACK key ay para sa nakakonektang device. Pindutin ang HOME button upang lumabas."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Hindi sinusuportahan ang Live TV sa device na ito na may Android Lollipop."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Kailangan ng pahintulot ng Live TV upang mabasa ang mga listahan sa TV."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"I-set up ang iyong mga pinagmulan"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"Mapapanood sa mga live channel ang mga ipinapalabas sa mga nakasanayan nang TV channel at sa mga streaming channel na mula sa mga app. \n\nMagsimula sa pamamagitan ng pagse-set up ng mga pinagmulan ng channel na naka-install na. O mag-browse sa Google Play Store para sa higit pang mga app na nag-aalok ng mga live na channel."</string>
 </resources>

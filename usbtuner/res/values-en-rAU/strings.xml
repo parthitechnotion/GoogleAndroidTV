@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"USB channel tuner setup"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"This may take several minutes"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"%1$d channel found"</item>
-    <item quantity="other" msgid="7340557317633613">"%1$d channels found"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">%1$d channels found</item>
+      <item quantity="one">%1$d channel found</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"STOP CHANNEL SCAN"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"%1$d channel found"</item>
-    <item quantity="other" msgid="4331542666115153576">"%1$d channels found"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Nice! %1$d channel was found during the channel scan. If this doesn’t seem right, try adjusting the aerial position and scan again."</item>
-    <item quantity="other" msgid="8098777464551209564">"Nice! %1$d channels were found during the channel scan. If this doesn’t seem right, try adjusting the aerial position and scan again."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">%1$d channels found</item>
+      <item quantity="one">%1$d channel found</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">Nice! %1$d channels were found during the channel scan. If this doesn’t seem right, try adjusting the antenna position and scan again.</item>
+      <item quantity="one">Nice! %1$d channel was found during the channel scan. If this doesn’t seem right, try adjusting the antenna position and scan again.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Finished"</item>
     <item msgid="496688122303154468">"Scan again"</item>

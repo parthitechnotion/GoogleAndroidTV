@@ -32,6 +32,7 @@ import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.tv.common.TvContentRatingCache;
 import com.android.tv.search.LocalSearchProvider.SearchResult;
 import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.Utils;
@@ -61,6 +62,7 @@ public class TvProviderSearch implements SearchInterface {
     private final Context mContext;
     private final ContentResolver mContentResolver;
     private final TvInputManager mTvInputManager;
+    private final TvContentRatingCache mTvContentRatingCache = TvContentRatingCache.getInstance();
 
     TvProviderSearch(Context context) {
         mContext = context;
@@ -403,17 +405,15 @@ public class TvProviderSearch implements SearchInterface {
     }
 
     private boolean isRatingBlocked(String ratings) {
-        if (ratings == null) {
+        if (TextUtils.isEmpty(ratings) || !mTvInputManager.isParentalControlsEnabled()) {
             return false;
         }
-        for (String rating : ratings.split("\\s*,\\s*")) {
-            try {
-                if (mTvInputManager.isParentalControlsEnabled() && mTvInputManager.isRatingBlocked(
-                        TvContentRating.unflattenFromString(rating))) {
+        TvContentRating[] ratingArray = mTvContentRatingCache.getRatings(ratings);
+        if (ratingArray != null) {
+            for (TvContentRating r : ratingArray) {
+                if (mTvInputManager.isRatingBlocked(r)) {
                     return true;
                 }
-            } catch (IllegalArgumentException e) {
-                // Do nothing.
             }
         }
         return false;

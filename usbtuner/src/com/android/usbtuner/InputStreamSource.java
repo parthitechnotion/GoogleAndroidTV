@@ -23,7 +23,7 @@ import com.android.usbtuner.data.TunerChannel;
  * Interface definition for stream source. Source based on physical tuner or files should implement
  * this interface.
  */
-public interface InputStreamSource {
+public interface InputStreamSource extends AutoCloseable {
     /**
      * @return a type of the source. Either {@code TYPE_TUNER} or {@code TYPE_FILE}.
      */
@@ -70,9 +70,4 @@ public interface InputStreamSource {
      * @return the position of a input source
      */
     long getPosition();
-
-    /**
-     * Release all the resources related to stream source.
-     */
-    void release();
 }

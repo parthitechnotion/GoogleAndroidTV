@@ -51,6 +51,16 @@ public final class DvrContract {
         public static final String STATE_RECORDING_FINISHED = "STATE_RECORDING_FINISHED";
 
         /**
+         * The priority of this recording.
+         *
+         * <p> The lowest number is recorded first. If there is a tie in priority then the lower id
+         * wins.  Defaults to {@value Long#MAX_VALUE}
+         *
+         * <p>Type: INTEGER (long)
+         */
+        public static final String COLUMN_PRIORITY = "priority";
+
+        /**
          * The type of this recording.
          *
          * <p>This value should be one of the followings: {@link #TYPE_PROGRAM},

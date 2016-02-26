@@ -16,6 +16,5 @@
   -->
 
 <resources>
-    <!-- TODO: Change translatable to true once implemented. -->
-    <string name="action_text_done" translatable="false">Done</string>
+    <string name="action_text_done">Done</string>
 </resources>

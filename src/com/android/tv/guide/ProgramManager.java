@@ -16,14 +16,15 @@
 
 package com.android.tv.guide;
 
+import android.support.annotation.MainThread;
 import android.util.Log;
 
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.GenreItems;
 import com.android.tv.data.Program;
 import com.android.tv.data.ProgramDataManager;
-import com.android.tv.util.CollectionUtils;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Manages the channels and programs for the program guide.
  */
+@MainThread
 public class ProgramManager {
     private static final String TAG = "ProgramManager";
     private static final boolean DEBUG = false;

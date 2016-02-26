@@ -21,7 +21,7 @@
 #include <map>
 
 #include "mutex.h"
-#include "usbtuner_jni.h"
+#include "tunertvinput_jni.h"
 
 class DvbManager {
     static const int NUM_POLLFDS = 1;
@@ -32,13 +32,13 @@ class DvbManager {
     static const int PAT_PID = 0;
 
     static const int FILTER_TYPE_OTHER =
-            com_android_usbtuner_UsbTunerInterface_FILTER_TYPE_OTHER;
+            com_android_usbtuner_TunerHal_FILTER_TYPE_OTHER;
     static const int FILTER_TYPE_AUDIO =
-            com_android_usbtuner_UsbTunerInterface_FILTER_TYPE_AUDIO;
+            com_android_usbtuner_TunerHal_FILTER_TYPE_AUDIO;
     static const int FILTER_TYPE_VIDEO =
-            com_android_usbtuner_UsbTunerInterface_FILTER_TYPE_VIDEO;
+            com_android_usbtuner_TunerHal_FILTER_TYPE_VIDEO;
     static const int FILTER_TYPE_PCR =
-            com_android_usbtuner_UsbTunerInterface_FILTER_TYPE_PCR;
+            com_android_usbtuner_TunerHal_FILTER_TYPE_PCR;
 
     int mFeFd;
     int mDemuxFd;
@@ -54,7 +54,7 @@ class DvbManager {
 public:
     DvbManager(JNIEnv *env, jobject thiz);
     ~DvbManager();
-    int tuneAtsc(JNIEnv *env, jobject thiz,
+    int tune(JNIEnv *env, jobject thiz,
             const int frequency, const char *modulationStr, int timeout_ms);
     int stopTune();
     int readTsStream(JNIEnv *env, jobject thiz,

@@ -34,30 +34,36 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseLongArray;
 import android.view.View;
 
-import com.android.tv.R;
 import com.android.tv.ApplicationSingletons;
+import com.android.tv.MainActivityWrapper.OnCurrentChannelChangeListener;
+import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.util.BitmapUtils;
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
+import com.android.tv.util.ImageLoader;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A local service for notify recommendation at home launcher.
  */
-public class NotificationService extends Service implements Recommender.Listener {
-    private static final boolean DEBUG = false;
+public class NotificationService extends Service implements Recommender.Listener,
+        OnCurrentChannelChangeListener {
     private static final String TAG = "NotificationService";
+    private static final boolean DEBUG = false;
 
     public static final String ACTION_SHOW_RECOMMENDATION =
             "com.android.tv.notification.ACTION_SHOW_RECOMMENDATION";
@@ -100,6 +106,8 @@ public class NotificationService extends Service implements Recommender.Listener
     private final String mRecommendationType;
     private int mCurrentNotificationCount;
     private long[] mNotificationChannels;
+
+    private Channel mPlayingChannel;
 
     private float mNotificationCardMaxWidth;
     private float mNotificationCardHeight;
@@ -152,6 +160,16 @@ public class NotificationService extends Service implements Recommender.Listener
         // Just called for early initialization.
         appSingletons.getChannelDataManager();
         appSingletons.getProgramDataManager();
+        appSingletons.getMainActivityWrapper().addOnCurrentChannelChangeListener(this);
+    }
+
+    @UiThread
+    @Override
+    public void onCurrentChannelChange(@Nullable Channel channel) {
+        if (DEBUG) Log.d(TAG, "onCurrentChannelChange");
+        mPlayingChannel = channel;
+        mHandler.removeMessages(MSG_SHOW_RECOMMENDATION);
+        mHandler.sendEmptyMessage(MSG_SHOW_RECOMMENDATION);
     }
 
     private void handleInitializeRecommender() {
@@ -195,11 +213,17 @@ public class NotificationService extends Service implements Recommender.Listener
 
     @Override
     public void onDestroy() {
-        mRecommender.release();
-        mRecommender = null;
-        mHandlerThread.quit();
-        mHandlerThread = null;
-        mHandler = null;
+        TvApplication.getSingletons(this).getMainActivityWrapper()
+                .removeOnCurrentChannelChangeListener(this);
+        if (mRecommender != null) {
+            mRecommender.release();
+            mRecommender = null;
+        }
+        if (mHandlerThread != null) {
+            mHandlerThread.quit();
+            mHandlerThread = null;
+            mHandler = null;
+        }
         super.onDestroy();
     }
 
@@ -231,6 +255,7 @@ public class NotificationService extends Service implements Recommender.Listener
     public void onRecommenderReady() {
         if (DEBUG) Log.d(TAG, "onRecommendationReady");
         if (mShowRecommendationAfterRecommenderReady) {
+            mHandler.removeMessages(MSG_SHOW_RECOMMENDATION);
             mHandler.sendEmptyMessage(MSG_SHOW_RECOMMENDATION);
             mShowRecommendationAfterRecommenderReady = false;
         }
@@ -239,6 +264,13 @@ public class NotificationService extends Service implements Recommender.Listener
     @Override
     public void onRecommendationChanged() {
         if (DEBUG) Log.d(TAG, "onRecommendationChanged");
+        // Update recommendation on the handler thread.
+        mHandler.removeMessages(MSG_SHOW_RECOMMENDATION);
+        mHandler.sendEmptyMessage(MSG_SHOW_RECOMMENDATION);
+    }
+
+    private void showRecommendation() {
+        if (DEBUG) Log.d(TAG, "showRecommendation");
         SparseLongArray notificationChannels = new SparseLongArray();
         for (int i = 0; i < NOTIFICATION_COUNT; ++i) {
             if (mNotificationChannels[i] == Channel.INVALID_ID) {
@@ -246,7 +278,7 @@ public class NotificationService extends Service implements Recommender.Listener
             }
             notificationChannels.put(i, mNotificationChannels[i]);
         }
-        List<Channel> channels = mRecommender.recommendChannels();
+        List<Channel> channels = recommendChannels();
         for (Channel c : channels) {
             int index = notificationChannels.indexOfValue(c.getId());
             if (index >= 0) {
@@ -261,13 +293,7 @@ public class NotificationService extends Service implements Recommender.Listener
                 mNotificationChannels[notificationId] = Channel.INVALID_ID;
                 --mCurrentNotificationCount;
             }
-            showRecommendation();
         }
-    }
-
-    private void showRecommendation() {
-        if (DEBUG) Log.d(TAG, "showRecommendation");
-        List<Channel> channels = mRecommender.recommendChannels();
         for (Channel c : channels) {
             if (mCurrentNotificationCount >= NOTIFICATION_COUNT) {
                 break;
@@ -277,14 +303,13 @@ public class NotificationService extends Service implements Recommender.Listener
             }
         }
         if (mCurrentNotificationCount < NOTIFICATION_COUNT) {
-            Message msg = mHandler.obtainMessage(MSG_SHOW_RECOMMENDATION);
-            mHandler.sendMessageDelayed(msg, RECOMMENDATION_RETRY_TIME_MS);
+            mHandler.sendEmptyMessageDelayed(MSG_SHOW_RECOMMENDATION, RECOMMENDATION_RETRY_TIME_MS);
         }
     }
 
     private void changeRecommendation(int notificationId) {
         if (DEBUG) Log.d(TAG, "changeRecommendation");
-        List<Channel> channels = mRecommender.recommendChannels();
+        List<Channel> channels = recommendChannels();
         if (mNotificationChannels[notificationId] != Channel.INVALID_ID) {
             mNotificationChannels[notificationId] = Channel.INVALID_ID;
             --mCurrentNotificationCount;
@@ -297,6 +322,15 @@ public class NotificationService extends Service implements Recommender.Listener
             }
         }
         mNotificationManager.cancel(NOTIFY_TAG, notificationId);
+    }
+
+    private List<Channel> recommendChannels() {
+        List channels = mRecommender.recommendChannels();
+        if (channels.contains(mPlayingChannel)) {
+            channels = new ArrayList<>(channels);
+            channels.remove(mPlayingChannel);
+        }
+        return channels;
     }
 
     private void hideAllRecommendation() {
@@ -319,9 +353,6 @@ public class NotificationService extends Service implements Recommender.Listener
             Log.d(TAG, "sendNotification (channelName=" + channel.getDisplayName() + " notifyId="
                     + notificationId + ")");
         }
-        Intent intent = new Intent(Intent.ACTION_VIEW, channel.getUri());
-        intent.putExtra(TUNE_PARAMS_RECOMMENDATION_TYPE, mRecommendationType);
-        final PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         // TODO: Move some checking logic into TvRecommendation.
         String inputId = Utils.getInputIdForChannel(this, channel.getId());
@@ -361,43 +392,9 @@ public class NotificationService extends Service implements Recommender.Listener
         final Bitmap posterArtBitmap = posterArtBitmapInfo.bitmap;
 
         channel.loadBitmap(this, Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO, mChannelLogoMaxWidth,
-                mChannelLogoMaxHeight, new Channel.LoadImageCallback() {
-                    @Override
-                    public void onLoadImageFinished(Channel channel, int type, Bitmap channelLogo) {
-                        // This callback will run on the main thread.
-                        Bitmap largeIconBitmap = (channelLogo == null) ? posterArtBitmap
-                                : overlayChannelLogo(channelLogo, posterArtBitmap);
-                        String channelDisplayName = channel.getDisplayName();
-                        Notification notification =
-                                new Notification.Builder(NotificationService.this)
-                                        .setContentIntent(notificationIntent)
-                                        .setContentTitle(program.getTitle())
-                                        .setContentText(inputDisplayName + " " +
-                                                (TextUtils.isEmpty(channelDisplayName)
-                                                ? channel.getDisplayNumber() : channelDisplayName))
-                                        .setContentInfo(channelDisplayName)
-                                        .setAutoCancel(true)
-                                        .setLargeIcon(largeIconBitmap)
-                                        .setSmallIcon(R.drawable.ic_launcher_s)
-                                        .setCategory(Notification.CATEGORY_RECOMMENDATION)
-                                        .setProgress((programProgress > 0) ? 100 : 0,
-                                                programProgress,
-                                                false)
-                                        .setSortKey(mRecommender.getChannelSortKey(channelId))
-                                        .build();
-                        notification.color = Utils.getColor(getResources(),
-                                R.color.recommendation_card_background);
-                        if (!TextUtils.isEmpty(program.getThumbnailUri())) {
-                            notification.extras.putString(Notification.EXTRA_BACKGROUND_IMAGE_URI,
-                                    program.getThumbnailUri());
-                        }
-                        mNotificationManager.notify(NOTIFY_TAG, notificationId, notification);
-                        Message msg = mHandler.obtainMessage(
-                                MSG_UPDATE_RECOMMENDATION, notificationId, 0, channel);
-                        mHandler.sendMessageDelayed(msg,
-                                programDurationMs / MAX_PROGRAM_UPDATE_COUNT);
-                    }
-                });
+                mChannelLogoMaxHeight,
+                createChannelLogoCallback(this, notificationId, inputDisplayName, channel, program,
+                        posterArtBitmap));
 
         if (mNotificationChannels[notificationId] == Channel.INVALID_ID) {
             ++mCurrentNotificationCount;
@@ -405,6 +402,55 @@ public class NotificationService extends Service implements Recommender.Listener
         mNotificationChannels[notificationId] = channel.getId();
 
         return true;
+    }
+
+    @NonNull
+    private static ImageLoader.ImageLoaderCallback<NotificationService> createChannelLogoCallback(
+            NotificationService service, final int notificationId, final String inputDisplayName,
+            final Channel channel, final Program program, final Bitmap posterArtBitmap) {
+        return new ImageLoader.ImageLoaderCallback<NotificationService>(service) {
+            @Override
+            public void onBitmapLoaded(NotificationService service, Bitmap channelLogo) {
+                service.sendNotification(notificationId, channelLogo, channel, posterArtBitmap,
+                        program, inputDisplayName);
+            }
+        };
+    }
+
+    private void sendNotification(int notificationId, Bitmap channelLogo, Channel channel,
+            Bitmap posterArtBitmap, Program program, String inputDisplayName1) {
+
+        final long programDurationMs = program.getEndTimeUtcMillis() - program
+                .getStartTimeUtcMillis();
+        long programLeftTimsMs = program.getEndTimeUtcMillis() - System.currentTimeMillis();
+        final int programProgress = (programDurationMs <= 0) ? -1
+                : 100 - (int) (programLeftTimsMs * 100 / programDurationMs);
+        Intent intent = new Intent(Intent.ACTION_VIEW, channel.getUri());
+        intent.putExtra(TUNE_PARAMS_RECOMMENDATION_TYPE, mRecommendationType);
+        final PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        // This callback will run on the main thread.
+        Bitmap largeIconBitmap = (channelLogo == null) ? posterArtBitmap
+                : overlayChannelLogo(channelLogo, posterArtBitmap);
+        String channelDisplayName = channel.getDisplayName();
+        Notification notification = new Notification.Builder(this)
+                .setContentIntent(notificationIntent).setContentTitle(program.getTitle())
+                .setContentText(inputDisplayName1 + " " +
+                        (TextUtils.isEmpty(channelDisplayName) ? channel.getDisplayNumber()
+                                : channelDisplayName)).setContentInfo(channelDisplayName)
+                .setAutoCancel(true).setLargeIcon(largeIconBitmap)
+                .setSmallIcon(R.drawable.ic_launcher_s)
+                .setCategory(Notification.CATEGORY_RECOMMENDATION)
+                .setProgress((programProgress > 0) ? 100 : 0, programProgress, false)
+                .setSortKey(mRecommender.getChannelSortKey(channel.getId())).build();
+        notification.color = Utils.getColor(getResources(), R.color.recommendation_card_background);
+        if (!TextUtils.isEmpty(program.getThumbnailUri())) {
+            notification.extras
+                    .putString(Notification.EXTRA_BACKGROUND_IMAGE_URI, program.getThumbnailUri());
+        }
+        mNotificationManager.notify(NOTIFY_TAG, notificationId, notification);
+        Message msg = mHandler.obtainMessage(MSG_UPDATE_RECOMMENDATION, notificationId, 0, channel);
+        mHandler.sendMessageDelayed(msg, programDurationMs / MAX_PROGRAM_UPDATE_COUNT);
     }
 
     private Bitmap overlayChannelLogo(Bitmap logo, Bitmap background) {

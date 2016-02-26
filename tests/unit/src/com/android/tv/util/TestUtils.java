@@ -32,7 +32,7 @@ public class TestUtils {
         // Create a mock TvInputInfo by using private constructor
         // TODO: Find better way to mock TvInputInfo.
         // Note that mockito doesn't support mock/spy on final object.
-        if (Build.VERSION.SDK_INT < 23) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return createTvInputInfoForLmp(service, id, parentId, type);
         }
         return createTvInputInfoForMnc(service, id, parentId, type, isHardwareInput);

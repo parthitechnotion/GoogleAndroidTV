@@ -86,9 +86,9 @@ public class TimeShiftManager {
     public static final int PLAY_DIRECTION_BACKWARD = 1;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({TIME_SHIFT_ACTION_ID_PLAY, TIME_SHIFT_ACTION_ID_PAUSE, TIME_SHIFT_ACTION_ID_REWIND,
-        TIME_SHIFT_ACTION_ID_FAST_FORWARD, TIME_SHIFT_ACTION_ID_JUMP_TO_PREVIOUS,
-        TIME_SHIFT_ACTION_ID_JUMP_TO_NEXT})
+    @IntDef(flag = true, value = {TIME_SHIFT_ACTION_ID_PLAY, TIME_SHIFT_ACTION_ID_PAUSE,
+            TIME_SHIFT_ACTION_ID_REWIND, TIME_SHIFT_ACTION_ID_FAST_FORWARD,
+            TIME_SHIFT_ACTION_ID_JUMP_TO_PREVIOUS, TIME_SHIFT_ACTION_ID_JUMP_TO_NEXT})
     public @interface TimeShiftActionId{}
     public static final int TIME_SHIFT_ACTION_ID_PLAY = 1;
     public static final int TIME_SHIFT_ACTION_ID_PAUSE = 1 << 1;
@@ -103,6 +103,7 @@ public class TimeShiftManager {
     private static final long MAX_DUMMY_PROGRAM_DURATION = TimeUnit.MINUTES.toMillis(30);
     @VisibleForTesting
     static final long INVALID_TIME = -1;
+    static final long CURRENT_TIME = -2;
     private static final long PREFETCH_TIME_OFFSET_FROM_PROGRAM_END = TimeUnit.MINUTES.toMillis(1);
     private static final long PREFETCH_DURATION_FOR_NEXT = TimeUnit.HOURS.toMillis(2);
 
@@ -215,6 +216,22 @@ public class TimeShiftManager {
         long oldestProgramStartTime = mProgramManager.getOldestProgramStartTime();
         return oldestProgramStartTime == INVALID_TIME ? INVALID_TIME
                 : mPlayController.mRecordStartTimeMs;
+    }
+
+    /**
+     * Returns the end time of the recording in milliseconds.
+     */
+    public long getRecordEndTimeMs() {
+        if (mPlayController.mRecordEndTimeMs == CURRENT_TIME) {
+            return System.currentTimeMillis();
+        } else {
+            return mPlayController.mRecordEndTimeMs;
+        }
+    }
+
+    public boolean isPlayForRecording() {
+        // TODO: need to find better way to check if it's for recording playback.
+        return mPlayController.mRecordEndTimeMs != CURRENT_TIME;
     }
 
     /**
@@ -419,7 +436,7 @@ public class TimeShiftManager {
             // Fast forward action and jump to next action
             threshold = isActionEnabled(TIME_SHIFT_ACTION_ID_FAST_FORWARD)
                     ? DISABLE_ACTION_THRESHOLD : ENABLE_ACTION_THRESHOLD;
-            enabled = System.currentTimeMillis() - mCurrentPositionMediator.mCurrentPositionMs
+            enabled = getRecordEndTimeMs() - mCurrentPositionMediator.mCurrentPositionMs
                     > threshold;
             enableAction(TIME_SHIFT_ACTION_ID_FAST_FORWARD, enabled);
             enableAction(TIME_SHIFT_ACTION_ID_JUMP_TO_NEXT, enabled);
@@ -495,13 +512,14 @@ public class TimeShiftManager {
         }
     }
 
-    void onRecordStartTimeChanged() {
+    void onRecordTimeRangeChanged() {
         if (mPlayController.isAvailable()) {
-            mProgramManager.onRecordStartTimeChanged(mPlayController.mRecordStartTimeMs);
+            mProgramManager.onRecordTimeRangeChanged(mPlayController.mRecordStartTimeMs,
+                    mPlayController.mRecordEndTimeMs);
         }
         updateActions();
         if (mNotificationEnabled && mListener != null) {
-            mListener.onRecordStartTimeChanged();
+            mListener.onRecordTimeRangeChanged();
         }
     }
 
@@ -574,6 +592,7 @@ public class TimeShiftManager {
 
         private long mPossibleStartTimeMs;
         private long mRecordStartTimeMs;
+        private long mRecordEndTimeMs;
 
         @PlayStatus private int mPlayStatus = PLAY_STATUS_PAUSED;
         @PlaySpeed private int mDisplayedPlaySpeed = PLAY_SPEED_1X;
@@ -604,6 +623,7 @@ public class TimeShiftManager {
                     mIsPlayOffsetChanged = false;
                     mPossibleStartTimeMs = System.currentTimeMillis();
                     mRecordStartTimeMs = mPossibleStartTimeMs;
+                    mRecordEndTimeMs = CURRENT_TIME;
                     mCurrentPositionMediator.initialize(mPossibleStartTimeMs);
                     mHandler.removeMessages(MSG_GET_CURRENT_POSITION);
 
@@ -622,7 +642,8 @@ public class TimeShiftManager {
 
                 @Override
                 public void onRecordStartTimeChanged(long recordStartTimeMs) {
-                    if (recordStartTimeMs < mPossibleStartTimeMs) {
+                    if (mRecordEndTimeMs == CURRENT_TIME &&
+                            recordStartTimeMs < mPossibleStartTimeMs) {
                         // Do not warn in this case because it can happen in normal cases.
                         if (DEBUG) {
                             Log.d(TAG, "Record start time is less then the time when it became "
@@ -637,7 +658,7 @@ public class TimeShiftManager {
                         return;
                     }
                     mRecordStartTimeMs = recordStartTimeMs;
-                    TimeShiftManager.this.onRecordStartTimeChanged();
+                    TimeShiftManager.this.onRecordTimeRangeChanged();
 
                     // According to the UX guidelines, the stream should be resumed if the
                     // recording buffer fills up while paused, which means that the current time
@@ -654,6 +675,21 @@ public class TimeShiftManager {
                         TimeShiftManager.this.play();
                     }
                 }
+
+                @Override
+                public void onRecordEndTimeChanged(long recordEndTimeMs) {
+                    if (mRecordEndTimeMs == recordEndTimeMs) {
+                        return;
+                    }
+                    mRecordEndTimeMs = recordEndTimeMs;
+                    TimeShiftManager.this.onRecordTimeRangeChanged();
+
+                    if (mPlayStatus == PLAY_STATUS_PLAYING &&
+                            mRecordEndTimeMs - getCurrentPositionMs()
+                            < RECORDING_BOUNDARY_THRESHOLD) {
+                        TimeShiftManager.this.pause();
+                    }
+                }
             });
         }
 
@@ -663,7 +699,8 @@ public class TimeShiftManager {
 
         void handleGetCurrentPosition() {
             if (mIsPlayOffsetChanged) {
-                long currentTimeMs = System.currentTimeMillis();
+                long currentTimeMs = mRecordEndTimeMs == CURRENT_TIME ? System.currentTimeMillis()
+                        : mRecordEndTimeMs;
                 long currentPositionMs = Math.max(
                         Math.min(mTvView.timeshiftGetCurrentPositionMs(), currentTimeMs),
                         mRecordStartTimeMs);
@@ -755,8 +792,9 @@ public class TimeShiftManager {
          * Moves to the specified time.
          */
         void seekTo(long timeMs) {
-            mTvView.timeshiftSeekTo(Math.min(System.currentTimeMillis(),
-                    Math.max(mRecordStartTimeMs, timeMs)));
+            mTvView.timeshiftSeekTo(Math.min(mRecordEndTimeMs == CURRENT_TIME
+                    ? System.currentTimeMillis() : mRecordEndTimeMs,
+                            Math.max(mRecordStartTimeMs, timeMs)));
             mIsPlayOffsetChanged = true;
         }
 
@@ -851,17 +889,19 @@ public class TimeShiftManager {
             }
         }
 
-        void onRecordStartTimeChanged(long startTimeMs) {
+        void onRecordTimeRangeChanged(long startTimeMs, long endTimeMs) {
             if (mChannel == null || mChannel.isPassthrough()) {
                 return;
             }
-            long currentMs = System.currentTimeMillis();
+            if (endTimeMs == CURRENT_TIME) {
+                endTimeMs = System.currentTimeMillis();
+            }
 
             long fetchStartTimeMs = Utils.floorTime(startTimeMs, MAX_DUMMY_PROGRAM_DURATION);
             boolean needToLoad = addDummyPrograms(fetchStartTimeMs,
-                    currentMs + PREFETCH_DURATION_FOR_NEXT);
+                    endTimeMs + PREFETCH_DURATION_FOR_NEXT);
             if (needToLoad) {
-                Range<Long> period = Range.create(fetchStartTimeMs, currentMs);
+                Range<Long> period = Range.create(fetchStartTimeMs, endTimeMs);
                 mProgramLoadQueue.add(period);
                 startTaskIfNeeded();
             }
@@ -1274,7 +1314,7 @@ public class TimeShiftManager {
         /**
          * Called when the recordStartTime has been changed.
          */
-        void onRecordStartTimeChanged();
+        void onRecordTimeRangeChanged();
 
         /**
          * Called when the current position is changed.

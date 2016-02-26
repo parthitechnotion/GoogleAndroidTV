@@ -18,14 +18,14 @@ package com.android.tv.tests.jank;
 import static com.android.tv.testing.uihelper.UiDeviceAsserts.assertWaitForCondition;
 
 import android.content.res.Resources;
-import android.os.SystemClock;
+import android.os.Build;
+import android.support.test.filters.SdkSuppress;
+import android.support.test.jank.GfxMonitor;
 import android.support.test.jank.JankTest;
 import android.support.test.jank.JankTestBase;
-import android.support.test.jank.WindowContentFrameStatsMonitor;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.Until;
 import android.test.suitebuilder.annotation.MediumTest;
-import android.util.Log;
 
 import com.android.tv.R;
 import com.android.tv.testing.uihelper.ByResource;
@@ -38,19 +38,31 @@ import com.android.tv.testing.uihelper.UiDeviceUtils;
  * Jank tests for the program guide.
  */
 @MediumTest
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
 public class ProgramGuideJankTest extends JankTestBase {
     private static final boolean DEBUG = false;
     private static final String TAG = "ProgramGuideJank";
 
     private static final String STARTING_CHANNEL = "13";
-    private static final int EXPECTED_FRAMES = 5;
+    public static final String LIVE_CHANNELS_PROCESS_NAME = "com.android.tv";
+
+    /**
+     * The minimum number of frames expected during each jank test.
+     * If there is less the test will fail.  To be safe we loop the action in each test to create
+     * twice this many frames under normal conditions.
+     * <p>200 is chosen so there will be enough frame for the 90th, 95th, and 98th percentile
+     * measurements are significant.
+     *
+     * @see <a href="http://go/janktesthelper-best-practices">Jank Test Helper Best Practices</a>
+     */
+    private static final int EXPECTED_FRAMES = 200;
+    public static final String LIVE_CHANNELS_PACKAGE = "com.android.tv";
 
     protected UiDevice mDevice;
 
     protected Resources mTargetResources;
     protected MenuHelper mMenuHelper;
     protected LiveChannelsUiDeviceHelper mLiveChannelsHelper;
-
 
     @Override
     protected void setUp() throws Exception {
@@ -64,81 +76,40 @@ public class ProgramGuideJankTest extends JankTestBase {
         pressKeysForChannelNumber(STARTING_CHANNEL);
     }
 
-    @JankTest(expectedFrames = 7,
-            beforeTest = "warmProgramGuide",
-            beforeLoop = "selectProgramGuideMenuItem",
-            afterLoop = "clearProgramGuide")
-    @WindowContentFrameStatsMonitor
-    public void testShowProgramGuide() {
-        mDevice.pressDPadCenter();
-
-        // Full show has two animations.
-        long delay = mTargetResources.getInteger(R.integer.program_guide_anim_duration) * 2;
-        waitForIdleAtLeast(delay);
-    }
 
     @JankTest(expectedFrames = EXPECTED_FRAMES,
-            beforeLoop = "showProgramGuide")
-    @WindowContentFrameStatsMonitor
-    public void testClearProgramGuide() {
-        mDevice.pressBack();
-        // Full show has two animations.
-        waitForIdleAtLeast(mTargetResources.getInteger(R.integer.program_guide_anim_duration) * 2);
+            beforeTest = "warmProgramGuide")
+    @GfxMonitor(processName = LIVE_CHANNELS_PACKAGE)
+    public void testShowClearProgramGuide() {
+        int frames = 53; // measured by hand
+        int repeat = EXPECTED_FRAMES * 2 / frames;
+        for (int i = 0; i < repeat; i++) {
+            showProgramGuide();
+            clearProgramGuide();
+        }
     }
 
     @JankTest(expectedFrames = EXPECTED_FRAMES,
             beforeLoop = "showProgramGuide",
             afterLoop = "clearProgramGuide")
-    @WindowContentFrameStatsMonitor
+    @GfxMonitor(processName = LIVE_CHANNELS_PROCESS_NAME)
     public void testScrollDown() {
-        mDevice.pressDPadDown();
-        waitForIdleAtLeast(mTargetResources
-                .getInteger(R.integer.program_guide_table_detail_toggle_anim_duration));
+        int frames = 20;  // measured by hand
+        int repeat = EXPECTED_FRAMES * 2 / frames;
+        for (int i = 0; i < repeat; i++) {
+            mDevice.pressDPadDown();
+        }
     }
 
     @JankTest(expectedFrames = EXPECTED_FRAMES,
             beforeLoop = "showProgramGuide",
             afterLoop = "clearProgramGuide")
-    @WindowContentFrameStatsMonitor
+    @GfxMonitor(processName = LIVE_CHANNELS_PROCESS_NAME)
     public void testScrollRight() {
-        mDevice.pressDPadRight();
-        waitForIdleAtLeast(mTargetResources
-                .getInteger(R.integer.program_guide_table_detail_toggle_anim_duration));
-    }
-
-    /**
-     * {@link UiDevice#waitForIdle() Wait for idle} , then sleep if needed, then wait for idle
-     * again.
-     *
-     * @param delayInMillis The minimum amount of time to delay.  This is usually the expected
-     *                      duration of the animation.
-     */
-    private void waitForIdleAtLeast(long delayInMillis) {
-
-        // This seems to give the most reliable numbers.
-        // The first wait until idle usually returned in 1ms.
-        //  Sometimes it would take the whole duration. If we sleep after that we get bad fps
-        // because nothing is happening after the idle ends.
-        //
-        // So sleeping only for the remaining about ensure there is at least enough time for the
-        // animation to complete. If we sleep then wait for idle again.  This will usually allow
-        // the animation to complete.
-
-        long startTime = SystemClock.uptimeMillis();
-        mDevice.waitForIdle();
-
-        long idle = SystemClock.uptimeMillis() - startTime;
-        if (DEBUG) {
-            Log.d(TAG, "Waited for idle " + (idle) / 1000.0 + " sec");
-        }
-        if (idle < delayInMillis) {
-            long more = delayInMillis - idle;
-            SystemClock.sleep(more);
-            Log.d(TAG, "Slept " + (more) / 1000.0 + " sec");
-            mDevice.waitForIdle();
-        }
-        if (DEBUG) {
-            Log.d(TAG, "Total wait " + (SystemClock.uptimeMillis() - startTime) / 1000.0 + " sec");
+        int frames = 30;  // measured by hand
+        int repeat = EXPECTED_FRAMES * 2 / frames;
+        for (int i = 0; i < repeat; i++) {
+            mDevice.pressDPadRight();
         }
     }
 

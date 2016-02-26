@@ -19,6 +19,7 @@ package com.android.tv.data;
 import android.test.AndroidTestCase;
 import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.android.tv.data.WatchedHistoryManager.WatchedRecord;
 import com.android.tv.testing.Utils;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
  * Test for {@link com.android.tv.data.WatchedHistoryManagerTest}
  */
 @SmallTest
+@Suppress // http://b/27156462
 public class WatchedHistoryManagerTest extends AndroidTestCase {
     private static final boolean DEBUG = false;
     private static final String TAG = "WatchedHistoryManager";

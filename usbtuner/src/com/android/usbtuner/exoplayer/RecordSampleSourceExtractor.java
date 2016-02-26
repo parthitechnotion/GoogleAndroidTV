@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 public class RecordSampleSourceExtractor implements SampleExtractor, CacheManager.EvictListener {
     // TODO: Decouple from {@link SampleExtractor}. Handle recording errors properly.
 
-    private static final String TAG = "RecordSampleSourceExtractor";
+    private static final String TAG = "RecordSampleSourceExt";
 
     // Maximum bandwidth of 1080p channel is about 2.2MB/s. 2MB for a sample will suffice.
     private static final int SAMPLE_BUFFER_SIZE = 1024 * 1024 * 2;
@@ -71,6 +71,7 @@ public class RecordSampleSourceExtractor implements SampleExtractor, CacheManage
 
     private final PlaybackCacheListener mCacheListener;
     private long[] mCacheEndPositionsUs;
+    private volatile long mCacheDurationUs = 0;
     private SampleCache[] mSampleCaches;
     private final SamplePool mSamplePool;
 
@@ -123,6 +124,9 @@ public class RecordSampleSourceExtractor implements SampleExtractor, CacheManage
             }
             sample.data.position(sample.size);
             sample.timeUs = mMediaExtractor.getSampleTime();
+            if (sample.timeUs > mCacheDurationUs) {
+                mCacheDurationUs = sample.timeUs;
+            }
             sample.flags = mMediaExtractor.getSampleFlags();
 
             mMediaExtractor.advance();
@@ -266,6 +270,7 @@ public class RecordSampleSourceExtractor implements SampleExtractor, CacheManage
             Pair<String, android.media.MediaFormat> audio = null, video = null;
             for (int i = 0; i < mTrackCount; ++i) {
                 String mime = mTrackInfos[i].mimeType;
+                mMediaFormat[i].setLong(android.media.MediaFormat.KEY_DURATION, mCacheDurationUs);
                 if (MimeTypes.isAudio(mime)) {
                     audio = new Pair<>(getTrackId(i), mMediaFormat[i]);
                 }

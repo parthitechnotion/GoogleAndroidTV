@@ -19,6 +19,8 @@ package com.android.tv.util;
 import android.support.annotation.VisibleForTesting;
 import android.util.LongSparseArray;
 
+import com.android.tv.common.CollectionUtils;
+
 import java.util.Collections;
 import java.util.Set;
 

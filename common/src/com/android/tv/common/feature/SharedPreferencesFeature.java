@@ -20,14 +20,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.android.tv.common.SharedPreferencesUtils;
+
 /**
  * Feature controlled by shared preferences.
  */
 public final class SharedPreferencesFeature implements Feature {
-    private static final String TAG = "SharedPreferencesFeature";
+    private static final String TAG = "SharedPrefFeature";
     private static final boolean DEBUG = false;
 
-    private static final String SHARED_PREFERENCE = "sharePreferencesFeatures";
     private String mKey;
     private boolean mEnabled;
     private boolean mDefaultValue;
@@ -54,7 +55,7 @@ public final class SharedPreferencesFeature implements Feature {
         }
         if (mSharedPreferences == null) {
             mSharedPreferences = context.getSharedPreferences(
-                    SHARED_PREFERENCE, Context.MODE_PRIVATE);
+                    SharedPreferencesUtils.SHARED_PREF_FEATURES, Context.MODE_PRIVATE);
             mEnabled = mSharedPreferences.getBoolean(mKey, mDefaultValue);
         }
         if (DEBUG) Log.d(TAG, mKey + " is " + mEnabled);
@@ -70,7 +71,7 @@ public final class SharedPreferencesFeature implements Feature {
         if (DEBUG) Log.d(TAG, mKey + " is set to " + enable);
         if (mSharedPreferences == null) {
             mSharedPreferences = context.getSharedPreferences(
-                    SHARED_PREFERENCE, Context.MODE_PRIVATE);
+                    SharedPreferencesUtils.SHARED_PREF_FEATURES, Context.MODE_PRIVATE);
             mEnabled = enable;
             mSharedPreferences.edit().putBoolean(mKey, enable).apply();
         } else if (mEnabled != enable) {

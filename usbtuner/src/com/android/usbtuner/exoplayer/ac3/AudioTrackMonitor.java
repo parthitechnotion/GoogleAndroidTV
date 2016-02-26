@@ -105,19 +105,15 @@ public class AudioTrackMonitor {
                 ptsBuilder.append("PTS received ").append(mSampleCount).append(", ")
                         .append(totalDuration - sampleDuration).append(' ');
 
-                for (int i = 0; i < mPtsList.size(); ++i) {
-                    Pair pair = mPtsList.get(i);
-                    ptsBuilder.append('[').append(pair.first)
-                            .append(':').append(pair.second).append("], ");
+                for (Pair<Long, Integer> pair : mPtsList) {
+                    ptsBuilder.append('[').append(pair.first).append(':').append(pair.second)
+                            .append("], ");
                 }
                 Log.d(TAG, ptsBuilder.toString());
             }
             if (DEBUG || mCurSampleSize.size() > 1) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(mSampleSize);
-                sb.append(mCurSampleSize);
-                sb.append(mAc3Header);
-                Log.d(TAG, "PTS received sample size: " + sb.toString());
+                Log.d(TAG, "PTS received sample size: "
+                        + String.valueOf(mSampleSize) + mCurSampleSize + mAc3Header);
             }
             flush();
         }

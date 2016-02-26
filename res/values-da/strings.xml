@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"Til"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"Fra"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Flere lydspor"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"Kanalkonfig."</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"Børnesikring"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"Om"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"Få flere kanaler"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"Indstillinger"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"Kilde"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"Skift"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"Til"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"Gruppér efter"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"Kanalkonfiguration"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"Dette program er blokeret"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"Dette program er klassificereret som <xliff:g id="RATING">%1$s</xliff:g>"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"Kanalkilder"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"Der er nye tilgængelige kanaler"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"Tilpas kanallisten"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"Vælg kanaler på din programoversigt"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"Ikke konfigureret"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"Dette input understøtter ikke automatisk scanning"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"Automatisk scanning for \"<xliff:g id="TV_INPUT">%s</xliff:g>\" kunne ikke startes"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"Præferencer for undertekster gældende for hele systemet kunne ikke startes."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d kanal blev tilføjet"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d kanaler tilføjet"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="one">%1$d kanal blev tilføjet</item>
+      <item quantity="other">%1$d kanaler blev tilføjet</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"Ingen kanaler tilføjet"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Tuner"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"Børnesikring"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"Angiv ny pinkode"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"Bekræft din pinkode"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"Angiv din aktuelle pinkode"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"Du har indtastet den forkerte pinkode 5 gange.\nPrøv igen om <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> sekund."</item>
-    <item quantity="other" msgid="8829550842387756054">"Du har indtastet den forkerte pinkode 5 gange.\nPrøv igen om <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> sekunder."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="one">Du har indtastet en forkert PIN-kode 5 gange.\nPrøv igen om <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> sekund.</item>
+      <item quantity="other">Du har indtastet en forkert PIN-kode 5 gange.\nPrøv igen om <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> sekunder.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"Pinkoden var forkert. Prøv igen."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Prøv igen. Pinkoden var forkert"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"Om"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"Open source-licenser"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"Indstillinger"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"Tilpas kanallisten"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Vælg kanaler til din programoversigt"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"Kanalkilder"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"Der er nye tilgængelige kanaler"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"Børnesikring"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"Open source-licenser"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Open source-licenser"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"Version"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"Version"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"Indstillinger for udviklere"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Aktivér USB-tuner til fjernsynet"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Dit fjernsyn skal understøtte AC3-gennemførsel, for at du kan høre lyd fra USB-tuneren til fjernsynet."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Ingen titel"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Kanalen er blokeret"</string>
     <string name="episode_format" msgid="4881195874563241096">"S<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Afsnit <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g><xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"Kanalkilder"</string>
-    <string name="setup_description" msgid="8728423605912915099">"Konfigurer tv-kanaler fra de tilgængelige kilder. Dette kan tage flere minutter afhængigt af kanalkilden."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"Udfør"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d tilgængelig kanal"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d tilgængelige kanaler"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"Nye"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"Kilder"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="one">%1$d kanal</item>
+      <item quantity="other">%1$d kanaler</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"Der er ingen tilgængelige kanaler"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"Nye"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"Ikke konfigureret"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"Få flere kilder"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"Gennemse apps, der viser tv-kanaler"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"Der er nye tilgængelige kanalkilder"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"Du kan få kanaler fra nye kanalkilder.\nKonfigurer dem nu, eller gør det senere i indstillingen for kanalkilder."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"Konfigurer nu"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"OK, det er forstået"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"Tryk på VÆLG"</b>" for at få adgang til TV-menuen."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Knappen Tilbage er til den tilsluttede enhed. Tryk på knappen Hjem for at afslutte."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Tv-kanaler understøttes ikke på denne enhed med Android Lollipop."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Tv-kanaler skal have tilladelse for at kunne læse tv-guiden."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"Konfigurer dine kilder"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"Tv-kanaler kombinerer oplevelsen af traditionelle fjernsynskanaler med streamingkanaler fra apps. \n\nKom godt i gang ved at konfigurere de kanalkilder, der allerede er installeret. Du kan også gå til Google Play Butik og finde flere apps med tv-kanaler."</string>
 </resources>

@@ -252,32 +252,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
                 // It is usually called when Genre is changed.
                 // Reset selection of ProgramGrid
                 resetRowSelection();
-
-                // Align EPG at vertical center, if EPG table height is less than the screen size.
-                Resources res = mActivity.getResources();
-                int screenHeight = mContainer.getHeight();
-                int startPadding = res
-                        .getDimensionPixelOffset(R.dimen.program_guide_table_margin_start);
-                int topPadding = res
-                        .getDimensionPixelOffset(R.dimen.program_guide_table_margin_top);
-                int bottomPadding = res
-                        .getDimensionPixelOffset(R.dimen.program_guide_table_margin_bottom);
-                int tableHeight =
-                        res.getDimensionPixelOffset(R.dimen.program_guide_table_header_row_height)
-                                + mDetailHeight + mRowHeight * mGrid.getAdapter().getItemCount()
-                                + topPadding + bottomPadding;
-                if (tableHeight > screenHeight) {
-                    // EPG height is longer that the screen height.
-                    mTable.setPaddingRelative(startPadding, topPadding, 0, 0);
-                    LayoutParams layoutParams = mTable.getLayoutParams();
-                    layoutParams.height = LayoutParams.WRAP_CONTENT;
-                    mTable.setLayoutParams(layoutParams);
-                } else {
-                    mTable.setPaddingRelative(startPadding, topPadding, 0, bottomPadding);
-                    LayoutParams layoutParams = mTable.getLayoutParams();
-                    layoutParams.height = tableHeight;
-                    mTable.setLayoutParams(layoutParams);
-                }
+                updateGuidePosition();
             }
         });
 
@@ -399,6 +374,34 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         mShowGuidePartial = mSharedPreference.getBoolean(KEY_SHOW_GUIDE_PARTIAL, true);
     }
 
+    private void updateGuidePosition() {
+        // Align EPG at vertical center, if EPG table height is less than the screen size.
+        Resources res = mActivity.getResources();
+        int screenHeight = mContainer.getHeight();
+        if (screenHeight <= 0) {
+            // mContainer is not initialized yet.
+            return;
+        }
+        int startPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_margin_start);
+        int topPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_margin_top);
+        int bottomPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_margin_bottom);
+        int tableHeight = res.getDimensionPixelOffset(R.dimen.program_guide_table_header_row_height)
+                + mDetailHeight + mRowHeight * mGrid.getAdapter().getItemCount() + topPadding
+                + bottomPadding;
+        if (tableHeight > screenHeight) {
+            // EPG height is longer that the screen height.
+            mTable.setPaddingRelative(startPadding, topPadding, 0, 0);
+            LayoutParams layoutParams = mTable.getLayoutParams();
+            layoutParams.height = LayoutParams.WRAP_CONTENT;
+            mTable.setLayoutParams(layoutParams);
+        } else {
+            mTable.setPaddingRelative(startPadding, topPadding, 0, bottomPadding);
+            LayoutParams layoutParams = mTable.getLayoutParams();
+            layoutParams.height = tableHeight;
+            mTable.setLayoutParams(layoutParams);
+        }
+    }
+
     @Override
     public void onRequestChildFocus(View oldFocus, View newFocus) {
         if (oldFocus != null && newFocus != null) {
@@ -510,18 +513,19 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
                 if (DEBUG) {
                     mContainer.getViewTreeObserver().addOnDrawListener(
                             new ViewTreeObserver.OnDrawListener() {
-                        long time = System.currentTimeMillis();
-                        int count = 0;
-                        @Override
-                        public void onDraw() {
-                            long curtime = System.currentTimeMillis();
-                            Log.d(TAG, "onDraw " + count++ + " " + (curtime - time) + "ms");
-                            time = curtime;
-                            if (count > 10) {
-                                mContainer.getViewTreeObserver().removeOnDrawListener(this);
-                            }
-                        }
-                    });
+                                long time = System.currentTimeMillis();
+                                int count = 0;
+
+                                @Override
+                                public void onDraw() {
+                                    long curtime = System.currentTimeMillis();
+                                    Log.d(TAG, "onDraw " + count++ + " " + (curtime - time) + "ms");
+                                    time = curtime;
+                                    if (count > 10) {
+                                        mContainer.getViewTreeObserver().removeOnDrawListener(this);
+                                    }
+                                }
+                            });
                 }
                 runnableAfterAnimatorReady.run();
                 if (mShowGuidePartial) {
@@ -529,6 +533,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
                 } else {
                     mShowAnimatorFull.start();
                 }
+                updateGuidePosition();
             }
         };
         mContainer.getViewTreeObserver().addOnGlobalLayoutListener(mOnLayoutListenerForShow);

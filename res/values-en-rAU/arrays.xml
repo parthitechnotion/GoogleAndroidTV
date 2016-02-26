@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premier"</item>
     <item msgid="8215762047341133299">"Tech/Science"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Live TV"</item>
+    <item msgid="7307688057853449735">"A simple way to discover content"</item>
+    <item msgid="7566838222783641942">"Download apps, get more channels"</item>
+    <item msgid="8646630833216197238">"Customise your channel line-up"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Watch content from your apps such as watching channels on TV."</item>
+    <item msgid="1855708984677953238">"Browse content from your apps with a familiar guide and friendly interface, \njust like channels on TV."</item>
+    <item msgid="3420760668363283731">"Add more channels by installing apps that offer live channels. \nFind compatible apps in Google Play Store by using the link within the TV menu."</item>
+    <item msgid="8974157841656828507">"Set up your newly installed channel sources to customise your channel list. \nChoose the Channel sources within the Settings menu to get started."</item>
+  </string-array>
 </resources>

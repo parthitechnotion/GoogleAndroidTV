@@ -133,10 +133,11 @@
     <!-- Setup -->
     <color name="setup_title">#EEEEEE</color>
     <color name="setup_description">#B3EEEEEE</color>
-    <color name="setup_background">#E701579B</color>
-    <color name="setup_divider">#4DEEEEEE</color>
-
-    <!-- Onboarding screen -->
-    <color name="onboarding_dot_selected">#FFFFFFFF</color>
-    <color name="onboarding_dot_unselected">#4DFFFFFF</color>
+    <!-- Add alpha value to common_tv_background -->
+    <color name="setup_background">#E70288D1</color>
+    <!-- Add alpha value to common_setup_action_background -->
+    <color name="setup_actions_background">#B30374BF</color>
+    <!-- Add alpha value to common_setup_done_container_background -->
+    <color name="setup_done_button_container_background">#8004549D</color>
+    <color name="setup_category">#3EC2FF</color>
 </resources>

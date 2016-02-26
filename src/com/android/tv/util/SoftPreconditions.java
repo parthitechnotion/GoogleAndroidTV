@@ -20,7 +20,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.tv.BuildConfig;
+import com.android.tv.common.BuildConfig;
 import com.android.tv.common.feature.Feature;
 
 /**
@@ -147,8 +147,10 @@ public final class SoftPreconditions {
                 tag = TAG;
             }
             String logMessage;
-            if (msg == null) {
+            if (TextUtils.isEmpty(msg)) {
                 logMessage = prefix;
+            } else if (TextUtils.isEmpty(prefix)) {
+                logMessage = msg;
             } else {
                 logMessage = prefix + ": " + msg;
             }

@@ -21,6 +21,7 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.PlaybackParams;
@@ -28,10 +29,10 @@ import android.media.tv.TvContentRating;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvTrackInfo;
-import android.media.tv.TvView;
 import android.media.tv.TvView.OnUnhandledInputEventListener;
 import android.media.tv.TvView.TvInputCallback;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
@@ -47,12 +48,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.tv.R;
 import com.android.tv.ApplicationSingletons;
+import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.DurationTimer;
 import com.android.tv.analytics.Tracker;
-import com.android.tv.common.TvCommonConstants;
+import com.android.tv.common.recording.PlaybackTvView;
+import com.android.tv.common.recording.RecordingUtils;
 import com.android.tv.data.Channel;
 import com.android.tv.data.StreamInfo;
 import com.android.tv.data.WatchedHistoryManager;
@@ -311,6 +313,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
                 }
 
                 @Override
+                @TargetApi(Build.VERSION_CODES.M)
                 public void onTimeShiftStatusChanged(String inputId, int status) {
                     setTimeShiftAvailable(status == TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
                 }
@@ -468,6 +471,18 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
     }
 
     /**
+     * Plays a recording.
+     */
+    public boolean playRecording(String inputId, Uri recordingUri, OnTuneListener listener) {
+        // Create a dummy channel.
+        Channel channel = new Channel.Builder()
+                .setId(0)
+                .setInputId(inputId)
+                .build();
+        return tuneTo(channel, RecordingUtils.buildMediaUri(recordingUri), listener);
+    }
+
+    /**
      * Tunes to a channel with the {@code channelId}.
      *
      * @param params extra data to send it to TIS and store the data in TIMS.
@@ -517,7 +532,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         mHasClosedCaption = false;
         mTvView.setCallback(mCallback);
         mTimeShiftCurrentPositionMs = INVALID_TIME;
-        if (TvCommonConstants.HAS_TIME_SHIFT_API) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // To reduce the IPCs, unregister the callback here and register it when necessary.
             mTvView.setTimeShiftPositionCallback(null);
         }
@@ -1074,12 +1089,12 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
     }
 
     private void setTimeShiftAvailable(boolean isTimeShiftAvailable) {
-        if (!TvCommonConstants.HAS_TIME_SHIFT_API || mTimeShiftAvailable == isTimeShiftAvailable) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || mTimeShiftAvailable == isTimeShiftAvailable) {
             return;
         }
         mTimeShiftAvailable = isTimeShiftAvailable;
         if (isTimeShiftAvailable) {
-            mTvView.setTimeShiftPositionCallback(new TvView.TimeShiftPositionCallback() {
+            mTvView.setTimeShiftPositionCallback(new PlaybackTvView.TimeShiftPositionCallback2() {
                 @Override
                 public void onTimeShiftStartPositionChanged(String inputId, long timeMs) {
                     if (mTimeShiftListener != null && mCurrentChannel != null
@@ -1091,6 +1106,14 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
                 @Override
                 public void onTimeShiftCurrentPositionChanged(String inputId, long timeMs) {
                     mTimeShiftCurrentPositionMs = timeMs;
+                }
+
+                @Override
+                public void onTimeShiftEndPositionChanged(String inputId, long timeMs) {
+                    if (mTimeShiftListener != null && mCurrentChannel != null
+                            && mCurrentChannel.getInputId().equals(inputId)) {
+                        mTimeShiftListener.onRecordEndTimeChanged(timeMs);
+                    }
                 }
             });
         } else {
@@ -1122,7 +1145,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
      * Plays the media, if the current input supports time-shifting.
      */
     public void timeshiftPlay() {
-        if (!TvCommonConstants.HAS_TIME_SHIFT_API) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "Time shifting is not supported in this platform.");
             return;
         }
@@ -1139,7 +1162,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
      * Pauses the media, if the current input supports time-shifting.
      */
     public void timeshiftPause() {
-        if (!TvCommonConstants.HAS_TIME_SHIFT_API) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "Time shifting is not supported in this platform.");
             return;
         }
@@ -1158,20 +1181,19 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
      * @param speed The speed to rewind the media. e.g. 2 for 2x, 3 for 3x and 4 for 4x.
      */
     public void timeshiftRewind(int speed) {
-        if (!TvCommonConstants.HAS_TIME_SHIFT_API) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "Time shifting is not supported in this platform.");
-            return;
-        }
-        if (!isTimeShiftAvailable()) {
+        } else if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
+        } else {
+            if (speed <= 0) {
+                throw new IllegalArgumentException("The speed should be a positive integer.");
+            }
+            mTimeShiftState = TIME_SHIFT_STATE_REWIND;
+            PlaybackParams params = new PlaybackParams();
+            params.setSpeed(speed * -1);
+            mTvView.timeShiftSetPlaybackParams(params);
         }
-        if (speed <= 0) {
-            throw new IllegalArgumentException("The speed should be a positive integer.");
-        }
-        mTimeShiftState = TIME_SHIFT_STATE_REWIND;
-        PlaybackParams params = new PlaybackParams();
-        params.setSpeed(speed * -1);
-        mTvView.timeShiftSetPlaybackParams(params);
     }
 
     /**
@@ -1180,20 +1202,19 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
      * @param speed The speed to forward the media. e.g. 2 for 2x, 3 for 3x and 4 for 4x.
      */
     public void timeshiftFastForward(int speed) {
-        if (!TvCommonConstants.HAS_TIME_SHIFT_API) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "Time shifting is not supported in this platform.");
-            return;
-        }
-        if (!isTimeShiftAvailable()) {
+        } else if (!isTimeShiftAvailable()) {
             throw new IllegalStateException("Time-shift is not supported for the current channel");
+        } else {
+            if (speed <= 0) {
+                throw new IllegalArgumentException("The speed should be a positive integer.");
+            }
+            mTimeShiftState = TIME_SHIFT_STATE_FAST_FORWARD;
+            PlaybackParams params = new PlaybackParams();
+            params.setSpeed(speed);
+            mTvView.timeShiftSetPlaybackParams(params);
         }
-        if (speed <= 0) {
-            throw new IllegalArgumentException("The speed should be a positive integer.");
-        }
-        mTimeShiftState = TIME_SHIFT_STATE_FAST_FORWARD;
-        PlaybackParams params = new PlaybackParams();
-        params.setSpeed(speed);
-        mTvView.timeShiftSetPlaybackParams(params);
     }
 
     /**
@@ -1202,7 +1223,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
      * @param timeMs The time in milliseconds to seek to.
      */
     public void timeshiftSeekTo(long timeMs) {
-        if (!TvCommonConstants.HAS_TIME_SHIFT_API) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "Time shifting is not supported in this platform.");
             return;
         }
@@ -1216,7 +1237,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
      * Returns the current playback position in milliseconds.
      */
     public long timeshiftGetCurrentPositionMs() {
-        if (!TvCommonConstants.HAS_TIME_SHIFT_API) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "Time shifting is not supported in this platform.");
             return INVALID_TIME;
         }
@@ -1241,9 +1262,14 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
         public abstract void onAvailabilityChanged();
 
         /**
-         * Called when the record start time has been changed..
+         * Called when the record start time has been changed.
          */
         public abstract void onRecordStartTimeChanged(long recordStartTimeMs);
+
+        /**
+         * Called when the record end time has been changed.
+         */
+        public abstract void onRecordEndTimeChanged(long recordEndTimeMs);
     }
 
     /**

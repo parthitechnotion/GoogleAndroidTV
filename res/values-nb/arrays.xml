@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premiere"</item>
     <item msgid="8215762047341133299">"Teknologi/vitenskap"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Direkte-TV"</item>
+    <item msgid="7307688057853449735">"En enkel måte å oppdage innhold på"</item>
+    <item msgid="7566838222783641942">"Last ned apper – få flere kanaler"</item>
+    <item msgid="8646630833216197238">"Tilpass rekkefølgen på kanalene dine"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Se innhold fra appene dine – akkurat som når du ser på TV-kanaler."</item>
+    <item msgid="1855708984677953238">"Bla gjennom innhold fra appene dine med en gjenkjennelig TV-programoversikt og et brukervennlig grensesnitt, \nakkurat som med kanaler på TV."</item>
+    <item msgid="3420760668363283731">"Legg til flere kanaler ved å installere apper som tilbyr direkte-TV. \nFinn kompatible apper i Google Play Butikk ved å følge linken i TV-menyen."</item>
+    <item msgid="8974157841656828507">"Konfigurer de nylig installerte kanalkildene for å spesialtilpasse kanallisten din. \nVelg alternativet for kanalkilder i innstillingsmenyen for å komme i gang."</item>
+  </string-array>
 </resources>

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-javah -jni -classpath ../bin:../../../../../prebuilts/sdk/current/android.jar -o usbtuner_jni.h com.android.usbtuner.UsbTunerInterface
+javah -jni -classpath ../../bin/classes:../../../../../../prebuilts/sdk/current/android.jar -o tunertvinput_jni.h com.android.usbtuner.TunerHal

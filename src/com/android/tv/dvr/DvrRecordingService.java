@@ -21,14 +21,15 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.android.tv.ApplicationSingletons;
-import com.android.tv.Features;
 import com.android.tv.TvApplication;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.util.Clock;
 import com.android.tv.util.SoftPreconditions;
 
@@ -49,12 +50,13 @@ import com.android.tv.util.SoftPreconditions;
 public class DvrRecordingService extends Service {
     private static final String TAG = "DvrRecordingService";
     private static final boolean DEBUG = false;
+    public static final String HANDLER_THREAD_NAME = "DvrRecordingService-handler";
+
     public static void startService(Context context) {
         Intent dvrSchedulerIntent = new Intent(context, DvrRecordingService.class);
         context.startService(dvrSchedulerIntent);
     }
 
-    private DvrSessionManager mSessionManager;
     private WritableDvrDataManager mDataManager;
 
     /**
@@ -71,20 +73,24 @@ public class DvrRecordingService extends Service {
     private final IBinder mBinder = new SchedulerBinder();
 
     private Scheduler mScheduler;
+    private HandlerThread mHandlerThread;
 
     @Override
     public void onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate");
         super.onCreate();
-        SoftPreconditions.checkFeatureEnabled(this, Features.DVR, TAG);
+        SoftPreconditions.checkFeatureEnabled(this, CommonFeatures.DVR, TAG);
         ApplicationSingletons singletons = TvApplication.getSingletons(this);
         mDataManager = (WritableDvrDataManager) singletons.getDvrDataManager();
-        mSessionManager = singletons.getDvrSessionManger();
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         // mScheduler may have been set for testing.
         if (mScheduler == null) {
-            mScheduler = new Scheduler(mSessionManager, mDataManager, this, Clock.SYSTEM,
+            DvrSessionManager sessionManager = singletons.getDvrSessionManger();
+            mHandlerThread = new HandlerThread(HANDLER_THREAD_NAME);
+            mHandlerThread.start();
+            mScheduler = new Scheduler(mHandlerThread.getLooper(), sessionManager, mDataManager,
+                    this, Clock.SYSTEM,
                     alarmManager);
         }
         mDataManager.addListener(mScheduler);
@@ -102,6 +108,10 @@ public class DvrRecordingService extends Service {
         if (DEBUG) Log.d(TAG, "onDestroy");
         mDataManager.removeListener(mScheduler);
         mScheduler = null;
+        if (mHandlerThread != null) {
+            mHandlerThread.quit();
+            mHandlerThread = null;
+        }
         super.onDestroy();
     }
 

@@ -84,7 +84,8 @@ public class KeypadChannelSwitchView extends LinearLayout implements
                         TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
                         | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
                         | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
-                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU
+                        | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_FRAGMENT);
             }
         }
     };
@@ -127,6 +128,7 @@ public class KeypadChannelSwitchView extends LinearLayout implements
 
     @Override
     protected void onFinishInflate(){
+        super.onFinishInflate();
         mChannelNumberView = (TextView) findViewById(R.id.channel_number);
         mChannelItemListView = (ListView) findViewById(R.id.channel_list);
         mChannelItemListView.setAdapter(mAdapter);

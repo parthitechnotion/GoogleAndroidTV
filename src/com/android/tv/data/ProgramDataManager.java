@@ -26,16 +26,16 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.MainThread;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 
-import com.android.tv.BuildConfig;
+import com.android.tv.common.CollectionUtils;
+import com.android.tv.common.MemoryManageable;
 import com.android.tv.util.AsyncDbTask;
 import com.android.tv.util.Clock;
-import com.android.tv.util.CollectionUtils;
-import com.android.tv.util.MemoryManageable;
 import com.android.tv.util.MultiLongSparseArray;
 import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
@@ -51,6 +51,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@MainThread
 public class ProgramDataManager implements MemoryManageable {
     private static final String TAG = "ProgramDataManager";
     private static final boolean DEBUG = false;
@@ -454,7 +455,7 @@ public class ProgramDataManager implements MemoryManageable {
                             return null;
                         }
                         Program program = Program.fromCursor(c);
-                        if (isDuplicateProgram(program, lastReadProgram)) {
+                        if (Program.isDuplicate(program, lastReadProgram)) {
                             duplicateCount++;
                             continue;
                         } else {
@@ -537,7 +538,7 @@ public class ProgramDataManager implements MemoryManageable {
                         return programs;
                     }
                     Program program = Program.fromCursor(c);
-                    if (isDuplicateProgram(program, lastReadProgram)) {
+                    if (Program.isDuplicate(program, lastReadProgram)) {
                         duplicateCount++;
                         continue;
                     } else {
@@ -710,20 +711,6 @@ public class ProgramDataManager implements MemoryManageable {
                 .setChannelId(Channel.INVALID_ID)
                 .setStartTimeUtcMillis(startTimeMs)
                 .setEndTimeUtcMillis(endTimeMs).build();
-    }
-
-    private static boolean isDuplicateProgram(Program p1, Program p2) {
-        if (p1 == null || p2 == null) {
-            return false;
-        }
-        boolean isDuplicate = p1.getChannelId() == p2.getChannelId()
-                && p1.getStartTimeUtcMillis() == p2.getStartTimeUtcMillis()
-                && p1.getEndTimeUtcMillis() == p2.getEndTimeUtcMillis();
-        if (BuildConfig.ENG && isDuplicate) {
-            Log.w(TAG, "Duplicate programs detected! - \"" + p1.getTitle() + "\" and \""
-                    + p2.getTitle() + "\"");
-        }
-        return isDuplicate;
     }
 
     @Override

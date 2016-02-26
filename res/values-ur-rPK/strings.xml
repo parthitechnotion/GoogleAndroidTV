@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"آن"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"آف"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"کثیر آڈیو"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"چینل سیٹ اپ"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"والدین کے کنٹرولز"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"تفصیل"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"مزید چینلز حاصل کریں"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"ترتیبات"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"ماخذ"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"تبادلہ کریں"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"آن"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"گروپ بلحاظ"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"چینل سیٹ اپ"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"یہ پروگرام مسدود ہے"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"اس پروگرام کی درجہ بندی <xliff:g id="RATING">%1$s</xliff:g> کی گئی ہے"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"چینل کے مآخذ"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"نئے چینلز دستیاب ہیں"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"چینل لسٹ کسٹمائز کریں"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"اپنی پروگرام گائیڈ کیلئے چینلز منتخب کریں"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"ترتیب نہیں دیا گیا"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"ان پٹ آٹو اسکین کو سپورٹ نہیں کرتا"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"\'<xliff:g id="TV_INPUT">%s</xliff:g>\' کیلئے آٹو اسکین شروع کرنے سے قاصر ہے"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"سب ٹائٹلز کیلئے سسٹم وار ترجیحات شروع کرنے سے قاصر ہے۔"</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"‏%1$d چینل شامل کیا گیا"</item>
-    <item quantity="other" msgid="1078861616751739285">"‏%1$d چینلز شامل کیے گئے"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">‏%1$d چینل شامل ہو گئے</item>
+      <item quantity="one">‏%1$d چینل شامل ہو گیا</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"کوئی چینلز شامل نہیں کیے گئے"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"ٹیونر"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"والدین کے کنٹرولز"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"‏نیا PIN درج کریں"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"‏اپنے PIN کی توثیق کریں"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"‏اپنا موجودہ PIN درج کریں"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"‏آپ نے 5 بار غلط PIN درج کر دیا ہے۔\n<xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> سیکنڈ بعد دوبارہ کوشش کریں۔"</item>
-    <item quantity="other" msgid="8829550842387756054">"‏آپ نے 5 بار غلط PIN درج کر دیا ہے۔\n<xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> سیکنڈ بعد دوبارہ کوشش کریں۔"</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">‏آپ نے 5 بار غلط PIN درج کی۔\n<xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> سیکنڈز بعد دوبارہ کوشش کریں۔</item>
+      <item quantity="one">‏آپ نے 5 بار غلط PIN درج کی۔\n<xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> سیکنڈ بعد دوبارہ کوشش کریں۔</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"‏وہ PIN غلط تھا۔ دوبارہ کوشش کریں۔"</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"‏دوبارہ کوشش کریں، PIN مماثل نہیں ہے"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"تفصیل"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"اوپن سورس لائسنسز"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"ترتیبات"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"چینل فہرست حسب ضرورت بنائیں"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"اپنی پروگرام گائیڈ کیلئے چینلز منتخب کریں"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"چینل کے مآخذ"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"نئے چینلز دستیاب ہیں"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"والدین کے کنٹرولز"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"اوپن سورس لائسنسز"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"اوپن سورس لائسنسز"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"ورژن"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"ورژن"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"ڈیولپر کے اختیارات"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"‏USB TV ٹیونر فعال کریں"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"‏USB TV ٹیونر کی آواز سننے کیلئے، آپ کے TV کو AC3 پاس تھرو کی معاونت کرنی چاہئیے۔"</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"کوئی عنوان نہیں ہے"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"چینل مسدود کر دیا گیا"</string>
     <string name="episode_format" msgid="4881195874563241096">"سیزن <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: قسط <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"چینل کے مآخذ"</string>
-    <string name="setup_description" msgid="8728423605912915099">"دستیاب مآخذ سے لائیو چینلز کو ترتیب دیں۔ چینل کے ماخذ کی بنیاد پر اس میں کئی منٹ لگ سکتے ہیں۔"</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"ہوگیا"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"‏%1$d چینل دستیاب ہے"</item>
-    <item quantity="other" msgid="2386588423841837714">"‏%1$d چینلز دستیاب ہیں"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"نئے"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"مآخذ"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">‏%1$d چینلز</item>
+      <item quantity="one">‏%1$d چینل</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"کوئی چینلز دستیاب نہیں ہیں"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"نئے"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"ترتیب نہیں دیا گیا"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"مزید مآخذ حاصل کریں"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"لائیو چینلز کی پیشکش کرنے والی ایپس براؤز کریں"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"نئے چینل ماخذین دستیاب ہیں"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"نئے چینل ماخذین کے پاس پیشکش کیلئے چینل ہیں۔\nانہیں ابھی سیٹ اپ کریں یا چینل ماخذ ترتیب میں بعد میں کریں۔"</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"ابھی سیٹ اپ کریں"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"ٹھیک ہے، سمجھ آ گئی"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307">"‏TV مینو تک رسائی حاصل کرنے کیلئے "<b>"منتخب کریں کو دبائیں"</b>"۔"</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"‏BACK کلید منسلک آلہ کیلئے ہے۔ باہر نکلنے کیلئے HOME بٹن دبائیں۔"</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"‏Android Lollipop والے اس آلے پر لائیو چینلز کی معاونت نہیں ہے۔"</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"‏لائیو چینلز کو TV فہرستیں پڑھنے کیلئے اجازت کی ضرورت ہے۔"</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"اپنے ذرائع سیٹ اپ کریں"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"‏لائیو چینلز روایتی TV چینلز کے تجربے کو ایپس کی جانب سے فراہم کردہ اسٹریمنگ چینلز سے ملاتے ہیں۔ \n\nپہلے سے انسٹال شدہ چینل ماخذین کو سیٹ اپ کر کے شروع کریں۔ یا لائیو چینلز کی پیشکش کرنے والی مزید ایپس کیلئے Google Play اسٹور براؤز کریں۔"</string>
 </resources>

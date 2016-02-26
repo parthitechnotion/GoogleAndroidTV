@@ -31,6 +31,7 @@ import android.util.Log;
 
 import com.android.tv.Features;
 import com.android.tv.TvApplication;
+import com.android.usbtuner.setup.TunerSetupActivity;
 import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 import java.util.Map;
@@ -157,7 +158,7 @@ public class UsbInputController extends BroadcastReceiver {
         // Since PackageManager.DONT_KILL_APP delays the operation by 10 seconds
         // (PackageManagerService.BROADCAST_DELAY), we'd better avoid using it. It is used only
         // when the LiveChannels app is active since we don't want to kill the running app.
-        int flags = ((TvApplication) context.getApplicationContext()).hasMainActivity()
+        int flags = TvApplication.getSingletons(context).getMainActivityWrapper().isCreated()
                 ? PackageManager.DONT_KILL_APP : 0;
         int newState = enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;

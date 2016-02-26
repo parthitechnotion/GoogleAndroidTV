@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Estrenos"</item>
     <item msgid="8215762047341133299">"Ciencia y tecnología"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Canales en vivo"</item>
+    <item msgid="7307688057853449735">"Una manera simple de descubrir contenido"</item>
+    <item msgid="7566838222783641942">"Descarga apps y obtén más canales"</item>
+    <item msgid="8646630833216197238">"Personaliza tu listado de canales"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Mira contenido desde tus apps como si miraras canales en la TV."</item>
+    <item msgid="1855708984677953238">"Navega por el contenido de tus apps con una guía que ya conoces y una interfaz simple,\ncomo lo haces con los canales de TV."</item>
+    <item msgid="3420760668363283731">"Agrega más canales mediante la instalación de apps que ofrecen canales en vivo.\nEncuentra apps compatibles en Google Play Store con el vínculo que aparece en el menú de TV."</item>
+    <item msgid="8974157841656828507">"Configura tus fuentes de canales recién instaladas para personalizar la lista de canales.\nElige las fuentes de Canales en el menú Configuración para comenzar."</item>
+  </string-array>
 </resources>

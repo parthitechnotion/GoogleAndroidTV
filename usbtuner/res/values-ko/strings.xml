@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"USB 채널 튜너 설정"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"이 작업은 몇 분 정도 걸릴 수 있습니다."</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"%1$d개 채널 발견"</item>
-    <item quantity="other" msgid="7340557317633613">"채널 %1$d개 발견"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">채널 %1$d개 발견</item>
+      <item quantity="one">채널 %1$d개 발견</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"채널 스캔 중지"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"%1$d개 채널 발견"</item>
-    <item quantity="other" msgid="4331542666115153576">"채널 %1$d개 발견"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"채널을 스캔하는 동안 채널 %1$d개를 발견했습니다. 맞지 않는 것 같다면 안테나 위치를 조정한 후 다시 스캔하세요."</item>
-    <item quantity="other" msgid="8098777464551209564">"채널을 스캔하는 동안 채널 %1$d개를 발견했습니다. 맞지 않는 것 같다면 안테나 위치를 조정한 후 다시 스캔하세요."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">채널 %1$d개 발견</item>
+      <item quantity="one">채널 %1$d개 발견</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">좋습니다. 채널 스캔 중에 채널 %1$d개를 발견했습니다. 맞지 않는 것 같다면 안테나 위치를 조정한 후 다시 스캔하세요.</item>
+      <item quantity="one">좋습니다. 채널 스캔 중에 채널 %1$d개를 발견했습니다. 맞지 않는 것 같다면 안테나 위치를 조정한 후 다시 스캔하세요.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"완료"</item>
     <item msgid="496688122303154468">"다시 스캔"</item>

@@ -16,6 +16,8 @@
 
 package com.android.tv.ui;
 
+import static com.android.tv.util.ImageLoader.ImageLoaderCallback;
+
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
@@ -29,6 +31,7 @@ import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -62,8 +65,7 @@ import java.util.Objects;
 /**
  * A view to render channel banner.
  */
-public class ChannelBannerView extends FrameLayout implements Channel.LoadImageCallback,
-        TvTransitionManager.TransitionLayout {
+public class ChannelBannerView extends FrameLayout implements TvTransitionManager.TransitionLayout {
 
     /**
      * Show all information at the channel banner.
@@ -128,7 +130,8 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadImageC
                     TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_DIALOG
                     | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS
                     | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE
-                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU);
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU
+                    | TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_FRAGMENT);
         }
     };
     private final long mShowDurationMillis;
@@ -407,8 +410,7 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadImageC
 
         TvInputInfo info = mMainActivity.getTvInputManagerHelper().getTvInputInfo(
                 mCurrentChannel.getInputId());
-        if (info == null ||
-                !ImageLoader.loadBitmap(createTvInputLogoLoaderCallback(info),
+        if (info == null || !ImageLoader.loadBitmap(createTvInputLogoLoaderCallback(info, this),
                         new LoadTvInputLogoTask(getContext(), ImageCache.getInstance(), info))) {
             mTvInputLogoImageView.setVisibility(View.GONE);
             mTvInputLogoImageView.setImageDrawable(null);
@@ -416,17 +418,23 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadImageC
         mChannelLogoImageView.setImageBitmap(null);
         mChannelLogoImageView.setVisibility(View.GONE);
         mCurrentChannel.loadBitmap(getContext(), Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO,
-                mChannelLogoImageViewWidth, mChannelLogoImageViewHeight, this);
+                mChannelLogoImageViewWidth, mChannelLogoImageViewHeight,
+                createChannelLogoCallback(this, mCurrentChannel));
     }
 
-    private ImageLoader.ImageLoaderCallback createTvInputLogoLoaderCallback(
-            final TvInputInfo info) {
-        return new ImageLoader.ImageLoaderCallback() {
+    private void updateTvInputLogo(Bitmap bitmap) {
+        mTvInputLogoImageView.setVisibility(View.VISIBLE);
+        mTvInputLogoImageView.setImageBitmap(bitmap);
+    }
+
+    private static ImageLoaderCallback<ChannelBannerView> createTvInputLogoLoaderCallback(
+            final TvInputInfo info, ChannelBannerView channelBannerView) {
+        return new ImageLoaderCallback<ChannelBannerView>(channelBannerView) {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap) {
-                if (bitmap != null && info.getId().equals(mCurrentChannel.getInputId())) {
-                    mTvInputLogoImageView.setVisibility(View.VISIBLE);
-                    mTvInputLogoImageView.setImageBitmap(bitmap);
+            public void onBitmapLoaded(ChannelBannerView channelBannerView, Bitmap bitmap) {
+                if (bitmap != null && info.getId()
+                        .equals(channelBannerView.mCurrentChannel.getInputId())) {
+                    channelBannerView.updateTvInputLogo(bitmap);
                 }
             }
         };
@@ -458,12 +466,21 @@ public class ChannelBannerView extends FrameLayout implements Channel.LoadImageC
         }
     }
 
-    @Override
-    public void onLoadImageFinished(Channel channel, int type, Bitmap logo) {
-        if (channel != mCurrentChannel) {
-            // The logo is obsolete.
-            return;
-        }
+    private static ImageLoaderCallback<ChannelBannerView> createChannelLogoCallback(
+            ChannelBannerView channelBannerView, final Channel channel) {
+        return new ImageLoaderCallback<ChannelBannerView>(channelBannerView) {
+            @Override
+            public void onBitmapLoaded(ChannelBannerView view, @Nullable Bitmap logo) {
+                if (channel != view.mCurrentChannel) {
+                    // The logo is obsolete.
+                    return;
+                }
+                view.updateLogo(logo);
+            }
+        };
+    }
+
+    private void updateLogo(@Nullable Bitmap logo) {
         if (logo == null) {
             // Need to update the text size of the program text view depending on the channel logo.
             updateProgramTextView(mLastUpdatedProgram);

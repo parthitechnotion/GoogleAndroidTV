@@ -36,6 +36,7 @@ import com.android.usbtuner.UsbTunerPreferences;
 import com.android.usbtuner.data.PsipData.EitItem;
 import com.android.usbtuner.data.TunerChannel;
 import com.android.usbtuner.util.ConvertUtils;
+import com.android.usbtuner.util.TisConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,8 +128,14 @@ public class ChannelDataManager implements Handler.Callback {
 
     public ChannelDataManager(Context context) {
         mContext = context;
-        mInputId = TvContract.buildInputId(new ComponentName(mContext.getPackageName(),
-                UsbTunerTvInputService.class.getName()));
+        if (TisConfiguration.isInternalTunerTvInput(context)) {
+            mInputId = TvContract.buildInputId(new ComponentName(mContext.getPackageName(),
+                    InternalTunerTvInputService.class.getName())) + "/HW" +
+                    TisConfiguration.getTunerHwDeviceId(context);
+        } else {
+            mInputId = TvContract.buildInputId(new ComponentName(mContext.getPackageName(),
+                    UsbTunerTvInputService.class.getName()));
+        }
         mChannelsUri = TvContract.buildChannelsUriForInput(mInputId);
         mTunerChannelMap = new ConcurrentHashMap<>();
         mTunerChannelIdMap = new ConcurrentSkipListMap<>();

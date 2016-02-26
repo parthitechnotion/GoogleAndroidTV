@@ -17,48 +17,45 @@
 package com.android.tv.onboarding;
 
 import android.app.Fragment;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.media.tv.TvInputInfo;
-import android.net.Uri;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.tv.R;
 import com.android.tv.TvApplication;
-import com.android.tv.common.WeakHandler;
-import com.android.tv.common.ui.setup.SetupStep;
-import com.android.tv.common.ui.setup.SteppedSetupActivity;
+import com.android.tv.common.ui.setup.SetupActivity;
+import com.android.tv.common.ui.setup.SetupMultiPaneFragment;
 import com.android.tv.data.ChannelDataManager;
-import com.android.tv.receiver.AudioCapabilitiesReceiver;
 import com.android.tv.util.OnboardingUtils;
+import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.SetupUtils;
-import com.android.tv.util.SoftPreconditions;
-import com.android.tv.util.Utils;
 
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
-public class OnboardingActivity extends SteppedSetupActivity {
-    private static final String TAG = "OnboardingActivity";
-
+public class OnboardingActivity extends SetupActivity {
     private static final String KEY_INTENT_AFTER_COMPLETION = "key_intent_after_completion";
 
-    private static final int MSG_CHECK_RECEIVED_AC3_CAPABILITY_NOTIFICATION = 1;
-    private static final long AC3_CHECK_WAIT_TIMEOUT = TimeUnit.SECONDS.toMillis(1);
+    private static final int PERMISSIONS_REQUEST_READ_TV_LISTINGS = 1;
+    private static final String PERMISSION_READ_TV_LISTINGS = "android.permission.READ_TV_LISTINGS";
 
-    private static final int REQUEST_CODE_SETUP_USB_TUNER = 1;
+    private static final int SHOW_RIPPLE_DURATION_MS = 266;
 
-    private Handler mHandler = new OnboardingActivityHandler(this);
-    private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
-    private Boolean mAc3Supported;
+    private ChannelDataManager mChannelDataManager;
+    private final ChannelDataManager.Listener mChannelListener = new ChannelDataManager.Listener() {
+        @Override
+        public void onLoadFinished() {
+            mChannelDataManager.removeListener(this);
+            SetupUtils.getInstance(OnboardingActivity.this).markNewChannelsBrowsable();
+        }
+
+        @Override
+        public void onChannelListUpdated() { }
+
+        @Override
+        public void onChannelBrowsableChanged() { }
+    };
 
     /**
      * Returns an intent to start {@link OnboardingActivity}.
@@ -76,72 +73,51 @@ public class OnboardingActivity extends SteppedSetupActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Register a receiver for HDMI audio plug and wait for the response.
-        mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this,
-                new AudioCapabilitiesReceiver.OnAc3PassthroughCapabilityChangeListener() {
-                    @Override
-                    public void onAc3PassthroughCapabilityChange(boolean capability) {
-                        mAudioCapabilitiesReceiver.unregister();
-                        mAudioCapabilitiesReceiver = null;
-                        mHandler.removeMessages(MSG_CHECK_RECEIVED_AC3_CAPABILITY_NOTIFICATION);
-                        mAc3Supported = capability;
-                        startFirstStep();
-                    }
-        });
-        mAudioCapabilitiesReceiver.register();
-        mHandler.sendEmptyMessageDelayed(MSG_CHECK_RECEIVED_AC3_CAPABILITY_NOTIFICATION,
-                AC3_CHECK_WAIT_TIMEOUT);
-    }
-
-    @Override
-    protected SetupStep onCreateInitialStep() {
-        if (mAc3Supported == null) {
-            return null;
+        // Make the channels of the new inputs which have been setup outside Live TV
+        // browsable.
+        mChannelDataManager = TvApplication.getSingletons(this).getChannelDataManager();
+        if (mChannelDataManager.isDbLoadFinished()) {
+            SetupUtils.getInstance(this).markNewChannelsBrowsable();
+        } else {
+            mChannelDataManager.addListener(mChannelListener);
         }
-        if (OnboardingUtils.isFirstRun(this)) {
-            return new WelcomeStep(null);
-        }
-        return new AppOverviewStep(null);
     }
 
     @Override
     protected void onDestroy() {
-        mHandler.removeCallbacksAndMessages(null);
-        if (mAudioCapabilitiesReceiver != null) {
-            mAudioCapabilitiesReceiver.unregister();
-            mAudioCapabilitiesReceiver = null;
-        }
+        mChannelDataManager.removeListener(mChannelListener);
         super.onDestroy();
     }
 
-    void startFirstStep() {
-        SoftPreconditions.checkNotNull(mAc3Supported, TAG,
-                "AC3 passthrough support check hasn't been completed yet.");
-        startInitialStep();
+    @Override
+    protected Fragment onCreateInitialFragment() {
+        return OnboardingUtils.isFirstRunWithCurrentVersion(this) ? new WelcomeFragment()
+                : new SetupSourcesFragment();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_SETUP_USB_TUNER && resultCode == RESULT_OK) {
-            SetupUtils.getInstance(this).onTvInputSetupFinished(Utils.getUsbTunerInputId(this),
-                    null);
-            return;
+    protected void onResume() {
+        super.onResume();
+        if (!PermissionUtils.hasAccessAllEpg(this)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                Toast.makeText(this, R.string.msg_not_supported_device, Toast.LENGTH_LONG).show();
+                finish();
+            } else if (checkSelfPermission(PERMISSION_READ_TV_LISTINGS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{PERMISSION_READ_TV_LISTINGS},
+                        PERMISSIONS_REQUEST_READ_TV_LISTINGS);
+            }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private static class OnboardingActivityHandler extends WeakHandler<OnboardingActivity> {
-        OnboardingActivityHandler(OnboardingActivity activity) {
-            // Should run on main thread because onAc3SupportChanged will be called on main thread.
-            super(Looper.getMainLooper(), activity);
-        }
-
-        @Override
-        protected void handleMessage(Message msg, OnboardingActivity activity) {
-            if (msg.what == MSG_CHECK_RECEIVED_AC3_CAPABILITY_NOTIFICATION) {
-                activity.mAudioCapabilitiesReceiver.unregister();
-                activity.mAudioCapabilitiesReceiver = null;
-                activity.startFirstStep();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_READ_TV_LISTINGS) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, R.string.msg_read_tv_listing_permission_denied,
+                        Toast.LENGTH_LONG).show();
+                finish();
             }
         }
     }
@@ -155,112 +131,44 @@ public class OnboardingActivity extends SteppedSetupActivity {
         finish();
     }
 
-    private class WelcomeStep extends SetupStep {
-        public WelcomeStep(@Nullable SetupStep previousStep) {
-            super(getFragmentManager(), previousStep);
-        }
-
-        @Override
-        public Fragment onCreateFragment() {
-            return new WelcomeFragment();
-        }
-
-        @Override
-        public void executeAction(int actionId) {
-            switch (actionId) {
-                case WelcomeFragment.ACTION_NEXT:
-                    OnboardingUtils.setFirstRunCompleted(OnboardingActivity.this);
-                    if (!OnboardingUtils.areChannelsAvailable(OnboardingActivity.this)) {
-                        startStep(new AppOverviewStep(this), false);
-                    } else {
-                        // TODO: Go to the correct step.
-                        finishActivity();
-                    }
-                    break;
+    void showMerchantCollection() {
+        executeActionWithDelay(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(OnboardingUtils.PLAY_STORE_INTENT);
             }
-        }
+        }, SHOW_RIPPLE_DURATION_MS);
     }
 
-    private class AppOverviewStep extends SetupStep {
-        private static final String TV_MERCHANT_COLLECTION = "https://play.google.com/store/apps/"
-                + "collection/promotion_3001bf9_ATV_livechannels?sticky_source_country=";
-
-        public AppOverviewStep(@Nullable SetupStep previousStep) {
-            super(getFragmentManager(), previousStep);
-        }
-
-        @Override
-        public Fragment onCreateFragment() {
-            Fragment fragment = new AppOverviewFragment();
-            Bundle bundle = new Bundle();
-            bundle.putBoolean(AppOverviewFragment.KEY_AC3_SUPPORT, mAc3Supported);
-            fragment.setArguments(bundle);
-            return fragment;
-        }
-
-        @Override
-        public void executeAction(int actionId) {
-            switch (actionId) {
-                case AppOverviewFragment.ACTION_SETUP_SOURCE: {
-                    startStep(new SetupSourcesStep(this), true);
-                    break;
+    @Override
+    protected void executeAction(String category, int actionId) {
+        switch (category) {
+            case WelcomeFragment.ACTION_CATEGORY:
+                switch (actionId) {
+                    case WelcomeFragment.ACTION_NEXT:
+                        OnboardingUtils.setFirstRunWithCurrentVersionCompleted(
+                                OnboardingActivity.this);
+                        showFragment(new SetupSourcesFragment(), false);
+                        break;
                 }
-                case AppOverviewFragment.ACTION_GET_MORE_CHANNELS:
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(TV_MERCHANT_COLLECTION + Locale.getDefault().getCountry())));
-                    break;
-                case AppOverviewFragment.ACTION_SETUP_USB_TUNER: {
-                    Context context = OnboardingActivity.this;
-                    TvInputInfo input = Utils.getUsbTunerInputInfo(context);
-                    if (input != null) {
-                        SetupUtils.grantEpgPermission(context,
-                                input.getServiceInfo().packageName);
-                        Intent intent = input.createSetupIntent();
-                        try {
-                            startActivityForResult(intent, REQUEST_CODE_SETUP_USB_TUNER);
-                        } catch (ActivityNotFoundException e) {
-                            Toast.makeText(context, getString(
-                                    R.string.msg_unable_to_start_setup_activity,
-                                    input.loadLabel(context)), Toast.LENGTH_SHORT).show();
-                            Log.e(TAG, "Can't find activity: " + intent.getComponent(), e);
-                            break;
+                break;
+            case SetupSourcesFragment.ACTION_CATEGORY:
+                switch (actionId) {
+                    case SetupSourcesFragment.ACTION_PLAY_STORE:
+                        showMerchantCollection();
+                        break;
+                    case SetupMultiPaneFragment.ACTION_DONE: {
+                        ChannelDataManager manager = TvApplication.getSingletons(
+                                OnboardingActivity.this).getChannelDataManager();
+                        if (manager.getChannelCount() == 0) {
+                            finish();
+                        } else {
+                            finishActivity();
                         }
-                        // TODO: Add transition animation.
-                    } else {
-                        // TODO: Implement this.
-                        Toast.makeText(OnboardingActivity.this, "Not implemented yet.",
-                                Toast.LENGTH_SHORT).show();
+                        break;
                     }
-                    break;
                 }
-            }
-        }
-    }
-
-    private class SetupSourcesStep extends SetupStep {
-        public SetupSourcesStep(@Nullable SetupStep previousStep) {
-            super(getFragmentManager(), previousStep);
-        }
-
-        @Override
-        public Fragment onCreateFragment() {
-            return new SetupSourcesFragment();
-        }
-
-        @Override
-        public void executeAction(int actionId) {
-            switch (actionId) {
-                case SetupSourcesFragment.ACTION_DONE: {
-                    ChannelDataManager manager = TvApplication.getSingletons(
-                            OnboardingActivity.this).getChannelDataManager();
-                    if (manager.getChannelCount() == 0) {
-                        finish();
-                    } else {
-                        finishActivity();
-                    }
-                    break;
-                }
-            }
+                break;
         }
     }
 }

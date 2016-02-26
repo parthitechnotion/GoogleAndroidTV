@@ -19,6 +19,7 @@ package com.android.tv.dvr.provider;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
@@ -69,6 +70,71 @@ public abstract class AsyncDvrDbTask<Params, Progress, Result>
         executeOnExecutor(DB_EXECUTOR, params);
     }
 
+    @Override
+    protected final Result doInBackground(Params... params) {
+        initializeDbHelper(mContext);
+        return doInDvrBackground(params);
+    }
+
+    /**
+     * Executes in the background after {@link #initializeDbHelper(Context)}
+     */
+    @Nullable
+    protected abstract Result doInDvrBackground(Params... params);
+
+     /**
+     * Inserts recordings returning the list of recordings with id set.
+     * The id will be -1 if there was an error.
+     */
+    public abstract static class AsyncAddRecordingTask
+            extends AsyncDvrDbTask<Recording, Void, List<Recording>> {
+
+        public AsyncAddRecordingTask(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected final List<Recording> doInDvrBackground(Recording... params) {
+            return sDbHelper.insertRecordings(params);
+        }
+    }
+
+    /**
+     * Update recordings.
+     *
+     * @return list of row update counts.  The count will be -1 if there was an error or 0
+     * if no match was found. The count is expected to be exactly 1 for each recording.
+     */
+    public abstract static class AsyncUpdateRecordingTask
+            extends AsyncDvrDbTask<Recording, Void, List<Integer>> {
+        public AsyncUpdateRecordingTask(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected final List<Integer> doInDvrBackground(Recording... params) {
+            return sDbHelper.updateRecordings(params);
+        }
+    }
+
+    /**
+     * Delete recordings.
+     *
+     * @return list of row delete counts.  The count will be -1 if there was an error or 0
+     * if no match was found. The count is expected to be exactly 1 for each recording.
+     */
+    public abstract static class AsyncDeleteRecordingTask
+            extends AsyncDvrDbTask<Recording, Void, List<Integer>> {
+        public AsyncDeleteRecordingTask(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected final List<Integer> doInDvrBackground(Recording... params) {
+            return sDbHelper.deleteRecordings(params);
+        }
+    }
+
     public abstract static class AsyncDvrQueryTask
             extends AsyncDvrDbTask<Void, Void, List<Recording>> {
         public AsyncDvrQueryTask(Context context) {
@@ -76,9 +142,8 @@ public abstract class AsyncDvrDbTask<Params, Progress, Result>
         }
 
         @Override
-        protected List<Recording> doInBackground(Void... params) {
-            initializeDbHelper(mContext);
-
+        @Nullable
+        protected final List<Recording> doInDvrBackground(Void... params) {
             if (isCancelled()) {
                 return null;
             }
@@ -116,6 +181,7 @@ public abstract class AsyncDvrDbTask<Params, Progress, Result>
                     List<Long> programList = recordingToProgramMap.get(recordingId);
                     if (programList == null) {
                         programList = new ArrayList<>();
+                        recordingToProgramMap.put(recordingId, programList);
                     }
                     programList.add(c.getLong(1));
                 }

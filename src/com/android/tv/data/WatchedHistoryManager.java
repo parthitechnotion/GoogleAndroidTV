@@ -10,6 +10,8 @@ import android.support.annotation.MainThread;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
+import com.android.tv.common.SharedPreferencesUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +32,6 @@ public class WatchedHistoryManager {
     private final boolean DEBUG = false;
 
     private static final int MAX_HISTORY_SIZE = 10000;
-    private static final String SHARED_PREF_WATCHED_HISTORY = "watched_history_shared_preference";
     private static final String PREF_KEY_LAST_INDEX = "last_index";
     private static final long MIN_DURATION_MS = TimeUnit.SECONDS.toMillis(10);
     private static final long RECENT_CHANNEL_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5);
@@ -108,7 +109,7 @@ public class WatchedHistoryManager {
             @Override
             protected Void doInBackground(Void... params) {
                 mSharedPreferences = mContext.getSharedPreferences(
-                        SHARED_PREF_WATCHED_HISTORY, Context.MODE_PRIVATE);
+                        SharedPreferencesUtils.SHARED_PREF_WATCHED_HISTORY, Context.MODE_PRIVATE);
                 mLastIndex = mSharedPreferences.getLong(PREF_KEY_LAST_INDEX, -1);
                 if (mLastIndex >= 0 && mLastIndex < mMaxHistorySize) {
                     for (int i = 0; i <= mLastIndex; ++i) {

@@ -21,4 +21,5 @@
     <color name="common_setup_action_background">#0374BF</color>
     <color name="common_setup_done_container_background">#04549D</color>
     <color name="common_setup_button_done_selected">#26FFFFFF</color>
+    <color name="common_setup_input_description">#EEEEEE</color>
 </resources>

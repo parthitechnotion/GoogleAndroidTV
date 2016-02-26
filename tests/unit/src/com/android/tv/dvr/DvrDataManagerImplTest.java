@@ -34,22 +34,22 @@ public class DvrDataManagerImplTest extends TestCase {
         long id = 1;
         List<Recording> recordings = new ArrayList<>();
         assertNextStartTime(recordings, 0L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
-        recordings.add(RecordingTestUtils.createTestRecordingWithPeriod(id++, 10L, 20L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
         assertNextStartTime(recordings, 9L, 10L);
         assertNextStartTime(recordings, 10L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
-        recordings.add(RecordingTestUtils.createTestRecordingWithPeriod(id++, 20L, 30L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 20L, 30L));
         assertNextStartTime(recordings, 9L, 10L);
         assertNextStartTime(recordings, 10L, 20L);
         assertNextStartTime(recordings, 20L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
-        recordings.add(RecordingTestUtils.createTestRecordingWithPeriod(id++, 30L, 40L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 30L, 40L));
         assertNextStartTime(recordings, 9L, 10L);
         assertNextStartTime(recordings, 10L, 20L);
         assertNextStartTime(recordings, 20L, 30L);
         assertNextStartTime(recordings, 30L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
         recordings.clear();
-        recordings.add(RecordingTestUtils.createTestRecordingWithPeriod(id++, 10L, 20L));
-        recordings.add(RecordingTestUtils.createTestRecordingWithPeriod(id++, 10L, 20L));
-        recordings.add(RecordingTestUtils.createTestRecordingWithPeriod(id++, 10L, 20L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
         assertNextStartTime(recordings, 9L, 10L);
         assertNextStartTime(recordings, 10L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
     }

@@ -27,6 +27,7 @@ import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -34,7 +35,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 
-import com.android.tv.common.TvCommonConstants;
 import com.android.tv.testing.ChannelInfo;
 import com.android.tv.testing.testinput.ChannelState;
 
@@ -47,6 +47,8 @@ public class TestTvInputService extends TvInputService {
     private static final String TAG = "TestTvInputServices";
     private static final int REFRESH_DELAY_MS = 1000 / 5;
     private static final boolean DEBUG = false;
+    private static final boolean HAS_TIME_SHIFT_API = Build.VERSION.SDK_INT
+            >= Build.VERSION_CODES.M;
     private final TestInputControl mBackend = TestInputControl.getInstance();
 
     public static String buildInputId(Context context) {
@@ -194,7 +196,7 @@ public class TestTvInputService extends TvInputService {
             } else {
                 Log.i(TAG, "Tuning to " + mChannel);
             }
-            if (TvCommonConstants.HAS_TIME_SHIFT_API) {
+            if (HAS_TIME_SHIFT_API) {
                 notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
                 mRecordStartTimeMs = mCurrentPositionMs = mLastCurrentPositionUpdateTimeMs
                         = System.currentTimeMillis();
@@ -319,7 +321,7 @@ public class TestTvInputService extends TvInputService {
 
             private void draw(Surface surface, ChannelInfo currentChannel) {
                 if (surface != null) {
-                    String now = TvCommonConstants.HAS_TIME_SHIFT_API
+                    String now = HAS_TIME_SHIFT_API
                             ? new Date(mCurrentPositionMs).toString() : new Date().toString();
                     String name = currentChannel == null ? "Null" : currentChannel.name;
                     Canvas c = surface.lockCanvas(null);

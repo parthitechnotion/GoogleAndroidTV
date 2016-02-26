@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"USB ఛానెల్ ట్యూనర్ సెటప్"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"దీనికి కొన్ని నిమిషాలు పట్టవచ్చు"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"%1$d ఛానెల్ కనుగొనబడింది"</item>
-    <item quantity="other" msgid="7340557317633613">"%1$d ఛానెల్‌లు కనుగొనబడ్డాయి"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">%1$d ఛానెల్‌లు కనుగొనబడ్డాయి</item>
+      <item quantity="one">%1$d ఛానెల్ కనుగొనబడింది</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"ఛానెల్ స్కాన్‌ను ఆపివేయి"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"%1$d ఛానెల్ కనుగొనబడింది"</item>
-    <item quantity="other" msgid="4331542666115153576">"%1$d ఛానెల్‌లు కనుగొనబడ్డాయి"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"బాగుంది! ఛానెల్ స్కాన్‌లో %1$d ఛానెల్ కనుగొనబడింది. ఇది సరైనదిగా కనిపించకపోతే, యాంటెన్నా స్థానాన్ని సర్దుబాటు చేయడాన్ని ప్రయత్నించి, ఆపై మళ్లీ స్కాన్ చేయండి."</item>
-    <item quantity="other" msgid="8098777464551209564">"బాగుంది! ఛానెల్ స్కాన్‌లో %1$d ఛానెల్‌లు కనుగొనబడ్డాయి. ఇది సరైనదిగా కనిపించకపోతే, యాంటెన్నా స్థానాన్ని సర్దుబాటు చేయడాన్ని ప్రయత్నించి, ఆపై మళ్లీ స్కాన్ చేయండి."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">%1$d ఛానెల్‌లు కనుగొనబడ్డాయి</item>
+      <item quantity="one">%1$d ఛానెల్ కనుగొనబడింది</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">మంచిది! ఛానెల్ స్కాన్‌లో %1$d ఛానెల్‌లు కనుగొనబడ్డాయి. ఇది సరైనదిగా అనిపించకుంటే, యాంటెన్నా స్థానం సర్దుబాటు చేసి, ఆపై మళ్లీ స్కాన్ చేయడం ప్రయత్నించండి.</item>
+      <item quantity="one">మంచిది! ఛానెల్ స్కాన్‌లో %1$d ఛానెల్ కనుగొనబడింది. ఇది సరైనదిగా అనిపించకుంటే, యాంటెన్నా స్థానం సర్దుబాటు చేసి, ఆపై మళ్లీ స్కాన్ చేయడం ప్రయత్నించండి.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"పూర్తయింది"</item>
     <item msgid="496688122303154468">"మళ్లీ స్కాన్ చేయి"</item>

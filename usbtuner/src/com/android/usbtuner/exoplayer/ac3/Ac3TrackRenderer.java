@@ -87,6 +87,7 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
     private final Handler mEventHandler;
     private final boolean mIsSoftware;
     private final AudioTrackMonitor mMonitor;
+    private final MediaClock mMediaClock;
 
     private MediaFormat mFormat;
     private Ac3Decoder mDecoder;
@@ -117,6 +118,7 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
         AUDIO_TRACK.restart();
         mCodecCounters = new CodecCounters();
         mMonitor = new AudioTrackMonitor();
+        mMediaClock = new MediaClock();
     }
 
     @Override
@@ -150,17 +152,9 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
 
     @Override
     protected void onEnabled(long positionUs, boolean joining) {
-        mMonitor.reset(MONITOR_DURATION_MS);
         mSource.enable(mTrackIndex, positionUs);
-        mSourceStateReady = false;
         mDecoder.startDecoder(this);
-        mInputStreamEnded = false;
-        mOutputStreamEnded = false;
-        mPresentationTimeUs = positionUs;
-        mPresentationCount = 0;
-        mPreviousPositionUs = 0;
-        mCurrentPositionUs = Long.MIN_VALUE;
-        mInterpolatedTimeUs = Long.MIN_VALUE;
+        seekToInternal(positionUs);
     }
 
     @Override
@@ -188,33 +182,40 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
         return AUDIO_TRACK.isReady() || (mFormat != null && (mSourceStateReady || mOutputReady));
     }
 
-    @Override
-    protected void seekTo(long positionUs) {
+    private void seekToInternal(long positionUs) {
         mMonitor.reset(MONITOR_DURATION_MS);
-        mSource.seekToUs(positionUs);
         mSourceStateReady = false;
         mInputStreamEnded = false;
         mOutputStreamEnded = false;
-        AUDIO_TRACK.reset();
-        // resetSessionId() will create a new framework AudioTrack instead of reusing old one.
-        if (!mIsSoftware) {
-            AUDIO_TRACK.resetSessionId();
-        }
         mPresentationTimeUs = positionUs;
         mPresentationCount = 0;
         mPreviousPositionUs = 0;
         mCurrentPositionUs = Long.MIN_VALUE;
         mInterpolatedTimeUs = Long.MIN_VALUE;
+        mMediaClock.setPositionUs(positionUs);
+    }
+
+    @Override
+    protected void seekTo(long positionUs) {
+        mSource.seekToUs(positionUs);
+        AUDIO_TRACK.reset();
+        // resetSessionId() will create a new framework AudioTrack instead of reusing old one.
+        if (!mIsSoftware) {
+            AUDIO_TRACK.resetSessionId();
+        }
+        seekToInternal(positionUs);
     }
 
     @Override
     protected void onStarted() {
         AUDIO_TRACK.play();
+        mMediaClock.start();
     }
 
     @Override
     protected void onStopped() {
         AUDIO_TRACK.pause();
+        mMediaClock.stop();
     }
 
     @Override
@@ -401,7 +402,9 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
 
     @Override
     protected long getCurrentPositionUs() {
-        if (!AUDIO_TRACK.isEnabled()) {
+        if (!AUDIO_TRACK.isInitialized()) {
+            return mMediaClock.getPositionUs();
+        } if (!AUDIO_TRACK.isEnabled()) {
             if (mInterpolatedTimeUs > 0) {
                 return mInterpolatedTimeUs - ESTIMATED_TRACK_RENDERING_DELAY_US;
             }
@@ -409,7 +412,7 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
         }
         long audioTrackCurrentPositionUs = AUDIO_TRACK.getCurrentPositionUs(isEnded());
         if (audioTrackCurrentPositionUs == AudioTrack.CURRENT_POSITION_NOT_SET) {
-            mPreviousPositionUs = 0l;
+            mPreviousPositionUs = 0L;
             if (DEBUG) {
                 long oldPositionUs = Math.max(mCurrentPositionUs, 0);
                 long currentPositionUs = Math.max(mPresentationTimeUs, mCurrentPositionUs);

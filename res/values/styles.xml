@@ -84,4 +84,8 @@
         <item name="android:windowEnterAnimation">@anim/select_input_activity_enter</item>
         <item name="android:windowExitAnimation">@anim/select_input_activity_exit</item>
     </style>
+
+    <style name="TV.DoneButtonContainerStyle" parent="DoneButtonContainerStyle">
+        <item name="android:background">@color/setup_done_button_container_background</item>
+    </style>
 </resources>

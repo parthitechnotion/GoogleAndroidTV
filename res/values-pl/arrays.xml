@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Specjalne"</item>
     <item msgid="8215762047341133299">"Nauka i technika"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Telewizja online"</item>
+    <item msgid="7307688057853449735">"Prosty sposób okrywania nowych treści"</item>
+    <item msgid="7566838222783641942">"Pobierz aplikacje, by dodać nowe kanały"</item>
+    <item msgid="8646630833216197238">"Dostosuj ofertę programową"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Oglądaj treści z aplikacji jak kanały na telewizorze."</item>
+    <item msgid="1855708984677953238">"Przeglądaj treści z aplikacji, korzystając ze znanego Ci przewodnika i interfejsu,\nzupełnie jak kanały na telewizorze."</item>
+    <item msgid="3420760668363283731">"Dodaj kanały, instalując aplikacje z telewizją online.\nZnajdź zgodne aplikacje w Sklepie Google Play, korzystając z linku w menu TV."</item>
+    <item msgid="8974157841656828507">"Skonfiguruj nowo zainstalowane źródła kanałów, by dostosować listę kanałów.\nAby rozpocząć, wybierz Kanał z menu Ustawienia."</item>
+  </string-array>
 </resources>

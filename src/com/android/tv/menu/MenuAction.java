@@ -42,18 +42,13 @@ public class MenuAction {
     public static final MenuAction SELECT_AUDIO_LANGUAGE_ACTION =
             new MenuAction(R.string.options_item_multi_audio, TvOptionsManager.OPTION_MULTI_AUDIO,
                     R.drawable.ic_tvoption_multi_track);
-    public static final MenuAction CHANNEL_SOURCES_ACTION =
-            new MenuAction(R.string.options_item_channel_sources,
-                    TvOptionsManager.OPTION_CHANNEL_SOURCES,
-                    R.drawable.ic_tvoption_channel_sources);
-    public static final MenuAction PARENTAL_CONTROLS_ACTION =
-            new MenuAction(R.string.options_item_parental_controls,
-                    TvOptionsManager.OPTION_PARENTAL_CONTROLS,
-                    R.drawable.ic_tvoption_parental);
-    public static final MenuAction ABOUT_ACTION =
-            new MenuAction(R.string.options_item_about,
-                    TvOptionsManager.OPTION_ABOUT,
-                    R.drawable.ic_tvoption_about);
+    public static final MenuAction MORE_CHANNELS_ACTION =
+            new MenuAction(R.string.options_item_more_channels,
+                    TvOptionsManager.OPTION_MORE_CHANNELS, R.drawable.ic_store);
+    // TODO: Change the icon.
+    public static final MenuAction SETTINGS_ACTION =
+            new MenuAction(R.string.options_item_settings, TvOptionsManager.OPTION_SETTINGS,
+                    R.drawable.ic_settings);
     // Actions in the PIP option row.
     public static final MenuAction PIP_SELECT_INPUT_ACTION =
             new MenuAction(R.string.pip_options_item_source, TvOptionsManager.OPTION_PIP_INPUT,

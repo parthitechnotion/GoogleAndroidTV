@@ -44,7 +44,7 @@ DvbManager::DvbManager(JNIEnv *env, jobject)
           mPatFilterFd(-1),
           mFeHasLock(false) {
     jclass clazz = env->FindClass(
-        "com/android/usbtuner/UsbTunerInterface");
+        "com/android/usbtuner/TunerHal");
     mOpenDvbFrontEndMethodID = env->GetMethodID(
         clazz, "openDvbFrontEndFd", "()I");
     mOpenDvbDemuxMethodID = env->GetMethodID(
@@ -66,7 +66,7 @@ bool DvbManager::isFeLocked() {
     return false;
 }
 
-int DvbManager::tuneAtsc(JNIEnv *env, jobject thiz,
+int DvbManager::tune(JNIEnv *env, jobject thiz,
         const int frequency, const char *modulationStr, int timeout_ms) {
     resetExceptFe();
 

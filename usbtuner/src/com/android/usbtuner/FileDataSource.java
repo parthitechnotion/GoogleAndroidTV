@@ -304,9 +304,6 @@ public class FileDataSource extends MediaDataSource implements InputStreamSource
     public void close() {}
 
     @Override
-    public void release() {}
-
-    @Override
     public int getType() {
         return Channel.TYPE_FILE;
     }

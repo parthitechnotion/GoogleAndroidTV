@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"تشغيل"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"إيقاف"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"إعدادات صوتية متعددة"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"إعداد القناة"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"عناصر التحكم الأبوي"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"حول"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"جلب قنوات أخرى"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"الإعدادات"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"المصدر"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"تبديل"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"تشغيل"</string>
@@ -84,21 +83,19 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"دقة عالية"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"دقة قياسية"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"تجميع بحسب"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"إعداد القناة"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"تم حظر هذا البرنامج"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"تم تصنيف هذا البرنامج على أنه <xliff:g id="RATING">%1$s</xliff:g>."</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"مصادر القنوات"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"تتوفر قنوات جديدة"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"تخصيص قائمة قنوات"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"اختر القنوات الخاصة بدليل البرامج"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"لم يتم الإعداد"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"الإدخال ليس متوافقًا مع الفحص التلقائي"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"تعذر بدء البحث التلقائي في \"<xliff:g id="TV_INPUT">%s</xliff:g>\""</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"تعذر بدء التفضيلات على مستوى النظام للترجمات المصاحبة."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"‏تمت إضافة %1$d من القنوات"</item>
-    <item quantity="other" msgid="1078861616751739285">"‏تمت إضافة %1$d من القنوات"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="zero">‏تمت إضافة %1$d قناة</item>
+      <item quantity="two">‏تمت إضافة قناتين (%1$d)</item>
+      <item quantity="few">‏تمت إضافة %1$d قنوات</item>
+      <item quantity="many">‏تمت إضافة %1$d قناة</item>
+      <item quantity="other">‏تمت إضافة %1$d قناة</item>
+      <item quantity="one">‏تمت إضافة %1$d قناة</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"لم تتم إضافة قنوات"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"موالف"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"عناصر التحكم الأبوي"</string>
@@ -136,16 +133,25 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"إدخال رقم تعريف شخصي جديد"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"تأكيد رقم التعريف الشخصي"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"أدخل رقم التعريف الشخصي الحالي"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"لقد أدخلت رقم تعريف شخصي خاطئًا 5 مرات.\nأعد المحاولة بعد <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> ثانية."</item>
-    <item quantity="other" msgid="8829550842387756054">"لقد أدخلت رقم تعريف شخصي خاطئًا 5 مرات.\nأعد المحاولة بعد <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> من الثواني."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="zero">لقد أدخلت رقم التعريف الشخصي بشكل خاطئ 5 مرات.\nأعد المحاولة خلال <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> ثانية.</item>
+      <item quantity="two">لقد أدخلت رقم التعريف الشخصي بشكل خاطئ 5 مرات.\nأعد المحاولة خلال ثانيتين (<xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g>).</item>
+      <item quantity="few">لقد أدخلت رقم التعريف الشخصي بشكل خاطئ 5 مرات.\nأعد المحاولة خلال <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> ثوانٍ.</item>
+      <item quantity="many">لقد أدخلت رقم التعريف الشخصي بشكل خاطئ 5 مرات.\nأعد المحاولة خلال <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> ثانية.</item>
+      <item quantity="other">لقد أدخلت رقم التعريف الشخصي بشكل خاطئ 5 مرات.\nأعد المحاولة خلال <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> ثانية.</item>
+      <item quantity="one">لقد أدخلت رقم التعريف الشخصي بشكل خاطئ 5 مرات.\nأعد المحاولة خلال <xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> ثانية.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"رقم التعريف الشخصي هذا خاطئ. أعد المحاولة."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"أعد المحاولة، رقم التعريف الشخصي غير مطابق"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"حول"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"تراخيص البرامج المفتوحة المصدر"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"الإعدادات"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"تخصيص قائمة قنوات"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"اختر القنوات الخاصة بدليل البرامج."</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"مصادر القنوات"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"تتوفر قنوات جديدة."</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"أدوات الرقابة الأبوية"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"تراخيص البرامج المفتوحة المصدر"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"تراخيص البرامج المفتوحة المصدر"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"الإصدار"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"الإصدار"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"خيارات المطورين"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"‏تمكين موالف التلفزيون عبر USB"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"‏لسماع الصوت الصادر عن موالف التلفزيون عبر USB، يجب أن يكون تلفزيونك متوافقًا مع إمكانية العبور AC3."</string>
@@ -166,15 +172,25 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"بلا عنوان"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"تم حظر القناة"</string>
     <string name="episode_format" msgid="4881195874563241096">"الموسم <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: الحلقة <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"مصادر القنوات"</string>
-    <string name="setup_description" msgid="8728423605912915099">"يمكنك إعداد قنوات مباشرة من المصادر المتاحة. وقد يستغرق هذا بضع دقائق حسب مصدر القنوات."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"تمّ"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"‏عدد القنوات المتوفرة: %1$d"</item>
-    <item quantity="other" msgid="2386588423841837714">"‏عدد القنوات المتوفرة: %1$d"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"جديدة"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"المصادر"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="zero">‏%1$d قناة</item>
+      <item quantity="two">‏قناتان (%1$d)</item>
+      <item quantity="few">‏%1$d قنوات</item>
+      <item quantity="many">‏%1$d قناة</item>
+      <item quantity="other">‏%1$d قناة</item>
+      <item quantity="one">‏%1$d قناة</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"لا تتوفر أية قناة"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"جديد"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"لم يتم الإعداد"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"الحصول على مزيد من المصادر"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"تصفح التطبيقات التي تقدم قنوات مباشرة"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"مصادر قنوات جديدة متاحة"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"هناك مصادر قنوات جديدة تعرض قنوات. \n يمكنك إعدادها الآن أو لاحقًا حسب ما يتم تعيينه في إعداد مصادر القنوات."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"الإعداد الآن"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"حسنًا"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307">"‏"<b>"اضغط على \"تحديد\""</b>" للوصول إلى قائمة TV."</string>
@@ -191,4 +207,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"زر الرجوع مخصص للجهاز المتصل. يمكنك الضغط على زر الصفحة الرئيسية للخروج."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"‏القنوات المباشرة غير متوافقة على هذا الجهاز مع Android Lollipop."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"‏تحتاج القنوات المباشرة إلى إذن لقراءة قوائم TV."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"إعداد مصادرك"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"‏تجمع قنوات البث التلفزيوني المباشر بين تجربة قنوات التلفزيون التقليدية وقنوات البث التي توفِّرها التطبيقات. \n\nيمكنك البدء من خلال إعداد مصادر القنوات المثبَّتة حاليًا، أو تصفُّح متجر Google Play للحصول على المزيد من التطبيقات التي توفِّر قنوات بث تلفزيوني مباشر."</string>
 </resources>

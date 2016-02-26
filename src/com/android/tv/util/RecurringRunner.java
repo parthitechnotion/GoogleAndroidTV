@@ -23,6 +23,8 @@ import android.os.Handler;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
+import com.android.tv.common.SharedPreferencesUtils;
+
 import java.util.Date;
 
 /**
@@ -38,13 +40,16 @@ public final class RecurringRunner {
     private final Handler mHandler;
     private final long mIntervalMs;
     private final Runnable mRunnable;
+    private final Runnable mOnStopRunnable;
     private final Context mContext;
     private final String mName;
     private boolean mRunning;
 
-    public RecurringRunner(Context context, long intervalMs, Runnable runnable) {
+    public RecurringRunner(Context context, long intervalMs, Runnable runnable,
+            Runnable onStopRunnable) {
         mContext = context.getApplicationContext();
         mRunnable = runnable;
+        mOnStopRunnable = onStopRunnable;
         mIntervalMs = intervalMs;
         if (DEBUG) Log.i(TAG, "Delaying " + (intervalMs / 1000.0) + " seconds");
         mName = runnable.getClass().getCanonicalName();
@@ -73,6 +78,9 @@ public final class RecurringRunner {
     public void stop() {
         mRunning = false;
         mHandler.removeCallbacksAndMessages(null);
+        if (mOnStopRunnable != null) {
+            mOnStopRunnable.run();
+        }
     }
 
     private void postAt(long next) {
@@ -102,7 +110,7 @@ public final class RecurringRunner {
     }
 
     private SharedPreferences getSharedPreferences() {
-        return mContext.getSharedPreferences(RecurringRunner.class.getCanonicalName(),
+        return mContext.getSharedPreferences(SharedPreferencesUtils.SHARED_PREF_RECURRING_RUNNER,
                 Context.MODE_PRIVATE);
     }
 

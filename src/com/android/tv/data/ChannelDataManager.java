@@ -28,17 +28,18 @@ import android.media.tv.TvInputManager.TvInputCallback;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.MutableInt;
 
-import com.android.tv.analytics.Tracker;
+import com.android.tv.common.CollectionUtils;
+import com.android.tv.common.SharedPreferencesUtils;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.util.AsyncDbTask;
-import com.android.tv.util.CollectionUtils;
 import com.android.tv.util.PermissionUtils;
-import com.android.tv.util.RecurringRunner;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -49,7 +50,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The class to manage channel data.
@@ -58,13 +58,12 @@ import java.util.concurrent.TimeUnit;
  * This class is not thread-safe and under an assumption that its public methods are called in
  * only the main thread.
  */
+@MainThread
 public class ChannelDataManager {
     private static final String TAG = "ChannelDataManager";
     private static final boolean DEBUG = false;
 
     private static final int MSG_UPDATE_CHANNELS = 1000;
-    private static final long SEND_CHANNEL_STATUS_INTERVAL_MS = TimeUnit.DAYS.toMillis(1);
-    private static final String SHARED_PREF_BROWSABLE = "browsable_shared_preference";
 
     private final Context mContext;
     private final TvInputManagerHelper mInputManager;
@@ -72,9 +71,6 @@ public class ChannelDataManager {
     private boolean mDbLoadFinished;
     private QueryAllChannelsTask mChannelsUpdateTask;
     private final List<Runnable> mPostRunnablesAfterChannelUpdate = new ArrayList<>();
-    // TODO: move ChannelDataManager to TvApplication to consistently run mRecurringRunner.
-    private RecurringRunner mRecurringRunner;
-    private final Tracker mTracker;
 
     private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
     private final Map<Long, ChannelWrapper> mChannelWrapperMap = new HashMap<>();
@@ -104,9 +100,7 @@ public class ChannelDataManager {
             }
             if (channelAdded) {
                 Collections.sort(mChannels, mChannelComparator);
-                for (Listener l : mListeners) {
-                    l.onChannelListUpdated();
-                }
+                notifyChannelListUpdated();
             }
         }
 
@@ -129,9 +123,7 @@ public class ChannelDataManager {
                     }
                 }
                 Collections.sort(mChannels, mChannelComparator);
-                for (Listener l : mListeners) {
-                    l.onChannelListUpdated();
-                }
+                notifyChannelListUpdated();
                 for (ChannelWrapper channel : removedChannels) {
                     channel.notifyChannelRemoved();
                 }
@@ -139,13 +131,12 @@ public class ChannelDataManager {
         }
     };
 
-    public ChannelDataManager(Context context, TvInputManagerHelper inputManager,
-            Tracker tracker) {
-        this(context, inputManager, tracker, context.getContentResolver());
+    public ChannelDataManager(Context context, TvInputManagerHelper inputManager) {
+        this(context, inputManager, context.getContentResolver());
     }
 
     @VisibleForTesting
-    ChannelDataManager(Context context, TvInputManagerHelper inputManager, Tracker tracker,
+    ChannelDataManager(Context context, TvInputManagerHelper inputManager,
             ContentResolver contentResolver) {
         mContext = context;
         mInputManager = inputManager;
@@ -162,12 +153,9 @@ public class ChannelDataManager {
                 }
             }
         };
-        mTracker = tracker;
-        mRecurringRunner = new RecurringRunner(mContext, SEND_CHANNEL_STATUS_INTERVAL_MS,
-                new SendChannelStatusRunnable());
         mStoreBrowsableInSharedPreferences = !PermissionUtils.hasAccessAllEpg(mContext);
-        mBrowsableSharedPreferences = context.getSharedPreferences(SHARED_PREF_BROWSABLE,
-                Context.MODE_PRIVATE);
+        mBrowsableSharedPreferences = context.getSharedPreferences(
+                SharedPreferencesUtils.SHARED_PREF_BROWSABLE, Context.MODE_PRIVATE);
     }
 
     @VisibleForTesting
@@ -186,8 +174,8 @@ public class ChannelDataManager {
         // Should be called directly instead of posting MSG_UPDATE_CHANNELS message to the handler.
         // If not, other DB tasks can be executed before channel loading.
         handleUpdateChannels();
-        mContentResolver.registerContentObserver(
-                TvContract.Channels.CONTENT_URI, true, mChannelObserver);
+        mContentResolver.registerContentObserver(TvContract.Channels.CONTENT_URI, true,
+                mChannelObserver);
         mInputManager.addCallback(mTvInputCallback);
     }
 
@@ -202,7 +190,6 @@ public class ChannelDataManager {
         }
         mStarted = false;
         mDbLoadFinished = false;
-        mRecurringRunner.stop();
 
         ChannelLogoFetcher.stopFetchingChannelLogos();
         mInputManager.removeCallback(mTvInputCallback);
@@ -223,14 +210,22 @@ public class ChannelDataManager {
      * Adds a {@link Listener}.
      */
     public void addListener(Listener listener) {
-        mListeners.add(listener);
+        if (DEBUG) Log.d(TAG, "addListener " + listener);
+        SoftPreconditions.checkNotNull(listener);
+        if (listener != null) {
+            mListeners.add(listener);
+        }
     }
 
     /**
      * Removes a {@link Listener}.
      */
     public void removeListener(Listener listener) {
-        mListeners.remove(listener);
+        if (DEBUG) Log.d(TAG, "removeListener " + listener);
+        SoftPreconditions.checkNotNull(listener);
+        if (listener != null) {
+            mListeners.remove(listener);
+        }
     }
 
     /**
@@ -365,8 +360,23 @@ public class ChannelDataManager {
     }
 
     public void notifyChannelBrowsableChanged() {
-        for (Listener l : mListeners) {
+        // Copy the original collection to allow the callee to modify the listeners.
+        for (Listener l : mListeners.toArray(new Listener[mListeners.size()])) {
             l.onChannelBrowsableChanged();
+        }
+    }
+
+    private void notifyChannelListUpdated() {
+        // Copy the original collection to allow the callee to modify the listeners.
+        for (Listener l : mListeners.toArray(new Listener[mListeners.size()])) {
+            l.onChannelListUpdated();
+        }
+    }
+
+    private void notifyLoadFinished() {
+        // Copy the original collection to allow the callee to modify the listeners.
+        for (Listener l : mListeners.toArray(new Listener[mListeners.size()])) {
+            l.onLoadFinished();
         }
     }
 
@@ -652,14 +662,9 @@ public class ChannelDataManager {
 
             if (!mDbLoadFinished) {
                 mDbLoadFinished = true;
-                mRecurringRunner.start();
-                for (Listener l : mListeners) {
-                    l.onLoadFinished();
-                }
+                notifyLoadFinished();
             } else if (channelAdded || channelUpdated || channelRemoved) {
-                for (Listener l : mListeners) {
-                    l.onChannelListUpdated();
-                }
+                notifyChannelListUpdated();
             }
             for (ChannelWrapper channelWrapper : removedChannelWrappers) {
                 channelWrapper.notifyChannelRemoved();
@@ -711,19 +716,6 @@ public class ChannelDataManager {
             if (msg.what == MSG_UPDATE_CHANNELS) {
                 channelDataManager.handleUpdateChannels();
             }
-        }
-    }
-
-    private class SendChannelStatusRunnable implements Runnable {
-        @Override
-        public void run() {
-            int browsableChannelCount = 0;
-            for (Channel channel : mChannels) {
-                if (channel.isBrowsable()) {
-                    ++browsableChannelCount;
-                }
-            }
-            mTracker.sendChannelCount(browsableChannelCount, mChannels.size());
         }
     }
 }

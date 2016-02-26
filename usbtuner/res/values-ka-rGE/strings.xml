@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"არხების USB ტუნერის დაყენება"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"ამას შეიძლება რამდენიმე წუთი დასჭირდეს"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"მოიძებნა %1$d არხი"</item>
-    <item quantity="other" msgid="7340557317633613">"მოიძებნა %1$d არხი"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">მოიძებნა %1$d არხი</item>
+      <item quantity="one">მოიძებნა %1$d არხი</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"არხების სკანირების შეწყვეტა"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"მოიძებნა %1$d არხი"</item>
-    <item quantity="other" msgid="4331542666115153576">"მოიძებნა %1$d არხი"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"ძალიან კარგი! არხების სკანირებისას მოიძებნა %1$d არხი. თუ სათანადო შედეგს ვერ მიიღებთ, ცადეთ ანტენის პოზიციის დარეგულირება და ხელახლა დაასკანირეთ."</item>
-    <item quantity="other" msgid="8098777464551209564">"ძალიან კარგი! არხების სკანირებისას მოიძებნა %1$d არხი. თუ სათანადო შედეგს ვერ მიიღებთ, ცადეთ ანტენის პოზიციის დარეგულირება და ხელახლა დაასკანირეთ."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">მოიძებნა %1$d არხი</item>
+      <item quantity="one">მოიძებნა %1$d არხი</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">მშვენიერია! არხების სკანირებისას მოიძებნა %1$d არხი. თუ სათანადო შედეგს ვერ მიიღებთ, ცადეთ ანტენის პოზიციის დარეგულირება და ხელახლა დაასკანირეთ.</item>
+      <item quantity="one">მშვენიერია! არხების სკანირებისას მოიძებნა %1$d არხი. თუ სათანადო შედეგს ვერ მიიღებთ, ცადეთ ანტენის პოზიციის დარეგულირება და ხელახლა დაასკანირეთ.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"მზადაა"</item>
     <item msgid="496688122303154468">"ხელახლა სკანირება"</item>

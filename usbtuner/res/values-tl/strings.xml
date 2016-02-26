@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Pag-setup ng USB tuner ng channel"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Maaaring abutin ito ng ilang minuto"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Nakakita ng %1$d channel"</item>
-    <item quantity="other" msgid="7340557317633613">"Nakakita ng %1$d (na) channel"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="one">Nakahanap ng %1$d channel</item>
+      <item quantity="other">Nakahanap ng %1$d na channel</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"IHINTO ANG PAG-SCAN NG CHANNEL"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Nakakita ng %1$d channel"</item>
-    <item quantity="other" msgid="4331542666115153576">"Nakakita ng %1$d (na) channel"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Ayos! Nakakita ng %1$d channel noong nag-ii-scan ng channel. Kung sa palagay mo ay kulang pa ito, subukang ayusin ang posisyon ng antenna at muling mag-scan."</item>
-    <item quantity="other" msgid="8098777464551209564">"Ayos! Nakakita ng %1$d (na) channel noong nag-ii-scan ng channel. Kung sa palagay mo ay kulang pa ito, subukang ayusin ang posisyon ng antenna at muling mag-scan."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="one">Nakahanap ng %1$d channel</item>
+      <item quantity="other">Nakahanap ng %1$d na channel</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="one">Ayos! Nakahanap ng %1$d channel noong nag-ii-scan ng channel. Kung sa palagay mo ay kulang pa ito, subukang ayusin ang posisyon ng antenna at muling mag-scan.</item>
+      <item quantity="other">Ayos! Nakahanap ng %1$d na channel noong nag-ii-scan ng channel. Kung sa palagay mo ay kulang pa ito, subukang ayusin ang posisyon ng antenna at muling mag-scan.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Tapos Na"</item>
     <item msgid="496688122303154468">"Muling mag-scan"</item>

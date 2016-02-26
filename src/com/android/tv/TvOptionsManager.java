@@ -37,9 +37,8 @@ public class TvOptionsManager {
     public static final int OPTION_DISPLAY_MODE = 1;
     public static final int OPTION_PIP = 2;
     public static final int OPTION_MULTI_AUDIO = 3;
-    public static final int OPTION_CHANNEL_SOURCES = 4;
-    public static final int OPTION_PARENTAL_CONTROLS = 5;
-    public static final int OPTION_ABOUT = 6;
+    public static final int OPTION_MORE_CHANNELS = 4;
+    public static final int OPTION_SETTINGS = 5;
 
     public static final int OPTION_PIP_INPUT = 100;
     public static final int OPTION_PIP_SWAP = 101;
@@ -54,7 +53,6 @@ public class TvOptionsManager {
     private int mDisplayMode;
     private boolean mPip;
     private String mMultiAudio;
-    private boolean mIsParentalControlEnabled;
     private String mPipInput;
     private boolean mPipSwap;
     @PipSound private int mPipSound;
@@ -82,10 +80,6 @@ public class TvOptionsManager {
                         mPip ? R.string.options_item_pip_on : R.string.options_item_pip_off);
             case OPTION_MULTI_AUDIO:
                 return mMultiAudio;
-            case OPTION_PARENTAL_CONTROLS:
-                return mContext.getString(
-                        mIsParentalControlEnabled ? R.string.option_toggle_parental_controls_on
-                                : R.string.option_toggle_parental_controls_off);
             case OPTION_PIP_INPUT:
                 return mPipInput;
             case OPTION_PIP_SWAP:
@@ -142,11 +136,6 @@ public class TvOptionsManager {
     public void onMultiAudioChanged(String multiAudio) {
         mMultiAudio = multiAudio;
         notifyOptionChanged(OPTION_MULTI_AUDIO);
-    }
-
-    public void onParentalControlChanged(boolean isParentalControlEnabled) {
-        mIsParentalControlEnabled = isParentalControlEnabled;
-        notifyOptionChanged(OPTION_PARENTAL_CONTROLS);
     }
 
     public void onPipInputChanged(String pipInput) {

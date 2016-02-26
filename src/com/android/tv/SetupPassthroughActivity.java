@@ -79,7 +79,9 @@ public class SetupPassthroughActivity extends Activity {
 
     @Override
     public void onActivityResult(int requestCode, final int resultCode, final Intent data) {
-        if (requestCode != REQUEST_START_SETUP_ACTIVITY || resultCode != Activity.RESULT_OK) {
+        boolean setupComplete = requestCode == REQUEST_START_SETUP_ACTIVITY
+                && resultCode == Activity.RESULT_OK;
+        if (!setupComplete) {
             setResult(resultCode, data);
             finish();
             return;

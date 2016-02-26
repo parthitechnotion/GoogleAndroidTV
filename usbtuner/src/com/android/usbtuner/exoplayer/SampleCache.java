@@ -41,7 +41,7 @@ public class SampleCache {
 
     private final long mCreatedTimeMs;
     private final long mStartPositionUs;
-    private long mLastWrittenPositionUs = 0;
+    private long mEndPositionUs = 0;
     private SampleCache mNextCache = null;
     private final CacheState mCacheState = new CacheState();
     private final Handler mIoHandler;
@@ -120,7 +120,6 @@ public class SampleCache {
         private final CacheManager.CacheListener mCacheListener;
         private final SamplePool mSamplePool;
         private final CacheState mCacheState;
-        private final long mLastLoadedPosition;
         private RandomAccessFile mRaf = null;
         private long mWriteOffset = 0;
         private long mReadOffset = 0;
@@ -134,33 +133,19 @@ public class SampleCache {
             mCacheListener = cacheListener;
             mSamplePool = samplePool;
             mCacheState = cacheState;
-            mLastLoadedPosition = fromFile ? loadFromFile() : -1;
+            if (fromFile) {
+                loadFromFile();
+            }
         }
 
-        private long loadFromFile() throws IOException {
+        private void loadFromFile() throws IOException {
             // "r" is enough
             try (RandomAccessFile raf = new RandomAccessFile(mFile, "r")) {
                 mWriteFinished = true;
                 mWriteOffset = raf.length();
                 mCacheState.setSize(mWriteOffset);
-                long offset = 0L, sampleTimeUs;
-                int sampleSize, sampleFlags;
-
-                // TODO: Save last sampleTimeUs in the indices file to remove this inefficiency.
-                do {
-                    raf.seek(offset);
-                    sampleSize = raf.readInt();
-                    sampleFlags = raf.readInt();
-                    sampleTimeUs = raf.readLong();
-                    offset += (sampleSize + SAMPLE_HEADER_LENGTH);
-                } while (offset < mWriteOffset);
                 mCacheListener.onWrite(SampleCache.this);
-                return sampleTimeUs;
             }
-        }
-
-        public long getLastLoadedPosition() {
-            return mLastLoadedPosition;
         }
 
         @Override
@@ -330,7 +315,7 @@ public class SampleCache {
     protected SampleCache(SamplePool samplePool, File file, long startPositionUs,
             long createdTimeMs, CacheManager.CacheListener cacheListener, Looper looper)
             throws IOException {
-            mLastWrittenPositionUs = mStartPositionUs = startPositionUs;
+            mEndPositionUs = mStartPositionUs = startPositionUs;
             mCreatedTimeMs = createdTimeMs;
             mIoHandler = new Handler(looper,
                     new IoHandlerCallback(file, cacheListener, samplePool, mCacheState, false));
@@ -340,10 +325,9 @@ public class SampleCache {
     // Constructor of SampleCache which is backed by the given existing file.
     protected SampleCache(SamplePool samplePool, File file, long startPositionUs,
             CacheManager.CacheListener cacheListener, Looper looper) throws IOException {
-        mCreatedTimeMs = mStartPositionUs = startPositionUs;
+        mCreatedTimeMs = mEndPositionUs = mStartPositionUs = startPositionUs;
         IoHandlerCallback handlerCallback =
                 new IoHandlerCallback(file, cacheListener, samplePool, mCacheState, true);
-        mLastWrittenPositionUs = handlerCallback.getLastLoadedPosition();
         mIoHandler = new Handler(looper, handlerCallback);
     }
 
@@ -375,14 +359,14 @@ public class SampleCache {
             throw new IllegalStateException(
                     "Called writeSample() even though write is already finished");
         }
-        mLastWrittenPositionUs = sample.timeUs;
+        mEndPositionUs = sample.timeUs;
         conditionVariable.close();
         mIoHandler.obtainMessage(IoHandlerCallback.MSG_WRITE,
                 new Object[] { sample, conditionVariable }).sendToTarget();
     }
 
-    public long getLastWrittenPositionUs() {
-        return mLastWrittenPositionUs;
+    public long getEndPositionUs() {
+        return mEndPositionUs;
     }
 
     public long getCreatedTimeMs() {

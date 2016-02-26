@@ -57,18 +57,18 @@ public class SampleQueue {
         }
     }
 
-    public Long getStartPositionUs() {
-        if (mQueue.isEmpty()) {
-            return null;
-        }
-        return mQueue.getFirst().timeUs;
-    }
-
     public Long getEndPositionUs() {
         if (mQueue.isEmpty()) {
             return null;
         }
         return mQueue.getLast().timeUs;
+    }
+
+    public boolean isDurationGreaterThan(long durationUs) {
+        if (mQueue.isEmpty()) {
+            return false;
+        }
+        return mQueue.getLast().timeUs - mQueue.getFirst().timeUs > durationUs;
     }
 
     public boolean isEmpty() {

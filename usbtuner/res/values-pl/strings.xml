@@ -50,19 +50,25 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Konfiguracja kanałów w tunerze USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Może to potrwać kilka minut"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Znaleziono %1$d kanał"</item>
-    <item quantity="other" msgid="7340557317633613">"Znalezione kanały: %1$d"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="few">Znaleziono %1$d kanały</item>
+      <item quantity="many">Znaleziono %1$d kanałów</item>
+      <item quantity="other">Znaleziono %1$d kanału</item>
+      <item quantity="one">Znaleziono %1$d kanał</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"ZATRZYMAJ SKANOWANIE W POSZUKIWANIU KANAŁÓW"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Znaleziono %1$d kanał"</item>
-    <item quantity="other" msgid="4331542666115153576">"Znalezione kanały: %1$d"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Świetnie! Podczas skanowania znaleziono %1$d kanał. Jeśli coś jest nie tak, wyreguluj położenie anteny i ponownie wykonaj skanowanie."</item>
-    <item quantity="other" msgid="8098777464551209564">"Świetnie! Podczas skanowania znaleziono kanały: %1$d. Jeśli coś jest nie tak, spróbuj wyregulować położenie anteny i ponownie wykonaj skanowanie."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="few">Znaleziono %1$d kanały</item>
+      <item quantity="many">Znaleziono %1$d kanałów</item>
+      <item quantity="other">Znaleziono %1$d kanału</item>
+      <item quantity="one">Znaleziono %1$d kanał</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="few">Super! Podczas skanowania znaleziono %1$d kanały. Jeśli coś jest nie tak, wyreguluj położenie anteny i ponownie wykonaj skanowanie</item>
+      <item quantity="many"> Super! Podczas skanowania znaleziono %1$d kanałów. Jeśli coś jest nie tak, wyreguluj położenie anteny i ponownie wykonaj skanowanie</item>
+      <item quantity="other"> Super! Podczas skanowania znaleziono %1$d kanału. Jeśli coś jest nie tak, wyreguluj położenie anteny i ponownie wykonaj skanowanie</item>
+      <item quantity="one">Super! Podczas skanowania znaleziono %1$d kanał. Jeśli coś jest nie tak, wyreguluj położenie anteny i ponownie wykonaj skanowanie</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Gotowe"</item>
     <item msgid="496688122303154468">"Skanuj ponownie"</item>

@@ -20,12 +20,13 @@ import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
-import com.android.tv.util.CollectionUtils;
 import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.TvInputManagerHelper;
 
@@ -40,6 +41,7 @@ import java.util.Set;
  * It manages the current tuned channel among browsable channels. And it determines the next channel
  * by channel up/down. But, it doesn't actually tune through TvView.
  */
+@MainThread
 public class ChannelTuner {
     private static final String TAG = "ChannelTuner";
 

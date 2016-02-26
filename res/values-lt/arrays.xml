@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premjera"</item>
     <item msgid="8215762047341133299">"Technol. / mokslas"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Tiesioginiai kanalai"</item>
+    <item msgid="7307688057853449735">"Paprastas būdas atrasti turinį"</item>
+    <item msgid="7566838222783641942">"Atsisiųskite programų, gaukite daugiau kanalų"</item>
+    <item msgid="8646630833216197238">"Tinkinkite kanalų išdėstymą"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Žiūrėkite programų turinį kaip televizoriaus kanalus."</item>
+    <item msgid="1855708984677953238">"Naršykite programų turinį naudodami panašų vadovą ir jums pritaikytą sąsają, \nkaip naršote televizoriaus kanalus."</item>
+    <item msgid="3420760668363283731">"Pridėkite daugiau kanalų įdiegdami tiesioginius kanalus teikiančių programų. \nSuraskite suderinamų programų „Google Play“ parduotuvėje, naudodami TV meniu pateiktą nuorodą."</item>
+    <item msgid="8974157841656828507">"Nustatykite įdiegtus naujus kanalų šaltinius ir tinkinkite kanalų sąrašą. \nKad pradėtumėte, pasirinkite kanalų šaltinius „Nustatymų“ meniu."</item>
+  </string-array>
 </resources>

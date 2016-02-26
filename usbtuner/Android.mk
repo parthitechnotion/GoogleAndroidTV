@@ -20,34 +20,24 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_PRIVILEGED_MODULE := true
 LOCAL_SDK_VERSION := system_current
 
-LOCAL_SRC_FILES := \
-    $(call all-java-files-under, src) \
-    $(call all-proto-files-under, proto)
-
 LOCAL_STATIC_JAVA_LIBRARIES := \
-    android-support-v4 \
-    android-support-v7-recyclerview \
-    android-support-v17-leanback \
-    icu4j-usbtuner \
-    libprotobuf-java-nano \
-    tv-common
-
+    usbtuner-tvinput
 
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res \
+    $(LOCAL_PATH)/../common/res \
     $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
     $(TOP)/prebuilts/sdk/current/support/v17/leanback/res
 
 LOCAL_AAPT_FLAGS := --auto-add-overlay \
-    --extra-packages android.support.v17.leanback
+    --extra-packages android.support.v7.recyclerview \
+    --extra-packages android.support.v17.leanback \
+    --extra-packages com.android.tv.common
 
 LOCAL_JNI_SHARED_LIBRARIES := \
     libusbtuner_jni
 
 LOCAL_PROGUARD_ENABLED := disabled
-
-LOCAL_PROTOC_OPTIMIZE_TYPE := nano
-LOCAL_PROTOC_FLAGS := --proto_path=$(LOCAL_PATH)/proto/
 
 include $(BUILD_PACKAGE)
 
@@ -78,11 +68,13 @@ LOCAL_PROGUARD_ENABLED := disabled
 
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res \
+    $(LOCAL_PATH)/../common/res \
     $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
     $(TOP)/prebuilts/sdk/current/support/v17/leanback/res
 
 LOCAL_AAPT_FLAGS := --auto-add-overlay \
-    --extra-packages android.support.v17.leanback
+    --extra-packages android.support.v17.leanback \
+    --extra-packages com.android.tv.common \
 
 LOCAL_PROTOC_OPTIMIZE_TYPE := nano
 LOCAL_PROTOC_FLAGS := --proto_path=$(LOCAL_PATH)/proto/

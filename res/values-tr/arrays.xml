@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"İlk Gösterim"</item>
     <item msgid="8215762047341133299">"Teknoloji/Bilim"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Canlı Yayın Kanalları"</item>
+    <item msgid="7307688057853449735">"İçeriği keşfetmenin basit bir yolu"</item>
+    <item msgid="7566838222783641942">"Uygulamaları indirin, daha çok kanal alın"</item>
+    <item msgid="8646630833216197238">"Kanal listenizi özelleştirin"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Uygulamalarınızdaki içerikleri TV\'nizdeki kanalları izler gibi izleyin."</item>
+    <item msgid="1855708984677953238">"Uygulamalarınızdaki içeriklere bildiğiniz bir rehber ve kullanıcı dostu bir arayüzle göz atın, \ntıpkı TV\'deki kanallarda olduğu gibi."</item>
+    <item msgid="3420760668363283731">"Canlı kanallar sunan uygulamalar yükleyerek daha fazla kanal ekleyin. \nTV menüsündeki bağlantıyı kullanarak Google Play Store\'daki uyumlu uygulamaları bulun."</item>
+    <item msgid="8974157841656828507">"Kanal listenizi özelleştirmek için yeni yüklediğiniz kanal kaynaklarını ayarlayın. \nBaşlangıç olarak Ayarlar menüsünden Kanal kaynaklarını seçin."</item>
+  </string-array>
 </resources>

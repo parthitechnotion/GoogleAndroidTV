@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"เปิด"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"ปิด"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"หลายเสียง"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"การตั้งค่าช่อง"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"ผู้ปกครองควบคุม"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"เกี่ยวกับ"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"รับชมช่องต่างๆ มากขึ้น"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"การตั้งค่า"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"แหล่งที่มา"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"สลับ"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"เปิด"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"จัดกลุ่มตาม"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"การตั้งค่าช่อง"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"โปรแกรมนี้ถูกบล็อก"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"โปรแกรมนี้เรต <xliff:g id="RATING">%1$s</xliff:g>"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"แหล่งที่มาของช่อง"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"มีช่องใหม่ให้บริการ"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"กำหนดค่ารายการช่อง"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"เลือกช่องสำหรับคู่มือโปรแกรมของคุณ"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"ไม่ได้ตั้งค่า"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"อินพุตไม่สนับสนุนการสแกนอัตโนมัติ"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"ไม่สามารถเริ่มการสแกนอัตโนมัติสำหรับ \"<xliff:g id="TV_INPUT">%s</xliff:g>\""</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"ไม่สามารถเริ่มใช้ค่ากำหนดสำหรับทั้งระบบกับคำบรรยายได้"</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"เพิ่มแล้ว %1$d ช่อง"</item>
-    <item quantity="other" msgid="1078861616751739285">"เพิ่มแล้ว %1$d ช่อง"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">เพิ่มแล้ว %1$d ช่อง</item>
+      <item quantity="one">เพิ่มแล้ว %1$d ช่อง</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"ไม่ได้เพิ่มช่อง"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"ตัวรับสัญญาณ"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"ควบคุมโดยผู้ปกครอง"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"ป้อน PIN ใหม่"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"ยืนยัน PIN"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"ป้อน PIN ปัจจุบันของคุณ"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"คุณป้อน PIN ผิด 5 ครั้งแล้ว\nลองอีกครั้งใน <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> วินาที"</item>
-    <item quantity="other" msgid="8829550842387756054">"คุณป้อน PIN ผิด 5 ครั้งแล้ว\nลองอีกครั้งใน <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> วินาที"</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">คุณป้อน PIN ผิด 5 ครั้ง\nลองอีกครั้งใน <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> วินาที</item>
+      <item quantity="one">คุณป้อน PIN ผิด 5 ครั้ง\nลองอีกครั้งใน <xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> วินาที</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"PIN ไม่ถูกต้อง ลองอีกครั้ง"</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"ลองอีกครั้ง PIN ไม่ตรงกัน"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"เกี่ยวกับ"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"ใบอนุญาตโอเพนซอร์ส"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"การตั้งค่า"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"กำหนดค่ารายการช่อง"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"เลือกช่องสำหรับคู่มือรายการทีวีของคุณ"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"แหล่งที่มาของช่อง"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"มีช่องใหม่ให้บริการ"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"การควบคุมโดยผู้ปกครอง"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"ใบอนุญาตโอเพนซอร์ส"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ใบอนุญาตโอเพนซอร์ส"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"เวอร์ชัน"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"เวอร์ชัน"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"ตัวเลือกสำหรับนักพัฒนา"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"เปิดใช้ตัวรับสัญญาณทีวีผ่าน USB"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"หากต้องการได้ยินเสียงของตัวรับสัญญาณทีวีผ่าน USB ทีวีของคุณต้องสนับสนุนการส่งผ่าน AC3"</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"ไม่มีชื่อ"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"บล็อกช่องแล้ว"</string>
     <string name="episode_format" msgid="4881195874563241096">"ซีซัน <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: ตอนที่ <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"แหล่งที่มาของช่อง"</string>
-    <string name="setup_description" msgid="8728423605912915099">"ตั้งค่าช่องสดจากแหล่งที่มาที่พร้อมใช้งาน ขั้นตอนนี้อาจใช้เวลาหลายนาทีขึ้นอยู่กับแหล่งที่มาของช่อง"</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"เสร็จสิ้น"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"มี %1$d ช่อง"</item>
-    <item quantity="other" msgid="2386588423841837714">"มี %1$d ช่อง"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"ใหม่"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"แหล่งที่มา"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">%1$d ช่อง</item>
+      <item quantity="one">%1$d ช่อง</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"ไม่มีช่องให้บริการ"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"ใหม่"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"ไม่ได้ตั้งค่า"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"รับแหล่งที่มาเพิ่มเติม"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"เรียกดูแอปที่เสนอรายการถ่ายทอดสด"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"มีแหล่งที่มาของช่องใหม่"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"แหล่งที่มาของช่องใหม่มีหลายช่องมาให้ใช้งาน\nตั้งค่าช่องเลยตอนนี้ หรือทำในภายหลังในการตั้งค่าแหล่งที่มาของช่อง"</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"ตั้งค่าเลย"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"รับทราบ"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"กด \"เลือก\""</b>" เพื่อเข้าถึงเมนู TV"</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"แป้นกลับมีไว้สำหรับอุปกรณ์ที่เชื่อมต่อ กดปุ่มหน้าแรกเพื่อออก"</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Live TV ไม่ได้รับการสนับสนุนบนอุปกรณ์นี้ซึ่งมี Android Lollipop"</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Live TV ต้องใช้สิทธิ์ในการอ่านรายการทีวี"</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"ตั้งค่าแหล่งที่มา"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"รายการถ่ายทอดสดมอบประสบการณ์ที่ผสมผสานระหว่างช่องทีวีแบบดั้งเดิมกับช่องแบบสตรีมโดยแอป\n\nเริ่มต้นใช้งานได้โดยตั้งค่าแหล่งที่มาของช่องที่ติดตั้งไว้แล้ว หรือเรียกดู Google Play สโตร์เพื่อค้นหาแอปอื่นๆ ที่เสนอรายการถ่ายทอดสด"</string>
 </resources>

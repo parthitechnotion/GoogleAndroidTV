@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Perdana"</item>
     <item msgid="8215762047341133299">"Teknikal/Sains"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Saluran Langsung"</item>
+    <item msgid="7307688057853449735">"Cara mudah untuk menemui kandungan"</item>
+    <item msgid="7566838222783641942">"Muat turun apl, dapatkan lebih banyak saluran"</item>
+    <item msgid="8646630833216197238">"Sesuaikan barisan saluran anda"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Tonton kandungan daripada apl anda seperti menonton saluran pada TV."</item>
+    <item msgid="1855708984677953238">"Semak imbas kandungan daripada apl anda dengan menggunakan panduan biasa dan antara muka yang mesra, \n sama seperti saluran pada TV."</item>
+    <item msgid="3420760668363283731">"Tambahkan lagi saluran dengan memasang apl yang menawarkan saluran langsung. \nCari apl yang serasi di Gedung Google Play dengan menggunakan pautan dalam menu TV."</item>
+    <item msgid="8974157841656828507">"Sediakan sumber saluran yang baru dipasang untuk menyesuaikan senarai saluran anda. \nPilih sumber Saluran dalam menu Tetapan untuk memulakan."</item>
+  </string-array>
 </resources>

@@ -44,10 +44,38 @@ import java.util.List;
 public final class Recording {
     private static final String TAG = "Recording";
 
+    public static final String RECORDING_ID_EXTRA = "extra.dvr.recording.id";
+    public static final String PARAM_INPUT_ID = "input_id";
+
+    public static final long ID_NOT_SET = -1;
+
     public static final Comparator<Recording> START_TIME_COMPARATOR = new Comparator<Recording>() {
         @Override
         public int compare(Recording lhs, Recording rhs) {
             return Long.compare(lhs.mStartTimeMs, rhs.mStartTimeMs);
+        }
+    };
+
+    public static final Comparator<Recording> PRIORITY_COMPARATOR = new Comparator<Recording>() {
+        @Override
+        public int compare(Recording lhs, Recording rhs) {
+            int value = Long.compare(lhs.mPriority, rhs.mPriority);
+            if (value == 0) {
+                value = Long.compare(lhs.mId, rhs.mId);
+            }
+            return value;
+        }
+    };
+
+    public static final Comparator<Recording> START_TIME_THEN_PRIORITY_COMPARATOR
+            = new Comparator<Recording>() {
+        @Override
+        public int compare(Recording lhs, Recording rhs) {
+            int value = START_TIME_COMPARATOR.compare(lhs, rhs);
+            if (value == 0) {
+                value = PRIORITY_COMPARATOR.compare(lhs, rhs);
+            }
+            return value;
         }
     };
 
@@ -64,11 +92,13 @@ public final class Recording {
         return new Builder()
                 .setChannel(c)
                 .setStartTime(startTime)
-                .setEndTime(endTime);
+                .setEndTime(endTime)
+                .setType(TYPE_TIMED);
     }
 
     public static final class Builder {
-        private long mId;
+        private long mId = ID_NOT_SET;
+        private long mPriority = Long.MAX_VALUE;
         private Uri mUri;
         private Channel mChannel;
         private List<Program> mPrograms;
@@ -86,7 +116,12 @@ public final class Recording {
             return this;
         }
 
-        public Builder setUri(Uri uri) {
+        public Builder setPriority(long priority) {
+            mPriority = priority;
+            return this;
+        }
+
+        private Builder setUri(Uri uri) {
             mUri = uri;
             return this;
         }
@@ -132,7 +167,8 @@ public final class Recording {
         }
 
         public Recording build() {
-            return new Recording(mId, mUri, mChannel, mPrograms, mType, mStartTime, mEndTime, mSize,
+            return new Recording(mId, mPriority, mUri, mChannel, mPrograms, mType, mStartTime,
+                    mEndTime, mSize,
                     mState, mParentSeasonRecording);
         }
     }
@@ -150,6 +186,7 @@ public final class Recording {
                 .setSize(orig.mMediaSize)
                 .setStartTime(orig.mStartTimeMs)
                 .setState(orig.mState)
+                .setType(orig.mType)
                 .setUri(orig.mUri);
     }
 
@@ -169,11 +206,11 @@ public final class Recording {
     /**
      * Record with given time range.
      */
-    private static final int TYPE_TIMED = 1;
+    static final int TYPE_TIMED = 1;
     /**
      * Record with a given program.
      */
-    private static final int TYPE_PROGRAM = 2;
+    static final int TYPE_PROGRAM = 2;
 
     @RecordingType private final int mType;
 
@@ -183,6 +220,7 @@ public final class Recording {
     public static final String[] PROJECTION = {
         // Columns must match what is read in Recording.fromCursor()
         DvrContract.Recordings._ID,
+        DvrContract.Recordings.COLUMN_PRIORITY,
         DvrContract.Recordings.COLUMN_TYPE,
         DvrContract.Recordings.COLUMN_URI,
         DvrContract.Recordings.COLUMN_CHANNEL_ID,
@@ -196,6 +234,14 @@ public final class Recording {
      * The ID internal to Live TV
      */
     private final long mId;
+
+    /**
+     * The priority of this recording.
+     *
+     * <p> The lowest number is recorded first. If there is a tie in priority then the lower id
+     * wins.
+     */
+    private final long mPriority;
 
     /**
      * The {@link Uri} is used as its identifier with the TIS.
@@ -224,11 +270,19 @@ public final class Recording {
 
     private final SeasonRecording mParentSeasonRecording;
 
-
-    private Recording(long id, Uri uri, Channel channel, List<Program> programs,
+    private Recording(long id, long priority, Uri uri, Channel channel, List<Program> programs,
             @RecordingType int type, long startTime, long endTime, long size,
             @RecordingState int state, SeasonRecording parentSeasonRecording) {
         mId = id;
+        mPriority = priority;
+        if (uri == null && id >= 0 && channel != null) {
+            uri = new Uri.Builder()
+                    .scheme("record")
+                    .authority("com.android.tv")
+                    .appendPath(Long.toString(mId))
+                    .appendQueryParameter(PARAM_INPUT_ID, channel.getInputId())
+                    .build();
+        }
         mUri = uri;
         mChannel = channel;
         mPrograms = programs == null ? Collections.EMPTY_LIST : new ArrayList<>(programs);
@@ -317,6 +371,10 @@ public final class Recording {
         return mId;
     }
 
+    public long getPriority() {
+        return mPriority;
+    }
+
     /**
      * Creates {@link Recording} object from the given {@link Cursor}.
      */
@@ -324,6 +382,7 @@ public final class Recording {
         Builder builder = new Builder();
         int index = -1;
         builder.setId(c.getLong(++index));
+        builder.setPriority(c.getLong(++index));
         builder.setType(recordingType(c.getString(++index)));
         String uri = c.getString(++index);
         if (uri != null) {
@@ -405,6 +464,7 @@ public final class Recording {
                 + "(startTime=" + Utils.toIsoDateTimeString(mStartTimeMs)
                 + ",endTime=" + Utils.toIsoDateTimeString(mEndTimeMs)
                 + ",state=" + mState
+                + ",priority=" + mPriority
                 + ")";
     }
 }

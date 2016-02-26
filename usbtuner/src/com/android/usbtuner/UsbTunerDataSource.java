@@ -56,14 +56,14 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
     private boolean mEndOfStreamSent;
     private boolean mStreaming;
 
-    private final UsbTunerInterface mUsbTunerInterface;
+    private final TunerHal mTunerHal;
     private Thread mStreamingThread;
     private boolean mDeviceConfigured;
     private EventDetector mEventDetector;
 
-    public UsbTunerDataSource(UsbTunerInterface usbTunerInterface, EventListener eventListener) {
-        mUsbTunerInterface = usbTunerInterface;
-        mEventDetector = new EventDetector(mUsbTunerInterface, eventListener);
+    public UsbTunerDataSource(TunerHal tunerHal, EventListener eventListener) {
+        mTunerHal = tunerHal;
+        mEventDetector = new EventDetector(mTunerHal, eventListener);
     }
 
     /**
@@ -102,17 +102,17 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
      */
     @Override
     public boolean tuneToChannel(TunerChannel channel) {
-        if (mUsbTunerInterface.tuneAtsc(channel.getFrequency(), channel.getModulation())) {
+        if (mTunerHal.tune(channel.getFrequency(), channel.getModulation())) {
             if (channel.hasVideo()) {
-                mUsbTunerInterface.addTunerPidFilter(channel.getVideoPid(),
-                        UsbTunerInterface.FILTER_TYPE_VIDEO);
+                mTunerHal.addPidFilter(channel.getVideoPid(),
+                        TunerHal.FILTER_TYPE_VIDEO);
             }
             if (channel.hasAudio()) {
-                mUsbTunerInterface.addTunerPidFilter(channel.getAudioPid(),
-                        UsbTunerInterface.FILTER_TYPE_AUDIO);
+                mTunerHal.addPidFilter(channel.getAudioPid(),
+                        TunerHal.FILTER_TYPE_AUDIO);
             }
-            mUsbTunerInterface.addTunerPidFilter(channel.getPcrPid(),
-                    UsbTunerInterface.FILTER_TYPE_PCR);
+            mTunerHal.addPidFilter(channel.getPcrPid(),
+                    TunerHal.FILTER_TYPE_PCR);
             if (mEventDetector != null) {
                 mEventDetector.startDetecting(channel.getFrequency(), channel.getModulation());
             }
@@ -167,7 +167,7 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
                     }
                 }
 
-                int bytesWritten = mUsbTunerInterface.readTsStream(dataBuffer, dataBuffer.length);
+                int bytesWritten = mTunerHal.readTsStream(dataBuffer, dataBuffer.length);
                 if (bytesWritten <= 0) {
                     continue;
                 }
@@ -193,9 +193,6 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
             }
 
             Log.i(TAG, "Streaming stopped");
-
-            // Once the stream stops we perform cleanup with the DVB API.
-            mUsbTunerInterface.stopStreaming();
         }
     }
 
@@ -262,11 +259,8 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
     }
 
     @Override
-    public void close() {}
-
-    @Override
-    public void release() {
-        mUsbTunerInterface.stopTune();
+    public void close() {
+        mTunerHal.stopTune();
     }
 
     @Override

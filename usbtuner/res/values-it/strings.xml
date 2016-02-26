@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Configurazione del sintonizzatore di canali USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"L\'operazione potrebbe richiedere alcuni minuti"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"%1$d canale trovato"</item>
-    <item quantity="other" msgid="7340557317633613">"%1$d canali trovati"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">%1$d canali trovati</item>
+      <item quantity="one">%1$d canale trovato</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"INTERROMPI RICERCA CANALI"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"%1$d canale trovato"</item>
-    <item quantity="other" msgid="4331542666115153576">"%1$d canali trovati"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Bene! È stato trovato %1$d canale durante la ricerca dei canali. Se non è corretto, prova a regolare la posizione dell\'antenna ed esegui nuovamente la ricerca."</item>
-    <item quantity="other" msgid="8098777464551209564">"Bene! Sono stati trovati %1$d canali durante la ricerca dei canali. Se non è corretto, prova a regolare la posizione dell\'antenna ed esegui nuovamente la ricerca."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">%1$d canali trovati</item>
+      <item quantity="one">%1$d canale trovato</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">Bene! Sono stati trovati %1$d canali durante la ricerca dei canali. Se non è corretto, prova a regolare la posizione dell\'antenna ed esegui nuovamente la ricerca.</item>
+      <item quantity="one">Bene! È stato trovato %1$d canale durante la ricerca dei canali. Se non è corretto, prova a regolare la posizione dell\'antenna ed esegui nuovamente la ricerca.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Fine"</item>
     <item msgid="496688122303154468">"Cerca di nuovo"</item>

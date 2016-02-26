@@ -21,7 +21,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -37,7 +36,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class BitmapUtils {
+public final class BitmapUtils {
     private static final String TAG = "BitmapUtils";
     private static final boolean DEBUG = false;
 
@@ -52,12 +51,8 @@ public class BitmapUtils {
     private BitmapUtils() { /* cannot be instantiated */ }
 
     public static Bitmap scaleBitmap(Bitmap bm, int maxWidth, int maxHeight) {
-        Bitmap result;
         Rect rect = calculateNewSize(bm, maxWidth, maxHeight);
-        result = Bitmap.createBitmap(rect.right, rect.bottom, bm.getConfig());
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(bm, null, rect, null);
-        return result;
+        return Bitmap.createScaledBitmap(bm, rect.right, rect.bottom, false);
     }
 
     private static Rect calculateNewSize(Bitmap bm, int maxWidth, int maxHeight) {

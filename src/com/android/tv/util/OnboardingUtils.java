@@ -18,8 +18,10 @@ package com.android.tv.util;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.tv.TvContract.Channels;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.UiThread;
 
@@ -31,7 +33,16 @@ import com.android.tv.data.ChannelDataManager;
  */
 public final class OnboardingUtils {
     private static final String PREF_KEY_IS_FIRST_BOOT = "pref_onbaording_is_first_boot";
-    private static final String PREF_KEY_IS_FIRST_RUN = "pref_onbaording_is_first_run";
+    private static final String PREF_KEY_ONBOARDING_VERSION_CODE = "pref_onbaording_versionCode";
+    private static final int ONBOARDING_VERSION = 1;
+
+    private static final String MERCHANT_COLLECTION_URL_STRING =
+            "https://play.google.com/store/apps/collection/promotion_3001bf9_ATV_livechannels";
+    /**
+     * Intent to show merchant collection in play store.
+     */
+    public static final Intent PLAY_STORE_INTENT = new Intent(Intent.ACTION_VIEW,
+            Uri.parse(MERCHANT_COLLECTION_URL_STRING));
 
     /**
      * Checks if this is the first boot after the onboarding experience has been applied.
@@ -52,29 +63,29 @@ public final class OnboardingUtils {
     }
 
     /**
-     * Checks if this is the first run of {@link com.android.tv.MainActivity} after the
-     * onboarding experience has been applied.
+     * Checks if this is the first run of {@link com.android.tv.MainActivity} with the
+     * current onboarding version.
      */
-    public static boolean isFirstRun(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(PREF_KEY_IS_FIRST_RUN, true);
+    public static boolean isFirstRunWithCurrentVersion(Context context) {
+        int versionCode = PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(PREF_KEY_ONBOARDING_VERSION_CODE, 0);
+        return versionCode != ONBOARDING_VERSION;
     }
 
     /**
-     * Marks that the first run of {@link com.android.tv.MainActivity} has been completed.
+     * Marks that the first run of {@link com.android.tv.MainActivity} with the current
+     * onboarding version has been completed.
      */
-    public static void setFirstRunCompleted(Context context) {
-        PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putBoolean(PREF_KEY_IS_FIRST_RUN, false)
-                .apply();
+    public static void setFirstRunWithCurrentVersionCompleted(Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(PREF_KEY_ONBOARDING_VERSION_CODE, ONBOARDING_VERSION).apply();
     }
 
     /**
      * Checks whether the onboarding screen should be shown or not.
      */
     public static boolean needToShowOnboarding(Context context) {
-        return isFirstRun(context) || !areChannelsAvailable(context);
+        return isFirstRunWithCurrentVersion(context) || !areChannelsAvailable(context);
     }
 
     /**
@@ -92,5 +103,13 @@ public final class OnboardingUtils {
                 null, null)) {
             return c.getCount() != 0;
         }
+    }
+
+    /**
+     * Checks if there are any available TV inputs.
+     */
+    public static boolean areInputsAvailable(Context context) {
+        return TvApplication.getSingletons(context).getTvInputManagerHelper()
+                .getTvInputInfos(true, false).size() > 0;
     }
 }

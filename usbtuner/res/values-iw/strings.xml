@@ -50,19 +50,25 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"‏הגדרת טיונר ערוצים בחיבור USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"פעולה זו עשויה להימשך מספר דקות"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"נמצא ערוץ אחד"</item>
-    <item quantity="other" msgid="7340557317633613">"‏נמצאו %1$d ערוצים"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="two">‏נמצאו %1$d ערוצים</item>
+      <item quantity="many">‏נמצאו %1$d ערוצים</item>
+      <item quantity="other">‏נמצאו %1$d ערוצים</item>
+      <item quantity="one">נמצא ערוץ אחד</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"הפסק סריקת ערוצים"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"נמצא ערוץ אחד"</item>
-    <item quantity="other" msgid="4331542666115153576">"‏נמצאו %1$d ערוצים"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"יופי! נמצא ערוץ אחד במהלך סריקת הערוצים. אם הדבר נראה שגוי, נסה לכוונן את מיקום האנטנה ולסרוק שוב."</item>
-    <item quantity="other" msgid="8098777464551209564">"‏יופי! נמצאו %1$d ערוצים במהלך סריקת הערוצים. אם הדבר נראה שגוי, נסה לכוונן את מיקום האנטנה ולסרוק שוב."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="two">‏נמצאו %1$d ערוצים</item>
+      <item quantity="many">‏נמצאו %1$d ערוצים</item>
+      <item quantity="other">‏נמצאו %1$d ערוצים</item>
+      <item quantity="one">נמצא ערוץ אחד</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="two">‏לא רע! במהלך סריקה הערוצים, נמצאו %1$d ערוצים. אם הקליטה לא תקינה, נסה לכוונן את מיקום האנטנה ובצע סריקה נוספת.</item>
+      <item quantity="many">‏לא רע! במהלך סריקה הערוצים, נמצאו %1$d ערוצים. אם הקליטה לא תקינה, נסה לכוונן את מיקום האנטנה ובצע סריקה נוספת.</item>
+      <item quantity="other">‏לא רע! במהלך סריקה הערוצים, נמצאו %1$d ערוצים. אם הקליטה לא תקינה, נסה לכוונן את מיקום האנטנה ובצע סריקה נוספת.</item>
+      <item quantity="one">לא רע! במהלך סריקת הערוצים נמצא ערוץ אחד. אם הקליטה לא תקינה, נסה לכוונן את מיקום האנטנה ובצע סריקה נוספת.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"בוצע"</item>
     <item msgid="496688122303154468">"סרוק שוב"</item>

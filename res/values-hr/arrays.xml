@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premijere"</item>
     <item msgid="8215762047341133299">"Tehnologija/znanost"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"TV kanali uživo"</item>
+    <item msgid="7307688057853449735">"Jednostavan način otkrivanja sadržaja"</item>
+    <item msgid="7566838222783641942">"Preuzmite aplikacije i gledajte više kanala"</item>
+    <item msgid="8646630833216197238">"Prilagodite svoj popis kanala"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Gledajte sadržaj iz aplikacija kao da gledate TV kanale."</item>
+    <item msgid="1855708984677953238">"Pregledavajte sadržaj iz aplikacija uz poznati vodič i ugodno sučelje, \nbaš kao kanale na televizoru."</item>
+    <item msgid="3420760668363283731">"Instalirajte aplikacije koje nude kanale uživo kako biste dodali više kanala. \nPronađite kompatibilne aplikacije u Trgovini Google Play putem veze na izborniku TV-a."</item>
+    <item msgid="8974157841656828507">"Postavite novoinstalirane izvore kanala da biste prilagodili popis kanala. \nOdaberite izvore kanala na izborniku Postavke da biste započeli."</item>
+  </string-array>
 </resources>

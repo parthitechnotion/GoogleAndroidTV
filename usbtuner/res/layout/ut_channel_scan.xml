@@ -15,12 +15,10 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:background="@color/ut_guidedstep_background"
     android:animateLayoutChanges="true"
     android:keepScreenOn="true" >
     <LinearLayout
@@ -66,6 +64,7 @@
                 android:progressDrawable="@drawable/ut_scan_progress" />
             <TextView
                 android:id="@+id/tune_description"
+                android:accessibilityLiveRegion="polite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/ut_scan_description_margin_top"
@@ -81,12 +80,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/ut_scan_button_height"
                 android:layout_marginTop="@dimen/ut_scan_button_margin_top"
-                android:layout_marginLeft="@dimen/ut_scan_icon_margin_right_for_button"
+                android:layout_marginLeft="@dimen/ut_scan_icon_margin_right"
                 android:layout_below="@id/tune_description"
                 android:layout_toRightOf="@id/tune_icon"
                 android:paddingLeft="@dimen/ut_scan_button_padding"
                 android:paddingRight="@dimen/ut_scan_button_padding"
                 android:textAllCaps="false"
+                android:focusable="true"
                 android:fontFamily="sans-serif-condensed"
                 android:textColor="@color/ut_scan_button_text"
                 android:textSize="@dimen/ut_scan_button_text_size"
@@ -98,7 +98,10 @@
         android:id="@+id/channel_holder"
         android:layout_width="@dimen/ut_scan_channellist_width"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true" >
+        android:focusable="false"
+        android:descendantFocusability="blocksDescendants"
+        android:animateLayoutChanges="true"
+        android:visibility="gone">
         <ListView
             android:id="@+id/channel_list"
             android:layout_width="match_parent"
@@ -108,6 +111,7 @@
             android:paddingStart="@dimen/ut_scan_channellist_padding_start"
             android:divider="@android:color/transparent"
             android:scrollbars="none"
-            android:dividerHeight="7dp" />
+            android:dividerHeight="7dp"
+            android:transcriptMode="alwaysScroll" />
     </LinearLayout>
 </LinearLayout>

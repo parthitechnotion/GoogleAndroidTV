@@ -16,9 +16,11 @@
 
 package com.android.tv.ui.sidepanel;
 
+import android.support.annotation.UiThread;
 import android.view.View;
 import android.view.ViewGroup;
 
+@UiThread
 public abstract class Item {
     private View mItemView;
     private boolean mEnabled = true;

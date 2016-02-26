@@ -20,6 +20,7 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.android.tv.common.MemoryManageable;
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
 
 /**

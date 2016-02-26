@@ -17,25 +17,33 @@
 package com.android.tv.dvr;
 
 import android.content.Context;
+import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Range;
+
+import com.android.tv.util.SoftPreconditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A DVR Data manager that stores values in memory suitable for testing.
  */
 @VisibleForTesting // TODO(DVR): move to testing dir.
+@MainThread
 public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
+    private final static String TAG = "DvrDataManagerInMemory";
+    private final AtomicLong mNextId = new AtomicLong(1);
     private final Map<Long, Recording> mRecordings = new HashMap<>();
     private List<SeasonRecording> mSeasonSchedule = new ArrayList<>();
 
-    DvrDataManagerInMemoryImpl(Context context) {
+    public DvrDataManagerInMemoryImpl(Context context) {
         super(context);
     }
 
@@ -51,19 +59,17 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
 
     @Override
     public List<Recording> getFinishedRecordings() {
-        //TODO filter
-        return new ArrayList(mRecordings.values());
+        return getRecordingsWithState(Recording.STATE_RECORDING_FINISHED);
     }
 
     @Override
     public List<Recording> getStartedRecordings() {
-        return null;
+        return getRecordingsWithState(Recording.STATE_RECORDING_IN_PROGRESS);
     }
 
     @Override
     public List<Recording> getScheduledRecordings() {
-        //TODO filter
-        return new ArrayList(mRecordings.values());
+        return getRecordingsWithState(Recording.STATE_RECORDING_NOT_STARTED);
     }
 
     @Override
@@ -101,8 +107,16 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
      */
     @Override
     public void addRecording(Recording recording) {
+        addRecordingInternal(recording);
+    }
+
+    public Recording addRecordingInternal(Recording recording) {
+        SoftPreconditions.checkState(recording.getId() == Recording.ID_NOT_SET, TAG,
+                "expected id of " + Recording.ID_NOT_SET + " but was " + recording);
+        recording = Recording.buildFrom(recording).setId(mNextId.incrementAndGet()).build();
         mRecordings.put(recording.getId(), recording);
         notifyRecordingAdded(recording);
+        return recording;
     }
 
     @Override
@@ -133,7 +147,19 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
     }
 
     @Nullable
+    @Override
     public Recording getRecording(long id) {
         return mRecordings.get(id);
+    }
+
+    @NonNull
+    private List<Recording> getRecordingsWithState(int state) {
+        ArrayList<Recording> result = new ArrayList<>();
+        for (Recording r : mRecordings.values()) {
+            if(r.getState() == state){
+                result.add(r);
+            }
+        }
+        return result;
     }
 }

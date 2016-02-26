@@ -50,19 +50,19 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"ការដំឡើងឧបករណ៍ចាប់ប៉ុស្តិ៍ USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"វាអាចចំណាយពេលច្រើននាទី"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"រកឃើញប៉ុស្តិ៍ %1$d"</item>
-    <item quantity="other" msgid="7340557317633613">"រកឃើញប៉ុស្តិ៍ %1$d"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="other">បានរកឃើញប៉ុស្តិ៍ %1$d</item>
+      <item quantity="one">បានរកឃើញប៉ុស្តិ៍ %1$d</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"បញ្ឈប់ការស្កេនរកប៉ុស្តិ៍"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"រកឃើញប៉ុស្តិ៍ %1$d"</item>
-    <item quantity="other" msgid="4331542666115153576">"រកឃើញប៉ុស្តិ៍ %1$d"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"ល្អ! បានរកឃើញប៉ុស្តិ៍ %1$d អំឡុងពេលស្កេនរកប៉ុស្តិ៍។ ប្រសិនបើការស្កេននេះរកមិនឃើញប៉ុស្តិ៍ទេ សូមសាកល្បងសម្រួលទីតាំងអង់តែន ហើយស្កេនម្តងទៀត។"</item>
-    <item quantity="other" msgid="8098777464551209564">"ល្អ! បានរកឃើញប៉ុស្តិ៍ %1$d អំឡុងពេលស្កេនរកប៉ុស្តិ៍។ ប្រសិនបើការស្កេននេះរកមិនឃើញប៉ុស្តិ៍ទេ សូមសាកល្បងសម្រួលទីតាំងអង់តែន ហើយស្កេនម្តងទៀត។"</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="other">បានរកឃើញប៉ុស្តិ៍ %1$d</item>
+      <item quantity="one">បានរកឃើញប៉ុស្តិ៍ %1$d</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="other">ល្អណាស់! បានរកឃើញប៉ុស្តិ៍ %1$d អំឡុងពេលស្កេន។ ប្រសិនបើការស្កេននេះរកមិនឃើញប៉ុស្តិ៍ទេ សូមសាកល្បងសម្រួលទីតាំងអង់តែន ហើយស្កេនម្តងទៀត។</item>
+      <item quantity="one">ល្អណាស់! បានរកឃើញប៉ុស្តិ៍ %1$d អំឡុងពេលស្កេន។ ប្រសិនបើការស្កេននេះរកមិនឃើញប៉ុស្តិ៍ទេ សូមសាកល្បងសម្រួលទីតាំងអង់តែន ហើយស្កេនម្តងទៀត។</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"រួចរាល់"</item>
     <item msgid="496688122303154468">"ស្កេនម្តងទៀត"</item>

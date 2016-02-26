@@ -50,19 +50,25 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Nastavenie kanálov tunera USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"Môže to trvať niekoľko minút"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Našiel sa %1$d kanál"</item>
-    <item quantity="other" msgid="7340557317633613">"Nájdené kanály: %1$d"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="few">Našli sa %1$d kanály</item>
+      <item quantity="many">Našlo sa %1$d kanála</item>
+      <item quantity="other">Našlo sa %1$d kanálov</item>
+      <item quantity="one">Našiel sa %1$d kanál</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"ZASTAVIŤ HĽADANIE KANÁLOV"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Našiel sa %1$d kanál"</item>
-    <item quantity="other" msgid="4331542666115153576">"Nájdené kanály: %1$d"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Skvelé! Pri hľadaní kanálov sa našiel %1$d kanál. Ak sa vám to nezdá, skúste upraviť pozíciu antény a spustite hľadanie znova."</item>
-    <item quantity="other" msgid="8098777464551209564">"Skvelé! Pri hľadaní kanálov sa našlo niekoľko kanálov (počet: %1$d). Ak sa vám to nezdá, skúste upraviť pozíciu antény a spustite hľadanie znova."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="few">Našli sa %1$d kanály</item>
+      <item quantity="many">Našlo sa %1$d kanála</item>
+      <item quantity="other">Našlo sa %1$d kanálov</item>
+      <item quantity="one">Našiel sa %1$d kanál</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="few">Skvelé! Pri hľadaní kanálov sa našli %1$d kanály. Ak sa vám to nezdá, skúste upraviť pozíciu antény a spustite hľadanie znova.</item>
+      <item quantity="many">Skvelé! Pri hľadaní kanálov sa našlo %1$d kanála. Ak sa vám to nezdá, skúste upraviť pozíciu antény a spustite hľadanie znova.</item>
+      <item quantity="other">Skvelé! Pri hľadaní kanálov sa našlo %1$d kanálov. Ak sa vám to nezdá, skúste upraviť pozíciu antény a spustite hľadanie znova.</item>
+      <item quantity="one">Skvelé! Pri hľadaní kanálov sa našiel %1$d kanál. Ak sa vám to nezdá, skúste upraviť pozíciu antény a spustite hľadanie znova.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Hotovo"</item>
     <item msgid="496688122303154468">"Hľadať znova"</item>

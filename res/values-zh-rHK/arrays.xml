@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"首選"</item>
     <item msgid="8215762047341133299">"科技/科學"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"直播頻道"</item>
+    <item msgid="7307688057853449735">"輕鬆探索各種內容"</item>
+    <item msgid="7566838222783641942">"下載應用程式，觀看更多頻道"</item>
+    <item msgid="8646630833216197238">"自訂您的頻道節目表"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"像觀看電視頻道一樣瀏覽您應用程式中的內容。"</item>
+    <item msgid="1855708984677953238">"透過熟悉的節目指南和易用的介面瀏覽您應用程式中的內容，\n就像觀看電視頻道一樣。"</item>
+    <item msgid="3420760668363283731">"安裝提供直播頻道的應用程式即可新增更多頻道。\n您可以使用電視選單中的連結，前往「Google Play 商店」尋找相容的應用程式。"</item>
+    <item msgid="8974157841656828507">"設定新安裝的頻道來源，即可自訂您的頻道清單。\n在「設定」選單中選擇頻道來源即可開始設定。"</item>
+  </string-array>
 </resources>

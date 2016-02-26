@@ -16,7 +16,6 @@
 
 package com.android.tv.common.feature;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
@@ -31,6 +30,9 @@ import com.android.tv.common.TvCommonUtils;
  */
 public class TestableFeature implements Feature {
     private final static String TAG = "TestableFeature";
+    private final static String DETAIL_MESSAGE
+            = "TestableFeatures should only be changed in tests.";
+
     private final Feature mDelegate;
     private Boolean mTestValue = null;
 
@@ -44,24 +46,29 @@ public class TestableFeature implements Feature {
 
     @VisibleForTesting
     public void enableForTest() {
-        if (TvCommonUtils.isRunningInTest()) {
-            Log.e(TAG, "TestableFeatures should only be changed in tests. Ignoring");
+        if (!TvCommonUtils.isRunningInTest()) {
+            Log.e(TAG, "Not enabling for test:" + this,
+                    new IllegalStateException(DETAIL_MESSAGE));
+        } else {
             mTestValue = true;
         }
     }
 
     @VisibleForTesting
     public void disableForTests() {
-        if (TvCommonUtils.isRunningInTest()) {
-            Log.e(TAG, "TestableFeatures should only be changed in tests. Ignoring");
+        if (!TvCommonUtils.isRunningInTest()) {
+            Log.e(TAG, "Not disabling for test: " + this,
+                    new IllegalStateException(DETAIL_MESSAGE));
+        } else {
             mTestValue = false;
         }
     }
 
     @VisibleForTesting
     public void resetForTests() {
-        if (TvCommonUtils.isRunningInTest()) {
-            Log.e(TAG, "TestableFeatures should only be changed in tests. Ignoring");
+        if (!TvCommonUtils.isRunningInTest()) {
+            Log.e(TAG, "Not resetting feature: " + this, new IllegalStateException(DETAIL_MESSAGE));
+        } else {
             mTestValue = null;
         }
     }

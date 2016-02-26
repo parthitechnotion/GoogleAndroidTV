@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"Aan"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"Uit"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Multi-audio"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"Kanaalconfiguratie"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"Ouderlijk toezicht"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"Over"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"Kanalen ophalen"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"Instellingen"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"Bron"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"Wisselen"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"Aan"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"Groeperen op"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"Kanaalconfiguratie"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"Dit programma is geblokkeerd"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"Dit programma is beoordeeld als <xliff:g id="RATING">%1$s</xliff:g>"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"Kanaalbronnen"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"Nieuwe kanalen beschikbaar"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"Kanaallijst aanp."</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"Kanalen kiezen voor je programmagids"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"Niet ingesteld"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"De invoer biedt geen ondersteuning voor automatisch scannen"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"Kan automatische scan voor \'<xliff:g id="TV_INPUT">%s</xliff:g>\' niet starten"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"Kan de ondertitelingsvoorkeuren voor het hele systeem niet starten."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d kanaal toegevoegd"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d kanalen toegevoegd"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">%1$d kanalen toegevoegd</item>
+      <item quantity="one">%1$d kanaal toegevoegd</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"Geen kanalen toegevoegd"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Tuner"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"Ouderlijk toezicht"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"Nieuwe pincode opgeven"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"Je pincode bevestigen"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"Je huidige pincode opgeven"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"Je hebt vijf keer een verkeerde pincode ingevoerd.\nProbeer het over <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> seconde opnieuw."</item>
-    <item quantity="other" msgid="8829550842387756054">"Je hebt vijf keer een verkeerde pincode ingevoerd.\nProbeer het over <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> seconden opnieuw."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">Je hebt vijf keer een onjuiste pincode opgegeven.\nProbeer het over <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> seconden opnieuw.</item>
+      <item quantity="one">Je hebt vijf keer een onjuiste pincode opgegeven.\nProbeer het over <xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> seconde opnieuw.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"Die pincode is onjuist. Probeer het opnieuw."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Probeer het opnieuw; de pincode komt niet overeen"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"Over"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"Open-sourcelicenties"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"Instellingen"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"Kanaallijst aanpassen"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Kanalen kiezen voor je tv-gids"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"Kanaalbronnen"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"Nieuwe kanalen beschikbaar"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"Ouderlijk toezicht"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"Open-sourcelicenties"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Open-sourcelicenties"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"Versie"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"Versie"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"Opties voor ontwikkelaars"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB-tv-tuner inschakelen"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Als je het geluid van je USB-tv-tuner wilt horen, moet je tv ondersteuning bieden voor AC3-doorvoer."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Geen titel"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Kanaal geblokkeerd"</string>
     <string name="episode_format" msgid="4881195874563241096">"S. <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: afl. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"Kanaalbronnen"</string>
-    <string name="setup_description" msgid="8728423605912915099">"Configureer live kanalen van de beschikbare bronnen. Dit kan enkele minuten duren afhankelijk van de kanaalbron."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"Gereed"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d kanaal beschikbaar"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d kanalen beschikbaar"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"Nieuw"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"Bronnen"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">%1$d kanalen</item>
+      <item quantity="one">%1$d kanaal</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"Geen kanalen beschikbaar"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"Nieuw"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"Niet ingesteld"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"Meer bronnen ophalen"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"Browsen door apps die live kanalen aanbieden"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"Nieuwe kanaalbronnen beschikbaar"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"Er zijn nieuwe kanaalbronnen die kanalen aanbieden.\nStel ze nu in of doe dit later via de instelling voor kanaalbronnen."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"Nu instellen"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"OK"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"Druk op SELECTEREN"</b>" voor toegang tot het tv-menu."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"De toets TERUG is voor verbonden apparaten. Druk op de knop HOME om te sluiten."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"De app \'Live kanalen\' wordt niet ondersteund op dit apparaat met Android Lollipop."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"De app \'Live kanalen\' heeft toestemming nodig om tv-vermeldingen te lezen."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"Je bronnen configureren"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"Live tv combineert de functionaliteit van traditionele tv-kanalen met streaming kanalen die worden geleverd door apps. \n\nJe kunt aan de slag gaan door de kanaalbronnen te configureren die al zijn geïnstalleerd. Of browse in de Google Play Store voor meer apps die live tv aanbieden."</string>
 </resources>

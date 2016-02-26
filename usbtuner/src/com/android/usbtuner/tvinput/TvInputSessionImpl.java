@@ -35,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer.audio.AudioCapabilities;
-import com.android.tv.common.dvr.DvrTvInputService;
+import com.android.tv.common.recording.RecordingTvInputService;
 import com.android.usbtuner.R;
 import com.android.usbtuner.cc.CaptionLayout;
 import com.android.usbtuner.cc.CaptionTrackRenderer;
@@ -51,7 +51,7 @@ import java.util.ArrayList;
 /**
  * Provides a USB tuner TV input session.
  */
-public class TvInputSessionImpl extends DvrTvInputService.PlaybackSession
+public class TvInputSessionImpl extends RecordingTvInputService.PlaybackSession
         implements Handler.Callback, TvInputSessionImplInternal.InternalListener {
     private static final String TAG = "TvInputSessionImpl";
     private static final boolean DEBUG = false;
@@ -169,6 +169,10 @@ public class TvInputSessionImpl extends DvrTvInputService.PlaybackSession
 
     @Override
     public long onTimeShiftGetStartPosition() {
+        Long duration = mSessionImplInternal.getDurationForRecording();
+        if (duration != null) {
+            notifyTimeShiftEndPosition(mSessionImplInternal.getStartPosition() + duration);
+        }
         return mSessionImplInternal.getStartPosition();
     }
 
@@ -191,6 +195,18 @@ public class TvInputSessionImpl extends DvrTvInputService.PlaybackSession
         mSessionImplInternal.tune(channelUri);
         mPlayPaused = false;
         return true;
+    }
+
+    @Override
+    public void onPlayMedia(Uri recordUri) {
+        if (recordUri == null) {
+            Log.w(TAG, "onPlayMedia() is failed due to null channelUri.");
+            mSessionImplInternal.stopTune();
+            return;
+        }
+        mTuneStartTimestamp = SystemClock.elapsedRealtime();
+        mSessionImplInternal.tune(recordUri);
+        mPlayPaused = false;
     }
 
     @Override

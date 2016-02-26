@@ -24,7 +24,7 @@ import android.content.pm.PackageManager;
 
 import com.android.tv.TvActivity;
 import com.android.tv.TvApplication;
-import com.android.usbtuner.TunerSetupActivity;
+import com.android.usbtuner.setup.TunerSetupActivity;
 import com.android.usbtuner.UsbTunerPreferences;
 import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 

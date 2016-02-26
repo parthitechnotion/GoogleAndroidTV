@@ -53,6 +53,7 @@ public class ActionCardView extends FrameLayout implements ItemListRowView.CardV
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         mIconView = (ImageView) findViewById(R.id.action_card_icon);
         mLabelView = (TextView) findViewById(R.id.action_card_label);
         mStateView = (TextView) findViewById(R.id.action_card_state);

@@ -25,13 +25,17 @@ import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.util.Log;
 
 import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,6 +51,8 @@ public class SetupUtils {
     private static final String PREF_KEY_KNOWN_INPUTS = "known_inputs";
     // Set up inputs are inputs whose setup activity has been launched and finished successfully.
     private static final String PREF_KEY_SET_UP_INPUTS = "set_up_inputs";
+    // Recognized inputs means that the user already knows the inputs are installed.
+    private static final String PREF_KEY_RECOGNIZED_INPUTS = "recognized_inputs";
     private static final String PREF_KEY_IS_FIRST_TUNE = "is_first_tune";
     private static SetupUtils sSetupUtils;
 
@@ -54,16 +60,22 @@ public class SetupUtils {
     private final SharedPreferences mSharedPreferences;
     private final Set<String> mKnownInputs;
     private final Set<String> mSetUpInputs;
+    private final Set<String> mRecognizedInputs;
     private boolean mIsFirstTune;
     private final String mUsbTunerInputId;
 
     private SetupUtils(TvApplication tvApplication) {
         mTvApplication = tvApplication;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(tvApplication);
-        mSetUpInputs = new HashSet<>(mSharedPreferences.getStringSet(PREF_KEY_SET_UP_INPUTS,
-                new HashSet<String>()));
-        mKnownInputs = new HashSet<>(mSharedPreferences.getStringSet(PREF_KEY_KNOWN_INPUTS,
-                new HashSet<String>()));
+        mSetUpInputs = CollectionUtils.createSmallSet();
+        mSetUpInputs.addAll(mSharedPreferences.getStringSet(PREF_KEY_SET_UP_INPUTS,
+                Collections.<String>emptySet()));
+        mKnownInputs = CollectionUtils.createSmallSet();
+        mKnownInputs.addAll(mSharedPreferences.getStringSet(PREF_KEY_KNOWN_INPUTS,
+                Collections.<String>emptySet()));
+        mRecognizedInputs = CollectionUtils.createSmallSet();
+        mRecognizedInputs.addAll(mSharedPreferences.getStringSet(PREF_KEY_RECOGNIZED_INPUTS,
+                mKnownInputs));
         mIsFirstTune = mSharedPreferences.getBoolean(PREF_KEY_IS_FIRST_TUNE, true);
         mUsbTunerInputId = TvContract.buildInputId(new ComponentName(tvApplication,
                 com.android.usbtuner.tvinput.UsbTunerTvInputService.class));
@@ -83,7 +95,8 @@ public class SetupUtils {
     /**
      * Additional work after the setup of TV input.
      */
-    public void onTvInputSetupFinished(final String inputId, final Runnable postRunnable) {
+    public void onTvInputSetupFinished(final String inputId,
+            @Nullable final Runnable postRunnable) {
         // When TIS adds several channels, ChannelDataManager.Listener.onChannelList
         // Updated() can be called several times. In this case, it is hard to detect
         // which one is the last callback. To reduce error prune, we update channel
@@ -136,6 +149,37 @@ public class SetupUtils {
         });
     }
 
+    /**
+     * Marks the channels in newly installed inputs browsable.
+     */
+    @UiThread
+    public void markNewChannelsBrowsable() {
+        Set<String> newInputsWithChannels = new HashSet<>();
+        TvInputManagerHelper tvInputManagerHelper = mTvApplication.getTvInputManagerHelper();
+        ChannelDataManager channelDataManager = mTvApplication.getChannelDataManager();
+        SoftPreconditions.checkState(channelDataManager.isDbLoadFinished());
+        for (TvInputInfo input : tvInputManagerHelper.getTvInputInfos(true, true)) {
+            String inputId = input.getId();
+            if (!isSetupDone(inputId) && channelDataManager.getChannelCountForInput(inputId) > 0) {
+                onSetupDone(inputId);
+                newInputsWithChannels.add(inputId);
+                if (DEBUG) {
+                    Log.d(TAG, "New input " + inputId + " has "
+                            + channelDataManager.getChannelCountForInput(inputId)
+                            + " channels");
+                }
+            }
+        }
+        if (!newInputsWithChannels.isEmpty()) {
+            for (Channel channel : channelDataManager.getChannelList()) {
+                if (newInputsWithChannels.contains(channel.getInputId())) {
+                    channelDataManager.updateBrowsable(channel.getId(), true);
+                }
+            }
+            channelDataManager.applyUpdatedValuesToDb();
+        }
+    }
+
     public boolean isFirstTune() {
         return mIsFirstTune;
     }
@@ -153,7 +197,9 @@ public class SetupUtils {
      */
     public void markAsKnownInput(String inputId) {
         mKnownInputs.add(inputId);
-        mSharedPreferences.edit().putStringSet(PREF_KEY_KNOWN_INPUTS, mKnownInputs).apply();
+        mRecognizedInputs.add(inputId);
+        mSharedPreferences.edit().putStringSet(PREF_KEY_KNOWN_INPUTS, mKnownInputs)
+                .putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mRecognizedInputs).apply();
     }
 
     /**
@@ -173,6 +219,37 @@ public class SetupUtils {
     public boolean hasNewInput(TvInputManagerHelper inputManager) {
         for (TvInputInfo input : inputManager.getTvInputInfos(true, true)) {
             if (isNewInput(input.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether the given input is already recognized by the user or not.
+     */
+    private boolean isRecognizedInput(String inputId) {
+        return mRecognizedInputs.contains(inputId);
+    }
+
+    /**
+     * Marks all the inputs as recognized inputs. Once it is marked, {@link #isRecognizedInput} will
+     * return {@code true}.
+     */
+    public void markAllInputsRecognized(TvInputManagerHelper inputManager) {
+        for (TvInputInfo input : inputManager.getTvInputInfos(true, true)) {
+            mRecognizedInputs.add(input.getId());
+        }
+        mSharedPreferences.edit().putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mRecognizedInputs)
+                .apply();
+    }
+
+    /**
+     * Checks whether there are any unrecognized inputs.
+     */
+    public boolean hasUnrecognizedInput(TvInputManagerHelper inputManager) {
+        for (TvInputInfo input : inputManager.getTvInputInfos(true, true)) {
+            if (!isRecognizedInput(input.getId())) {
                 return true;
             }
         }
@@ -251,8 +328,8 @@ public class SetupUtils {
      * Called when input list is changed. It mainly handles input removals.
      */
     public void onInputListUpdated(TvInputManager manager) {
-        // mKnownInputs is a super set of mSetUpInputs.
-        Set<String> removedInputList = new HashSet<>(mKnownInputs);
+        // mRecognizedInputs > mKnownInputs > mSetUpInputs.
+        Set<String> removedInputList = new HashSet<>(mRecognizedInputs);
         for (TvInputInfo input : manager.getTvInputList()) {
             removedInputList.remove(input.getId());
         }
@@ -263,12 +340,13 @@ public class SetupUtils {
 
         if (!removedInputList.isEmpty()) {
             for (String input : removedInputList) {
+                mRecognizedInputs.remove(input);
                 mSetUpInputs.remove(input);
                 mKnownInputs.remove(input);
             }
-            mSharedPreferences.edit()
-                    .putStringSet(PREF_KEY_SET_UP_INPUTS, mSetUpInputs).apply();
-            mSharedPreferences.edit().putStringSet(PREF_KEY_KNOWN_INPUTS, mKnownInputs).apply();
+            mSharedPreferences.edit().putStringSet(PREF_KEY_SET_UP_INPUTS, mSetUpInputs)
+                    .putStringSet(PREF_KEY_KNOWN_INPUTS, mKnownInputs)
+                    .putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mKnownInputs).apply();
         }
     }
 
@@ -279,12 +357,20 @@ public class SetupUtils {
     public void onSetupDone(String inputId) {
         SoftPreconditions.checkState(inputId != null);
         if (DEBUG) Log.d(TAG, "onSetupDone: input=" + inputId);
+        if (!mRecognizedInputs.contains(inputId)) {
+            Log.i(TAG, "An unrecognized input's setup has been done. inputId=" + inputId);
+            mRecognizedInputs.add(inputId);
+            mSharedPreferences.edit().putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mKnownInputs)
+                    .apply();
+        }
         if (!mKnownInputs.contains(inputId)) {
             Log.i(TAG, "An unknown input's setup has been done. inputId=" + inputId);
             mKnownInputs.add(inputId);
+            mSharedPreferences.edit().putStringSet(PREF_KEY_KNOWN_INPUTS, mKnownInputs).apply();
         }
-        mSetUpInputs.add(inputId);
-        mSharedPreferences.edit()
-                .putStringSet(PREF_KEY_SET_UP_INPUTS, mSetUpInputs).apply();
+        if (!mSetUpInputs.contains(inputId)) {
+            mSetUpInputs.add(inputId);
+            mSharedPreferences.edit().putStringSet(PREF_KEY_SET_UP_INPUTS, mSetUpInputs).apply();
+        }
     }
 }

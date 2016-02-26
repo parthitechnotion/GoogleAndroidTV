@@ -39,7 +39,7 @@ public class TrickplayStorageManager implements CacheManager.StorageManager {
 
     // Copied from android.os.StorageManager
     private static final int DEFAULT_THRESHOLD_PERCENTAGE = 10;
-    private static final long DEFAULT_THRESHOLD_MAX_BYTES = 500l * 1024 * 1024;
+    private static final long DEFAULT_THRESHOLD_MAX_BYTES = 500L * 1024 * 1024;
 
     private final File mCacheDir;
     private final long mMaxCacheSize;

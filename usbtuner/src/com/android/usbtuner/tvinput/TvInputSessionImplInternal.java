@@ -19,6 +19,7 @@ package com.android.usbtuner.tvinput;
 import android.content.ContentUris;
 import android.content.Context;
 import android.media.MediaDataSource;
+import android.media.MediaFormat;
 import android.media.PlaybackParams;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvInputManager;
@@ -29,7 +30,6 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.os.SystemClock;
 import android.text.Html;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
@@ -38,10 +38,11 @@ import android.view.Surface;
 import android.view.accessibility.CaptioningManager;
 
 import com.google.android.exoplayer.audio.AudioCapabilities;
+import com.android.tv.common.TvContentRatingCache;
 import com.android.usbtuner.FileDataSource;
 import com.android.usbtuner.InputStreamSource;
+import com.android.usbtuner.TunerHal;
 import com.android.usbtuner.UsbTunerDataSource;
-import com.android.usbtuner.UsbTunerInterface;
 import com.android.usbtuner.data.Cea708Data;
 import com.android.usbtuner.data.Channel;
 import com.android.usbtuner.data.PsipData.EitItem;
@@ -50,6 +51,7 @@ import com.android.usbtuner.data.Track.AtscAudioTrack;
 import com.android.usbtuner.data.Track.AtscCaptionTrack;
 import com.android.usbtuner.data.TunerChannel;
 import com.android.usbtuner.exoplayer.CacheManager;
+import com.android.usbtuner.exoplayer.DvrStorageManager;
 import com.android.usbtuner.exoplayer.MpegTsPassthroughAc3RendererBuilder;
 import com.android.usbtuner.exoplayer.MpegTsPlayer;
 import com.android.usbtuner.util.IsoUtils;
@@ -57,6 +59,9 @@ import com.android.usbtuner.util.StatusTextUtils;
 
 import junit.framework.Assert;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -70,9 +75,11 @@ import java.util.concurrent.CountDownLatch;
 public class TvInputSessionImplInternal implements PlaybackCacheListener,
         MpegTsPlayer.VideoEventListener, MpegTsPlayer.Listener, EventDetector.EventListener,
         ChannelDataManager.ProgramInfoListener, Handler.Callback {
-    private static final String TAG = "TvInputSessionImplInternal";
+    private static final String TAG = "TvInputSessionInternal";
     private static final boolean DEBUG = false;
     private static final boolean ENABLE_PROFILER = true;
+    private static final String PLAY_FROM_CHANNEL = "channel";
+    private static final String PLAY_FROM_RECORDING = "record";
 
     // Public messages
     public static final int MSG_SELECT_TRACK = 1;
@@ -138,7 +145,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
 
     private final Context mContext;
     private final ChannelDataManager mChannelDataManager;
-    private final UsbTunerInterface mUsbTunerInterface;
+    private final TunerHal mTunerHal;
     private UsbTunerDataSource mTunerSource;
     private FileDataSource mFileSource;
     private InputStreamSource mSource;
@@ -148,6 +155,8 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
     private int mEndedGeneration;
     private volatile MpegTsPlayer mPlayer;
     private volatile TunerChannel mChannel;
+    private String mRecordingId;
+    private volatile Long mRecordingDuration;
     private final Handler mHandler;
     private final HandlerThread mHandlerThread;
     private int mRetryCount;
@@ -174,12 +183,13 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
     private long mLastLimitInBytes = 0L;
     private long mLastPositionInBytes = 0L;
     private final CacheManager mCacheManager;
+    private final TvContentRatingCache mTvContentRatingCache = TvContentRatingCache.getInstance();
 
     public TvInputSessionImplInternal(Context context, ChannelDataManager channelDataManager,
                 CacheManager cacheManager) {
         mContext = context;
-        mUsbTunerInterface = new UsbTunerInterface(context);
-        if (!mUsbTunerInterface.openFirstAvailable()) {
+        mTunerHal = TunerHal.getInstance(context);
+        if (mTunerHal == null) {
             throw new RuntimeException("Failed to open a DVB device");
         }
 
@@ -192,7 +202,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
         mChannelDataManager.setListener(this);
         mChannelDataManager.checkDataVersion(mContext);
         mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
-        mTunerSource = new UsbTunerDataSource(mUsbTunerInterface, this);
+        mTunerSource = new UsbTunerDataSource(mTunerHal, this);
         mFileSource = new FileDataSource(this);
         mVolume = 1.0f;
         mTvTracks = new ArrayList<>();
@@ -224,6 +234,36 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
 
     public long getStartPosition() {
         return mCacheStartTimeMs;
+    }
+
+
+    private String getRecordingPath() {
+        return mContext.getCacheDir().getAbsolutePath() + "/recording" + mRecordingId;
+    }
+
+    public Long getDurationForRecording() {
+        return mRecordingDuration;
+    }
+
+    private Long getDurationForRecording(String recordingId) {
+        try {
+            DvrStorageManager storageManager =
+                    new DvrStorageManager(new File(getRecordingPath()), false);
+            Pair<String, MediaFormat> trackInfo = null;
+            try {
+                trackInfo = storageManager.readTrackInfoFile(false);
+            } catch (FileNotFoundException e) {
+            }
+            if (trackInfo == null) {
+                trackInfo = storageManager.readTrackInfoFile(true);
+            }
+            Long durationUs = trackInfo.second.getLong(MediaFormat.KEY_DURATION);
+            // we need duration by milli for trickplay notification.
+            return durationUs != null ? durationUs / 1000 : null;
+        } catch (IOException e) {
+            Log.e(TAG, "meta file for recording was not found: " + recordingId);
+            return null;
+        }
     }
 
     public long getCurrentPosition() {
@@ -419,6 +459,24 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
         }
     };
 
+    private long parseChannel(Uri uri) {
+        try {
+            List<String> paths = uri.getPathSegments();
+            if (paths.size() > 1 && paths.get(0).equals(PLAY_FROM_CHANNEL)) {
+                return ContentUris.parseId(uri);
+            }
+        } catch (UnsupportedOperationException | NumberFormatException e) {
+        }
+        return -1;
+    }
+
+    private String parseRecording(Uri uri) {
+        if (uri.getScheme().equals(PLAY_FROM_RECORDING)) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -431,15 +489,14 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                     return true;
                 }
                 Uri channelUri = (Uri) msg.obj;
-                long channelId;
-                try {
-                    channelId = ContentUris.parseId(channelUri);
-                } catch (UnsupportedOperationException | NumberFormatException e) {
-                    channelId = -1;
-                }
+                String recording = null;
+                long channelId = parseChannel(channelUri);
                 TunerChannel channel = (channelId == -1) ? null
                         : mChannelDataManager.getChannel(channelId);
-                if (channel == null) {
+                if (channelId == -1) {
+                    recording = parseRecording(channelUri);
+                }
+                if (channel == null && recording == null) {
                     Log.w(TAG, "onTune() is failed. Can't find channel for " + channelUri);
                     stopTune();
                     mInternalListener.notifyVideoUnavailable(
@@ -447,8 +504,10 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                     return true;
                 }
                 mHandler.removeCallbacksAndMessages(null);
-                mChannelDataManager.requestProgramsData(channel);
-                prepareTune(channel);
+                if (channel != null) {
+                    mChannelDataManager.requestProgramsData(channel);
+                }
+                prepareTune(channel, recording);
                 mInternalListener.notifyContentAllowed();
                 resetPlayback();
                 resetTvTracks();
@@ -466,7 +525,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                 stopPlayback();
                 stopCaptionTrack();
                 resetTvTracks();
-                mUsbTunerInterface.stopTune();
+                mTunerHal.stopTune();
                 mSource = null;
                 mInternalListener.notifyVideoUnavailable(
                         TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
@@ -479,7 +538,11 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                 mHandler.removeCallbacksAndMessages(null);
                 stopPlayback();
                 stopCaptionTrack();
-                mUsbTunerInterface.close();
+                try {
+                    mTunerHal.close();
+                } catch (Exception ex) {
+                    Log.e(TAG, "Error on closing tuner HAL.", ex);
+                }
                 mSource = null;
                 mReleaseLatch.countDown();
                 return true;
@@ -495,11 +558,11 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                         resetPlayback();
                     } else {
                         // When it reaches this point, it may be due to an error that occurred in
-                        // the tuner device. Calling stopPlayback() and UsbTunerInterface.stopTune()
+                        // the tuner device. Calling stopPlayback() and TunerHal.stopTune()
                         // resets the tuner device to recover from the error.
                         stopPlayback();
                         stopCaptionTrack();
-                        mUsbTunerInterface.stopTune();
+                        mTunerHal.stopTune();
 
                         mInternalListener.notifyVideoUnavailable(
                                 TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
@@ -523,7 +586,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                 if (DEBUG) {
                     Log.d(TAG, "MSG_START_PLAYBACK");
                 }
-                if (mChannel != null) {
+                if (mChannel != null || mRecordingId != null) {
                     startPlayback(msg.obj);
                 }
                 return true;
@@ -604,6 +667,9 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                 Pair<TunerChannel, List<EitItem>> pair =
                         (Pair<TunerChannel, List<EitItem>>) msg.obj;
                 TunerChannel channel = pair.first;
+                if (mChannel == null) {
+                    return true;
+                }
                 if (mChannel != null && mChannel.compareTo(channel) != 0) {
                     return true;
                 }
@@ -660,7 +726,8 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                     if (DEBUG) {
                         Log.d(TAG, "MSG_DRAWN_TO_SURFACE");
                     }
-                    mCacheStartTimeMs = mRecordStartTimeMs = System.currentTimeMillis();
+                    mCacheStartTimeMs = mRecordStartTimeMs =
+                            (mRecordingId != null) ? 0 : System.currentTimeMillis();
                     mInternalListener.notifyVideoAvailable();
                     mReportedDrawnToSurface = true;
 
@@ -707,6 +774,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                 return true;
             }
             case MSG_SELECT_TRACK: {
+                // TODO : mChannel == null && mRecordingId != null
                 if (mChannel != null) {
                     doSelectTrack(msg.arg1, (String) msg.obj);
                 }
@@ -820,7 +888,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
                             positionInBytes, limitInBytes));
                 }
                 mInternalListener.sendUiMessage(TvInputSessionImpl.MSG_UI_HIDE_MESSAGE);
-                if (mChannel.getType() == Channel.TYPE_TUNER
+                if (mSource != null && mChannel.getType() == Channel.TYPE_TUNER
                         && positionInBytes == mLastPositionInBytes
                         && limitInBytes == mLastLimitInBytes) {
                     mInternalListener.notifyVideoUnavailable(
@@ -886,14 +954,14 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
         }
     }
 
-    private MpegTsPlayer createPlayer(AudioCapabilities capabilities) {
+    private MpegTsPlayer createPlayer(AudioCapabilities capabilities, CacheManager cacheManager) {
         if (capabilities == null) {
             Log.w(TAG, "No Audio Capabilities");
         }
         ++mPlayerGeneration;
 
         MpegTsPlayer player = new MpegTsPlayer(mPlayerGeneration,
-                new MpegTsPassthroughAc3RendererBuilder(mCacheManager, this),
+                new MpegTsPassthroughAc3RendererBuilder(cacheManager, this),
                 mHandler, capabilities);
         Log.i(TAG, "Passthrough AC3 renderer");
         if (DEBUG) {
@@ -1076,7 +1144,9 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
 
     private void stopPlayback() {
         if (mPlayer != null) {
-            mSource.stopStream();
+            if (mSource != null) {
+                mSource.stopStream();
+            }
             mPlayer.setPlayWhenReady(false);
             mPlayer.release();
             mPlayer = null;
@@ -1089,10 +1159,11 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
     }
 
     private void startPlayback(Object playerObj) {
+        // TODO: provide hasAudio()/hasVideo() for play recordings.
         if (mPlayer == null || mPlayer != playerObj) {
             return;
         }
-        if (!mChannel.hasAudio()) {
+        if (mChannel != null && !mChannel.hasAudio()) {
             // A channel needs to have a audio stream at least to play in exoPlayer.
             mInternalListener.notifyVideoUnavailable(
                     TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
@@ -1102,7 +1173,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
             mPlayer.setSurface(mSurface);
             mPlayer.setPlayWhenReady(true);
             mPlayer.setVolume(mVolume);
-            if (!mChannel.hasVideo() && mChannel.hasAudio()) {
+            if (mChannel != null && !mChannel.hasVideo() && mChannel.hasAudio()) {
                 mInternalListener.notifyVideoUnavailable(
                         TvInputManager.VIDEO_UNAVAILABLE_REASON_AUDIO_ONLY);
             } else {
@@ -1112,6 +1183,51 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
             mInternalListener.sendUiMessage(TvInputSessionImpl.MSG_UI_HIDE_MESSAGE);
             mPlayerStarted = true;
         }
+    }
+
+    private void playFromChannel(long timestamp) {
+        long oldTimestamp;
+        mSource = getDataSource(mChannel.getType());
+        Assert.assertNotNull(mSource);
+        if (mSource.tuneToChannel(mChannel)) {
+            if (ENABLE_PROFILER) {
+                oldTimestamp = timestamp;
+                timestamp = SystemClock.elapsedRealtime();
+                Log.i(TAG, "[Profiler] tuneToChannel() takes " + (timestamp - oldTimestamp)
+                        + " ms");
+            }
+            mSource.startStream();
+            mPlayer = createPlayer(mAudioCapabilities, mCacheManager);
+            mPlayer.setCaptionServiceNumber(Cea708Data.EMPTY_SERVICE_NUMBER);
+            mPlayer.addListener(this);
+            mPlayer.setVideoEventListener(this);
+            mPlayer.setCaptionServiceNumber(mCaptionTrack != null ?
+                    mCaptionTrack.serviceNumber : Cea708Data.EMPTY_SERVICE_NUMBER);
+            mPreparingGeneration = mPlayerGeneration;
+            mPlayer.prepare((MediaDataSource) mSource);
+            mPlayerStarted = false;
+        } else {
+            // Close TunerHal when tune fails.
+            mTunerHal.stopTune();
+            mInternalListener.notifyVideoUnavailable(
+                    TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+        }
+    }
+
+    private void playFromRecording() {
+        // TODO: Handle errors.
+        CacheManager cacheManager =
+                new CacheManager(new DvrStorageManager(new File(getRecordingPath()), false));
+        mSource = null;
+        mPlayer = createPlayer(mAudioCapabilities, cacheManager);
+        mPlayer.setCaptionServiceNumber(Cea708Data.EMPTY_SERVICE_NUMBER);
+        mPlayer.addListener(this);
+        mPlayer.setVideoEventListener(this);
+        mPlayer.setCaptionServiceNumber(mCaptionTrack != null ?
+                mCaptionTrack.serviceNumber : Cea708Data.EMPTY_SERVICE_NUMBER);
+        mPreparingGeneration = mPlayerGeneration;
+        mPlayer.prepare(null);
+        mPlayerStarted = false;
     }
 
     private void resetPlayback() {
@@ -1124,34 +1240,13 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
             timestamp = SystemClock.elapsedRealtime();
             Log.i(TAG, "[Profiler] stopPlayback() takes " + (timestamp - oldTimestamp) + " ms");
         }
-        if (!mChannelBlocked && mSurface != null && mChannel != null) {
+        if (!mChannelBlocked && mSurface != null) {
             mInternalListener.notifyVideoUnavailable(
                     TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
-            mSource = getDataSource(mChannel.getType());
-            Assert.assertNotNull(mSource);
-            if (mSource.tuneToChannel(mChannel)) {
-                if (ENABLE_PROFILER) {
-                    oldTimestamp = timestamp;
-                    timestamp = SystemClock.elapsedRealtime();
-                    Log.i(TAG, "[Profiler] tuneToChannel() takes " + (timestamp - oldTimestamp)
-                            + " ms");
-                }
-                mSource.startStream();
-                mPlayer = createPlayer(mAudioCapabilities);
-                mPlayer.setCaptionServiceNumber(Cea708Data.EMPTY_SERVICE_NUMBER);
-                mPlayer.addListener(this);
-                mPlayer.setVideoEventListener(this);
-                mPlayer.setDataSource((MediaDataSource) mSource);
-                mPlayer.setCaptionServiceNumber(mCaptionTrack != null ?
-                        mCaptionTrack.serviceNumber : Cea708Data.EMPTY_SERVICE_NUMBER);
-                mPreparingGeneration = mPlayerGeneration;
-                mPlayer.prepare();
-                mPlayerStarted = false;
-            } else {
-                // Stop tune when it fails.
-                mUsbTunerInterface.stopTune();
-                mInternalListener.notifyVideoUnavailable(
-                        TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+            if (mChannel != null) {
+                playFromChannel(timestamp);
+            } else if (mRecordingId != null){
+                playFromRecording();
             }
         }
     }
@@ -1167,14 +1262,17 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
         }
     }
 
-    private void prepareTune(TunerChannel channel) {
+    private void prepareTune(TunerChannel channel, String recording) {
         mChannelBlocked = false;
         mUnblockedContentRating = null;
         mRetryCount = 0;
         mChannel = channel;
+        mRecordingId = recording;
+        mRecordingDuration = recording != null ? getDurationForRecording(recording) : null;
         mProgram = null;
         mPrograms = null;
-        mCacheStartTimeMs = mRecordStartTimeMs = System.currentTimeMillis();
+        mCacheStartTimeMs = mRecordStartTimeMs =
+                (mRecordingId != null) ? 0 : System.currentTimeMillis();
         mLastPositionMs = 0;
         mCaptionTrack = null;
         mHandler.sendEmptyMessage(MSG_PARENTAL_CONTROLS);
@@ -1324,12 +1422,15 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
         if (currentProgram == null) {
             return null;
         }
-        String[] ratings = TextUtils.split(currentProgram.getContentRating(), ",");
-        for (String rating : ratings) {
-            TvContentRating tvContentRating = TvContentRating.unflattenFromString(rating);
-            if (!Objects.equals(mUnblockedContentRating, tvContentRating)
-                    && mTvInputManager.isRatingBlocked(tvContentRating)) {
-                return tvContentRating;
+        TvContentRating[] ratings = mTvContentRatingCache
+                .getRatings(currentProgram.getContentRating());
+        if (ratings == null) {
+            return null;
+        }
+        for (TvContentRating rating : ratings) {
+            if (!Objects.equals(mUnblockedContentRating, rating) && mTvInputManager
+                    .isRatingBlocked(rating)) {
+                return rating;
             }
         }
         return null;
@@ -1343,7 +1444,7 @@ public class TvInputSessionImplInternal implements PlaybackCacheListener,
         mChannelBlocked = channelBlocked;
         if (mChannelBlocked) {
             mHandler.removeCallbacksAndMessages(null);
-            mUsbTunerInterface.stopTune();
+            mTunerHal.stopTune();
             stopPlayback();
             resetTvTracks();
             if (contentRating != null) {

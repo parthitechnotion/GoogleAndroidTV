@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"चालू"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"बंद"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"एकाधिक-ऑडियो"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"चैनल सेटअप"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"अभिभावकीय नियंत्रण"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"संक्षिप्त विवरण"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"अधिक चैनल पाएं"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"सेटिंग"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"स्रोत"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"स्वैप करें"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"चालू"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"इसके द्वारा समूहीकृत"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"चैनल सेटअप"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"यह कार्यक्रम अवरोधित है"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"इस कार्यक्रम को <xliff:g id="RATING">%1$s</xliff:g> रेट किया गया है"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"चैनल के स्रोत"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"नए चैनल उपलब्‍ध हैं"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"चैनल सूची कस्टमाइज़ करें"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"कार्यक्रम मार्गदर्शिका के लिए चैनल चुनें"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"सेट नहीं है"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"इनपुट ऑटो-स्कैन का समर्थन नहीं करता है"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"\'<xliff:g id="TV_INPUT">%s</xliff:g>\' के लिए स्वतः स्कैन प्रारंभ करने में असमर्थ"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"उपशीर्षक के लिए सिस्टम व्यापी प्राथमिकताएं प्रारंभ करने में अक्षम."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d चैनल जोड़ा गया"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d चैनल जोड़े गए"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="one">%1$d चैनल जोड़े गए</item>
+      <item quantity="other">%1$d चैनल जोड़े गए</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"कोई चैनल नहीं जोड़ा गया"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"ट्यूनर"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"अभिभावकीय नियंत्रण"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"नया पिन डालें"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"अपने पिन की पुष्टि करें"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"अपना वर्तमान पिन डालें"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"आपने 5 बार गलत पिन डाला है.\n <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> सेकंड में पुनः प्रयास करें."</item>
-    <item quantity="other" msgid="8829550842387756054">"आपने 5 बार गलत पिन डाला है.\n <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> सेकंड में पुनः प्रयास करें."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="one">आपने 5 बार गलत पिन डाला है.\n<xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> सेकंड में पुनः प्रयास करें.</item>
+      <item quantity="other">आपने 5 बार गलत पिन डाला है.\n<xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> सेकंड में पुनः प्रयास करें.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"वह पिन गलत था. पुन: प्रयास करें."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"फिर से प्रयास करें, पिन का मिलान नहीं हुआ"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"संक्षिप्त विवरण"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"ओपन सोर्स लाइसेंस"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"सेटिंग"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"चैनल सूची कस्टमाइज़ करें"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"कार्यक्रम मार्गदर्शिका के लिए चैनल चुनें"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"चैनल के स्रोत"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"नए चैनल उपलब्‍ध हैं"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"अभिभावकीय नियंत्रण"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"ओपन सोर्स लाइसेंस"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ओपन सोर्स लाइसेंस"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"वर्शन"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"वर्शन"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"डेवलपर विकल्प"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB टीवी ट्यूनर सक्षम करें"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB टीवी ट्यूनर की आवाज़ सुनने के लिए, आपके टीवी को AC3 पासथ्रू का समर्थन करना चाहिए."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"कोई शीर्षक नहीं"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"चैनल अवरोधित"</string>
     <string name="episode_format" msgid="4881195874563241096">"क्रमांक<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: एपिसोड <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"चैनल के स्रोत"</string>
-    <string name="setup_description" msgid="8728423605912915099">"उपलब्ध स्रोतों से लाइव चैनल सेट अप करें. चैनल स्रोत के आधार पर इसमें कुछ मिनट लग सकते हैं."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"हो गया"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d चैनल उपलब्‍ध है"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d चैनल उपलब्‍ध हैं"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"नए"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"स्रोत"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="one">%1$d चैनल</item>
+      <item quantity="other">%1$d चैनल</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"कोई चैनल उपलब्‍ध नहीं है"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"नया"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"सेट नहीं किया गया है"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"अधिक स्रोत प्राप्‍त करें"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"ऐसे ऐप्‍स ब्राउज़ करें जो लाइव चैनल ऑफ़र करते हैं"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"नए चैनल स्रोत उपलब्ध हैं"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"नए चैनल स्रोत में ऑफ़र किए जाने वाले चैनल मौजूद हैं.\nउन्हें अभी सेट करें या इसे बाद में चैनल स्रोत सेटिंग में करें."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"अभी सेट करें"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"ठीक है, समझ लिया!"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307">"टीवी मेनू ऐक्‍सेस करने के लिए "<b>"चुनें"</b>" दबाएं."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"BACK कुंजी कनेक्ट किए गए डिवाइस के लिए है. बाहर निकलने के लिए HOME बटन दबाएं."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Android Lollipop वाले इस डिवाइस पर लाइव चैनल समर्थित नहीं है."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"लाइव चैनल को टीवी सूची पढ़ने के लिए अनुमति की आवश्यकता होती है."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"अपने स्रोत सेट करें"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"लाइव चैनल परंपरागत टीवी चैनल के अनुभव के साथ ऐप्स के द्वारा प्रदान किए जाने वाले स्ट्रीमिंग चैनल अनुभव को संयोजित करते हैं. \n\nपहले से इंस्टॉल किए गए चैनल स्रोतों को सेट करके प्रारंभ करें. या लाइव चैनल उपलब्ध कराने वाले अधिक ऐप्स के लिए Google Play स्टोर ब्राउज़ करें."</string>
 </resources>

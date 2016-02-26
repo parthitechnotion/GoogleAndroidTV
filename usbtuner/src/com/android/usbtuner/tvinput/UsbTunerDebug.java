@@ -24,7 +24,7 @@ import android.util.Log;
  */
 public class UsbTunerDebug {
     private static final String TAG = "UsbTunerDebug";
-    public static final boolean ENABLED = true;
+    public static final boolean ENABLED = false;
 
     private int mVideoFrameDrop;
     private int mBytesInQueue;

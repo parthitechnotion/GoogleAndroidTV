@@ -43,7 +43,7 @@ public class DvrStorageManager implements CacheManager.StorageManager {
 
     // Size of minimum reserved storage buffer which will be used to save meta files
     // and index files after actual recording finished.
-    private static final long MIN_BUFFER_BYTES = 256l * 1024 * 1024;
+    private static final long MIN_BUFFER_BYTES = 256L * 1024 * 1024;
     private static final int NO_VALUE = -1;
     private static final long NO_VALUE_LONG = -1L;
 
@@ -84,11 +84,7 @@ public class DvrStorageManager implements CacheManager.StorageManager {
 
     @Override
     public boolean hasEnoughBuffer(long pendingDelete) {
-        if (mIsRecording) {
-            return mCacheDir.getUsableSpace() >= MIN_BUFFER_BYTES;
-        } else {
-            return true;
-        }
+        return !mIsRecording || mCacheDir.getUsableSpace() >= MIN_BUFFER_BYTES;
     }
 
     private void readFormatInt(DataInputStream in, MediaFormat format, String key)
@@ -172,7 +168,7 @@ public class DvrStorageManager implements CacheManager.StorageManager {
                 readFormatByteBuffer(in, format, "csd-" + i);
             }
             readFormatLong(in, format, MediaFormat.KEY_DURATION);
-            return new Pair<String, MediaFormat>(name, format);
+            return new Pair<>(name, format);
         }
     }
 

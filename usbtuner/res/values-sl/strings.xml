@@ -50,19 +50,25 @@
   </string-array>
     <string name="ut_channel_scan" msgid="5275436876483779315">"Nastavitev sprejemnika kanalov USB"</string>
     <string name="ut_channel_scan_time" msgid="5108578893396614867">"To lahko traja nekaj minut"</string>
-  <plurals name="ut_channel_scan_message">
-    <item quantity="one" msgid="4648415957579494291">"Najden je bil %1$d kanal"</item>
-    <item quantity="other" msgid="7340557317633613">"Najdenih je bilo toliko kanalov: %1$d"</item>
-  </plurals>
+    <plurals name="ut_channel_scan_message" formatted="false" msgid="8883404542863956040">
+      <item quantity="one">Najden je bil %1$d kanal</item>
+      <item quantity="two">Najdena sta bila %1$d kanala</item>
+      <item quantity="few">Najdeni so bili %1$d kanali</item>
+      <item quantity="other">Najdenih je bilo %1$d kanalov</item>
+    </plurals>
     <string name="ut_stop_channel_scan" msgid="8358794117343664624">"USTAVI ISKANJE KANALOV"</string>
-  <plurals name="ut_result_found_title">
-    <item quantity="one" msgid="5609704543525317852">"Najden je bil %1$d kanal"</item>
-    <item quantity="other" msgid="4331542666115153576">"Najdenih je bilo toliko kanalov: %1$d"</item>
-  </plurals>
-  <plurals name="ut_result_found_description">
-    <item quantity="one" msgid="3464139901043217695">"Lepo! Med iskanjem kanalov je bil najden %1$d kanal. Če menite, da to ni pravilno, poskusite prilagoditi položaj antene in iščite znova."</item>
-    <item quantity="other" msgid="8098777464551209564">"Lepo! Med iskanjem kanalov je bilo najdenih toliko kanalov: %1$d. Če menite, da to ni pravilno, poskusite prilagoditi položaj antene in iščite znova."</item>
-  </plurals>
+    <plurals name="ut_result_found_title" formatted="false" msgid="4621251784881527371">
+      <item quantity="one">Najden je bil %1$d kanal</item>
+      <item quantity="two">Najdena sta bila %1$d kanala</item>
+      <item quantity="few">Najdeni so bili %1$d kanali</item>
+      <item quantity="other">Najdenih je bilo %1$d kanalov</item>
+    </plurals>
+    <plurals name="ut_result_found_description" formatted="false" msgid="1946474144459881182">
+      <item quantity="one">Super. Med iskanjem kanalov je bil najden %1$d kanal. Če menite, da to ni pravilno, poskusite prilagoditi položaj antene in iščite znova.</item>
+      <item quantity="two">Super. Med iskanjem kanalov sta bila najdena %1$d kanala. Če menite, da to ni pravilno, poskusite prilagoditi položaj antene in iščite znova.</item>
+      <item quantity="few">Super. Med iskanjem kanalov so bili najdeni %1$d kanali. Če menite, da to ni pravilno, poskusite prilagoditi položaj antene in iščite znova.</item>
+      <item quantity="other">Super. Med iskanjem kanalov je bilo najdenih %1$d kanalov. Če menite, da to ni pravilno, poskusite prilagoditi položaj antene in iščite znova.</item>
+    </plurals>
   <string-array name="ut_result_found_choices">
     <item msgid="979481834388007277">"Končano"</item>
     <item msgid="496688122303154468">"Znova išči"</item>

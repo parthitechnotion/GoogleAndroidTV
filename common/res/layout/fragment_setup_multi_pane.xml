@@ -23,6 +23,12 @@
     android:clipChildren="false"
     android:clipToPadding="false"
     android:orientation="horizontal">
+    <View
+        android:id="@+id/setup_common_guidance_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/setup_common_guidance_background_margin_start"
+        android:background="?attr/setupCommonGuidanceBackground" />
     <!-- Guided step fragment container must be at the left of the done button at least by 1 pixel
          for the focus navigation. If they overlap, the focus doesn't move from the button to the
          fragment container.-->
@@ -33,13 +39,14 @@
         android:layout_marginEnd="1dp"
         android:clipChildren="false"
         android:clipToPadding="false" />
+    // TODO: Use button action list in GuidedStepFragment
     <FrameLayout
         android:id="@+id/done_button_container"
         android:layout_width="@dimen/setup_done_button_container_width"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="@color/common_setup_done_container_background"
-        android:transitionGroup="false"
+        style="?attr/doneButtonContainerStyle"
+        android:transitionGroup="true"
         android:transitionName="buttonDoneTransition">
         <TextView
             android:id="@+id/button_done"

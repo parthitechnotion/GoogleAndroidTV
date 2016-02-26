@@ -28,7 +28,7 @@ public final class StubAnalytics implements Analytics {
     }
 
     private final Tracker mTracker = new StubTracker();
-    private boolean mOptOut = OptOutPreferenceHelper.ANALYTICS_OPT_OUT_DEFAULT_VALUE;
+    private boolean mOptOut = true;
 
     private StubAnalytics(Context context) {
     }

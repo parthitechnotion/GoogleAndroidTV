@@ -20,18 +20,17 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.Range;
 
 import com.android.tv.util.Clock;
-import com.android.tv.util.NamedThreadFactory;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,44 +41,46 @@ public class Scheduler implements DvrDataManager.Listener {
     private static final String TAG = "Scheduler";
     private static final boolean DEBUG = false;
 
+    private final static long SOON_DURATION_IN_MS = TimeUnit.MINUTES.toMillis(5);
+    @VisibleForTesting final static long MS_TO_WAKE_BEFORE_START = TimeUnit.MINUTES.toMillis(1);
+
     /**
-     * Wraps a RecordingTask removing it from {@link #mPendingRecordings} when it is done.
+     * Wraps a {@link RecordingTask} removing it from {@link #mPendingRecordings} when it is done.
      */
-    private final class TaskWrapper extends FutureTask<Void> {
+    public final class HandlerWrapper extends Handler {
+        public static final int MESSAGE_REMOVE = 999;
         private final long mId;
 
-        TaskWrapper(Recording recording) {
-            super(new RecordingTask(recording, mSessionManager, mDataManager, mClock), null);
+        HandlerWrapper(Looper looper, Recording recording, RecordingTask recordingTask) {
+            super(looper, recordingTask);
             mId = recording.getId();
         }
 
         @Override
-        public void done() {
-            if (DEBUG) Log.d(TAG, "done " + mId);
-            mPendingRecordings.remove(mId);
-            super.done();
+        public void handleMessage(Message msg) {
+            // The RecordingTask gets a chance first.
+            // It must return false to pass this message to here.
+            if (msg.what == MESSAGE_REMOVE) {
+                if (DEBUG)  Log.d(TAG, "done " + mId);
+                mPendingRecordings.remove(mId);
+            }
+            removeCallbacksAndMessages(null);
+            super.handleMessage(msg);
         }
     }
 
+    private final LongSparseArray<HandlerWrapper> mPendingRecordings = new LongSparseArray<>();
+    private final Looper mLooper;
+    private final DvrSessionManager mSessionManager;
     private final WritableDvrDataManager mDataManager;
     private final Context mContext;
-    private final DvrSessionManager mSessionManager;
-    private PendingIntent mAlarmIntent;
-
-    private static final NamedThreadFactory sNamedThreadFactory = new NamedThreadFactory(
-            "DVR-scheduler");
-    @VisibleForTesting final static long MS_TO_WAKE_BEFORE_START = TimeUnit.MINUTES.toMillis(1);
-    private final static long SOON_DURATION_IN_MS = TimeUnit.MINUTES.toMillis(5);
-
-    private final ExecutorService mExecutorService = Executors
-            .newCachedThreadPool(sNamedThreadFactory);
-    private final LongSparseArray<TaskWrapper> mPendingRecordings = new LongSparseArray<>();
     private final Clock mClock;
     private final AlarmManager mAlarmManager;
 
-    public Scheduler(DvrSessionManager sessionManager, WritableDvrDataManager dataManager,
-            Context context, Clock clock,
+    public Scheduler(Looper looper, DvrSessionManager sessionManager,
+            WritableDvrDataManager dataManager, Context context, Clock clock,
             AlarmManager alarmManager) {
+        mLooper = looper;
         mSessionManager = sessionManager;
         mDataManager = dataManager;
         mContext = context;
@@ -106,7 +107,6 @@ public class Scheduler implements DvrDataManager.Listener {
         updateNextAlarm();
     }
 
-
     @Override
     public void onRecordingAdded(Recording recording) {
         if (DEBUG) Log.d(TAG, "added " + recording);
@@ -120,9 +120,9 @@ public class Scheduler implements DvrDataManager.Listener {
     @Override
     public void onRecordingRemoved(Recording recording) {
         long id = recording.getId();
-        TaskWrapper task = mPendingRecordings.get(id);
-        if (task != null) {
-            task.cancel(true);
+        HandlerWrapper wrapper = mPendingRecordings.get(id);
+        if (wrapper != null) {
+            wrapper.removeCallbacksAndMessages(null);
             mPendingRecordings.remove(id);
         } else {
             updateNextAlarm();
@@ -134,12 +134,13 @@ public class Scheduler implements DvrDataManager.Listener {
         //TODO(DVR): implement
     }
 
-
     private void scheduleRecordingSoon(Recording recording) {
-        // TODO(DVR) test match in mPendingRecordings recordings.
-        TaskWrapper task = new TaskWrapper(recording);
-        mPendingRecordings.put(recording.getId(), task);
-        mExecutorService.submit(task);
+        RecordingTask recordingTask = new RecordingTask(recording, mSessionManager, mDataManager,
+                mClock);
+        HandlerWrapper handlerWrapper = new HandlerWrapper(mLooper, recording, recordingTask);
+        recordingTask.setHandler(handlerWrapper);
+        mPendingRecordings.put(recording.getId(), handlerWrapper);
+        handlerWrapper.sendEmptyMessage(RecordingTask.MESSAGE_INIT);
     }
 
     private void updateNextAlarm() {
@@ -149,9 +150,9 @@ public class Scheduler implements DvrDataManager.Listener {
             long wakeAt = nextStartTime - MS_TO_WAKE_BEFORE_START;
             if (DEBUG) Log.d(TAG, "Set alarm to record at " + wakeAt);
             Intent intent = new Intent(mContext, DvrStartRecordingReceiver.class);
-            mAlarmIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
+            PendingIntent alarmIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
             //This will cancel the previous alarm.
-            mAlarmManager.set(AlarmManager.RTC_WAKEUP, wakeAt, mAlarmIntent);
+            mAlarmManager.set(AlarmManager.RTC_WAKEUP, wakeAt, alarmIntent);
         } else {
             if (DEBUG) Log.d(TAG, "No future recording, alarm not set");
         }

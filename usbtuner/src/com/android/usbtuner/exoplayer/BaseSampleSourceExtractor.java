@@ -33,7 +33,7 @@ import java.io.IOException;
  * Base class for feeding samples from a given media extractor using a extractor thread.
  */
 public abstract class BaseSampleSourceExtractor implements SampleExtractor {
-    private static final String TAG = "BaseSampleSourceExtractor";
+    private static final String TAG = "BaseSampleSourceExt";
 
     // Maximum bandwidth of 1080p channel is about 2.2MB/s. 2MB for a sample will suffice.
     private static final int SAMPLE_BUFFER_SIZE = 1024 * 1024 * 2;

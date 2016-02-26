@@ -17,6 +17,7 @@
 package com.android.usbtuner.ts;
 
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 
 import com.android.usbtuner.data.PsiData.PatItem;
@@ -49,7 +50,15 @@ public class TsParser {
     private static final int TS_PACKET_TEI_MASK = 0x80;
     private static final int TS_PACKET_SIZE = 188;
 
-    private final Map<Integer, Stream> mStreamMap = new HashMap<>();
+    /*
+     * Using a SparseArray removes the need to auto box the int key for mStreamMap
+     * in feedTdPacket which is called 100 times a second. This greatly reduces the
+     * number of objects created and the frequency of garbage collection.
+     * Other maps might be suitable for a SparseArray, but the performance
+     * trade offs must be considered carefully.
+     * mStreamMap is the only one called at such a high rate.
+     */
+    private final SparseArray<Stream> mStreamMap = new SparseArray<>();
     private final Map<Integer, VctItem> mSourceIdToVctItemMap = new HashMap<>();
     private final Map<Integer, String> mSourceIdToVctItemDescriptionMap = new HashMap<>();
     private final Map<Integer, VctItem> mProgramNumberToVctItemMap = new HashMap<>();
@@ -187,9 +196,7 @@ public class TsParser {
             @Override
             public void onVctParsed(List<VctItem> items) {
                 for (VctItem i : items) {
-                    if (DEBUG) {
-                        Log.d(TAG, "onVCTParsed " + i);
-                    }
+                    if (DEBUG) Log.d(TAG, "onVCTParsed " + i);
                     if (i.getSourceId() != 0) {
                         mSourceIdToVctItemMap.put(i.getSourceId(), i);
                         i.setDescription(mSourceIdToVctItemDescriptionMap.get(i.getSourceId()));
@@ -210,9 +217,7 @@ public class TsParser {
 
             @Override
             public void onEitParsed(int sourceId, List<EitItem> items) {
-                if (DEBUG) {
-                    Log.d(TAG, "onEITParsed " + sourceId);
-                }
+                if (DEBUG) Log.d(TAG, "onEITParsed " + sourceId);
                 EventSourceEntry entry = new EventSourceEntry(mPid, sourceId);
                 mEitMap.put(entry, items);
                 handleEvents(sourceId);
@@ -349,15 +354,15 @@ public class TsParser {
 
     private boolean feedTSPacket(byte[] tsData, int pos) {
         if (tsData.length < pos + TS_PACKET_SIZE) {
-            Log.d(TAG, "Data should include a single TS packet.");
+            if (DEBUG) Log.d(TAG, "Data should include a single TS packet.");
             return false;
         }
         if (tsData[pos] != TS_PACKET_START_CODE) {
-            Log.d(TAG, "Invalid ts packet.");
+            if (DEBUG) Log.d(TAG, "Invalid ts packet.");
             return false;
         }
         if ((tsData[pos + 1] & TS_PACKET_TEI_MASK) != 0) {
-            Log.d(TAG, "Erroneous ts packet.");
+            if (DEBUG) Log.d(TAG, "Erroneous ts packet.");
             return false;
         }
 
@@ -375,7 +380,7 @@ public class TsParser {
             return false;
         }
         if (payloadPos > pos + TS_PACKET_SIZE) {
-            Log.d(TAG, "Payload should be included in a single TS packet.");
+            if (DEBUG) Log.d(TAG, "Payload should be included in a single TS packet.");
             return false;
         }
         stream.feedData(Arrays.copyOfRange(tsData, payloadPos, pos + TS_PACKET_SIZE),

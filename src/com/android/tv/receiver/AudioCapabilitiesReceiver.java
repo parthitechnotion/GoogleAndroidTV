@@ -29,6 +29,7 @@ import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Analytics;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.SharedPreferencesUtils;
 
 /**
  * Creates HDMI plug broadcast receiver, and reports AC3 passthrough capabilities to Google
@@ -36,7 +37,6 @@ import com.android.tv.analytics.Tracker;
  * {@link #unregister} to stop.
  */
 public final class AudioCapabilitiesReceiver {
-    private static final String PREFS_NAME = "com.android.tv.audio_capabilities";
     private static final String SETTINGS_KEY_AC3_PASSTHRU_REPORTED = "ac3_passthrough_reported";
     private static final String SETTINGS_KEY_AC3_PASSTHRU_CAPABILITIES = "ac3_passthrough";
     private static final String SETTINGS_KEY_AC3_REPORT_REVISION = "ac3_report_revision";
@@ -121,7 +121,8 @@ public final class AudioCapabilitiesReceiver {
     }
 
     private SharedPreferences getSharedPreferences() {
-        return mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return mContext.getSharedPreferences(SharedPreferencesUtils.SHARED_PREF_AUDIO_CAPABILITIES,
+                Context.MODE_PRIVATE);
     }
 
     private boolean getBoolean(String key, boolean def) {

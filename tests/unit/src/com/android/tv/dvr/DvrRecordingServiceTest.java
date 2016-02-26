@@ -23,8 +23,8 @@ import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.tv.ApplicationSingletons;
-import com.android.tv.Features;
 import com.android.tv.MockTvApplication;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.common.feature.TestableFeature;
 
 import org.mockito.Mock;
@@ -39,7 +39,7 @@ public class DvrRecordingServiceTest extends ServiceTestCase<DvrRecordingService
 
     @Mock Scheduler mMockScheduler;
     @Mock ApplicationSingletons mApplicationSingletons;
-    private final TestableFeature mDvrFeature = Features.DVR;
+    private final TestableFeature mDvrFeature = CommonFeatures.DVR;
     private DvrDataManagerInMemoryImpl mDataManager;
     private DvrRecordingService mService;
 

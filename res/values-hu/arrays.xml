@@ -42,4 +42,16 @@
     <item msgid="7452153120614274095">"Premier"</item>
     <item msgid="8215762047341133299">"Technika/tudomány"</item>
   </string-array>
+  <string-array name="welcome_page_titles">
+    <item msgid="8322900543391231769">"Élő csatornák"</item>
+    <item msgid="7307688057853449735">"Tartalomfelfedezés egyszerűen"</item>
+    <item msgid="7566838222783641942">"További csatornákért töltsön le alkalmazásokat"</item>
+    <item msgid="8646630833216197238">"Szabja személyre csatornalistáját"</item>
+  </string-array>
+  <string-array name="welcome_page_descriptions">
+    <item msgid="8445334820787831823">"Úgy nézhet tartalmakat alkalmazásaiból, mintha tévézne."</item>
+    <item msgid="1855708984677953238">"Ismerős műsorfüzet és barátságos felhasználói felület segítségével tallózhat az alkalmazástartalmak között, \nmintha csak a tévécsatornák között váltana."</item>
+    <item msgid="3420760668363283731">"Az élő csatornákat kínáló alkalmazások telepítésével új csatornákat adhat hozzá a kínálathoz. \nA tévé menüjében megjelenő link segítségével találhat kompatibilis alkalmazásokat a Google Play Áruházban."</item>
+    <item msgid="8974157841656828507">"A csatornalista személyre szabásához állítsa be az újonnan telepített csatornaforrásokat. \nA kezdéshez a Beállítások menüben válassza a Csatornaforrások lehetőséget."</item>
+  </string-array>
 </resources>

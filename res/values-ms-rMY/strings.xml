@@ -39,9 +39,8 @@
     <string name="options_item_pip_on" msgid="4647247480009077381">"Hidupkan"</string>
     <string name="options_item_pip_off" msgid="8799500161592387451">"Matikan"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Berbilang audio"</string>
-    <string name="options_item_channel_sources" msgid="2217574947817750560">"Psdiaan saluran"</string>
-    <string name="options_item_parental_controls" msgid="7880060136509458287">"Kawalan ibu bapa"</string>
-    <string name="options_item_about" msgid="3023532413252052050">"Perihal"</string>
+    <string name="options_item_more_channels" msgid="971040969622943300">"Dptkn lg saluran"</string>
+    <string name="options_item_settings" msgid="7623205838542400074">"Tetapan"</string>
     <string name="pip_options_item_source" msgid="1050948525825308652">"Sumber"</string>
     <string name="pip_options_item_swap" msgid="7245362207353732048">"Silih"</string>
     <string name="pip_options_item_swap_on" msgid="5647182616484983505">"Hidupkan"</string>
@@ -84,21 +83,15 @@
     <string name="edit_channels_group_divider_for_hd" msgid="5311355566660389423">"HD"</string>
     <string name="edit_channels_group_divider_for_sd" msgid="5846195382266436167">"SD"</string>
     <string name="side_panel_title_group_by" msgid="1783176601425788939">"Kumpulkan mengikut"</string>
-    <string name="side_panel_title_channel_sources" msgid="2171195037212553286">"Persediaan saluran"</string>
     <string name="program_guide_content_locked" msgid="198056836554559553">"Rancangan ini disekat"</string>
     <string name="program_guide_content_locked_format" msgid="514915272862967389">"Rancangan ini diberi rating <xliff:g id="RATING">%1$s</xliff:g>"</string>
-    <string name="channel_source_item_setup" msgid="1330441915487807542">"Sumber saluran"</string>
-    <string name="channel_source_item_setup_new_inputs" msgid="2992665972254089976">"Saluran baharu tersedia"</string>
-    <string name="channel_source_item_customize_channels" msgid="2836316051162501082">"Sesuaikan saluran"</string>
-    <string name="channel_source_item_customize_channels_description" msgid="3124895053900086630">"Pilih saluran utk panduan rancangan anda"</string>
-    <string name="channel_description_setup_now" msgid="7643342362645622249">"Tidak disediakan"</string>
     <string name="msg_no_setup_activity" msgid="7746893144640239857">"Input tidak menyokong autoimbas"</string>
     <string name="msg_unable_to_start_setup_activity" msgid="8402612466599977855">"Tidak dapat memulakan autoimbas untuk \'<xliff:g id="TV_INPUT">%s</xliff:g>\'"</string>
     <string name="msg_unable_to_start_system_captioning_settings" msgid="705242616044165668">"Tidak dapat memulakan pilihan sari kata untuk seluruh sistem."</string>
-  <plurals name="msg_channel_added">
-    <item quantity="one" msgid="6074059986849579215">"%1$d saluran ditambahkan"</item>
-    <item quantity="other" msgid="1078861616751739285">"%1$d saluran ditambahkan"</item>
-  </plurals>
+    <plurals name="msg_channel_added" formatted="false" msgid="5301526166755938705">
+      <item quantity="other">%1$d saluran ditambahkan</item>
+      <item quantity="one">%1$d saluran ditambahkan</item>
+    </plurals>
     <string name="msg_no_channel_added" msgid="2882586037409921925">"Tiada saluran ditambahkan"</string>
     <string name="input_selector_tuner_label" msgid="6631205039926880892">"Penala"</string>
     <string name="menu_parental_controls" msgid="2474294054521345840">"Kawalan ibu bapa"</string>
@@ -136,16 +129,21 @@
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"Masukkan PIN baharu"</string>
     <string name="pin_enter_again" msgid="2618999754723090427">"Sahkan PIN anda"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"Masukkan PIN semasa anda"</string>
-  <plurals name="pin_enter_countdown">
-    <item quantity="one" msgid="5555357148779935468">"Anda telah memasukkan PIN yang salah sebanyak 5 kali.\nCuba lagi dalam masa <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> saat."</item>
-    <item quantity="other" msgid="8829550842387756054">"Anda memasukkan PIN yang salah sebanyak 5 kali.\nCuba lagi dalam masa <xliff:g id="REMAINING_SECONDS">%1$d</xliff:g> saat."</item>
-  </plurals>
+    <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
+      <item quantity="other">Anda telah memasukkan PIN yang salah sebanyak 5 kali.\nCuba lagi dalam masa <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> saat.</item>
+      <item quantity="one">Anda telah memasukkan PIN yang salah sebanyak 5 kali.\nCuba lagi dalam masa <xliff:g id="REMAINING_SECONDS_0">%1$d</xliff:g> saat.</item>
+    </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"PIN itu salah. Cuba lagi."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Cuba lagi, PIN tidak sepadan"</string>
-    <string name="side_panel_title_about" msgid="4572960435017168299">"Perihal"</string>
-    <string name="about_menu_licenses" msgid="4831892908710402185">"Lesen sumber terbuka"</string>
+    <string name="side_panel_title_settings" msgid="8244327316510918755">"Tetapan"</string>
+    <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"Sesuaikan senarai saluran"</string>
+    <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Pilih saluran untuk panduan rancangan anda"</string>
+    <string name="settings_channel_source_item_setup" msgid="4566190088656419070">"Sumber saluran"</string>
+    <string name="settings_channel_source_item_setup_new_inputs" msgid="4845822152617430787">"Saluran baharu tersedia"</string>
+    <string name="settings_parental_controls" msgid="5449397921700749317">"Kawalan ibu bapa"</string>
+    <string name="settings_menu_licenses" msgid="1257646083838406103">"Lesen sumber terbuka"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Lesen sumber terbuka"</string>
-    <string name="about_menu_version" msgid="6303769835664868129">"Versi"</string>
+    <string name="settings_menu_version" msgid="2604030372029921403">"Versi"</string>
     <string name="side_panel_title_developer" msgid="7287627759979090359">"Pilihan pembangun"</string>
     <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Dayakan penala TV USB"</string>
     <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"TV anda harus menyokong laluan AC3 untuk mendengar bunyi penala TV USB."</string>
@@ -166,15 +164,21 @@
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Tiada tajuk"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Saluran disekat"</string>
     <string name="episode_format" msgid="4881195874563241096">"M<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Ep. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
-    <string name="setup_title" msgid="7268875010986705651">"Sumber saluran"</string>
-    <string name="setup_description" msgid="8728423605912915099">"Sediakan saluran langsung daripada sumber yang tersedia. Ini mungkin mengambil masa beberapa minit bergantung pada sumber saluran itu."</string>
-    <string name="setup_done_button_label" msgid="3488134953528237729">"Selesai"</string>
-  <plurals name="setup_input_channels">
-    <item quantity="one" msgid="7847402892516958129">"%1$d saluran tersedia"</item>
-    <item quantity="other" msgid="2386588423841837714">"%1$d saluran tersedia"</item>
-  </plurals>
+    <string name="setup_category_new" msgid="2899355289563443627">"Baharu"</string>
+    <string name="setup_category_done" msgid="4750902502852212319">"Sumber"</string>
+    <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
+      <item quantity="other">%1$d saluran</item>
+      <item quantity="one">1$d saluran</item>
+    </plurals>
     <string name="setup_input_no_channels" msgid="1669327912393163331">"Tiada saluran yang tersedia"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"Baharu"</string>
+    <string name="setup_input_setup_now" msgid="1772000402336958967">"Tidak disediakan"</string>
+    <string name="setup_play_store_action_title" msgid="859347291072224673">"Dapatkan lebih banyak sumber"</string>
+    <string name="setup_play_store_action_description" msgid="2472226338824629506">"Semak imbas apl yang menawarkan saluran langsung"</string>
+    <string name="new_sources_title" msgid="3878933676500061895">"Sumber saluran yang baharu tersedia"</string>
+    <string name="new_sources_description" msgid="749649005588426813">"Sumber saluran baharu mempunyai saluran untuk ditawarkan.\nSediakan saluran sekarang atau lakukannya kemudian dalam tetapan sumber saluran."</string>
+    <string name="new_sources_action_setup" msgid="177693761664016811">"Sediakan sekarang"</string>
+    <string name="new_sources_action_skip" msgid="2501296961258184330">"OK"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
     <string name="intro_description" msgid="7806473686446937307"><b>"Tekan PILIH"</b>" untuk mengakses menu TV."</string>
@@ -191,4 +195,6 @@
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Kekunci BACK adalah untuk peranti yang tersambung. Tekan butang HOME untuk keluar."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Saluran Langsung tidak disokong pada peranti ini dengan Android Lollipop."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"Saluran Langsung memerlukan kebenaran untuk membaca penyenaraian TV."</string>
+    <string name="setup_sources_text" msgid="4988039637873759839">"Sediakan sumber anda"</string>
+    <string name="setup_sources_description" msgid="5695518946225445202">"Saluran langsung menggabungkan pengalaman saluran TV tradisional dengan saluran penstriman yang disediakan oleh apl. \n\nMulakan dengan menyediakan sumber saluran yang sudah dipasang. Selain itu, semak imbas Gedung Google Play untuk mendapatkan lebih banyak apl yang menawarkan saluran langsung."</string>
 </resources>

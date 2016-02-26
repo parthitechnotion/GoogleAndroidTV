@@ -20,16 +20,15 @@ import android.content.Context;
 import android.media.tv.TvTrackInfo;
 import android.support.annotation.VisibleForTesting;
 
+import com.android.tv.Features;
 import com.android.tv.R;
 import com.android.tv.TvOptionsManager;
 import com.android.tv.customization.CustomAction;
 import com.android.tv.data.DisplayMode;
 import com.android.tv.ui.TvViewUiManager;
-import com.android.tv.ui.sidepanel.AboutFragment;
 import com.android.tv.ui.sidepanel.ClosedCaptionFragment;
 import com.android.tv.ui.sidepanel.DisplayModeFragment;
 import com.android.tv.ui.sidepanel.MultiAudioFragment;
-import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.PipInputManager;
 
 import java.util.ArrayList;
@@ -50,25 +49,18 @@ public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
     protected List<MenuAction> createBaseActions() {
         List<MenuAction> actionList = new ArrayList<>();
         actionList.add(MenuAction.SELECT_CLOSED_CAPTION_ACTION);
+        setOptionChangedListener(MenuAction.SELECT_CLOSED_CAPTION_ACTION);
         actionList.add(MenuAction.SELECT_DISPLAY_MODE_ACTION);
+        setOptionChangedListener(MenuAction.SELECT_DISPLAY_MODE_ACTION);
         actionList.add(MenuAction.PIP_ACTION);
+        setOptionChangedListener(MenuAction.PIP_ACTION);
         mPositionPipAction = actionList.size() - 1;
         actionList.add(MenuAction.SELECT_AUDIO_LANGUAGE_ACTION);
-        actionList.add(MenuAction.CHANNEL_SOURCES_ACTION);
-        if (PermissionUtils.hasModifyParentalControls(getMainActivity())) {
-            actionList.add(MenuAction.PARENTAL_CONTROLS_ACTION);
-        } else {
-            // Note: parental control is turned off, when MODIFY_PARENTAL_CONTROLS is not granted.
-            // But, we may be able to turn on channel lock feature regardless of the permission.
-            // It's TBD.
+        setOptionChangedListener(MenuAction.SELECT_AUDIO_LANGUAGE_ACTION);
+        if (Features.ONBOARDING_PLAY_STORE.isEnabled(getMainActivity())) {
+            actionList.add(MenuAction.MORE_CHANNELS_ACTION);
         }
-        actionList.add(MenuAction.ABOUT_ACTION);
-
-        for (MenuAction action : actionList) {
-            if (action.getType() != TvOptionsManager.OPTION_CHANNEL_SOURCES) {
-                setOptionChangedListener(action);
-            }
-        }
+        actionList.add(MenuAction.SETTINGS_ACTION);
 
         if (getCustomActions() != null) {
             // Adjust Pip action position which will be changed by applying custom actions.
@@ -188,15 +180,11 @@ public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
                 getMainActivity().getOverlayManager().getSideFragmentManager().show(
                         new MultiAudioFragment());
                 break;
-            case TvOptionsManager.OPTION_CHANNEL_SOURCES:
-                getMainActivity().showChannelSourcesFragment();
+            case TvOptionsManager.OPTION_MORE_CHANNELS:
+                getMainActivity().showMerchantCollection();
                 break;
-            case TvOptionsManager.OPTION_PARENTAL_CONTROLS:
-                getMainActivity().showParentalControlFragment();
-                break;
-            case TvOptionsManager.OPTION_ABOUT:
-                getMainActivity().getOverlayManager().getSideFragmentManager().show(
-                        new AboutFragment());
+            case TvOptionsManager.OPTION_SETTINGS:
+                getMainActivity().showSettingsFragment();
                 break;
         }
     }

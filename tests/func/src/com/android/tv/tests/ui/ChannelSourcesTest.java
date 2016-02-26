@@ -23,36 +23,48 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import com.android.tv.R;
 import com.android.tv.testing.uihelper.ByResource;
-import com.android.tv.testing.uihelper.SidePanelHelper;
 
 /**
  * Tests for channel sources.
  */
 @LargeTest
 public class ChannelSourcesTest extends LiveChannelsTestCase {
-    private SidePanelHelper mSidePanelHelper;
-    private BySelector mByChannelSourceSidePanel;
+    private BySelector mBySettingsSidePanel;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mSidePanelHelper = new SidePanelHelper(mDevice, mTargetResources);
-        mByChannelSourceSidePanel = mSidePanelHelper
-                .bySidePanelTitled(R.string.side_panel_title_channel_sources);
+        mBySettingsSidePanel = mSidePanelHelper.bySidePanelTitled(
+                R.string.side_panel_title_settings);
     }
 
     //TODO: create a cancelable test channel setup.
 
     public void testSetup_cancel() {
         mLiveChannelsHelper.assertAppStarted();
-        mMenuHelper.assertPressOptionsChannelSources();
-        assertWaitForCondition(mDevice, Until.hasObject(mByChannelSourceSidePanel));
+        mMenuHelper.assertPressOptionsSettings();
+        assertWaitForCondition(mDevice, Until.hasObject(mBySettingsSidePanel));
 
-        mSidePanelHelper.assertNavigateToItem(R.string.channel_source_item_setup);
+        mSidePanelHelper.assertNavigateToItem(R.string.settings_channel_source_item_setup);
         mDevice.pressDPadCenter();
 
         assertWaitForCondition(mDevice,
-                Until.hasObject(ByResource.text(mTargetResources, R.string.setup_title)));
+                Until.hasObject(ByResource.text(mTargetResources, R.string.setup_sources_text)));
+        mDevice.pressBack();
+    }
+
+    // SetupSourcesFragment should have no errors if side fragment item is clicked multiple times.
+    public void testSetupTwice_cancel() {
+        mLiveChannelsHelper.assertAppStarted();
+        mMenuHelper.assertPressOptionsSettings();
+        assertWaitForCondition(mDevice, Until.hasObject(mBySettingsSidePanel));
+
+        mSidePanelHelper.assertNavigateToItem(R.string.settings_channel_source_item_setup);
+        mDevice.pressDPadCenter();
+        mDevice.pressDPadCenter();
+
+        assertWaitForCondition(mDevice,
+                Until.hasObject(ByResource.text(mTargetResources, R.string.setup_sources_text)));
         mDevice.pressBack();
     }
 }

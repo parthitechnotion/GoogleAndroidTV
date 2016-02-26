@@ -20,7 +20,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 
-import com.android.usbtuner.UsbTunerInterface;
+import com.android.usbtuner.TunerHal;
 import com.android.usbtuner.data.PsiData.PatItem;
 import com.android.usbtuner.data.PsiData.PmtItem;
 import com.android.usbtuner.data.PsipData.EitItem;
@@ -43,7 +43,7 @@ public class EventDetector {
     private static final String TAG = "EventDetector";
     private static final boolean DEBUG = false;
 
-    private final UsbTunerInterface mUsbTunerInterface;
+    private final TunerHal mTunerHal;
 
     private TsParser mTsParser;
     private final Set<Integer> mPidSet = new HashSet<>();
@@ -61,8 +61,7 @@ public class EventDetector {
         @Override
         public void onPatDetected(List<PatItem> items) {
             for (PatItem i : items) {
-                mUsbTunerInterface.addTunerPidFilter(i.getPmtPid(),
-                        UsbTunerInterface.FILTER_TYPE_OTHER);
+                mTunerHal.addPidFilter(i.getPmtPid(), TunerHal.FILTER_TYPE_OTHER);
             }
         }
 
@@ -182,8 +181,8 @@ public class EventDetector {
         void onEventDetected(TunerChannel channel, List<EitItem> items);
     }
 
-    public EventDetector(UsbTunerInterface usbTunerInteface, EventListener listener) {
-        mUsbTunerInterface = usbTunerInteface;
+    public EventDetector(TunerHal usbTunerInteface, EventListener listener) {
+        mTunerHal = usbTunerInteface;
         mEventListener = listener;
     }
 
@@ -207,7 +206,7 @@ public class EventDetector {
             return;
         }
         mPidSet.add(pid);
-        mUsbTunerInterface.addTunerPidFilter(pid, UsbTunerInterface.FILTER_TYPE_OTHER);
+        mTunerHal.addPidFilter(pid, TunerHal.FILTER_TYPE_OTHER);
     }
 
     public void feedTSStream(byte[] data, int startOffset, int length) {

@@ -353,7 +353,6 @@ public class CacheManager {
      */
     public ArrayList<Pair<String, MediaFormat>> readTrackInfoFiles() throws IOException {
         ArrayList<Pair<String, MediaFormat>> trackInfos = new ArrayList<>();
-        mStorageManager.readTrackInfoFile(false);
         try {
             trackInfos.add(mStorageManager.readTrackInfoFile(false));
         } catch (FileNotFoundException e) {

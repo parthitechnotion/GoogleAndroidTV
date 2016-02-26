@@ -47,8 +47,10 @@ public class MpegTsPassthroughAc3RendererBuilder implements RendererBuilder {
     public void buildRenderers(MpegTsPlayer mpegTsPlayer, MediaDataSource dataSource,
             RendererBuilderCallback callback) {
         // Build the video and audio renderers.
-        SampleSource sampleSource = new DefaultSampleSource(
-                new MpegTsSampleSourceExtractor(dataSource, mCacheManager, mCacheListener),
+        SampleExtractor extractor = dataSource == null ?
+                new MpegTsSampleSourceExtractor(mCacheManager, mCacheListener) :
+                new MpegTsSampleSourceExtractor(dataSource, mCacheManager, mCacheListener);
+        SampleSource sampleSource = new DefaultSampleSource(extractor,
                 mpegTsPlayer.isAc3Playable() ? NUM_TRACKS : NUM_TRACKS - 1);
         MediaCodecVideoTrackRenderer videoRenderer =
                 new MediaCodecVideoTrackRenderer(sampleSource, null, true,

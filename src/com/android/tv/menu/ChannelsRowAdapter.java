@@ -25,6 +25,7 @@ import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Tracker;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.data.Channel;
 import com.android.tv.recommendation.Recommender;
 import com.android.tv.util.SetupUtils;
@@ -36,16 +37,16 @@ import java.util.List;
  * An adapter of the Channels row.
  */
 public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel> {
-    private static final int POSITION_FIRST_CARD = 0;
-    private static final int POSITION_SECOND_CARD = 1;
-    private static final int POSITION_THIRD_CARD = 2;
+    // There are four special cards: guide, setup, dvr, applink.
+    private static final int SIZE_OF_VIEW_TYPE = 4;
+
     private final Context mContext;
     private final Tracker mTracker;
     private final Recommender mRecommender;
     private final int mMaxCount;
     private final int mMinCount;
-    private boolean mShowSetupCard;
-    private boolean mShowAppLinkCard;
+    private boolean mShowDvrCard;
+    private int[] mViewType = new int[SIZE_OF_VIEW_TYPE];
 
     private final View.OnClickListener mGuideOnClickListener = new View.OnClickListener() {
         @Override
@@ -59,7 +60,15 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
         @Override
         public void onClick(View view) {
             mTracker.sendMenuClicked(R.string.channels_item_setup);
-            getMainActivity().getOverlayManager().showSetupDialog();
+            getMainActivity().getOverlayManager().showSetupFragment();
+        }
+    };
+
+    private final View.OnClickListener mDvrOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mTracker.sendMenuClicked(R.string.channels_item_dvr);
+            getMainActivity().getOverlayManager().showDvrManager();
         }
     };
 
@@ -93,26 +102,15 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
         mRecommender = recommender;
         mMinCount = minCount;
         mMaxCount = maxCount;
+        mShowDvrCard = CommonFeatures.DVR.isEnabled(mContext);
     }
 
     @Override
     public int getItemViewType(int position) {
-        switch (position) {
-            case POSITION_FIRST_CARD:
-                return R.layout.menu_card_guide;
-            case POSITION_SECOND_CARD:
-                return mShowSetupCard
-                        ? R.layout.menu_card_setup
-                        : mShowAppLinkCard
-                                ? R.layout.menu_card_app_link
-                                : R.layout.menu_card_channel;
-            case POSITION_THIRD_CARD:
-                return (mShowSetupCard && mShowAppLinkCard)
-                        ? R.layout.menu_card_app_link
-                        : R.layout.menu_card_channel;
-            default:
-                return R.layout.menu_card_channel;
+        if (position >= SIZE_OF_VIEW_TYPE) {
+            return R.layout.menu_card_channel;
         }
+        return mViewType[position];
     }
 
     @Override
@@ -131,6 +129,8 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
             viewHolder.itemView.setOnClickListener(mSetupOnClickListener);
         } else if (viewType == R.layout.menu_card_app_link) {
             viewHolder.itemView.setOnClickListener(mAppLinkOnClickListener);
+        } else if (viewType == R.layout.menu_card_dvr) {
+            viewHolder.itemView.setOnClickListener(mDvrOnClickListener);
         } else {
             viewHolder.itemView.setTag(getItemList().get(position));
             viewHolder.itemView.setOnClickListener(mChannelOnClickListener);
@@ -145,20 +145,30 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
         // For guide item
         channelList.add(dummyChannel);
         // For setup item
-        mShowSetupCard = SetupUtils.getInstance(mContext).hasNewInput(
-                ((MainActivity) mContext).getTvInputManagerHelper());
-        if (mShowSetupCard) {
-            channelList.add(dummyChannel);
-        }
-        if (Build.VERSION.SDK_INT >= 23) {
-            Channel currentChannel = ((MainActivity) mContext).getCurrentChannel();
-            mShowAppLinkCard = currentChannel != null
-                    && currentChannel.getAppLinkType(mContext) != Channel.APP_LINK_TYPE_NONE;
-            if (mShowAppLinkCard) {
-                channelList.add(currentChannel);
-            }
-        }
+        boolean showSetupCard = SetupUtils.getInstance(mContext)
+                .hasNewInput(((MainActivity) mContext).getTvInputManagerHelper());
+        Channel currentChannel = ((MainActivity) mContext).getCurrentChannel();
+        boolean showAppLinkCard = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && currentChannel != null
+                && currentChannel.getAppLinkType(mContext) != Channel.APP_LINK_TYPE_NONE;
 
+        mViewType[0] = R.layout.menu_card_guide;
+        int index = 1;
+        if (showSetupCard) {
+            channelList.add(dummyChannel);
+            mViewType[index++] = R.layout.menu_card_setup;
+        }
+        if (mShowDvrCard) {
+            channelList.add(dummyChannel);
+            mViewType[index++] = R.layout.menu_card_dvr;
+        }
+        if (showAppLinkCard) {
+            channelList.add(currentChannel);
+            mViewType[index++] = R.layout.menu_card_app_link;
+        }
+        for ( ; index < mViewType.length; ++index) {
+            mViewType[index] = R.layout.menu_card_channel;
+        }
         channelList.addAll(getRecentChannels());
         setItemList(channelList);
     }

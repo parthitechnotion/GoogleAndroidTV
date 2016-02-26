@@ -24,8 +24,8 @@ import android.support.v17.leanback.widget.VerticalGridView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.LinearLayout;
 
 import com.android.tv.common.R;
 
@@ -45,37 +45,31 @@ public abstract class SetupGuidedStepFragment extends GuidedStepFragment {
             Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         Bundle arguments = getArguments();
-        view.findViewById(R.id.action_fragment).setPadding(0, 0, 0, 0);
+        view.findViewById(R.id.action_fragment_root).setPadding(0, 0, 0, 0);
+        LinearLayout.LayoutParams guidanceLayoutParams = (LinearLayout.LayoutParams)
+                view.findViewById(R.id.content_fragment).getLayoutParams();
+        guidanceLayoutParams.weight = 0;
         if (arguments != null && arguments.getBoolean(KEY_THREE_PANE, false)) {
-            boolean isRtl = view.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
             // Content fragment.
-            LayoutParams layoutParams = view.findViewById(R.id.content_fragment).getLayoutParams();
-            layoutParams.width = getResources().getDimensionPixelOffset(
-                            R.dimen.setup_guidedstep_guidance_section_width_3pane);
+            guidanceLayoutParams.width = getResources().getDimensionPixelOffset(
+                    R.dimen.setup_guidedstep_guidance_section_width_3pane);
             int doneButtonWidth = getResources().getDimensionPixelOffset(
                     R.dimen.setup_done_button_container_width);
-            // Guided actions selector.
-            int endMargin = getResources().getDimensionPixelOffset(
-                    R.dimen.setup_guidedactions_selector_margin_end);
-            MarginLayoutParams marginLayoutParams = (MarginLayoutParams) view.findViewById(
-                    R.id.guidedactions_selector).getLayoutParams();
-            if (isRtl) {
-                marginLayoutParams.leftMargin = endMargin + doneButtonWidth;
-            } else {
-                marginLayoutParams.rightMargin = endMargin + doneButtonWidth;
-            }
             // Guided actions list
-            marginLayoutParams = (MarginLayoutParams) view.findViewById(R.id.guidedactions_list)
-                    .getLayoutParams();
-            if (isRtl) {
-                marginLayoutParams.leftMargin = doneButtonWidth;
-            } else {
+            View list = view.findViewById(R.id.guidedactions_list);
+            View list2 = view.findViewById(R.id.guidedactions_list2);
+            MarginLayoutParams marginLayoutParams = (MarginLayoutParams) view.findViewById(
+                    R.id.guidedactions_list).getLayoutParams();
+            // Use content view to check layout direction while view is being created.
+            if (getResources().getConfiguration().getLayoutDirection()
+                    == View.LAYOUT_DIRECTION_LTR) {
                 marginLayoutParams.rightMargin = doneButtonWidth;
+            } else {
+                marginLayoutParams.leftMargin = doneButtonWidth;
             }
         } else {
             // Content fragment.
-            LayoutParams layoutParams = view.findViewById(R.id.content_fragment).getLayoutParams();
-            layoutParams.width = getResources().getDimensionPixelOffset(
+            guidanceLayoutParams.width = getResources().getDimensionPixelOffset(
                     R.dimen.setup_guidedstep_guidance_section_width_2pane);
         }
         // gridView Alignment
@@ -91,6 +85,8 @@ public abstract class SetupGuidedStepFragment extends GuidedStepFragment {
         ViewGroup group = (ViewGroup) view.findViewById(R.id.content_frame);
         group.setClipChildren(false);
         group.setClipToPadding(false);
+        // Workaround b/26205201
+        view.findViewById(R.id.guidedactions_list2).setFocusable(false);
         return view;
     }
 
@@ -110,13 +106,20 @@ public abstract class SetupGuidedStepFragment extends GuidedStepFragment {
         };
     }
 
+    abstract protected String getActionCategory();
+
     @Override
     public void onGuidedActionClicked(GuidedAction action) {
-        SetupActionHelper.onActionClick(this, (int) action.getId());
+        SetupActionHelper.onActionClick(this, getActionCategory(), (int) action.getId());
     }
 
     @Override
     protected void onProvideFragmentTransitions() {
         // Don't use the fragment transition defined in GuidedStepFragment.
+    }
+
+    @Override
+    public boolean isFocusOutEndAllowed() {
+        return true;
     }
 }

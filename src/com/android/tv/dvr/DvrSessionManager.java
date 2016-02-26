@@ -16,12 +16,18 @@
 
 package com.android.tv.dvr;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.media.tv.TvContract;
+import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 
-import com.android.tv.Features;
-import com.android.tv.common.dvr.DvrSessionClient;
+import com.android.tv.common.feature.CommonFeatures;
+import com.android.tv.common.recording.RecordingCapability;
+import com.android.tv.common.recording.TvRecording;
 import com.android.tv.data.Channel;
 import com.android.tv.util.SoftPreconditions;
+import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 /**
  * Manages Dvr Sessions.
@@ -33,19 +39,55 @@ import com.android.tv.util.SoftPreconditions;
  */
 public class DvrSessionManager {
     private final static String TAG = "DvrSessionManager";
+    private final Context mContext;
+    private TvRecording.TvRecordingClient mRecordingClient;
+    private ArrayMap<String, RecordingCapability> mCapabilityMap = new ArrayMap<>();
 
     public DvrSessionManager(Context context) {
-        SoftPreconditions.checkFeatureEnabled(context, Features.DVR, TAG);
+        SoftPreconditions.checkFeatureEnabled(context, CommonFeatures.DVR, TAG);
+        mContext = context.getApplicationContext();
+        // TODO(DVR): get a session to all clients, for now just get USB a TestInput
+        final String inputId = TvContract
+                .buildInputId(new ComponentName(context, UsbTunerTvInputService.class));
+        mRecordingClient = acquireDvrSession(inputId, null);
+        mRecordingClient.connect(inputId, new TvRecording.ClientCallback() {
+            @Override
+            public void onCapabilityReceived(RecordingCapability capability) {
+                mCapabilityMap.put(inputId, capability);
+                mRecordingClient.release();
+                mRecordingClient = null;
+            }
+        });
+        if (CommonFeatures.DVR.isEnabled(context)) { // STOPSHIP(DVR)
+            String testInputId = "com.android.tv.testinput/.TestTvInputService";
+            mCapabilityMap.put(testInputId,
+                    RecordingCapability.builder()
+                            .setInputId(testInputId)
+                            .setMaxConcurrentPlayingSessions(2)
+                            .setMaxConcurrentTunedSessions(2)
+                            .setMaxConcurrentSessionsOfAllTypes(3)
+                            .build());
+
+        }
     }
 
-    public DvrSessionClient acquireDvrSession(String inputId, Channel channel) {
-        return null;
+    public TvRecording.TvRecordingClient acquireDvrSession(String inputId, Channel channel) {
+        // TODO(DVR): use input and channel or change API
+        TvRecording.TvRecordingClient sessionClient = new TvRecording.TvRecordingClient(mContext);
+        return sessionClient;
     }
 
     public boolean canAcquireDvrSession(String inputId, Channel channel) {
-        return false;
+        // TODO(DVR): implement
+        return true;
     }
 
-    public void releaseDvrSession(DvrSessionClient session) {
+    public void releaseDvrSession(TvRecording.TvRecordingClient session) {
+        session.release();
+    }
+
+    @Nullable
+    public RecordingCapability getRecordingCapability(String inputId) {
+        return mCapabilityMap.get(inputId);
     }
 }

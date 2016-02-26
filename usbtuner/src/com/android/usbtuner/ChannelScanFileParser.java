@@ -66,7 +66,7 @@ public class ChannelScanFileParser {
     public static List<ScanChannel> parseScanFile(InputStream is) {
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
         String line;
-        List<ScanChannel> scanChannelList = new ArrayList<ScanChannel>();
+        List<ScanChannel> scanChannelList = new ArrayList<>();
         try {
             while ((line = in.readLine()) != null) {
                 if (line.isEmpty()) {

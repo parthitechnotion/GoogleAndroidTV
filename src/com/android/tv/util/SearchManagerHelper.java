@@ -52,7 +52,7 @@ public final class SearchManagerHelper {
 
     public void launchAssistAction() {
         try {
-            if (Build.VERSION.SDK_INT >= 23) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 SearchManager.class.getDeclaredMethod(
                         "launchLegacyAssist", String.class, Integer.TYPE, Bundle.class).invoke(
                                 mSearchManager, null, UserHandle.myUserId(), null);
