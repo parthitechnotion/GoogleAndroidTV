@@ -58,7 +58,7 @@ code_version_major := $(shell echo $$(($(base_version_major)+3)))
 git_commit_count := $(shell git --git-dir $(LOCAL_PATH)/.git rev-list --since=$(base_version_since) --all --count HEAD)
 # x86 and arm sometimes don't match.
 #code_version_build := $(shell printf "%03d" $(git_commit_count))
-code_version_build := 419
+code_version_build := 420
 #####################################################
 #####################################################
 # Collect automatic version code parameters
