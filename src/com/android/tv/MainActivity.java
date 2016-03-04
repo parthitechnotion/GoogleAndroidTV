@@ -47,6 +47,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -259,6 +260,7 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     private Uri mInitChannelUri;
     @Nullable
     private String mParentInputIdWhenScreenOff;
+    private boolean mScreenOffIntentReceived;
     private boolean mShowProgramGuide;
     private boolean mShowSelectInputView;
     private TvInputInfo mInputToSetUp;
@@ -331,15 +333,8 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
                 // We need to stop TvView, when the screen is turned off. If not and TIS uses
                 // MediaPlayer, a device may not go to the sleep mode and audio can be heard,
                 // because MediaPlayer keeps playing media by its wake lock.
-                mInitChannelUri = mChannelTuner.getCurrentChannelUri();
-                if (mChannelTuner.isCurrentChannelPassthrough()) {
-                    // When ACTION_SCREEN_OFF is invoked, some CEC devices may be already
-                    // removed. So we need to get the input info from ChannelTuner instead of
-                    // TvInputManagerHelper.
-                    TvInputInfo input = mChannelTuner.getCurrentInputInfo();
-                    mParentInputIdWhenScreenOff = input.getParentId();
-                    if (DEBUG) Log.d(TAG, "Parent input: " + mParentInputIdWhenScreenOff);
-                }
+                mScreenOffIntentReceived = true;
+                markCurrentChannelDuringScreenOff();
                 stopAll(true);
             } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                 if (DEBUG) Log.d(TAG, "Received ACTION_SCREEN_ON");
@@ -703,6 +698,7 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     protected void onStart() {
         if (DEBUG) Log.d(TAG,"onStart()");
         super.onStart();
+        mScreenOffIntentReceived = false;
         mActivityStarted = true;
         mTracker.sendMainStart();
         mMainDurationTimer.start();
@@ -949,11 +945,38 @@ public class MainActivity extends Activity implements AudioManager.OnAudioFocusC
     @Override
     protected void onStop() {
         if (DEBUG) Log.d(TAG, "onStop()");
+        if (mScreenOffIntentReceived) {
+            mScreenOffIntentReceived = false;
+        } else {
+            PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (!powerManager.isInteractive()) {
+                // We added to check isInteractive as well as SCREEN_OFF intent, because
+                // calling timing of the intent SCREEN_OFF is not consistent. b/25953633.
+                // If we verify that checking isInteractive is enough, we can remove the logic
+                // for SCREEN_OFF intent.
+                markCurrentChannelDuringScreenOff();
+            }
+        }
         mActivityStarted = false;
         stopAll(false);
         unregisterReceiver(mBroadcastReceiver);
         mTracker.sendMainStop(mMainDurationTimer.reset());
         super.onStop();
+    }
+
+    /**
+     * Handles screen off to keep the current channel for next screen on.
+     */
+    private void markCurrentChannelDuringScreenOff() {
+        mInitChannelUri = mChannelTuner.getCurrentChannelUri();
+        if (mChannelTuner.isCurrentChannelPassthrough()) {
+            // When ACTION_SCREEN_OFF is invoked, some CEC devices may be already
+            // removed. So we need to get the input info from ChannelTuner instead of
+            // TvInputManagerHelper.
+            TvInputInfo input = mChannelTuner.getCurrentInputInfo();
+            mParentInputIdWhenScreenOff = input.getParentId();
+            if (DEBUG) Log.d(TAG, "Parent input: " + mParentInputIdWhenScreenOff);
+        }
     }
 
     private void stopAll(boolean keepVisibleBehind) {

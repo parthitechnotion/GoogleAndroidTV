@@ -72,7 +72,7 @@
         android:layout_centerHorizontal="true"
         android:visibility="gone" />
 
-    <com.google.android.tv.common.ui.setup.leanback.PagingIndicator
+    <com.android.tv.common.ui.setup.leanback.PagingIndicator
         android:id="@id/page_indicator"
         android:layout_width="@dimen/lb_onboarding_content_width"
         android:layout_height="@dimen/lb_onboarding_navigation_height"
