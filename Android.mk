@@ -25,9 +25,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := LiveTv
 
-# It is required for com.android.providers.tv.permission.ALL_EPG_DATA
-LOCAL_PRIVILEGED_MODULE := true
-
 LOCAL_SDK_VERSION := system_current
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res \
