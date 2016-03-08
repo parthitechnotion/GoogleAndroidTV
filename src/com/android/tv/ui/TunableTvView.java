@@ -637,7 +637,7 @@ public class TunableTvView extends FrameLayout implements StreamInfo {
     }
 
     public void requestUnblockContent(TvContentRating rating) {
-        mTvView.requestUnblockContent(rating);
+        mTvView.unblockContent(rating);
     }
 
     @Override
