@@ -1,11 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_BUILDCONFIG_CLASS := src/com/android/tv/common/BuildConfig.java
-BC_OUT_DIR := $(LOCAL_PATH)
-BC_APPLICATION_ID := "com.android.tv.common"
-include $(LOCAL_PATH)/buildconfig.mk
-
 # Include all test java files.
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
     $(LOCAL_BUILDCONFIG_CLASS)
