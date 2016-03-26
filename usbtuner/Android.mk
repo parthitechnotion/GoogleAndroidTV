@@ -21,6 +21,7 @@ LOCAL_PRIVILEGED_MODULE := true
 LOCAL_SDK_VERSION := system_current
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
+    lib-tv-exoplayer \
     usbtuner-tvinput
 
 LOCAL_RESOURCE_DIR := \
@@ -60,6 +61,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v7-recyclerview \
     android-support-v17-leanback \
     icu4j-usbtuner \
+    lib-tv-exoplayer \
     libprotobuf-java-nano \
     tv-common
 
@@ -95,5 +97,18 @@ LOCAL_SRC_FILES := \
 LOCAL_SDK_VERSION := system_current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
+
+#############################################################
+# Pre-built dependency jars
+#############################################################
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := \
+   lib-tv-exoplayer:libs/tv-exoplayer.jar \
+
+include $(BUILD_MULTI_PREBUILT)
 
 include $(call all-makefiles-under, $(LOCAL_PATH))
