@@ -19,6 +19,8 @@ package com.android.tv.dvr;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.os.Build;
+import android.support.test.filters.SdkSuppress;
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
@@ -26,6 +28,7 @@ import com.android.tv.ApplicationSingletons;
 import com.android.tv.MockTvApplication;
 import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.common.feature.TestableFeature;
+import com.android.tv.testing.FakeClock;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -35,6 +38,7 @@ import org.mockito.MockitoAnnotations;
  * Tests for {@link DvrRecordingService}.
  */
 @SmallTest
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.N)
 public class DvrRecordingServiceTest extends ServiceTestCase<DvrRecordingService> {
 
     @Mock Scheduler mMockScheduler;
@@ -42,13 +46,14 @@ public class DvrRecordingServiceTest extends ServiceTestCase<DvrRecordingService
     private final TestableFeature mDvrFeature = CommonFeatures.DVR;
     private DvrDataManagerInMemoryImpl mDataManager;
     private DvrRecordingService mService;
+    private FakeClock mFakeClock = FakeClock.createWithCurrentTime();
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mDvrFeature.enableForTest();
         MockitoAnnotations.initMocks(this);
-        mDataManager = new DvrDataManagerInMemoryImpl(getContext());
+        mDataManager = new DvrDataManagerInMemoryImpl(getContext(), mFakeClock);
         setApplication(new MockTvApplication(mApplicationSingletons));
         when(mApplicationSingletons.getDvrDataManager()).thenReturn(mDataManager);
         setupService();

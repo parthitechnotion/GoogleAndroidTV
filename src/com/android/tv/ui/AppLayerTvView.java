@@ -16,9 +16,8 @@
 
 package com.android.tv.ui;
 
-import com.android.tv.common.recording.PlaybackTvView;
-
 import android.content.Context;
+import android.media.tv.TvView;
 import android.util.AttributeSet;
 
 /**
@@ -30,7 +29,7 @@ import android.util.AttributeSet;
  * TODO: remove this class once the TvView.setMain() is revisited.
  * </p>
  */
-public class AppLayerTvView extends PlaybackTvView {
+public class AppLayerTvView extends TvView {
     public AppLayerTvView(Context context) {
         super(context);
     }

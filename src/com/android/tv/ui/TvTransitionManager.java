@@ -33,6 +33,7 @@ import android.widget.FrameLayout.LayoutParams;
 
 import com.android.tv.MainActivity;
 import com.android.tv.R;
+import com.android.tv.data.Channel;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -89,15 +90,21 @@ public class TvTransitionManager extends TransitionManager {
         }
         initIfNeeded();
         if (withAnimation) {
+            mEmptyView.setAlpha(1.0f);
             transitionTo(mEmptyScene);
         } else {
             TransitionManager.go(mEmptyScene, null);
+            // When transition is null, transition got stuck without calling endTransitions.
+            TransitionManager.endTransitions(mEmptyScene.getSceneRoot());
+            // Since Fade.OUT transition doesn't run, we need to set alpha manually.
+            mEmptyView.setAlpha(0);
         }
     }
 
     public void goToChannelBannerScene() {
         initIfNeeded();
-        if (mMainActivity.getCurrentChannel().isPassthrough()) {
+        Channel channel = mMainActivity.getCurrentChannel();
+        if (channel != null && channel.isPassthrough()) {
             if (mCurrentScene != mInputBannerScene) {
                 // Show the input banner instead.
                 LayoutParams lp = (LayoutParams) mInputBannerView.getLayoutParams();
@@ -152,7 +159,7 @@ public class TvTransitionManager extends TransitionManager {
         mExitAnimator = AnimatorInflater.loadAnimator(mMainActivity,
                 R.animator.channel_banner_exit);
 
-        mEmptyScene = new Scene(mSceneContainer, mEmptyView);
+        mEmptyScene = new Scene(mSceneContainer, (View) mEmptyView);
         mEmptyScene.setEnterAction(new Runnable() {
             @Override
             public void run() {

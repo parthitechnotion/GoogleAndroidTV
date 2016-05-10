@@ -48,17 +48,13 @@
 
 base_version_major := 1
 # Change this for each branch
-base_version_minor := 09
-# The date of the first commit checked in to the current branch
-base_version_since := 2015-11-21
+base_version_minor := 10
 
 # code_version_major will overflow at 22
 code_version_major := $(shell echo $$(($(base_version_major)+3)))
 
-git_commit_count := $(shell git --git-dir $(LOCAL_PATH)/.git rev-list --since=$(base_version_since) --all --count HEAD)
 # x86 and arm sometimes don't match.
-#code_version_build := $(shell printf "%03d" $(git_commit_count))
-code_version_build := 420
+code_version_build := 596
 #####################################################
 #####################################################
 # Collect automatic version code parameters

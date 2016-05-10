@@ -88,4 +88,35 @@
     <style name="TV.DoneButtonContainerStyle" parent="DoneButtonContainerStyle">
         <item name="android:background">@color/setup_done_button_container_background</item>
     </style>
+
+    <style name="TV.HalfSizedDialogAnim" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/half_sized_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/half_sized_dialog_exit</item>
+    </style>
+
+    <style name="TV.Dvr.GuidanceTitleStyle" parent="Widget.Setup.GuidanceTitleStyle">
+        <item name="android:layout_toStartOf">@null</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_marginTop">55dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">34sp</item>
+        <item name="android:fontFamily">@string/light_font</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="TV.Dvr.GuidanceDescriptionStyle" parent="Widget.Setup.GuidanceDescriptionStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:fontFamily">@string/light_font</item>
+        <item name="android:textColor">#ADEEEEEE</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="TV.Dvr.GuidedActionsListStyle" parent="Widget.Setup.GuidedActionsListStyle">
+        <item name="android:layout_marginTop">51dp</item>
+    </style>
+
+    <style name="TV.Dvr.GuidedActionItemContainerStyle" parent="Widget.Setup.GuidedActionItemContainerStyle">
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_marginTop">7dp</item>
+    </style>
 </resources>

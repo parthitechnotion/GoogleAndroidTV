@@ -19,9 +19,10 @@ LOCAL_MODULE_TAGS := optional
 # It's not required but keep it for a compatibility with the previous version.
 LOCAL_PRIVILEGED_MODULE := true
 LOCAL_SDK_VERSION := system_current
+LOCAL_MIN_SDK_VERSION := 23  # M
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
-    lib-tv-exoplayer \
+    lib-exoplayer \
     usbtuner-tvinput
 
 LOCAL_RESOURCE_DIR := \
@@ -61,7 +62,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v7-recyclerview \
     android-support-v17-leanback \
     icu4j-usbtuner \
-    lib-tv-exoplayer \
+    lib-exoplayer \
     libprotobuf-java-nano \
     tv-common
 
@@ -97,17 +98,21 @@ LOCAL_SRC_FILES := \
 LOCAL_SDK_VERSION := system_current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
-
 #############################################################
 # Pre-built dependency jars
 #############################################################
+
+# --------------------------------------------------------------
+# ExoPlayer library version 1.5.6
+# https://github.com/google/ExoPlayer/archive/r1.5.6.zip
+# TODO: Add ExoPlayer source code to external/ android repository.
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := \
-   lib-tv-exoplayer:libs/tv-exoplayer.jar \
+   lib-exoplayer:libs/exoplayer_1.5.6.jar
 
 include $(BUILD_MULTI_PREBUILT)
 
