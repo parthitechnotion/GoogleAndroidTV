@@ -22,12 +22,12 @@ import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
+import android.util.ArraySet;
 import android.util.Log;
 
-import com.android.tv.common.CollectionUtils;
+import com.android.tv.common.SoftPreconditions;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
-import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.TvInputManagerHelper;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class ChannelTuner {
 
     private final Handler mHandler = new Handler();
     private final ChannelDataManager mChannelDataManager;
-    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
+    private final Set<Listener> mListeners = new ArraySet<>();
     @Nullable
     private Channel mCurrentChannel;
     private final TvInputManagerHelper mInputManager;

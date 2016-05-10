@@ -29,10 +29,10 @@ import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer.DecoderInitializationException;
+import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioTrack;
-import com.google.android.exoplayer.chunk.MultiTrackChunkSource;
 import com.android.usbtuner.data.Cea708Data;
 import com.android.usbtuner.data.Cea708Data.CaptionEvent;
 import com.android.usbtuner.exoplayer.Cea708TextTrackRenderer.CcListener;
@@ -45,8 +45,7 @@ import java.lang.annotation.RetentionPolicy;
  * MPEG-2 TS stream player implementation using ExoPlayer.
  */
 public class MpegTsPlayer implements ExoPlayer.Listener,
-        MediaCodecVideoTrackRenderer.EventListener, MediaCodecAudioTrackRenderer.EventListener,
-        Ac3TrackRenderer.EventListener {
+        MediaCodecVideoTrackRenderer.EventListener, Ac3TrackRenderer.EventListener {
     private int mCaptionServiceNumber = Cea708Data.EMPTY_SERVICE_NUMBER;
 
     /**
@@ -61,8 +60,7 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
      * Interface definition for {@link RendererBuilder#buildRenderers} to notify the result.
      */
     public interface RendererBuilderCallback {
-        void onRenderers(String[][] trackNames, MultiTrackChunkSource[] multiTrackSources,
-                TrackRenderer[] renderers);
+        void onRenderers(String[][] trackNames, TrackRenderer[] renderers);
         void onRenderersError(Exception e);
     }
 
@@ -138,7 +136,6 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
     private TrackRenderer mVideoRenderer;
     private TrackRenderer mAudioRenderer;
 
-    private MultiTrackChunkSource[] mMultiTrackSources;
     private String[][] mTrackNames;
     private int[] mSelectedTracks;
 
@@ -147,7 +144,7 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
     private VideoEventListener mVideoEventListener;
 
     public MpegTsPlayer(int playerGeneration, RendererBuilder rendererBuilder, Handler handler,
-            AudioCapabilities capabilities) {
+            AudioCapabilities capabilities, Listener listener) {
         mRendererBuilder = rendererBuilder;
         mPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, MIN_BUFFER_MS, MIN_REBUFFER_MS);
         mPlayer.addListener(this);
@@ -158,14 +155,7 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         mRendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
         mSelectedTracks = new int[RENDERER_COUNT];
         mCcListener = new MpegTsCcListener();
-    }
-
-    public void addListener(Listener listener) {
         mListener = listener;
-    }
-
-    public void removeListener(Listener listener) {
-        mListener = null;
     }
 
     public void setVideoEventListener(VideoEventListener videoEventListener) {
@@ -223,25 +213,17 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         mRendererBuilder.buildRenderers(this, source, mBuilderCallback);
     }
 
-    /* package */ void onRenderers(String[][] trackNames,
-            MultiTrackChunkSource[] multiTrackSources, TrackRenderer[] renderers) {
+    /* package */ void onRenderers(String[][] trackNames, TrackRenderer[] renderers) {
         mBuilderCallback = null;
 
         // Normalize the results.
         if (trackNames == null) {
             trackNames = new String[RENDERER_COUNT][];
         }
-        if (multiTrackSources == null) {
-            multiTrackSources = new MultiTrackChunkSource[RENDERER_COUNT];
-        }
         for (int i = 0; i < RENDERER_COUNT; i++) {
             if (renderers[i] == null) {
                 // Convert a null renderer to a dummy renderer.
                 renderers[i] = new DummyTrackRenderer();
-            } else if (trackNames[i] == null) {
-                int trackCount = multiTrackSources[i] == null
-                        ? 1 : multiTrackSources[i].getTrackCount();
-                trackNames[i] = new String[trackCount];
             }
         }
         mVideoRenderer = renderers[TRACK_TYPE_VIDEO];
@@ -251,13 +233,12 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         mPlayer.sendMessage(
                 mTextRenderer, Cea708TextTrackRenderer.MSG_SERVICE_NUMBER, mCaptionServiceNumber);
         mTrackNames = trackNames;
-        mMultiTrackSources = multiTrackSources;
         mRendererBuildingState = RENDERER_BUILDING_STATE_BUILT;
         pushSurface(false);
+        mPlayer.prepare(renderers);
         pushTrackSelection(TRACK_TYPE_VIDEO, true);
         pushTrackSelection(TRACK_TYPE_AUDIO, true);
         pushTrackSelection(TRACK_TYPE_TEXT, true);
-        mPlayer.prepare(renderers);
     }
 
     /* package */ void onRenderersError(Exception e) {
@@ -284,6 +265,7 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         }
         mRendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
         mSurface = null;
+        mListener = null;
         mPlayer.release();
     }
 
@@ -361,7 +343,8 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
     }
 
     @Override
-    public void onVideoSizeChanged(int width, int height, float pixelWidthHeightRatio) {
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
+            float pixelWidthHeightRatio) {
         if (mListener != null) {
             mListener.onVideoSizeChanged(mPlayerGeneration, width, height, pixelWidthHeightRatio);
         }
@@ -446,19 +429,7 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         if (mRendererBuildingState != RENDERER_BUILDING_STATE_BUILT) {
             return;
         }
-
-        int trackIndex = mSelectedTracks[type];
-        if (mMultiTrackSources[type] == null) {
-            mPlayer.setRendererEnabled(type, allowRendererEnable);
-        } else {
-            boolean playWhenReady = mPlayer.getPlayWhenReady();
-            mPlayer.setPlayWhenReady(false);
-            mPlayer.setRendererEnabled(type, false);
-            mPlayer.sendMessage(mMultiTrackSources[type], MultiTrackChunkSource.MSG_SELECT_TRACK,
-                    trackIndex);
-            mPlayer.setRendererEnabled(type, allowRendererEnable);
-            mPlayer.setPlayWhenReady(playWhenReady);
-        }
+        mPlayer.setSelectedTrack(type, allowRendererEnable ? 0 : -1);
     }
 
     private class MpegTsCcListener implements CcListener {
@@ -486,10 +457,9 @@ public class MpegTsPlayer implements ExoPlayer.Listener,
         }
 
         @Override
-        public void onRenderers(String[][] trackNames, MultiTrackChunkSource[] multiTrackSources,
-                TrackRenderer[] renderers) {
+        public void onRenderers(String[][] trackNames, TrackRenderer[] renderers) {
             if (!canceled) {
-                MpegTsPlayer.this.onRenderers(trackNames, multiTrackSources, renderers);
+                MpegTsPlayer.this.onRenderers(trackNames, renderers);
             }
         }
 

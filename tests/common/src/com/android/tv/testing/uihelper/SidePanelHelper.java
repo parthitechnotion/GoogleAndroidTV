@@ -42,6 +42,10 @@ public class SidePanelHelper extends BaseUiDeviceHelper {
                 .hasDescendant(ByResource.text(mTargetResources, titleResId));
     }
 
+    public BySelector byViewText(int textResId) {
+        return By.hasDescendant(ByResource.text(mTargetResources, textResId));
+    }
+
     public UiObject2 assertNavigateToItem(int resId) {
         String title = mTargetResources.getString(resId);
         return assertNavigateToItem(title);

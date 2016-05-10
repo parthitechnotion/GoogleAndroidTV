@@ -56,7 +56,7 @@ public class Menu {
     @IntDef({REASON_NONE, REASON_GUIDE, REASON_PLAY_CONTROLS_PLAY, REASON_PLAY_CONTROLS_PAUSE,
         REASON_PLAY_CONTROLS_PLAY_PAUSE, REASON_PLAY_CONTROLS_REWIND,
         REASON_PLAY_CONTROLS_FAST_FORWARD, REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS,
-        REASON_PLAY_CONTROLS_JUMP_TO_NEXT})
+        REASON_PLAY_CONTROLS_JUMP_TO_NEXT, REASON_RECORDING_PLAYBACK})
     public @interface MenuShowReason {}
     public static final int REASON_NONE = 0;
     public static final int REASON_GUIDE = 1;
@@ -67,6 +67,7 @@ public class Menu {
     public static final int REASON_PLAY_CONTROLS_FAST_FORWARD = 6;
     public static final int REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS = 7;
     public static final int REASON_PLAY_CONTROLS_JUMP_TO_NEXT = 8;
+    public static final int REASON_RECORDING_PLAYBACK = 9;
 
     private static final List<String> sRowIdListForReason = new ArrayList<>();
     static {
@@ -79,6 +80,7 @@ public class Menu {
         sRowIdListForReason.add(PlayControlsRow.ID);  // REASON_PLAY_CONTROLS_FAST_FORWARD
         sRowIdListForReason.add(PlayControlsRow.ID);  // REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS
         sRowIdListForReason.add(PlayControlsRow.ID);  // REASON_PLAY_CONTROLS_JUMP_TO_NEXT
+        sRowIdListForReason.add(PlayControlsRow.ID);  // REASON_RECORDING_PLAYBACK
     }
 
     private static final String SCREEN_NAME = "Menu";

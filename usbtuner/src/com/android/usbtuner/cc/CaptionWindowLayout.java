@@ -91,6 +91,7 @@ public class CaptionWindowLayout extends RelativeLayout implements View.OnLayout
     private CaptionLayout mCaptionLayout;
     private CaptionStyleCompat mCaptionStyleCompat;
 
+    // TODO: Replace SubtitleView to {@link com.google.android.exoplayer.text.SubtitleLayout}.
     private final SubtitleView mSubtitleView;
     private int mRowLimit = 0;
     private final SpannableStringBuilder mBuilder = new SpannableStringBuilder();

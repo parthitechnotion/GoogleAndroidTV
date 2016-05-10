@@ -64,7 +64,9 @@ public class TimelineRow extends TimelineGridView {
     public void onRtlPropertiesChanged(int layoutDirection) {
         super.onRtlPropertiesChanged(layoutDirection);
         // Reset scroll
-        scrollTo(getScrollOffset(), false);
+        if (isAttachedToWindow()) {
+            scrollTo(getScrollOffset(), false);
+        }
     }
 
     @Override

@@ -16,45 +16,12 @@
 
 package com.android.tv.common;
 
-import android.os.Build;
-import android.util.ArrayMap;
-import android.util.ArraySet;
-
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Static utilities for collections
  */
 public class CollectionUtils {
-    /**
-     * Returns a new Set suitable for small data sets.
-     *
-     * <p>In M and above this is a {@link ArraySet} otherwise it is a  {@link HashSet}.
-     */
-    public static <T> Set<T> createSmallSet() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return new ArraySet<>();
-        } else {
-            return new HashSet<>();
-        }
-    }
-
-    /**
-     * Returns a new Map suitable for small data sets.
-     *
-     * <p>In M and above this is a {@link ArrayMap} otherwise it is a {@link HashMap}.
-     */
-    public static <K, V> Map<K, V> createSmallMap() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return new ArrayMap<>();
-        } else {
-            return new HashMap<>();
-        }
-    }
 
     /**
      * Returns an array with the arrays concatenated together.

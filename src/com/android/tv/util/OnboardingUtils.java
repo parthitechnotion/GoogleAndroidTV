@@ -37,7 +37,7 @@ public final class OnboardingUtils {
     private static final int ONBOARDING_VERSION = 1;
 
     private static final String MERCHANT_COLLECTION_URL_STRING =
-            "https://play.google.com/store/apps/collection/promotion_3001bf9_ATV_livechannels";
+            "TODO: put a market link to show TV input apps";
     /**
      * Intent to show merchant collection in play store.
      */
@@ -101,7 +101,7 @@ public final class OnboardingUtils {
         ContentResolver resolver = context.getContentResolver();
         try (Cursor c = resolver.query(Channels.CONTENT_URI, new String[] {Channels._ID}, null,
                 null, null)) {
-            return c.getCount() != 0;
+            return c != null && c.getCount() != 0;
         }
     }
 
