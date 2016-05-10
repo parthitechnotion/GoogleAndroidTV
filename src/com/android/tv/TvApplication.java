@@ -16,6 +16,7 @@
 
 package com.android.tv;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentName;
@@ -23,14 +24,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputManager.TvInputCallback;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.UiThread;
+import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -47,14 +49,17 @@ import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.ProgramDataManager;
 import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.dvr.DvrDataManagerImpl;
-import com.android.tv.dvr.DvrDataManagerInMemoryImpl;
 import com.android.tv.dvr.DvrManager;
 import com.android.tv.dvr.DvrRecordingService;
 import com.android.tv.dvr.DvrSessionManager;
+import com.android.tv.util.Clock;
 import com.android.tv.util.SetupUtils;
 import com.android.tv.util.SystemProperties;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
+import com.android.usbtuner.UsbTunerPreferences;
+import com.android.usbtuner.setup.TunerSetupActivity;
+import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 import java.util.List;
 
@@ -127,7 +132,7 @@ public class TvApplication extends Application implements ApplicationSingletons 
                 handleInputCountChanged();
             }
         });
-        if (CommonFeatures.DVR.isEnabled(this)) {
+        if (CommonFeatures.DVR.isEnabled(this) && BuildCompat.isAtLeastN()) {
             mDvrManager = new DvrManager(this);
             //NOTE: DvrRecordingService just keeps running.
             DvrRecordingService.startService(this);
@@ -148,6 +153,7 @@ public class TvApplication extends Application implements ApplicationSingletons 
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.N)
     public DvrSessionManager getDvrSessionManger() {
         if (mDvrSessionManager == null) {
             mDvrSessionManager = new DvrSessionManager(this);
@@ -199,16 +205,13 @@ public class TvApplication extends Application implements ApplicationSingletons 
     /**
      * Returns {@link DvrDataManager}.
      */
+    @TargetApi(Build.VERSION_CODES.N)
     @Override
     public DvrDataManager getDvrDataManager() {
         if (mDvrDataManager == null) {
-            if(SystemProperties.USE_IN_MEMORY_DVR_DB.getValue()){
-                mDvrDataManager = new DvrDataManagerInMemoryImpl(this);
-            } else {
-                DvrDataManagerImpl dvrDataManager = new DvrDataManagerImpl(this);
+                DvrDataManagerImpl dvrDataManager = new DvrDataManagerImpl(this, Clock.SYSTEM);
                 mDvrDataManager = dvrDataManager;
                 dvrDataManager.start();
-            }
         }
         return mDvrDataManager;
     }
@@ -256,7 +259,9 @@ public class TvApplication extends Application implements ApplicationSingletons 
         boolean hasTunerInput = false;
         for (TvInputInfo input : tvInputs) {
             if (input.isPassthroughInput()) {
-                ++inputCount;
+                if (!input.isHidden(this)) {
+                    ++inputCount;
+                }
             } else if (!hasTunerInput) {
                 hasTunerInput = true;
                 ++inputCount;
@@ -310,17 +315,38 @@ public class TvApplication extends Application implements ApplicationSingletons 
      * {@link SetupUtils}.
      */
     public void handleInputCountChanged() {
+        handleInputCountChanged(false, false, false);
+    }
+
+    /**
+     * Checks the input counts and enable/disable TvActivity. Also updates the input list in
+     * {@link SetupUtils}.
+     *
+     * @param calledByTunerServiceChanged true if it is called when UsbTunerTvInputService
+     *        is enabled or disabled.
+     * @param tunerServiceEnabled it's available only when calledByTunerServiceChanged is true.
+     * @param dontKillApp when TvActivity is enabled or disabled by this method, the app restarts
+     *        by default. But, if dontKillApp is true, the app won't restart.
+     */
+    public void handleInputCountChanged(boolean calledByTunerServiceChanged,
+            boolean tunerServiceEnabled, boolean dontKillApp) {
         TvInputManager inputManager = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
-        boolean enable = false;
-        if (Features.UNHIDE.isEnabled(TvApplication.this)) {
-            enable = true;
-        } else {
+        boolean enable = (calledByTunerServiceChanged && tunerServiceEnabled)
+                || Features.UNHIDE.isEnabled(TvApplication.this);
+        if (!enable) {
             List<TvInputInfo> inputs = inputManager.getTvInputList();
+            boolean skipTunerInputCheck = false;
             // Enable the TvActivity only if there is at least one tuner type input.
-            for (TvInputInfo input : inputs) {
-                if (input.getType() == TvInputInfo.TYPE_TUNER) {
-                    enable = true;
-                    break;
+            if (!skipTunerInputCheck) {
+                for (TvInputInfo input : inputs) {
+                    if (calledByTunerServiceChanged && !tunerServiceEnabled
+                            && UsbTunerTvInputService.getInputId(this).equals(input.getId())) {
+                        continue;
+                    }
+                    if (input.getType() == TvInputInfo.TYPE_TUNER) {
+                        enable = true;
+                        break;
+                    }
                 }
             }
             if (DEBUG) Log.d(TAG, "Enable MainActivity: " + enable);
@@ -330,7 +356,8 @@ public class TvApplication extends Application implements ApplicationSingletons 
         int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
         if (packageManager.getComponentEnabledSetting(name) != newState) {
-            packageManager.setComponentEnabledSetting(name, newState, 0);
+            packageManager.setComponentEnabledSetting(name, newState,
+                    dontKillApp ? PackageManager.DONT_KILL_APP : 0);
         }
         SetupUtils.getInstance(TvApplication.this).onInputListUpdated(inputManager);
     }

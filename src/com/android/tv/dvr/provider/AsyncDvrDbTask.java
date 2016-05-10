@@ -21,19 +21,12 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
-import com.android.tv.data.Channel;
-import com.android.tv.data.Program;
-import com.android.tv.dvr.Recording;
-import com.android.tv.dvr.provider.DvrContract.DvrChannels;
-import com.android.tv.dvr.provider.DvrContract.DvrPrograms;
-import com.android.tv.dvr.provider.DvrContract.RecordingToPrograms;
+import com.android.tv.dvr.ScheduledRecording;
 import com.android.tv.dvr.provider.DvrContract.Recordings;
 import com.android.tv.util.NamedThreadFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -87,14 +80,14 @@ public abstract class AsyncDvrDbTask<Params, Progress, Result>
      * The id will be -1 if there was an error.
      */
     public abstract static class AsyncAddRecordingTask
-            extends AsyncDvrDbTask<Recording, Void, List<Recording>> {
+            extends AsyncDvrDbTask<ScheduledRecording, Void, List<ScheduledRecording>> {
 
         public AsyncAddRecordingTask(Context context) {
             super(context);
         }
 
         @Override
-        protected final List<Recording> doInDvrBackground(Recording... params) {
+        protected final List<ScheduledRecording> doInDvrBackground(ScheduledRecording... params) {
             return sDbHelper.insertRecordings(params);
         }
     }
@@ -106,13 +99,13 @@ public abstract class AsyncDvrDbTask<Params, Progress, Result>
      * if no match was found. The count is expected to be exactly 1 for each recording.
      */
     public abstract static class AsyncUpdateRecordingTask
-            extends AsyncDvrDbTask<Recording, Void, List<Integer>> {
+            extends AsyncDvrDbTask<ScheduledRecording, Void, List<Integer>> {
         public AsyncUpdateRecordingTask(Context context) {
             super(context);
         }
 
         @Override
-        protected final List<Integer> doInDvrBackground(Recording... params) {
+        protected final List<Integer> doInDvrBackground(ScheduledRecording... params) {
             return sDbHelper.updateRecordings(params);
         }
     }
@@ -124,91 +117,43 @@ public abstract class AsyncDvrDbTask<Params, Progress, Result>
      * if no match was found. The count is expected to be exactly 1 for each recording.
      */
     public abstract static class AsyncDeleteRecordingTask
-            extends AsyncDvrDbTask<Recording, Void, List<Integer>> {
+            extends AsyncDvrDbTask<ScheduledRecording, Void, List<Integer>> {
         public AsyncDeleteRecordingTask(Context context) {
             super(context);
         }
 
         @Override
-        protected final List<Integer> doInDvrBackground(Recording... params) {
+        protected final List<Integer> doInDvrBackground(ScheduledRecording... params) {
             return sDbHelper.deleteRecordings(params);
         }
     }
 
     public abstract static class AsyncDvrQueryTask
-            extends AsyncDvrDbTask<Void, Void, List<Recording>> {
+            extends AsyncDvrDbTask<Void, Void, List<ScheduledRecording>> {
         public AsyncDvrQueryTask(Context context) {
             super(context);
         }
 
         @Override
         @Nullable
-        protected final List<Recording> doInDvrBackground(Void... params) {
+        protected final List<ScheduledRecording> doInDvrBackground(Void... params) {
             if (isCancelled()) {
                 return null;
-            }
-            // Read Channels Table.
-            Map<Long, Channel> channelMap = new HashMap<>();
-            try (Cursor c = sDbHelper.query(DvrChannels.TABLE_NAME, Channel.PROJECTION_DVR)) {
-                while (c.moveToNext() && !isCancelled()) {
-                    Channel channel = Channel.fromDvrCursor(c);
-                    channelMap.put(channel.getDvrId(), channel);
-                }
             }
 
             if (isCancelled()) {
                 return null;
             }
-            // Read Programs Table.
-            Map<Long, Program> programMap = new HashMap<>();
-            try (Cursor c = sDbHelper.query(DvrPrograms.TABLE_NAME, Program.PROJECTION_DVR)) {
-                while (c.moveToNext() && !isCancelled()) {
-                    Program program = Program.fromDvrCursor(c);
-                    programMap.put(program.getDvrId(), program);
-                }
-            }
-
             if (isCancelled()) {
                 return null;
             }
-            // Read Mapping Table.
-            Map<Long, List<Long>> recordingToProgramMap = new HashMap<>();
-            try (Cursor c = sDbHelper.query(RecordingToPrograms.TABLE_NAME, new String[] {
-                    RecordingToPrograms.COLUMN_RECORDING_ID,
-                    RecordingToPrograms.COLUMN_PROGRAM_ID})) {
+            List<ScheduledRecording> scheduledRecordings = new ArrayList<>();
+            try (Cursor c = sDbHelper.query(Recordings.TABLE_NAME, ScheduledRecording.PROJECTION)) {
                 while (c.moveToNext() && !isCancelled()) {
-                    long recordingId = c.getLong(0);
-                    List<Long> programList = recordingToProgramMap.get(recordingId);
-                    if (programList == null) {
-                        programList = new ArrayList<>();
-                        recordingToProgramMap.put(recordingId, programList);
-                    }
-                    programList.add(c.getLong(1));
+                    scheduledRecordings.add(ScheduledRecording.fromCursor(c));
                 }
             }
-
-            if (isCancelled()) {
-                return null;
-            }
-            List<Recording> recordings = new ArrayList<>();
-            try (Cursor c = sDbHelper.query(Recordings.TABLE_NAME, Recording.PROJECTION)) {
-                int idIndex = c.getColumnIndex(Recordings._ID);
-                int channelIndex = c.getColumnIndex(Recordings.COLUMN_CHANNEL_ID);
-                while (c.moveToNext() && !isCancelled()) {
-                    Channel channel = channelMap.get(c.getLong(channelIndex));
-                    List<Program> programs = null;
-                    long recordingId = c.getLong(idIndex);
-                    List<Long> programIds = recordingToProgramMap.get(recordingId);
-                    if (programIds != null) {
-                        programs = new ArrayList<>();
-                        for (long programId : programIds) {
-                            programs.add(programMap.get(programId));
-                        }
-                    }
-                    recordings.add(Recording.fromCursor(c, channel, programs));
-                }
-            }
-            return recordings;
+            return scheduledRecordings;
         }
     }
 }

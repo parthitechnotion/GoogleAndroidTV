@@ -16,95 +16,174 @@
 
 package com.android.tv.dvr;
 
+import android.annotation.TargetApi;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.media.tv.TvContract;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.ArraySet;
 import android.util.Log;
 import android.util.Range;
 
-import com.android.tv.dvr.Recording.RecordingState;
+import com.android.tv.common.SoftPreconditions;
+import com.android.tv.common.recording.RecordedProgram;
+import com.android.tv.dvr.ScheduledRecording.RecordingState;
 import com.android.tv.dvr.provider.AsyncDvrDbTask;
 import com.android.tv.dvr.provider.AsyncDvrDbTask.AsyncDvrQueryTask;
-import com.android.tv.util.SoftPreconditions;
+import com.android.tv.util.AsyncDbTask;
+import com.android.tv.util.Clock;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * DVR Data manager to handle recordings and schedules.
  */
 @MainThread
+@TargetApi(Build.VERSION_CODES.N)
 public class DvrDataManagerImpl extends BaseDvrDataManager {
     private static final String TAG = "DvrDataManagerImpl";
+    private static final boolean DEBUG = false;
 
-    private Context mContext;
-    private boolean mLoadFinished;
-    private final HashMap<Long, Recording> mRecordings = new HashMap<>();
-    private AsyncDvrQueryTask mQueryTask;
+    private final HashMap<Long, ScheduledRecording> mScheduledRecordings = new HashMap<>();
+    private final HashMap<Long, ScheduledRecording> mProgramId2ScheduledRecordings =
+            new HashMap<>();
+    private final HashMap<Long, RecordedProgram> mRecordedPrograms = new HashMap<>();
 
-    public DvrDataManagerImpl(Context context) {
-        super(context);
+    private final Context mContext;
+    private final Handler mMainThreadHandler = new Handler(Looper.getMainLooper());
+    private final ContentObserver mContentObserver = new ContentObserver(mMainThreadHandler) {
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, @Nullable final Uri uri) {
+            if (uri == null) {
+                // TODO reload everything.
+            }
+            AsyncRecordedProgramQueryTask task = new AsyncRecordedProgramQueryTask(
+                    mContext.getContentResolver(), uri);
+            task.executeOnDbThread();
+            mPendingTasks.add(task);
+        }
+    };
+
+    private void onObservedChange(Uri uri, RecordedProgram recordedProgram) {
+        long id = ContentUris.parseId(uri);
+        if (DEBUG) {
+            Log.d(TAG, "changed recorded program #" + id + " to " + recordedProgram);
+        }
+        if (recordedProgram == null) {
+            RecordedProgram old = mRecordedPrograms.remove(id);
+            if (old != null) {
+                notifyRecordedProgramRemoved(old);
+            } else {
+                Log.w(TAG, "Could not find old version of deleted program #" + id);
+            }
+        } else {
+            RecordedProgram old = mRecordedPrograms.put(id, recordedProgram);
+            if (old == null) {
+                notifyRecordedProgramAdded(recordedProgram);
+            } else {
+                notifyRecordedProgramChanged(recordedProgram);
+            }
+        }
+    }
+
+    private boolean mDvrLoadFinished;
+    private boolean mRecordedProgramLoadFinished;
+    private final Set<AsyncTask> mPendingTasks = new ArraySet<>();
+
+    public DvrDataManagerImpl(Context context, Clock clock) {
+        super(context, clock);
         mContext = context;
     }
 
     public void start() {
-        mQueryTask = new AsyncDvrQueryTask(mContext) {
+        AsyncDvrQueryTask mDvrQueryTask = new AsyncDvrQueryTask(mContext) {
+
             @Override
-            protected void onPostExecute(List<Recording> result) {
-                mQueryTask = null;
-                mLoadFinished = true;
-                for (Recording r : result) {
-                    mRecordings.put(r.getId(), r);
+            protected void onCancelled(List<ScheduledRecording> scheduledRecordings) {
+                mPendingTasks.remove(this);
+            }
+
+            @Override
+            protected void onPostExecute(List<ScheduledRecording> result) {
+                mPendingTasks.remove(this);
+                mDvrLoadFinished = true;
+                for (ScheduledRecording r : result) {
+                    mScheduledRecordings.put(r.getId(), r);
                 }
             }
         };
-        mQueryTask.executeOnDbThread();
+        mDvrQueryTask.executeOnDbThread();
+        mPendingTasks.add(mDvrQueryTask);
+        AsyncRecordedProgramsQueryTask mRecordedProgramQueryTask =
+                new AsyncRecordedProgramsQueryTask(mContext.getContentResolver());
+        mRecordedProgramQueryTask.executeOnDbThread();
+        ContentResolver cr = mContext.getContentResolver();
+        cr.registerContentObserver(TvContract.RecordedPrograms.CONTENT_URI, true, mContentObserver);
     }
 
     public void stop() {
-        if (mQueryTask != null) {
-            mQueryTask.cancel(true);
-            mQueryTask = null;
+        ContentResolver cr = mContext.getContentResolver();
+        cr.unregisterContentObserver(mContentObserver);
+        Iterator<AsyncTask> i = mPendingTasks.iterator();
+        while (i.hasNext()) {
+            AsyncTask task = i.next();
+            i.remove();
+            task.cancel(true);
         }
     }
 
     @Override
     public boolean isInitialized() {
-        return mLoadFinished;
+        return mDvrLoadFinished && mRecordedProgramLoadFinished;
     }
 
-    @Override
-    public List<Recording> getRecordings() {
-        if (!mLoadFinished) {
+    private List<ScheduledRecording> getScheduledRecordingsPrograms() {
+        if (!mDvrLoadFinished) {
             return Collections.emptyList();
         }
-        ArrayList<Recording> list = new ArrayList<>(mRecordings.size());
-        list.addAll(mRecordings.values());
-        Collections.sort(list, Recording.START_TIME_COMPARATOR);
-        return Collections.unmodifiableList(list);
+        ArrayList<ScheduledRecording> list = new ArrayList<>(mScheduledRecordings.size());
+        list.addAll(mScheduledRecordings.values());
+        Collections.sort(list, ScheduledRecording.START_TIME_COMPARATOR);
+        return list;
     }
 
     @Override
-    public List<Recording> getFinishedRecordings() {
-        return getRecordingsWithState(Recording.STATE_RECORDING_FINISHED);
+    public List<RecordedProgram> getRecordedPrograms() {
+        if (!mRecordedProgramLoadFinished) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(mRecordedPrograms.values());
     }
 
     @Override
-    public List<Recording> getStartedRecordings() {
-        return getRecordingsWithState(Recording.STATE_RECORDING_IN_PROGRESS);
+    public List<ScheduledRecording> getAllScheduledRecordings() {
+        return new ArrayList<>(mScheduledRecordings.values());
     }
 
-    @Override
-    public List<Recording> getScheduledRecordings() {
-        return getRecordingsWithState(Recording.STATE_RECORDING_NOT_STARTED);
-    }
-
-    private List<Recording> getRecordingsWithState(@RecordingState int state) {
-        List<Recording> result = new ArrayList<>();
-        for (Recording r : mRecordings.values()) {
+    protected List<ScheduledRecording> getRecordingsWithState(@RecordingState int state) {
+        List<ScheduledRecording> result = new ArrayList<>();
+        for (ScheduledRecording r : mScheduledRecordings.values()) {
             if (r.getState() == state) {
                 result.add(r);
             }
@@ -120,29 +199,29 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
 
     @Override
     public long getNextScheduledStartTimeAfter(long startTime) {
-        return getNextStartTimeAfter(getRecordings(), startTime);
+        return getNextStartTimeAfter(getScheduledRecordingsPrograms(), startTime);
     }
 
     @VisibleForTesting
-    static long getNextStartTimeAfter(List<Recording> recordings, long startTime) {
+    static long getNextStartTimeAfter(List<ScheduledRecording> scheduledRecordings, long startTime) {
         int start = 0;
-        int end = recordings.size() - 1;
+        int end = scheduledRecordings.size() - 1;
         while (start <= end) {
             int mid = (start + end) / 2;
-            if (recordings.get(mid).getStartTimeMs() <= startTime) {
+            if (scheduledRecordings.get(mid).getStartTimeMs() <= startTime) {
                 start = mid + 1;
             } else {
                 end = mid - 1;
             }
         }
-        return start < recordings.size() ? recordings.get(start).getStartTimeMs()
+        return start < scheduledRecordings.size() ? scheduledRecordings.get(start).getStartTimeMs()
                 : NEXT_START_TIME_NOT_FOUND;
     }
 
     @Override
-    public List<Recording> getRecordingsThatOverlapWith(Range<Long> period) {
-        List<Recording> result = new ArrayList<>();
-        for (Recording r : mRecordings.values()) {
+    public List<ScheduledRecording> getRecordingsThatOverlapWith(Range<Long> period) {
+        List<ScheduledRecording> result = new ArrayList<>();
+        for (ScheduledRecording r : mScheduledRecordings.values()) {
             if (r.isOverLapping(period)) {
                 result.add(r);
             }
@@ -152,38 +231,56 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
 
     @Nullable
     @Override
-    public Recording getRecording(long recordingId) {
-        if (mLoadFinished) {
-            return mRecordings.get(recordingId);
+    public ScheduledRecording getScheduledRecording(long recordingId) {
+        if (mDvrLoadFinished) {
+            return mScheduledRecordings.get(recordingId);
         }
         return null;
     }
 
+    @Nullable
     @Override
-    public void addRecording(final Recording recording) {
+    public ScheduledRecording getScheduledRecordingForProgramId(long programId) {
+        if (mDvrLoadFinished) {
+            return mProgramId2ScheduledRecordings.get(programId);
+        }
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public RecordedProgram getRecordedProgram(long recordingId) {
+        return mRecordedPrograms.get(recordingId);
+    }
+
+    @Override
+    public void addScheduledRecording(final ScheduledRecording scheduledRecording) {
         new AsyncDvrDbTask.AsyncAddRecordingTask(mContext) {
             @Override
-            protected void onPostExecute(List<Recording> recordings) {
-                super.onPostExecute(recordings);
-                SoftPreconditions.checkArgument(recordings.size() == 1);
-                for (Recording r : recordings) {
+            protected void onPostExecute(List<ScheduledRecording> scheduledRecordings) {
+                super.onPostExecute(scheduledRecordings);
+                SoftPreconditions.checkArgument(scheduledRecordings.size() == 1);
+                for (ScheduledRecording r : scheduledRecordings) {
                     if (r.getId() != -1) {
-                        mRecordings.put(r.getId(), r);
-                        notifyRecordingAdded(r);
+                        mScheduledRecordings.put(r.getId(), r);
+                        if (r.getProgramId() != ScheduledRecording.ID_NOT_SET) {
+                            mProgramId2ScheduledRecordings.put(r.getProgramId(), r);
+                        }
+                        notifyScheduledRecordingAdded(r);
                     } else {
                         Log.w(TAG, "Error adding " + r);
                     }
                 }
 
             }
-        }.executeOnDbThread(recording);
+        }.executeOnDbThread(scheduledRecording);
     }
 
     @Override
     public void addSeasonRecording(SeasonRecording seasonRecording) { }
 
     @Override
-    public void removeRecording(final Recording recording) {
+    public void removeScheduledRecording(final ScheduledRecording scheduledRecording) {
         new AsyncDvrDbTask.AsyncDeleteRecordingTask(mContext) {
             @Override
             protected void onPostExecute(List<Integer> counts) {
@@ -191,23 +288,27 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
                 SoftPreconditions.checkArgument(counts.size() == 1);
                 for (Integer c : counts) {
                     if (c == 1) {
-                        mRecordings.remove(recording.getId());
+                        mScheduledRecordings.remove(scheduledRecording.getId());
+                        if (scheduledRecording.getProgramId() != ScheduledRecording.ID_NOT_SET) {
+                            mProgramId2ScheduledRecordings
+                                    .remove(scheduledRecording.getProgramId());
+                        }
                         //TODO change to notifyRecordingUpdated
-                        notifyRecordingRemoved(recording);
+                        notifyScheduledRecordingRemoved(scheduledRecording);
                     } else {
-                        Log.w(TAG, "Error removing " + recording);
+                        Log.w(TAG, "Error removing " + scheduledRecording);
                     }
                 }
 
             }
-        }.executeOnDbThread(recording);
+        }.executeOnDbThread(scheduledRecording);
     }
 
     @Override
     public void removeSeasonSchedule(SeasonRecording seasonSchedule) { }
 
     @Override
-    public void updateRecording(final Recording recording) {
+    public void updateScheduledRecording(final ScheduledRecording scheduledRecording) {
         new AsyncDvrDbTask.AsyncUpdateRecordingTask(mContext) {
             @Override
             protected void onPostExecute(List<Integer> counts) {
@@ -215,15 +316,88 @@ public class DvrDataManagerImpl extends BaseDvrDataManager {
                 SoftPreconditions.checkArgument(counts.size() == 1);
                 for (Integer c : counts) {
                     if (c == 1) {
-                        mRecordings.put(recording.getId(), recording);
+                        ScheduledRecording oldScheduledRecording = mScheduledRecordings
+                                .put(scheduledRecording.getId(), scheduledRecording);
+                        long programId = scheduledRecording.getProgramId();
+                        if (oldScheduledRecording != null
+                                && oldScheduledRecording.getProgramId() != programId
+                                && oldScheduledRecording.getProgramId()
+                                != ScheduledRecording.ID_NOT_SET) {
+                            ScheduledRecording oldValueForProgramId = mProgramId2ScheduledRecordings
+                                    .get(oldScheduledRecording.getProgramId());
+                            if (oldValueForProgramId.getId() == scheduledRecording.getId()) {
+                                //Only remove the old ScheduledRecording if it has the same ID as
+                                // the new one.
+                                mProgramId2ScheduledRecordings
+                                        .remove(oldScheduledRecording.getProgramId());
+                            }
+                        }
+                        if (programId != ScheduledRecording.ID_NOT_SET) {
+                            mProgramId2ScheduledRecordings.put(programId, scheduledRecording);
+                        }
                         //TODO change to notifyRecordingUpdated
-                        notifyRecordingStatusChanged(recording);
+                        notifyScheduledRecordingStatusChanged(scheduledRecording);
                     } else {
-                        Log.w(TAG, "Error updating " + recording);
+                        Log.w(TAG, "Error updating " + scheduledRecording);
                     }
                 }
-
             }
-        }.executeOnDbThread(recording);
+        }.executeOnDbThread(scheduledRecording);
+    }
+
+    private final class AsyncRecordedProgramsQueryTask
+            extends AsyncDbTask.AsyncQueryListTask<RecordedProgram> {
+        public AsyncRecordedProgramsQueryTask(ContentResolver contentResolver) {
+            super(contentResolver, TvContract.RecordedPrograms.CONTENT_URI,
+                    RecordedProgram.PROJECTION, null, null, null);
+        }
+
+        @Override
+        protected RecordedProgram fromCursor(Cursor c) {
+            return RecordedProgram.fromCursor(c);
+        }
+
+        @Override
+        protected void onCancelled(List<RecordedProgram> scheduledRecordings) {
+            mPendingTasks.remove(this);
+        }
+
+        @Override
+        protected void onPostExecute(List<RecordedProgram> result) {
+            mPendingTasks.remove(this);
+            mRecordedProgramLoadFinished = true;
+            if (result != null) {
+                for (RecordedProgram r : result) {
+                    mRecordedPrograms.put(r.getId(), r);
+                }
+            }
+        }
+    }
+
+    private final class AsyncRecordedProgramQueryTask
+            extends AsyncDbTask.AsyncQueryItemTask<RecordedProgram> {
+
+        private final Uri mUri;
+
+        public AsyncRecordedProgramQueryTask(ContentResolver contentResolver, Uri uri) {
+            super(contentResolver, uri, RecordedProgram.PROJECTION, null, null, null);
+            mUri = uri;
+        }
+
+        @Override
+        protected RecordedProgram fromCursor(Cursor c) {
+            return RecordedProgram.fromCursor(c);
+        }
+
+        @Override
+        protected void onCancelled(RecordedProgram recordedProgram) {
+            mPendingTasks.remove(this);
+        }
+
+        @Override
+        protected void onPostExecute(RecordedProgram recordedProgram) {
+            mPendingTasks.remove(this);
+            onObservedChange(mUri, recordedProgram);
+        }
     }
 }

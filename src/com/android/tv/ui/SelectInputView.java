@@ -249,14 +249,16 @@ public class SelectInputView extends VerticalGridView implements
         boolean foundTuner = false;
         for (TvInputInfo input : mTvInputManagerHelper.getTvInputInfos(false, false)) {
             if (input.isPassthroughInput()) {
-                mInputList.add(input);
-                inputMap.put(input.getId(), input);
+                if (!input.isHidden(getContext())) {
+                    mInputList.add(input);
+                    inputMap.put(input.getId(), input);
+                }
             } else if (!foundTuner) {
                 foundTuner = true;
                 mInputList.add(input);
             }
         }
-        // Do not show an AVR if an HDMI device is connected to it.
+        // Do not show HDMI ports if a CEC device is directly connected to the port.
         for (TvInputInfo input : inputMap.values()) {
             if (input.getParentId() != null && !input.isConnectedToHdmiSwitch()) {
                 mInputList.remove(inputMap.get(input.getParentId()));

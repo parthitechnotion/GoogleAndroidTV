@@ -16,7 +16,9 @@
 
 package com.android.tv.recommendation;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.text.TextUtils;
 
 import com.android.tv.data.Program;
 
@@ -36,7 +38,6 @@ public class RoutineWatchEvaluator extends Recommender.Evaluator {
     private static final double TIME_MATCH_WEIGHT = 1 - TITLE_MATCH_WEIGHT;
     private static final long DIFF_MS_TOLERANCE_FOR_OLD_PROGRAM = TimeUnit.DAYS.toMillis(14);
     private static final long MAX_DIFF_MS_FOR_OLD_PROGRAM = TimeUnit.DAYS.toMillis(56);
-    private static final String REGULAR_EXPRESSION_FOR_WHITE_SPACES = "\\s+";
 
     @Override
     public double evaluateChannel(long channelId) {
@@ -91,8 +92,8 @@ public class RoutineWatchEvaluator extends Recommender.Evaluator {
         return maxScore;
     }
 
-    private double calculateRoutineWatchScore(
-            Program currentProgram, Program watchedProgram, long watchedDurationMs) {
+    private static double calculateRoutineWatchScore(Program currentProgram, Program watchedProgram,
+            long watchedDurationMs) {
         double timeMatchScore = calculateTimeMatchScore(currentProgram, watchedProgram);
         double titleMatchScore = calculateTitleMatchScore(
                 currentProgram.getTitle(), watchedProgram.getTitle());
@@ -107,10 +108,16 @@ public class RoutineWatchEvaluator extends Recommender.Evaluator {
                 * watchDurationScore * multiplierForOldProgram;
     }
 
-    private double calculateTitleMatchScore(String title1, String title2) {
+    @VisibleForTesting
+    static double calculateTitleMatchScore(@Nullable String title1, @Nullable String title2) {
+        if (TextUtils.isEmpty(title1) || TextUtils.isEmpty(title2)) {
+            return 0;
+        }
         List<String> wordList1 = splitTextToWords(title1);
         List<String> wordList2 = splitTextToWords(title2);
-
+        if (wordList1.isEmpty() || wordList2.isEmpty()) {
+            return 0;
+        }
         int maxMatchedWordSeqLen = calculateMaximumMatchedWordSequenceLength(
                 wordList1, wordList2);
 
@@ -121,8 +128,8 @@ public class RoutineWatchEvaluator extends Recommender.Evaluator {
     }
 
     @VisibleForTesting
-    int calculateMaximumMatchedWordSequenceLength(
-            List<String> toSearchWords, List<String> toMatchWords) {
+    static int calculateMaximumMatchedWordSequenceLength(List<String> toSearchWords,
+            List<String> toMatchWords) {
         int[] matchedWordSeqLen = new int[toMatchWords.size()];
         int maxMatchedWordSeqLen = 0;
         for (String word : toSearchWords) {
@@ -142,7 +149,7 @@ public class RoutineWatchEvaluator extends Recommender.Evaluator {
         return maxMatchedWordSeqLen;
     }
 
-    private double calculateTimeMatchScore(Program p1, Program p2) {
+    private static double calculateTimeMatchScore(Program p1, Program p2) {
         ProgramTime t1 = ProgramTime.createFromProgram(p1);
         ProgramTime t2 = ProgramTime.createFromProgram(p2);
 
@@ -155,7 +162,7 @@ public class RoutineWatchEvaluator extends Recommender.Evaluator {
     }
 
     @VisibleForTesting
-    double calculateOverlappedIntervalScore(ProgramTime t1, ProgramTime t2) {
+    static double calculateOverlappedIntervalScore(ProgramTime t1, ProgramTime t2) {
         if (t1.dayChanged && !t2.dayChanged) {
             // Swap two values.
             return calculateOverlappedIntervalScore(t2, t1);
@@ -181,7 +188,7 @@ public class RoutineWatchEvaluator extends Recommender.Evaluator {
         return score;
     }
 
-    private double calculateWatchDurationScore(Program program, long durationMs) {
+    private static double calculateWatchDurationScore(Program program, long durationMs) {
         return (double) durationMs
                 / (program.getEndTimeUtcMillis() - program.getStartTimeUtcMillis());
     }

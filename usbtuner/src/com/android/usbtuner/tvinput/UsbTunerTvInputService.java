@@ -16,12 +16,14 @@
 
 package com.android.usbtuner.tvinput;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.media.tv.TvContract;
 import android.os.Environment;
 import android.util.Log;
 
-import com.android.tv.common.recording.TvRecording;
-import com.android.usbtuner.exoplayer.CacheManager;
-import com.android.usbtuner.exoplayer.TrickplayStorageManager;
+import com.android.usbtuner.exoplayer.cache.CacheManager;
+import com.android.usbtuner.exoplayer.cache.TrickplayStorageManager;
 import com.android.usbtuner.util.SystemPropertiesProxy;
 
 import java.io.File;
@@ -39,7 +41,7 @@ public class UsbTunerTvInputService extends BaseTunerTvInputService {
     private static final int MIN_CACHE_SIZE_DEF = 256;  // 256MB
 
     @Override
-    protected void maybeInitCacheManager() {
+    protected CacheManager createCacheManager() {
         int maxCacheSizeMb = SystemPropertiesProxy.getInt(MAX_CACHE_SIZE_KEY, MAX_CACHE_SIZE_DEF);
         if (maxCacheSizeMb >= MIN_CACHE_SIZE_DEF) {
             boolean useExternalStorage = Environment.MEDIA_MOUNTED.equals(
@@ -49,11 +51,15 @@ public class UsbTunerTvInputService extends BaseTunerTvInputService {
             boolean allowToUseInternalStorage = true;
             if (useExternalStorage || allowToUseInternalStorage) {
                 File baseDir = useExternalStorage ? getExternalCacheDir() : getCacheDir();
-                mCacheManager = new CacheManager(
+                return new CacheManager(
                         new TrickplayStorageManager(getApplicationContext(), baseDir,
                                 1024L * 1024 * maxCacheSizeMb));
             }
         }
+        return null;
     }
 
+    public static String getInputId(Context context) {
+        return TvContract.buildInputId(new ComponentName(context, UsbTunerTvInputService.class));
+    }
 }

@@ -16,7 +16,6 @@
 
 package com.android.tv.guide;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,30 +32,24 @@ import com.android.tv.guide.ProgramManager.TableEntry;
  * Adapts a program list for a specific channel from {@link ProgramManager} to a row of the program
  * guide table.
  */
-public class ProgramListAdapter extends
-        RecyclerView.Adapter<ProgramListAdapter.ProgramViewHolder> implements
-        TableEntriesUpdatedListener {
+public class ProgramListAdapter extends RecyclerView.Adapter<ProgramListAdapter.ProgramViewHolder>
+        implements TableEntriesUpdatedListener {
     private static final String TAG = "ProgramListAdapter";
     private static final boolean DEBUG = false;
 
+    private final ProgramManager mProgramManager;
+    private final int mChannelIndex;
     private final String mNoInfoProgramTitle;
     private final String mBlockedProgramTitle;
 
-    private final ProgramManager mProgramManager;
-    private final int mChannelIndex;
-
     private long mChannelId;
 
-    public ProgramListAdapter(Context context, ProgramManager programManager,
-            int channelIndex) {
-        Resources res = context.getResources();
-        mNoInfoProgramTitle = res.getString(
-                R.string.program_title_for_no_information);
-        mBlockedProgramTitle = res.getString(
-                R.string.program_title_for_blocked_channel);
-
+    public ProgramListAdapter(Resources res, ProgramManager programManager, int channelIndex) {
+        setHasStableIds(true);
         mProgramManager = programManager;
         mChannelIndex = channelIndex;
+        mNoInfoProgramTitle = res.getString(R.string.program_title_for_no_information);
+        mBlockedProgramTitle = res.getString(R.string.program_title_for_blocked_channel);
         onTableEntriesUpdated();
     }
 
@@ -76,14 +69,6 @@ public class ProgramListAdapter extends
         return mProgramManager;
     }
 
-    public String getNoInfoProgramTitle() {
-        return mNoInfoProgramTitle;
-    }
-
-    public String getBlockedProgramTitle() {
-        return mBlockedProgramTitle;
-    }
-
     @Override
     public int getItemCount() {
         return mProgramManager.getTableEntryCount(mChannelId);
@@ -95,8 +80,15 @@ public class ProgramListAdapter extends
     }
 
     @Override
+    public long getItemId(int position) {
+        return mProgramManager.getTableEntry(mChannelId, position).getId();
+    }
+
+    @Override
     public void onBindViewHolder(ProgramViewHolder holder, int position) {
-        holder.onBind(mProgramManager.getTableEntry(mChannelId, position), this);
+        TableEntry tableEntry = mProgramManager.getTableEntry(mChannelId, position);
+        String gapTitle = tableEntry.isBlocked() ? mBlockedProgramTitle : mNoInfoProgramTitle;
+        holder.onBind(tableEntry, this.getProgramManager(), gapTitle);
     }
 
     @Override
@@ -116,16 +108,16 @@ public class ProgramListAdapter extends
             super(itemView);
         }
 
-        public void onBind(TableEntry entry, ProgramListAdapter adapter) {
+        public void onBind(TableEntry entry, ProgramManager programManager, String gapTitle) {
             if (DEBUG) {
                 Log.d(TAG, "onBind. View = " + itemView + ", Entry = " + entry);
             }
-
-            ((ProgramItemView) itemView).onBind(entry, adapter);
+            ((ProgramItemView) itemView).setValues(entry, programManager.getSelectedGenreId(),
+                    programManager.getFromUtcMillis(), programManager.getToUtcMillis(), gapTitle);
         }
 
         public void onUnbind() {
-            ((ProgramItemView) itemView).onUnbind();
+            ((ProgramItemView) itemView).clearValues();
         }
     }
 }

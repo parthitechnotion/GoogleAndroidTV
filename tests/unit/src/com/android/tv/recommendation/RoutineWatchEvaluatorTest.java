@@ -22,12 +22,39 @@ import android.test.suitebuilder.annotation.SmallTest;
 import com.android.tv.data.Program;
 import com.android.tv.recommendation.RoutineWatchEvaluator.ProgramTime;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 @SmallTest
 public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEvaluator> {
+    private static class ScoredItem implements Comparable<ScoredItem> {
+        private final String mBase;
+        private final String mText;
+        private final double mScore;
+
+        private ScoredItem(String base, String text) {
+            this.mBase = base;
+            this.mText = text;
+            this.mScore = RoutineWatchEvaluator.calculateTitleMatchScore(base, text);
+        }
+
+        @Override
+        public int compareTo(ScoredItem scoredItem) {
+            return Double.compare(mScore, scoredItem.mScore);
+        }
+
+        @Override
+        public String toString() {
+            return mBase + " scored with " + mText + " is " + mScore;
+        }
+    }
+
+    private static ScoredItem score(String t1, String t2) {
+        return new ScoredItem(t1, t2);
+    }
 
     @Override
     public RoutineWatchEvaluator createEvaluator() {
@@ -53,6 +80,34 @@ public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEva
         assertMaximumMatchedWordSequenceLength(1, "The Simpsons", "The Walking Dead");
         assertMaximumMatchedWordSequenceLength(3, "Game Of Thrones 1", "Game Of Thrones 6");
         assertMaximumMatchedWordSequenceLength(0, "Dexter", "Friends");
+    }
+
+    public void testCalculateTitleMatchScore_empty() {
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore("", ""));
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore("foo", ""));
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore("", "foo"));
+    }
+
+    public void testCalculateTitleMatchScore_spaces() {
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore(" ", " "));
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore("foo", " "));
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore(" ", "foo"));
+    }
+
+
+    public void testCalculateTitleMatchScore_null() {
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore(null, null));
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore("foo", null));
+        assertEquals(0.0, RoutineWatchEvaluator.calculateTitleMatchScore(null, "foo"));
+    }
+
+    public void testCalculateTitleMatchScore_longerMatchIsBetter() {
+        String base = "foo bar baz";
+        assertInOrder(
+                score(base, ""),
+                score(base, "bar"),
+                score(base, "foo bar"),
+                score(base, "foo bar baz"));
     }
 
     public void testProgramTime_createFromProgram() {
@@ -110,18 +165,18 @@ public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEva
 
         // Check intersection time and commutative law in all cases.
         int oneHourInSec = hourMinuteToSec(1, 0);
-        assertOverlappedIntervalScore(2 * oneHourInSec, true,
-                programTimeToday2100_2400, programTimeToday2200_0100);
-        assertOverlappedIntervalScore(0, false,
-                programTimeToday2100_2400, programTimeTomorrow0000_0300);
-        assertOverlappedIntervalScore(2 * oneHourInSec, false,
-                programTimeToday2100_2400, programTimeTomorrow2000_2300);
-        assertOverlappedIntervalScore(oneHourInSec, true,
-                programTimeToday2200_0100, programTimeTomorrow0000_0300);
-        assertOverlappedIntervalScore(oneHourInSec, false,
-                programTimeToday2200_0100, programTimeTomorrow2000_2300);
-        assertOverlappedIntervalScore(0, false,
-                programTimeTomorrow0000_0300, programTimeTomorrow2000_2300);
+        assertOverlappedIntervalScore(2 * oneHourInSec, true, programTimeToday2100_2400,
+                programTimeToday2200_0100);
+        assertOverlappedIntervalScore(0, false, programTimeToday2100_2400,
+                programTimeTomorrow0000_0300);
+        assertOverlappedIntervalScore(2 * oneHourInSec, false, programTimeToday2100_2400,
+                programTimeTomorrow2000_2300);
+        assertOverlappedIntervalScore(oneHourInSec, true, programTimeToday2200_0100,
+                programTimeTomorrow0000_0300);
+        assertOverlappedIntervalScore(oneHourInSec, false, programTimeToday2200_0100,
+                programTimeTomorrow2000_2300);
+        assertOverlappedIntervalScore(0, false, programTimeTomorrow0000_0300,
+                programTimeTomorrow2000_2300);
     }
 
     public void testGetTimeOfDayInSec() {
@@ -139,8 +194,8 @@ public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEva
         MoreAsserts.assertContentsInOrder(wordList, words);
     }
 
-    private void assertMaximumMatchedWordSequenceLength(int expectedLength,
-            String text1, String text2) {
+    private void assertMaximumMatchedWordSequenceLength(int expectedLength, String text1,
+            String text2) {
         List<String> wordList1 = RoutineWatchEvaluator.splitTextToWords(text1);
         List<String> wordList2 = RoutineWatchEvaluator.splitTextToWords(text2);
         assertEquals("MaximumMatchedWordSequenceLength", expectedLength,
@@ -152,10 +207,10 @@ public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEva
     private void assertProgramTime(int expectedWeekDay, int expectedStartTimeOfDayInSec,
             int expectedEndTimeOfDayInSec, ProgramTime actualProgramTime) {
         assertEquals("Weekday", expectedWeekDay, actualProgramTime.weekDay);
-        assertEquals("StartTimeOfDayInSec",
-                expectedStartTimeOfDayInSec, actualProgramTime.startTimeOfDayInSec);
-        assertEquals("EndTimeOfDayInSec",
-                expectedEndTimeOfDayInSec, actualProgramTime.endTimeOfDayInSec);
+        assertEquals("StartTimeOfDayInSec", expectedStartTimeOfDayInSec,
+                actualProgramTime.startTimeOfDayInSec);
+        assertEquals("EndTimeOfDayInSec", expectedEndTimeOfDayInSec,
+                actualProgramTime.endTimeOfDayInSec);
     }
 
     private void assertOverlappedIntervalScore(int expectedSeconds, boolean overlappedOnSameDay,
@@ -165,10 +220,10 @@ public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEva
             score *= RoutineWatchEvaluator.MULTIPLIER_FOR_UNMATCHED_DAY_OF_WEEK;
         }
         // Two tests for testing commutative law.
-        assertEquals("OverlappedIntervalScore",
-                score, mEvaluator.calculateOverlappedIntervalScore(t1, t2));
-        assertEquals("OverlappedIntervalScore",
-                score, mEvaluator.calculateOverlappedIntervalScore(t2, t1));
+        assertEquals("OverlappedIntervalScore", score,
+                mEvaluator.calculateOverlappedIntervalScore(t1, t2));
+        assertEquals("OverlappedIntervalScore", score,
+                mEvaluator.calculateOverlappedIntervalScore(t2, t1));
     }
 
     private int hourMinuteToSec(int hour, int minute) {
@@ -200,9 +255,12 @@ public class RoutineWatchEvaluatorTest extends EvaluatorTestCase<RoutineWatchEva
     private Program createDummyProgram(Calendar startTime, long programDurationMs) {
         long startTimeMs = startTime.getTimeInMillis();
 
-        return new Program.Builder()
-                .setStartTimeUtcMillis(startTimeMs)
-                .setEndTimeUtcMillis(startTimeMs + programDurationMs)
-                .build();
+        return new Program.Builder().setStartTimeUtcMillis(startTimeMs)
+                .setEndTimeUtcMillis(startTimeMs + programDurationMs).build();
+    }
+
+    private static <T> void assertInOrder(T... items) {
+        TreeSet<T> copy = new TreeSet<>(Arrays.asList(items));
+        MoreAsserts.assertContentsInOrder(copy, items);
     }
 }
