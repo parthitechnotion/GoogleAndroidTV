@@ -19,10 +19,13 @@ package com.android.usbtuner.exoplayer;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlaybackException;
+import com.google.android.exoplayer.MediaClock;
+import com.google.android.exoplayer.MediaFormat;
+import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
-import com.google.android.exoplayer.TrackInfo;
 import com.google.android.exoplayer.TrackRenderer;
+import com.google.android.exoplayer.util.Assertions;
 import com.android.usbtuner.cc.Cea708Parser;
 import com.android.usbtuner.cc.Cea708Parser.OnCea708ParserListener;
 import com.android.usbtuner.data.Cea708Data.CaptionEvent;
@@ -41,10 +44,10 @@ public class Cea708TextTrackRenderer extends TrackRenderer implements OnCea708Pa
     // According to CEA-708B, the maximum value of closed caption bandwidth is 9600bps.
     private static final int DEFAULT_INPUT_BUFFER_SIZE = 9600 / 8;
 
-    private SampleSource mSource;
+    private SampleSource.SampleSourceReader mSource;
     private SampleHolder mSampleHolder;
+    private MediaFormatHolder mFormatHolder;
     private int mServiceNumber;
-    private boolean mSourceStateReady;
     private boolean mInputStreamEnded;
     private long mCurrentPositionUs;
     private long mPresentationTimeUs;
@@ -58,14 +61,16 @@ public class Cea708TextTrackRenderer extends TrackRenderer implements OnCea708Pa
     }
 
     public Cea708TextTrackRenderer(SampleSource source) {
-        mSource = source;
+        mSource = source.register();
+        mTrackIndex = -1;
         mSampleHolder = new SampleHolder(SampleHolder.BUFFER_REPLACEMENT_MODE_DIRECT);
-        mSampleHolder.replaceBuffer(DEFAULT_INPUT_BUFFER_SIZE);
+        mSampleHolder.ensureSpaceForWrite(DEFAULT_INPUT_BUFFER_SIZE);
+        mFormatHolder = new MediaFormatHolder();
     }
 
     @Override
-    protected boolean isTimeSource() {
-        return false;
+    protected MediaClock getMediaClock() {
+        return null;
     }
 
     private boolean handlesMimeType(String mimeType) {
@@ -73,31 +78,28 @@ public class Cea708TextTrackRenderer extends TrackRenderer implements OnCea708Pa
     }
 
     @Override
-    protected int doPrepare(long positionUs) throws ExoPlaybackException {
-        try {
-            boolean sourcePrepared = mSource.prepare(positionUs);
-            if (!sourcePrepared) {
-                return TrackRenderer.STATE_UNPREPARED;
-            }
-        } catch (IOException e) {
-            throw new ExoPlaybackException(e);
+    protected boolean doPrepare(long positionUs) throws ExoPlaybackException {
+        boolean sourcePrepared = mSource.prepare(positionUs);
+        if (!sourcePrepared) {
+            return false;
         }
         int trackCount = mSource.getTrackCount();
         for (int i = 0; i < trackCount; ++i) {
-            TrackInfo trackInfo = mSource.getTrackInfo(i);
-            if (handlesMimeType(trackInfo.mimeType)) {
+            MediaFormat trackFormat = mSource.getFormat(i);
+            if (handlesMimeType(trackFormat.mimeType)) {
                 mTrackIndex = i;
                 clearDecodeState();
-                return TrackRenderer.STATE_PREPARED;
+                return true;
             }
         }
-        return TrackRenderer.STATE_IGNORE;
+        // TODO: Check this case. (Source do not have the proper mime type.)
+        return true;
     }
 
     @Override
-    protected void onEnabled(long positionUs, boolean joining) {
+    protected void onEnabled(int track, long positionUs, boolean joining) {
+        Assertions.checkArgument(mTrackIndex != -1 && track == 0);
         mSource.enable(mTrackIndex, positionUs);
-        mSourceStateReady = false;
         mInputStreamEnded = false;
         mPresentationTimeUs = positionUs;
         mCurrentPositionUs = Long.MIN_VALUE;
@@ -121,19 +123,34 @@ public class Cea708TextTrackRenderer extends TrackRenderer implements OnCea708Pa
 
     @Override
     protected boolean isReady() {
-        return mSourceStateReady;
+        // Since this track will be fed by {@link VideoTrackRenderer},
+        // it is not required to control transition between ready state and buffering state.
+        return true;
+    }
+
+    @Override
+    protected int getTrackCount() {
+        return mTrackIndex < 0 ? 0 : 1;
+    }
+
+    @Override
+    protected MediaFormat getFormat(int track) {
+        Assertions.checkArgument(mTrackIndex != -1 && track == 0);
+        return mSource.getFormat(mTrackIndex);
+    }
+
+    @Override
+    protected void maybeThrowError() throws ExoPlaybackException {
+        try {
+            mSource.maybeThrowError();
+        } catch (IOException e) {
+            throw new ExoPlaybackException(e);
+        }
     }
 
     @Override
     protected void doSomeWork(long positionUs, long elapsedRealtimeUs) throws ExoPlaybackException {
         try {
-            boolean continueBuffering = mSource.continueBuffering(positionUs);
-            if (mSourceStateReady != continueBuffering) {
-                mSourceStateReady = continueBuffering;
-                if (DEBUG) {
-                    Log.d(TAG, "mSourceStateReady: " + mSourceStateReady);
-                }
-            }
             mPresentationTimeUs = positionUs;
             if (!mInputStreamEnded) {
                 processOutput();
@@ -155,21 +172,24 @@ public class Cea708TextTrackRenderer extends TrackRenderer implements OnCea708Pa
         if (mInputStreamEnded) {
             return false;
         }
+        long discontinuity = mSource.readDiscontinuity(mTrackIndex);
+        if (discontinuity != SampleSource.NO_DISCONTINUITY) {
+            if (DEBUG) {
+                Log.d(TAG, "Read discontinuity happened");
+            }
+
+            // TODO: handle input discontinuity for trickplay.
+            clearDecodeState();
+            mPresentationTimeUs = discontinuity;
+            return false;
+        }
         mSampleHolder.data.clear();
         mSampleHolder.size = 0;
-        int result = mSource.readData(mTrackIndex, mPresentationTimeUs, null, mSampleHolder, false);
+        int result = mSource.readData(mTrackIndex, mPresentationTimeUs,
+                mFormatHolder, mSampleHolder);
         switch (result) {
             case SampleSource.NOTHING_READ: {
                 return false;
-            }
-            case SampleSource.DISCONTINUITY_READ: {
-                if (DEBUG) {
-                    Log.d(TAG, "Read discontinuity happened");
-                }
-
-                // TODO: handle input discontinuity for trickplay.
-                clearDecodeState();
-                return true;
             }
             case SampleSource.FORMAT_READ: {
                 if (DEBUG) {
@@ -203,26 +223,17 @@ public class Cea708TextTrackRenderer extends TrackRenderer implements OnCea708Pa
 
     @Override
     protected long getDurationUs() {
-        return mSource.getTrackInfo(mTrackIndex).durationUs;
-    }
-
-    @Override
-    protected long getCurrentPositionUs() {
-        mCurrentPositionUs = Math.max(mCurrentPositionUs, mPresentationTimeUs);
-        return mCurrentPositionUs;
+        return mSource.getFormat(mTrackIndex).durationUs;
     }
 
     @Override
     protected long getBufferedPositionUs() {
-        long positionUs = mSource.getBufferedPositionUs();
-        return positionUs == UNKNOWN_TIME_US || positionUs == END_OF_TRACK_US
-                ? positionUs : Math.max(positionUs, getCurrentPositionUs());
+        return mSource.getBufferedPositionUs();
     }
 
     @Override
     protected void seekTo(long currentPositionUs) throws ExoPlaybackException {
         mSource.seekToUs(currentPositionUs);
-        mSourceStateReady = false;
         mInputStreamEnded = false;
         mPresentationTimeUs = currentPositionUs;
         mCurrentPositionUs = Long.MIN_VALUE;

@@ -31,6 +31,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v17.leanback.widget.OnChildSelectedListener;
 import android.support.v17.leanback.widget.SearchOrbView;
 import android.support.v17.leanback.widget.VerticalGridView;
@@ -52,6 +53,7 @@ import com.android.tv.common.WeakHandler;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.GenreItems;
 import com.android.tv.data.ProgramDataManager;
+import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
@@ -160,12 +162,11 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
 
     public ProgramGuide(MainActivity activity, ChannelTuner channelTuner,
             TvInputManagerHelper tvInputManagerHelper, ChannelDataManager channelDataManager,
-            ProgramDataManager programDataManager, Tracker tracker, Runnable preShowRunnable,
-            Runnable postHideRunnable) {
+            ProgramDataManager programDataManager, @Nullable DvrDataManager dvrDataManager,
+            Tracker tracker, Runnable preShowRunnable, Runnable postHideRunnable) {
         mActivity = activity;
-        mProgramManager = new ProgramManager(tvInputManagerHelper,
-                channelDataManager,
-                programDataManager);
+        mProgramManager = new ProgramManager(tvInputManagerHelper, channelDataManager,
+                programDataManager, dvrDataManager);
         mChannelTuner = channelTuner;
         mTracker = tracker;
         mPreShowRunnable = preShowRunnable;
@@ -245,7 +246,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         mTimelineRow.setAdapter(mTimeListAdapter);
 
         ProgramTableAdapter programTableAdapter = new ProgramTableAdapter(mActivity,
-                tvInputManagerHelper, mProgramManager, this);
+                mProgramManager, this);
         programTableAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
@@ -590,7 +591,10 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
         return mTimelineRow.getScrollOffset();
     }
 
-    private void cancelHide() {
+    /**
+     * Cancel hiding the program guide.
+     */
+    public void cancelHide() {
         mHandler.removeCallbacks(mHideRunnable);
     }
 
@@ -720,6 +724,7 @@ public class ProgramGuide implements ProgramGrid.ChildFocusListener {
                 Math.max(mProgramManager.getChannelIndex(mChannelTuner.getCurrentChannel()),
                         0));
         mGrid.resetFocusState();
+        mGrid.onItemSelectionReset();
         mIsDuringResetRowSelection = false;
     }
 

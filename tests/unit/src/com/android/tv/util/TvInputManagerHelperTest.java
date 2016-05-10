@@ -20,6 +20,7 @@ import android.content.pm.ResolveInfo;
 import android.media.tv.TvInputInfo;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.android.tv.testing.ComparatorTester;
 
@@ -34,6 +35,7 @@ import java.util.LinkedHashMap;
  */
 @SmallTest
 public class TvInputManagerHelperTest extends AndroidTestCase {
+    @Suppress  // http://b/26903987
     public void testComparator() throws Exception {
         final LinkedHashMap<String, Boolean> INPUT_ID_TO_PARTNER_INPUT = new LinkedHashMap<>();
         INPUT_ID_TO_PARTNER_INPUT.put("2_partner_input", true);

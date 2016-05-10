@@ -16,6 +16,7 @@
 
 package com.android.usbtuner.setup;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -64,11 +65,9 @@ public class ScanResultFragment extends SetupMultiPaneFragment {
         private int mChannelCountOnPreference;
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            mChannelCountOnPreference = UsbTunerPreferences
-                    .getScannedChannelCount(getActivity().getApplicationContext());
-            return super.onCreateView(inflater, container, savedInstanceState);
+        public void onAttach(Context context) {
+            super.onAttach(context);
+            mChannelCountOnPreference = UsbTunerPreferences.getScannedChannelCount(context);
         }
 
         @NonNull

@@ -79,4 +79,9 @@
     <integer name="max_recycled_view_pool_epg_table_row">15</integer>
     <integer name="max_recycled_view_pool_epg_header_row_item">7</integer>
     <integer name="max_recycled_view_pool_epg_side_panel_row">12</integer>
+
+    <!-- Half sized Dialog -->
+    <integer name="half_sized_dialog_anim_duration">250</integer>
+    <integer name="half_sized_dialog_enter_offset_y">32</integer>
+    <integer name="half_sized_dialog_exit_offset_y">32</integer>
 </resources>

@@ -59,6 +59,7 @@ public class TvViewUiManager {
     private static final boolean DEBUG = false;
 
     private static final float DISPLAY_MODE_EPSILON = 0.001f;
+    private static final float DISPLAY_ASPECT_RATIO_EPSILON = 0.01f;
 
     private final Context mContext;
     private final Resources mResources;
@@ -71,8 +72,8 @@ public class TvViewUiManager {
     private final int mTvViewShrunkenEndMargin;
     private final int mTvViewPapStartMargin;
     private final int mTvViewPapEndMargin;
-    private final int mScreenWidth;
-    private final int mScreenHeight;
+    private int mWindowWidth;
+    private int mWindowHeight;
     private final int mPipViewHorizontalMargin;
     private final int mPipViewTopMargin;
     private final int mPipViewBottomMargin;
@@ -101,28 +102,28 @@ public class TvViewUiManager {
     private ObjectAnimator mBackgroundAnimator;
     private int mBackgroundColor;
     private int mAppliedDisplayedMode = DisplayMode.MODE_NOT_DEFINED;
-    private int mAppliedVideoWidth;
-    private int mAppliedVideoHeight;
     private int mAppliedTvViewStartMargin;
     private int mAppliedTvViewEndMargin;
+    private float mAppliedVideoDisplayAspectRatio;
 
     public TvViewUiManager(Context context, TunableTvView tvView, TunableTvView pipView,
             FrameLayout contentView, TvOptionsManager tvOptionManager) {
         mContext = context;
-        mResources = context.getResources();
+        mResources = mContext.getResources();
         mTvView = tvView;
         mPipView = pipView;
         mContentView = contentView;
         mTvOptionsManager = tvOptionManager;
 
-        DisplayManager displayManager = (DisplayManager) context
+        DisplayManager displayManager = (DisplayManager) mContext
                 .getSystemService(Context.DISPLAY_SERVICE);
         Display display = displayManager.getDisplay(Display.DEFAULT_DISPLAY);
         Point size = new Point();
         display.getSize(size);
-        mScreenWidth = size.x;
-        mScreenHeight = size.y;
+        mWindowWidth = size.x;
+        mWindowHeight = size.y;
 
+        // Have an assumption that PIP and TvView Shrinking happens only in full screen.
         mTvViewShrunkenStartMargin = mResources
                 .getDimensionPixelOffset(R.dimen.shrunken_tvview_margin_start);
         mTvViewShrunkenEndMargin =
@@ -131,7 +132,7 @@ public class TvViewUiManager {
         int papMarginHorizontal = mResources
                 .getDimensionPixelOffset(R.dimen.papview_margin_horizontal);
         int papSpacing = mResources.getDimensionPixelOffset(R.dimen.papview_spacing);
-        mTvViewPapWidth = (mScreenWidth - papSpacing) / 2 - papMarginHorizontal;
+        mTvViewPapWidth = (mWindowWidth - papSpacing) / 2 - papMarginHorizontal;
         mTvViewPapStartMargin = papMarginHorizontal + mTvViewPapWidth + papSpacing;
         mTvViewPapEndMargin = papMarginHorizontal;
         mTvViewFrame = createMarginLayoutParams(0, 0, 0, 0);
@@ -147,6 +148,21 @@ public class TvViewUiManager {
                 .getDimensionPixelOffset(R.dimen.pipview_margin_horizontal);
         mPipViewTopMargin = mResources.getDimensionPixelOffset(R.dimen.pipview_margin_top);
         mPipViewBottomMargin = mResources.getDimensionPixelOffset(R.dimen.pipview_margin_bottom);
+        mContentView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                int windowWidth = right - left;
+                int windowHeight = bottom - top;
+                if (windowWidth > 0 && windowHeight > 0) {
+                    if (mWindowWidth != windowWidth || mWindowHeight != windowHeight) {
+                        mWindowWidth = windowWidth;
+                        mWindowHeight = windowHeight;
+                        applyDisplayMode(mTvView.getVideoDisplayAspectRatio(), false, true);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -170,7 +186,7 @@ public class TvViewUiManager {
         mTvViewEndMarginBeforeShrunken = mTvViewEndMargin;
         if (mPipStarted && getPipLayout() == TvSettings.PIP_LAYOUT_SIDE_BY_SIDE) {
             float sidePanelWidth = mResources.getDimensionPixelOffset(R.dimen.side_panel_width);
-            float factor = 1.0f - sidePanelWidth / mScreenWidth;
+            float factor = 1.0f - sidePanelWidth / mWindowWidth;
             int startMargin = (int) (mTvViewPapStartMargin * factor);
             int endMargin = (int) (mTvViewPapEndMargin * factor + sidePanelWidth);
             setTvViewMargin(startMargin, endMargin);
@@ -209,25 +225,21 @@ public class TvViewUiManager {
         int viewWidth = mContentView.getWidth();
         int viewHeight = mContentView.getHeight();
 
-        int videoWidth = mTvView.getVideoWidth();
-        int videoHeight = mTvView.getVideoHeight();
-
-        if (viewWidth <= 0 || viewHeight <= 0 || videoWidth <= 0 || videoHeight <= 0) {
+        float videoDisplayAspectRatio = mTvView.getVideoDisplayAspectRatio();
+        if (viewWidth <= 0 || viewHeight <= 0 || videoDisplayAspectRatio <= 0f) {
             Log.w(TAG, "Video size is currently unavailable");
             if (DEBUG) {
                 Log.d(TAG, "isDisplayModeAvailable: "
                         + "viewWidth=" + viewWidth
                         + ", viewHeight=" + viewHeight
-                        + ", videoWidth=" + videoWidth
-                        + ", videoHeight="+ videoHeight
+                        + ", videoDisplayAspectRatio=" + videoDisplayAspectRatio
                 );
             }
             return false;
         }
 
         float viewRatio = viewWidth / (float) viewHeight;
-        float videoRatio = videoWidth / (float) videoHeight;
-        return Math.abs(viewRatio - videoRatio) >= DISPLAY_MODE_EPSILON;
+        return Math.abs(viewRatio - videoDisplayAspectRatio) >= DISPLAY_MODE_EPSILON;
     }
 
     /**
@@ -251,7 +263,7 @@ public class TvViewUiManager {
         if (storeInPreference) {
             mSharedPreferences.edit().putInt(TvSettings.PREF_DISPLAY_MODE, displayMode).apply();
         }
-        applyDisplayMode(mTvView.getVideoWidth(), mTvView.getVideoHeight(), animate);
+        applyDisplayMode(mTvView.getVideoDisplayAspectRatio(), animate, false);
         return prev;
     }
 
@@ -268,7 +280,7 @@ public class TvViewUiManager {
      * Updates TvView. It is called when video resolution is updated.
      */
     public void updateTvView() {
-        applyDisplayMode(mTvView.getVideoWidth(), mTvView.getVideoHeight(), false);
+        applyDisplayMode(mTvView.getVideoDisplayAspectRatio(), false, false);
         if (mTvView.isVideoAvailable() && mTvView.isFadedOut()) {
             mTvView.fadeIn(mResources.getInteger(R.integer.tvview_fade_in_duration),
                     mFastOutLinearIn, null);
@@ -507,11 +519,11 @@ public class TvViewUiManager {
                     @Override
                     public void run() {
                         if (DEBUG) {
-                            Log.d(TAG, "setFixedSize: w=" + mTvView.getWidth() + " h=" + mTvView
-                                    .getHeight());
+                            Log.d(TAG, "setFixedSize: w=" + layoutParams.width + " h="
+                                    + layoutParams.height);
                         }
                         mTvView.setLayoutParams(layoutParams);
-                        mTvView.setFixedSurfaceSize(mTvView.getWidth(), mTvView.getHeight());
+                        mTvView.setFixedSurfaceSize(layoutParams.width, layoutParams.height);
                     }
                 });
             } else {
@@ -541,15 +553,14 @@ public class TvViewUiManager {
         if (mPipLayout == TvSettings.PIP_LAYOUT_SIDE_BY_SIDE) {
             gravity = Gravity.CENTER_VERTICAL | Gravity.START;
             height = tvViewFrame.height;
-            int pipVideoWidth = mPipView.getVideoWidth();
-            int pipVideoHeight = mPipView.getVideoHeight();
-            if (pipVideoWidth > 0 && pipVideoHeight > 0) {
-                width = height * pipVideoWidth / pipVideoHeight;
+            float videoDisplayAspectRatio = mPipView.getVideoDisplayAspectRatio();
+            if (videoDisplayAspectRatio <= 0f) {
+                width = tvViewFrame.width;
+            } else {
+                width = (int) (height * videoDisplayAspectRatio);
                 if (width > tvViewFrame.width) {
                     width = tvViewFrame.width;
                 }
-            } else {
-                width = tvViewFrame.width;
             }
             startMargin = mResources.getDimensionPixelOffset(R.dimen.papview_margin_horizontal)
                     * tvViewFrame.width / mTvViewPapWidth + (tvViewFrame.width - width) / 2;
@@ -563,8 +574,8 @@ public class TvViewUiManager {
             int tvEndMargin = tvViewFrame.getMarginEnd();
             int tvTopMargin = tvViewFrame.topMargin;
             int tvBottomMargin = tvViewFrame.bottomMargin;
-            float horizontalScaleFactor = (float) tvViewWidth / mScreenWidth;
-            float verticalScaleFactor = (float) tvViewHeight / mScreenHeight;
+            float horizontalScaleFactor = (float) tvViewWidth / mWindowWidth;
+            float verticalScaleFactor = (float) tvViewHeight / mWindowHeight;
 
             int maxWidth;
             if (mPipSize == TvSettings.PIP_SIZE_SMALL) {
@@ -580,15 +591,14 @@ public class TvViewUiManager {
             } else {
                 throw new IllegalArgumentException("Invalid PIP size: " + mPipSize);
             }
-            int pipVideoWidth = mPipView.getVideoWidth();
-            int pipVideoHeight = mPipView.getVideoHeight();
-            if (pipVideoWidth > 0 && pipVideoHeight > 0) {
-                width = height * pipVideoWidth / pipVideoHeight;
+            float videoDisplayAspectRatio = mPipView.getVideoDisplayAspectRatio();
+            if (videoDisplayAspectRatio <= 0f) {
+                width = maxWidth;
+            } else {
+                width = (int) (height * videoDisplayAspectRatio);
                 if (width > maxWidth) {
                     width = maxWidth;
                 }
-            } else {
-                width = maxWidth;
             }
 
             startMargin = tvStartMargin + (int) (mPipViewHorizontalMargin * horizontalScaleFactor);
@@ -703,31 +713,29 @@ public class TvViewUiManager {
         });
     }
 
-    private void applyDisplayMode(int videoWidth, int videoHeight, boolean animate) {
+    private void applyDisplayMode(float videoDisplayAspectRatio, boolean animate,
+            boolean forceUpdate) {
         if (mAppliedDisplayedMode == mDisplayMode
-                && mAppliedVideoWidth == videoWidth
-                && mAppliedVideoHeight == videoHeight
                 && mAppliedTvViewStartMargin == mTvViewStartMargin
-                && mAppliedTvViewEndMargin == mTvViewEndMargin) {
-            return;
+                && mAppliedTvViewEndMargin == mTvViewEndMargin
+                && Math.abs(mAppliedVideoDisplayAspectRatio - videoDisplayAspectRatio) <
+                        DISPLAY_ASPECT_RATIO_EPSILON) {
+            if (!forceUpdate) {
+                return;
+            }
         } else {
             mAppliedDisplayedMode = mDisplayMode;
-            mAppliedVideoHeight = videoHeight;
-            mAppliedVideoWidth = videoWidth;
             mAppliedTvViewStartMargin = mTvViewStartMargin;
             mAppliedTvViewEndMargin = mTvViewEndMargin;
+            mAppliedVideoDisplayAspectRatio = videoDisplayAspectRatio;
         }
-        int availableAreaWidth = mScreenWidth - mTvViewStartMargin - mTvViewEndMargin;
-        int availableAreaHeight = availableAreaWidth * mScreenHeight / mScreenWidth;
+        int availableAreaWidth = mWindowWidth - mTvViewStartMargin - mTvViewEndMargin;
+        int availableAreaHeight = availableAreaWidth * mWindowHeight / mWindowWidth;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(0, 0,
                 ((FrameLayout.LayoutParams) mTvView.getLayoutParams()).gravity);
         int displayMode = mDisplayMode;
         double availableAreaRatio = 0;
         double videoRatio = 0;
-        if (videoWidth <= 0 || videoHeight <= 0) {
-            videoWidth = mScreenWidth;
-            videoHeight = mScreenHeight;
-        }
         if (availableAreaWidth <= 0 || availableAreaHeight <= 0) {
             displayMode = DisplayMode.MODE_FULL;
             Log.w(TAG, "Some resolution info is missing during applyDisplayMode. ("
@@ -735,10 +743,14 @@ public class TvViewUiManager {
                     + availableAreaHeight + ")");
         } else {
             availableAreaRatio = (double) availableAreaWidth / availableAreaHeight;
-            videoRatio = (double) videoWidth / videoHeight;
+            if (videoDisplayAspectRatio <= 0f) {
+                videoRatio = (double) mWindowWidth / mWindowHeight;
+            } else {
+                videoRatio = videoDisplayAspectRatio;
+            }
         }
 
-        int tvViewFrameTop = (mScreenHeight - availableAreaHeight) / 2;
+        int tvViewFrameTop = (mWindowHeight - availableAreaHeight) / 2;
         MarginLayoutParams tvViewFrame = createMarginLayoutParams(
                 mTvViewStartMargin, mTvViewEndMargin, tvViewFrameTop, tvViewFrameTop);
         layoutParams.width = availableAreaWidth;
@@ -777,7 +789,7 @@ public class TvViewUiManager {
         int marginStart = mTvViewStartMargin + (availableAreaWidth - layoutParams.width) / 2;
         layoutParams.setMarginStart(marginStart);
         // Set marginEnd as well because setTvViewPosition uses both start/end margin.
-        layoutParams.setMarginEnd(mScreenWidth - layoutParams.width - marginStart);
+        layoutParams.setMarginEnd(mWindowWidth - layoutParams.width - marginStart);
 
         setBackgroundColor(Utils.getColor(mResources, isTvViewFullScreen()
                 ? R.color.tvactivity_background : R.color.tvactivity_background_on_shrunken_tvview),
@@ -810,8 +822,8 @@ public class TvViewUiManager {
         lp.setMarginEnd(endMargin);
         lp.topMargin = topMargin;
         lp.bottomMargin = bottomMargin;
-        lp.width = mScreenWidth - startMargin - endMargin;
-        lp.height = mScreenHeight - topMargin - bottomMargin;
+        lp.width = mWindowWidth - startMargin - endMargin;
+        lp.height = mWindowHeight - topMargin - bottomMargin;
         return lp;
     }
 }

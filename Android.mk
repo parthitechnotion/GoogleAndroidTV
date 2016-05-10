@@ -29,10 +29,10 @@ LOCAL_PACKAGE_NAME := LiveTv
 LOCAL_PRIVILEGED_MODULE := true
 
 LOCAL_SDK_VERSION := system_current
+LOCAL_MIN_SDK_VERSION := 23  # M
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res \
     $(LOCAL_PATH)/common/res \
-    $(LOCAL_PATH)/common/res_leanback \
     $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
     $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
 
@@ -55,6 +55,7 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay \
     --version-code $(version_code_package) \
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
+
 
 LOCAL_RESOURCE_DIR += $(LOCAL_PATH)/usbtuner/res
 LOCAL_STATIC_JAVA_LIBRARIES += usbtuner-tvinput
