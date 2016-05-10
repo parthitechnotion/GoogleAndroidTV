@@ -16,20 +16,21 @@
 
 package com.android.tv;
 
+import static com.android.tv.common.feature.EngOnlyFeature.ENG_ONLY_FEATURE;
+import static com.android.tv.common.feature.FeatureUtils.AND;
+import static com.android.tv.common.feature.FeatureUtils.ON;
+import static com.android.tv.common.feature.FeatureUtils.OR;
+
+import android.content.Context;
+import android.os.Build;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.os.BuildCompat;
 
 import com.android.tv.common.feature.Feature;
 import com.android.tv.common.feature.GServiceFeature;
 import com.android.tv.common.feature.PackageVersionFeature;
 import com.android.tv.common.feature.PropertyFeature;
-import com.android.tv.common.feature.SharedPreferencesFeature;
-import com.android.tv.common.feature.TestableFeature;
-
-import static com.android.tv.common.feature.FeatureUtils.AND;
-import static com.android.tv.common.feature.FeatureUtils.ON;
-import static com.android.tv.common.feature.FeatureUtils.OR;
-import static com.android.tv.common.feature.TestableFeature.createTestableFeature;
-import static com.android.tv.common.feature.EngOnlyFeature.ENG_ONLY_FEATURE;
+import com.android.tv.util.PermissionUtils;
 
 /**
  * List of {@link Feature} for the Live TV App.
@@ -43,46 +44,64 @@ public final class Features {
      * <p>Do not turn this on until the splash screen asking existing users to opt-in is launched.
      * See <a href="http://b/20228119">b/20228119</a>
      */
-    public static Feature ANALYTICS_OPT_IN = ENG_ONLY_FEATURE;
+    public static final Feature ANALYTICS_OPT_IN = ENG_ONLY_FEATURE;
 
     /**
      * Analytics that include sensitive information such as channel or program identifiers.
      *
      * <p>See <a href="http://b/22062676">b/22062676</a>
      */
-    public static Feature ANALYTICS_V2 = AND(ON, ANALYTICS_OPT_IN);
+    public static final Feature ANALYTICS_V2 = AND(ON, ANALYTICS_OPT_IN);
 
-    public static Feature EPG_SEARCH = new PropertyFeature("feature_tv_use_epg_search", false);
+    public static final Feature EPG_SEARCH =
+            new PropertyFeature("feature_tv_use_epg_search", false);
 
-    public static SharedPreferencesFeature USB_TUNER = new SharedPreferencesFeature(
-            "usb_tuner", true,
-            OR(ENG_ONLY_FEATURE, new GServiceFeature("usbtuner_enabled", false)));
-    public static Feature DEVELOPER_OPTION = OR(ENG_ONLY_FEATURE,
-            new GServiceFeature("usbtuner_enabled", false));
+    public static final Feature USB_TUNER = new Feature() {
+
+        /**
+         * This is special handling just for USB Tuner.
+         * It does not require any N API's but relies on a improvements in N for AC3 support
+         * After release, change class to this to just be
+         * {@link BuildCompat#isAtLeastN()}.
+         */
+        @Override
+        public boolean isEnabled(Context context) {
+            return Build.VERSION.SDK_INT > Build.VERSION_CODES.M || BuildCompat.isAtLeastN();
+        }
+
+    };
 
     private static final String PLAY_STORE_PACKAGE_NAME = "com.android.vending";
     private static final int PLAY_STORE_ZIMA_VERSION_CODE = 80441186;
-    private static Feature PLAY_STORE_LINK = new PackageVersionFeature(PLAY_STORE_PACKAGE_NAME,
-            PLAY_STORE_ZIMA_VERSION_CODE);
+    private static final Feature PLAY_STORE_LINK =
+            new PackageVersionFeature(PLAY_STORE_PACKAGE_NAME, PLAY_STORE_ZIMA_VERSION_CODE);
 
-    public static Feature ONBOARDING_PLAY_STORE = PLAY_STORE_LINK;
+    public static final Feature ONBOARDING_PLAY_STORE = PLAY_STORE_LINK;
 
     /**
      * A flag which indicates that the on-boarding experience is used or not.
      *
      * <p>See <a href="http://b/24070322">b/24070322</a>
      */
-    public static Feature ONBOARDING_EXPERIENCE = ONBOARDING_PLAY_STORE;
+    public static final Feature ONBOARDING_EXPERIENCE = ONBOARDING_PLAY_STORE;
 
     private static final String GSERVICE_KEY_UNHIDE = "live_channels_unhide";
     /**
      * A flag which indicates that LC app is unhidden even when there is no input.
      */
-    public static Feature UNHIDE = AND(ONBOARDING_EXPERIENCE,
-            new GServiceFeature(GSERVICE_KEY_UNHIDE, false));
+    public static final Feature UNHIDE = AND(ONBOARDING_EXPERIENCE,
+            OR(new GServiceFeature(GSERVICE_KEY_UNHIDE, false), new Feature() {
+                @Override
+                public boolean isEnabled(Context context) {
+                    // If LC app runs as non-system app, we unhide the app.
+                    return !PermissionUtils.hasAccessAllEpg(context);
+                }
+            }));
 
     @VisibleForTesting
     public static Feature TEST_FEATURE = new PropertyFeature("test_feature", false);
+
+    public static final Feature FETCH_EPG = new PropertyFeature("live_channels_fetch_epg", false);
 
     private Features() {
     }

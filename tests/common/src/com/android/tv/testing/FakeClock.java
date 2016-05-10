@@ -81,7 +81,7 @@ public class FakeClock implements Clock {
      * @param unit The time unit to increment by.
      * @param amount The amount of time units to increment by.
      */
-    private void increment(TimeUnit unit, long amount) {
+    public void increment(TimeUnit unit, long amount) {
         mCurrentTimeMillis += unit.toMillis(amount);
     }
 

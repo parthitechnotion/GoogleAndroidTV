@@ -41,6 +41,7 @@ public class ItemListRowView extends MenuRowView implements OnChildSelectedListe
 
     public interface CardView<T> {
         void onBind(T row, boolean selected);
+        void onRecycled();
         void onSelected();
         void onDeselected();
     }
@@ -204,6 +205,13 @@ public class ItemListRowView extends MenuRowView implements OnChildSelectedListe
             @SuppressWarnings("unchecked")
             CardView<T> cardView = (CardView<T>) viewHolder.itemView;
             cardView.onBind(mItemList.get(position), cardView.equals(mItemListView.mSelectedCard));
+        }
+
+        @Override
+        public void onViewRecycled(MyViewHolder viewHolder) {
+            super.onViewRecycled(viewHolder);
+            CardView<T> cardView = (CardView<T>) viewHolder.itemView;
+            cardView.onRecycled();
         }
 
         public static class MyViewHolder extends RecyclerView.ViewHolder {

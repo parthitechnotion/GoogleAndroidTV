@@ -73,22 +73,23 @@ public final class DvrContract {
         public static final String COLUMN_TYPE = "type";
 
         /**
-         * The URI string for the recorded media.
-         *
-         * <p>This field can be null if the media is not recorded yet.
-         *
-         * <p>Type: String
-         */
-        public static final String COLUMN_URI = "uri";
-
-        /**
          * The ID of the channel for recording.
          *
-         * <p>This is a required field. It's not an ID in TvProvider, but in DVR database.
+         * <p>This is a required field.
          *
          * <p>Type: INTEGER (long)
          */
         public static final String COLUMN_CHANNEL_ID = "channel_id";
+
+
+        /**
+         * The  ID of the associated program for recording.
+         *
+         * <p>This is an optional field.
+         *
+         * <p>Type: INTEGER (long)
+         */
+        public static final String COLUMN_PROGRAM_ID = "program_id";
 
         /**
          * The start time of this recording, in milliseconds since the epoch.
@@ -109,13 +110,6 @@ public final class DvrContract {
         public static final String COLUMN_END_TIME_UTC_MILLIS = "end_time_utc_millis";
 
         /**
-         * The size of the stored media in bytes.
-         *
-         * <p>Type: INTEGER (long)
-         */
-        public static final String COLUMN_MEDIA_SIZE = "media_size";
-
-        /**
          * The state of this recording.
          *
          * <p>This value should be one of the followings: {@link #STATE_RECORDING_NOT_STARTED},
@@ -127,49 +121,9 @@ public final class DvrContract {
          * <p>Type: String
          */
         public static final String COLUMN_STATE = "state";
+
+        private Recordings() { }
     }
 
-    /**
-     * Column definition for channels for recording.
-     *
-     * <p>This is the subset of {@link android.media.tv.TvContract.Channels}.
-     */
-    public static final class DvrChannels implements BaseColumns {
-        /** The table name. */
-        public static final String TABLE_NAME = "dvr_channels";
-    }
-
-    /**
-     * Column definition for programs for recording.
-     *
-     * <p>This is the subset of {@link android.media.tv.TvContract.Programs}.
-     */
-    public static final class DvrPrograms implements BaseColumns {
-        /** The table name. */
-        public static final String TABLE_NAME = "dvr_programs";
-    }
-
-    /** Column definition for the mapping from recording to programs */
-    public static final class RecordingToPrograms implements BaseColumns {
-        /** The table name. */
-        public static final String TABLE_NAME = "recording_to_programs";
-
-        /**
-         * The ID of the recording.
-         *
-         * <p>This is a required field.
-         *
-         * <p>Type: INTEGER (long)
-         */
-        public static final String COLUMN_RECORDING_ID = "recording_id";
-
-        /**
-         * The ID of the program.
-         *
-         * <p>This is a required field. It's not an ID in TvProvider, but in DVR database.
-         *
-         * <p>Type: INTEGER (long)
-         */
-        public static final String COLUMN_PROGRAM_ID = "program_id";
-    }
+    private DvrContract() { }
 }

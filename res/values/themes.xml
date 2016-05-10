@@ -34,11 +34,25 @@
         <item name="imageCardViewStyle">@style/Widget.Leanback.ImageCardViewStyle</item>
     </style>
 
+    <style name="Theme.TV.MainActivity" parent="@style/Theme.TV">
+        <item name="setupCommonGuidanceBackground">@color/setup_background</item>
+        <item name="doneButtonContainerStyle">@style/TV.DoneButtonContainerStyle</item>
+        <item name="guidedStepTheme">@style/Theme.TV.GuidedStep</item>
+    </style>
+
     <style name="Theme.TV.dialog.Fullscreen" parent="@style/Theme.TV">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="Theme.TV.dialog.HalfSizedDialog" parent="@style/Theme.TV">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/TV.HalfSizedDialogAnim</item>
     </style>
 
     <style name="Theme.SelectInputActivity" parent="@android:style/Theme.Material.NoActionBar">
@@ -49,8 +63,17 @@
     </style>
 
     <style name="Theme.TV.GuidedStep" parent="Theme.Setup.GuidedStep">
-        <item name="setupCommonGuidanceBackground">@color/setup_background</item>
         <item name="guidedActionsBackground">@color/setup_actions_background</item>
-        <item name="doneButtonContainerStyle">@style/TV.DoneButtonContainerStyle</item>
+    </style>
+
+    <style name="Theme.TV.Dvr.GuidedStep" parent="Theme.Setup.GuidedStep">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="guidedStepBackground">@color/common_tv_background</item>
+        <item name="guidedActionsBackground">@color/common_tv_background</item>
+        <item name="guidanceTitleStyle">@style/TV.Dvr.GuidanceTitleStyle</item>
+        <item name="guidanceDescriptionStyle">@style/TV.Dvr.GuidanceDescriptionStyle</item>
+        <item name="guidedActionsListStyle">@style/TV.Dvr.GuidedActionsListStyle</item>
+        <item name="guidedActionItemContainerStyle">@style/TV.Dvr.GuidedActionItemContainerStyle</item>
+        <item name="guidedActionContentWidthWeight">@string/lb_guidedactions_width_weight</item>
     </style>
 </resources>
