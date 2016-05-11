@@ -20,11 +20,11 @@ import android.content.Context;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputManager.TvInputCallback;
-import android.util.ArraySet;
 import android.util.Log;
 
 import com.android.tv.ChannelTuner;
 import com.android.tv.R;
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 
 import java.util.ArrayList;
@@ -37,7 +37,6 @@ import java.util.Set;
 
 /**
  * A class that manages inputs for PIP. All tuner inputs are represented to one tuner input for PIP.
- * Hidden inputs should not be visible to the users.
  */
 public class PipInputManager {
     private static final String TAG = "PipInputManager";
@@ -51,7 +50,7 @@ public class PipInputManager {
     private final ChannelTuner mChannelTuner;
     private boolean mStarted;
     private final Map<String, PipInput> mPipInputMap = new HashMap<>();  // inputId -> PipInput
-    private final Set<Listener> mListeners = new ArraySet<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
 
     private final TvInputCallback mTvInputCallback = new TvInputCallback() {
         @Override
@@ -183,53 +182,40 @@ public class PipInputManager {
     /**
      * Gets the size of inputs for PIP.
      *
-     * <p>The hidden inputs are not counted.
-     *
-     * @param availableOnly If {@code true}, it counts only available PIP inputs. Please see {@link
+     * @param availableOnly If true, it counts only available PIP inputs. Please see {@link
      *        PipInput#isAvailable()} for the details of availability.
      */
     public int getPipInputSize(boolean availableOnly) {
-        int count = 0;
-        for (PipInput pipInput : mPipInputMap.values()) {
-            if (!pipInput.isHidden() && (!availableOnly || pipInput.mAvailable)) {
-                ++count;
-            }
-            if (pipInput.isPassthrough()) {
-                TvInputInfo info = pipInput.getInputInfo();
-                // Do not count HDMI ports if a CEC device is directly connected to the port.
-                if (info.getParentId() != null && !info.isConnectedToHdmiSwitch()) {
-                    --count;
+        if (availableOnly) {
+            int count = 0;
+            for (PipInput pipInput : mPipInputMap.values()) {
+                if (pipInput.isAvailable()) {
+                    ++count;
                 }
             }
+            return count;
+        } else {
+            return mPipInputMap.size();
         }
-        return count;
     }
 
     /**
-     * Gets the list of inputs for PIP..
-     *
-     * <p>The hidden inputs are excluded.
+     * Gets the list of inputs for PIP.
      *
      * @param availableOnly If true, it returns only available PIP inputs. Please see {@link
      *        PipInput#isAvailable()} for the details of availability.
      */
     public List<PipInput> getPipInputList(boolean availableOnly) {
-        List<PipInput> pipInputs = new ArrayList<>();
-        List<PipInput> removeInputs = new ArrayList<>();
-        for (PipInput pipInput : mPipInputMap.values()) {
-            if (!pipInput.isHidden() && (!availableOnly || pipInput.mAvailable)) {
-                pipInputs.add(pipInput);
-            }
-            if (pipInput.isPassthrough()) {
-                TvInputInfo info = pipInput.getInputInfo();
-                // Do not show HDMI ports if a CEC device is directly connected to the port.
-                if (info.getParentId() != null && !info.isConnectedToHdmiSwitch()) {
-                    removeInputs.add(mPipInputMap.get(info.getParentId()));
+        List<PipInput> pipInputs;
+        if (availableOnly) {
+            pipInputs = new ArrayList<>();
+            for (PipInput pipInput : mPipInputMap.values()) {
+                if (pipInput.mAvailable) {
+                    pipInputs.add(pipInput);
                 }
             }
-        }
-        if (!removeInputs.isEmpty()) {
-            pipInputs.removeAll(removeInputs);
+        } else {
+            pipInputs = new ArrayList<>(mPipInputMap.values());
         }
         Collections.sort(pipInputs, new Comparator<PipInput>() {
             @Override
@@ -339,9 +325,9 @@ public class PipInputManager {
         }
 
         /**
-         * Returns {@code true}, if the input is available for PIP. If a channel of an input is
-         * already played or an input is not connected state or there is no browsable channel, the
-         * input is unavailable.
+         * Returns true, if the input is available for PIP. If a channel of an input is already
+         * played or an input is not connected state or there is no browsable channel, the input
+         * is unavailable.
          */
         public boolean isAvailable() {
             return mAvailable;
@@ -420,11 +406,6 @@ public class PipInputManager {
                     l.onPipInputStateUpdated();
                 }
             }
-        }
-
-        private boolean isHidden() {
-            // mInputInfo is null for the tuner input and it's always visible.
-            return mInputInfo != null && mInputInfo.isHidden(mContext);
         }
     }
 }

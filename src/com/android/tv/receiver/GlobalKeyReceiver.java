@@ -19,7 +19,6 @@ package com.android.tv.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.tv.TvContract;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -40,22 +39,10 @@ public class GlobalKeyReceiver extends BroadcastReceiver {
             if (DEBUG) Log.d(TAG, "onReceive: " + event);
             int keyCode = event.getKeyCode();
             int action = event.getAction();
-            if (action == KeyEvent.ACTION_UP) {
-                switch (keyCode) {
-                    case KeyEvent.KEYCODE_GUIDE:
-                        context.startActivity(
-                                new Intent(Intent.ACTION_VIEW, TvContract.Programs.CONTENT_URI));
-                        break;
-                    case KeyEvent.KEYCODE_TV:
-                        ((TvApplication) context.getApplicationContext()).handleTvKey();
-                        break;
-                    case KeyEvent.KEYCODE_TV_INPUT:
-                        ((TvApplication) context.getApplicationContext()).handleTvInputKey();
-                        break;
-                    default:
-                        // Do nothing
-                        break;
-                }
+            if (keyCode == KeyEvent.KEYCODE_TV && action == KeyEvent.ACTION_UP) {
+                ((TvApplication) context.getApplicationContext()).handleTvKey();
+            } else if (keyCode == KeyEvent.KEYCODE_TV_INPUT && action == KeyEvent.ACTION_UP) {
+                ((TvApplication) context.getApplicationContext()).handleTvInputKey();
             }
         }
     }

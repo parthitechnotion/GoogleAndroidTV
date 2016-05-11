@@ -16,21 +16,18 @@
 
 package com.android.tv.dvr;
 
-import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Context;
-import android.media.tv.TvInputInfo;
-import android.media.tv.TvInputManager;
-import android.media.tv.TvRecordingClient;
-import android.os.Build;
-import android.os.Handler;
+import android.media.tv.TvContract;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.ArrayMap;
-import android.util.Log;
 
-import com.android.tv.common.SoftPreconditions;
 import com.android.tv.common.feature.CommonFeatures;
+import com.android.tv.common.recording.RecordingCapability;
+import com.android.tv.common.recording.TvRecording;
 import com.android.tv.data.Channel;
+import com.android.tv.util.SoftPreconditions;
+import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 /**
  * Manages Dvr Sessions.
@@ -40,91 +37,57 @@ import com.android.tv.data.Channel;
  *     <li>Manage capabilities (conflict)</li>
  * </ul>
  */
-@TargetApi(Build.VERSION_CODES.N)
-public class DvrSessionManager extends TvInputManager.TvInputCallback {
-    //consider moving all of this to TvInputManagerHelper
+public class DvrSessionManager {
     private final static String TAG = "DvrSessionManager";
-    private static final boolean DEBUG = false;
-
     private final Context mContext;
-    private final TvInputManager mTvInputManager;
-    private final ArrayMap<String, TvInputInfo> mRecordingTvInputs = new ArrayMap<>();
+    private TvRecording.TvRecordingClient mRecordingClient;
+    private ArrayMap<String, RecordingCapability> mCapabilityMap = new ArrayMap<>();
 
     public DvrSessionManager(Context context) {
-        this(context, (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE),
-                new Handler());
-    }
-
-    @VisibleForTesting
-    DvrSessionManager(Context context, TvInputManager tvInputManager, Handler handler) {
         SoftPreconditions.checkFeatureEnabled(context, CommonFeatures.DVR, TAG);
-        mTvInputManager = tvInputManager;
         mContext = context.getApplicationContext();
-        for (TvInputInfo info : tvInputManager.getTvInputList()) {
-            if (DEBUG) {
-                Log.d(TAG, info + " canRecord=" + info.canRecord() + " tunerCount=" + info
-                        .getTunerCount());
+        // TODO(DVR): get a session to all clients, for now just get USB a TestInput
+        final String inputId = TvContract
+                .buildInputId(new ComponentName(context, UsbTunerTvInputService.class));
+        mRecordingClient = acquireDvrSession(inputId, null);
+        mRecordingClient.connect(inputId, new TvRecording.ClientCallback() {
+            @Override
+            public void onCapabilityReceived(RecordingCapability capability) {
+                mCapabilityMap.put(inputId, capability);
+                mRecordingClient.release();
+                mRecordingClient = null;
             }
-            if (info.canRecord()) {
-                mRecordingTvInputs.put(info.getId(), info);
-            }
-        }
-        tvInputManager.registerCallback(this, handler);
+        });
+        if (CommonFeatures.DVR.isEnabled(context)) { // STOPSHIP(DVR)
+            String testInputId = "com.android.tv.testinput/.TestTvInputService";
+            mCapabilityMap.put(testInputId,
+                    RecordingCapability.builder()
+                            .setInputId(testInputId)
+                            .setMaxConcurrentPlayingSessions(2)
+                            .setMaxConcurrentTunedSessions(2)
+                            .setMaxConcurrentSessionsOfAllTypes(3)
+                            .build());
 
+        }
     }
 
-    public TvRecordingClient createTvRecordingClient(String tag,
-            TvRecordingClient.RecordingCallback callback, Handler handler) {
-        return new TvRecordingClient(mContext, tag, callback, handler);
+    public TvRecording.TvRecordingClient acquireDvrSession(String inputId, Channel channel) {
+        // TODO(DVR): use input and channel or change API
+        TvRecording.TvRecordingClient sessionClient = new TvRecording.TvRecordingClient(mContext);
+        return sessionClient;
     }
 
     public boolean canAcquireDvrSession(String inputId, Channel channel) {
-        // TODO(DVR): implement checking tuner count etc.
-        TvInputInfo info = mRecordingTvInputs.get(inputId);
-        return info != null;
+        // TODO(DVR): implement
+        return true;
     }
 
-    public void releaseTvRecordingClient(TvRecordingClient recordingClient) {
-        recordingClient.release();
-    }
-
-    @Override
-    public void onInputAdded(String inputId) {
-        super.onInputAdded(inputId);
-        TvInputInfo info = mTvInputManager.getTvInputInfo(inputId);
-        if (DEBUG) {
-            Log.d(TAG, "onInputAdded " + info.toString() + " canRecord=" + info.canRecord()
-                    + " tunerCount=" + info.getTunerCount());
-        }
-        if (info.canRecord()) {
-            mRecordingTvInputs.put(inputId, info);
-        }
-    }
-
-    @Override
-    public void onInputRemoved(String inputId) {
-        super.onInputRemoved(inputId);
-        if (DEBUG) Log.d(TAG, "onInputRemoved " + inputId);
-        mRecordingTvInputs.remove(inputId);
-    }
-
-    @Override
-    public void onInputUpdated(String inputId) {
-        super.onInputUpdated(inputId);
-        TvInputInfo info = mTvInputManager.getTvInputInfo(inputId);
-        if (DEBUG) {
-            Log.d(TAG, "onInputUpdated " + info.toString() + " canRecord=" + info.canRecord()
-                    + " tunerCount=" + info.getTunerCount());
-        }
-        if (info.canRecord()) {
-            mRecordingTvInputs.put(inputId, info);
-        } else {
-            mRecordingTvInputs.remove(inputId);
-        }
+    public void releaseDvrSession(TvRecording.TvRecordingClient session) {
+        session.release();
     }
 
     @Nullable
-    public TvInputInfo getTvInputInfo(String inputId) {
-        return mRecordingTvInputs.get(inputId);
+    public RecordingCapability getRecordingCapability(String inputId) {
+        return mCapabilityMap.get(inputId);
     }
 }

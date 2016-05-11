@@ -20,8 +20,8 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.util.ArraySet;
 
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 
 import java.util.Set;
@@ -34,7 +34,7 @@ import java.util.Set;
 public final class MainActivityWrapper {
     private MainActivity mActivity;
 
-    private final Set<OnCurrentChannelChangeListener> mListeners = new ArraySet<>();
+    private final Set<OnCurrentChannelChangeListener> mListeners = CollectionUtils.createSmallSet();
 
     /**
      * Returns the current main activity.

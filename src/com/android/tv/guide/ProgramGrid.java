@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.support.v17.leanback.widget.VerticalGridView;
-import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -67,16 +66,6 @@ public class ProgramGrid extends VerticalGridView {
                 }
             };
 
-    private final ViewTreeObserver.OnPreDrawListener mPreDrawListener =
-            new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    getViewTreeObserver().removeOnPreDrawListener(this);
-                    updateInputLogo();
-                    return true;
-                }
-            };
-
     private ProgramManager mProgramManager;
     private View mNextFocusByUpDown;
 
@@ -94,7 +83,7 @@ public class ProgramGrid extends VerticalGridView {
     private boolean mKeepCurrentProgram;
 
     private ChildFocusListener mChildFocusListener;
-    private final OnRepeatedKeyInterceptListener mOnRepeatedKeyInterceptListener;
+    private OnRepeatedKeyInterceptListener mOnRepeatedKeyInterceptListener;
 
     interface ChildFocusListener {
         /**
@@ -343,10 +332,6 @@ public class ProgramGrid extends VerticalGridView {
         return contains((View) v.getParent());
     }
 
-    public void onItemSelectionReset() {
-        getViewTreeObserver().addOnPreDrawListener(mPreDrawListener);
-    }
-
     @Override
     public boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
         if (mLastFocusedView != null && mLastFocusedView.isShown()) {
@@ -373,49 +358,6 @@ public class ProgramGrid extends VerticalGridView {
             if (y < minY) scrollBy(0, y - minY);
             int maxY = (mSelectionRow + 1) * mRowHeight + mDetailHeight;
             if (y > maxY) scrollBy(0, y - maxY);
-        }
-        updateInputLogo();
-    }
-
-    @Override
-    public void onViewRemoved(View view) {
-        // It is required to ensure input logo showing when the scroll is moved to most bottom.
-        updateInputLogo();
-    }
-
-    private int getFirstVisibleChildIndex() {
-        final LayoutManager mLayoutManager = getLayoutManager();
-        int top = mLayoutManager.getPaddingTop();
-        int childCount = getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            View childView = getChildAt(i);
-            int childTop = mLayoutManager.getDecoratedTop(childView);
-            int childBottom = mLayoutManager.getDecoratedBottom(childView);
-            if ((childTop + childBottom) / 2 > top) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public void updateInputLogo() {
-        int childCount = getChildCount();
-        if (childCount == 0) {
-            return;
-        }
-        int firstVisibleChildIndex = getFirstVisibleChildIndex();
-        if (firstVisibleChildIndex == -1) {
-            return;
-        }
-        View childView = getChildAt(firstVisibleChildIndex);
-        int childAdapterPosition = getChildAdapterPosition(childView);
-        ((ProgramTableAdapter.ProgramRowHolder) getChildViewHolder(childView))
-                .updateInputLogo(childAdapterPosition, true);
-        for (int i = firstVisibleChildIndex + 1; i < childCount; i++) {
-            childView = getChildAt(i);
-            ((ProgramTableAdapter.ProgramRowHolder) getChildViewHolder(childView))
-                    .updateInputLogo(childAdapterPosition, false);
-            childAdapterPosition = getChildAdapterPosition(childView);
         }
     }
 

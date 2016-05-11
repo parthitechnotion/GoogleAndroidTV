@@ -23,9 +23,9 @@ import android.media.tv.TvInputInfo;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.android.tv.common.SoftPreconditions;
 import com.android.tv.common.TvCommonConstants;
 import com.android.tv.util.SetupUtils;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.TvInputManagerHelper;
 
 /**

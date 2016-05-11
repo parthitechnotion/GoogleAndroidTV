@@ -17,8 +17,9 @@
 package com.android.tv.util;
 
 import android.support.annotation.VisibleForTesting;
-import android.util.ArraySet;
 import android.util.LongSparseArray;
+
+import com.android.tv.common.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Set;
@@ -104,7 +105,7 @@ public class MultiLongSparseArray<T> {
 
     private Set<T> getEmptySet() {
         if (mEmptyIndex < 0) {
-            return new ArraySet<>();
+            return CollectionUtils.createSmallSet();
         }
         Set<T> emptySet = mEmptySets[mEmptyIndex];
         mEmptySets[mEmptyIndex--] = null;

@@ -93,7 +93,4 @@ public class ActionCardView extends FrameLayout implements ItemListRowView.CardV
             Log.d(TAG, "onDeselected: action=" + mLabelView.getText());
         }
     }
-
-    @Override
-    public void onRecycled() { }
 }

@@ -60,12 +60,12 @@
 
     <!-- TV content rating system strings for BR TV. These strings are from
          http://www.justica.gov.br/seus-direitos/classificacao/guia-pratico/practical-guide.pdf/view -->
-    <string name="title_br_tv_l" translatable="false">GA</string>
-    <string name="title_br_tv_10" translatable="false">PG-10</string>
-    <string name="title_br_tv_12" translatable="false">PG-12</string>
-    <string name="title_br_tv_14" translatable="false">PG-14</string>
-    <string name="title_br_tv_16" translatable="false">PG-16</string>
-    <string name="title_br_tv_18" translatable="false">PG-18</string>
+    <string name="title_br_tv_l" translatable="false">Livre</string>
+    <string name="title_br_tv_10" translatable="false">10 anos</string>
+    <string name="title_br_tv_12" translatable="false">12 anos</string>
+    <string name="title_br_tv_14" translatable="false">14 anos</string>
+    <string name="title_br_tv_16" translatable="false">16 anos</string>
+    <string name="title_br_tv_18" translatable="false">18 anos</string>
     <string name="description_br_tv_l" translatable="false">General audiences</string>
     <string name="description_br_tv_10" translatable="false">Not recommended for ages under 10.</string>
     <string name="description_br_tv_12" translatable="false">Not recommended for ages under 12.</string>
@@ -100,33 +100,24 @@
     <string name="description_ca_tv_fr_18" translatable="false">The program is appropriate for viewing by persons 18 years of age or older. Programs reserved for adults most often deal primarily with the representation of explicit sexual encounters.  They may also be extremely violent, showing scenes of hyperrealistic cruelty, torture and horror.</string>
 
     <!-- TV content rating system strings for DVB -->
-    <!-- A TV content rating of DVB for all ages [CHAR LIMIT=NONE] -->
-    <string name="description_fr_dvb_u">Recommended for all ages.</string>
-    <!-- A TV content rating of DVB for all ages [CHAR LIMIT=NONE] -->
-    <string name="description_es_dvb_all">Recommended for all ages.</string>
-    <!-- A TV content rating of DVB for children [CHAR LIMIT=NONE] -->
-    <string name="description_es_dvb_c">Recommended for children.</string>
-    <!-- A TV content rating of DVB for adult [CHAR LIMIT=NONE] -->
-    <string name="description_es_dvb_x">Recommended for adults.</string>
+    <string name="description_fr_dvb_u" translatable="false">Recommended for all ages.</string>
+    <string name="description_es_dvb_all" translatable="false">Recommended for all ages.</string>
+    <string name="description_es_dvb_c" translatable="false">Recommended for children.</string>
+    <string name="description_es_dvb_x" translatable="false">Recommended for adults.</string>
 
     <!-- TV content rating system strings for KR TV. These strings are from
          http://www.law.go.kr/admRulLsInfoP.do?admRulSeq=2000000118507 but they are translated
          from Korean to English. -->
-    <string name="title_kr_tv_all" translatable="false">ALL</string>
-    <string name="title_kr_tv_7" translatable="false">7</string>
-    <string name="title_kr_tv_12" translatable="false">12</string>
-    <string name="title_kr_tv_15" translatable="false">15</string>
-    <string name="title_kr_tv_19" translatable="false">19</string>
-    <!-- A TV content rating of Korea for all ages [CHAR LIMIT=NONE] -->
-    <string name="description_kr_tv_all">Programs do not contain material inappropriate for all ages, and thus are suitable for all ages.</string>
-    <!-- A TV content rating of Korea for persons aged 7 and above [CHAR LIMIT=NONE] -->
-    <string name="description_kr_tv_7">Programs may contain material inappropriate for children under 7, and therefore parental discretion should be used for them.</string>
-    <!-- A TV content rating of Korea for persons aged 12 and above [CHAR LIMIT=NONE] -->
-    <string name="description_kr_tv_12">Programs may contain material inappropriate for children under 12, and therefore parental discretion should be used for them.</string>
-    <!-- A TV content rating of Korea for persons aged 15 and above [CHAR LIMIT=NONE] -->
-    <string name="description_kr_tv_15">Programs may contain material inappropriate for audiences under 15, and therefore parental discretion should be used for them.</string>
-    <!-- A TV content rating of Korea for persons aged 19 and above [CHAR LIMIT=NONE] -->
-    <string name="description_kr_tv_19">Programs may contain material inappropriate for audiences under 19, and thus are not suitable for youngsters under 19.</string>
+    <string name="title_kr_tv_all" translatable="false">모든연령시청가</string>
+    <string name="title_kr_tv_7" translatable="false">7세이상시청가</string>
+    <string name="title_kr_tv_12" translatable="false">12세이상시청가</string>
+    <string name="title_kr_tv_15" translatable="false">15세이상시청가</string>
+    <string name="title_kr_tv_19" translatable="false">19세이상시청가</string>
+    <string name="description_kr_tv_all" translatable="false">Programs do not contain material inappropriate for all ages, and thus are suitable for all ages.</string>
+    <string name="description_kr_tv_7" translatable="false">Programs may contain material inappropriate for children under 7, and therefore parental discretion should be used for them.</string>
+    <string name="description_kr_tv_12" translatable="false">Programs may contain material inappropriate for children under 12, and therefore parental discretion should be used for them.</string>
+    <string name="description_kr_tv_15" translatable="false">Programs may contain material inappropriate for youngsters under 15, and therefore parental discretion should be used for them.</string>
+    <string name="description_kr_tv_19" translatable="false">Programs may contain material inappropriate for youngsters under 19, and thus are not suitable for youngsters under 19.</string>
 
     <!-- TV content rating system strings for SG TV. These strings are from
          http://www.mda.gov.sg/RegulationsAndLicensing/ContentStandardsAndClassification/FilmsAndVideos/Pages/default.aspx -->

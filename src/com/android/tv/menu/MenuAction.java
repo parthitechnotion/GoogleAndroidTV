@@ -36,11 +36,8 @@ public class MenuAction {
     public static final MenuAction SELECT_DISPLAY_MODE_ACTION =
             new MenuAction(R.string.options_item_display_mode, TvOptionsManager.OPTION_DISPLAY_MODE,
                     R.drawable.ic_tvoption_aspect);
-    public static final MenuAction PIP_IN_APP_ACTION =
-            new MenuAction(R.string.options_item_pip, TvOptionsManager.OPTION_IN_APP_PIP,
-                    R.drawable.ic_tvoption_pip);
-    public static final MenuAction SYSTEMWIDE_PIP_ACTION =
-            new MenuAction(R.string.options_item_pip, TvOptionsManager.OPTION_SYSTEMWIDE_PIP,
+    public static final MenuAction PIP_ACTION =
+            new MenuAction(R.string.options_item_pip, TvOptionsManager.OPTION_PIP,
                     R.drawable.ic_tvoption_pip);
     public static final MenuAction SELECT_AUDIO_LANGUAGE_ACTION =
             new MenuAction(R.string.options_item_multi_audio, TvOptionsManager.OPTION_MULTI_AUDIO,

@@ -17,18 +17,59 @@
 package com.android.tv.receiver;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 
+import com.android.tv.TvActivity;
 import com.android.tv.TvApplication;
+import com.android.usbtuner.setup.TunerSetupActivity;
+import com.android.usbtuner.UsbTunerPreferences;
+import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 /**
  * A class for handling the broadcast intents from PackageManager.
  */
 public class PackageIntentsReceiver extends BroadcastReceiver {
+    private PackageManager mPackageManager;
+    private ComponentName mTvActivityComponentName;
+    private ComponentName mUsbTunerComponentName;
+
+    private void init(Context context) {
+        mPackageManager = context.getPackageManager();
+        mTvActivityComponentName = new ComponentName(context, TvActivity.class);
+        mUsbTunerComponentName = new ComponentName(context, UsbTunerTvInputService.class);
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (mPackageManager == null) {
+            init(context);
+        }
         ((TvApplication) context.getApplicationContext()).handleInputCountChanged();
+        // Check the component status of UsbTunerTvInputService and TvActivity here to make sure
+        // start the setup activity of USB tuner TV input service only when those components are
+        // enabled.
+        if (UsbTunerPreferences.shouldShowSetupActivity(context)
+                && Intent.ACTION_PACKAGE_CHANGED.equals(intent.getAction())
+                && mPackageManager.getComponentEnabledSetting(mTvActivityComponentName)
+                == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                && mPackageManager.getComponentEnabledSetting(mUsbTunerComponentName)
+                == PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
+            startUsbTunerSetupActivity(context);
+            UsbTunerPreferences.setShouldShowSetupActivity(context, false);
+        }
+    }
+
+    /**
+     * Launches the setup activity of USB tuner TV input service.
+     *
+     * @param context {@link Context} instance
+     */
+    private static void startUsbTunerSetupActivity(Context context) {
+        Intent intent = TunerSetupActivity.createSetupActivity(context);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 }

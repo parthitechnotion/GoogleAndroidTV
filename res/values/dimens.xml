@@ -166,16 +166,14 @@
     <dimen name="program_guide_table_margin_top">27dp</dimen>
     <dimen name="program_guide_table_margin_bottom">27dp</dimen>
     <dimen name="program_guide_table_margin_start">56dp</dimen>
-    <dimen name="program_guide_table_header_column_width">232dp</dimen>
+    <dimen name="program_guide_table_header_column_width">204dp</dimen>
     <dimen name="program_guide_table_header_column_padding_start">16dp</dimen>
     <dimen name="program_guide_table_header_column_padding_end">16dp</dimen>
     <dimen name="program_guide_table_header_column_channel_number_width">84dp</dimen>
     <dimen name="program_guide_table_header_column_channel_number_large_font_size">32sp</dimen>
     <dimen name="program_guide_table_header_column_channel_number_small_font_size">24sp</dimen>
-    <dimen name="program_guide_table_header_column_channel_number_margin_start">28dp</dimen>
     <dimen name="program_guide_table_header_column_channel_name_width">88dp</dimen>
     <dimen name="program_guide_table_header_column_channel_name_font_size">14sp</dimen>
-    <dimen name="program_guide_table_header_column_channel_name_margin_start">112dp</dimen>
     <dimen name="program_guide_table_header_column_channel_logo_width">70dp</dimen>
     <dimen name="program_guide_table_header_column_channel_logo_height">40dp</dimen>
     <dimen name="program_guide_table_header_column_channel_logo_margin_top">12dp</dimen>
@@ -185,10 +183,6 @@
         @dimen/program_guide_table_header_column_channel_logo_height</dimen>
     <dimen name="program_guide_table_header_column_channel_block_margin_top">
         @dimen/program_guide_table_header_column_channel_logo_margin_top</dimen>
-    <dimen name="program_guide_table_header_column_input_logo_width">18dp</dimen>
-    <dimen name="program_guide_table_header_column_input_logo_height">
-        @dimen/program_guide_table_header_column_input_logo_width</dimen>
-    <dimen name="program_guide_table_header_column_input_logo_margin_top">23dp</dimen>
     <dimen name="program_guide_table_header_row_height">40dp</dimen>
     <dimen name="program_guide_table_header_row_font_size">16sp</dimen>
     <dimen name="program_guide_table_header_row_fade_length">24dp</dimen>
@@ -223,11 +217,11 @@
     <!-- TV view -->
     <dimen name="tvview_block_icon_width">200dp</dimen>
     <dimen name="tvview_block_icon_height">120dp</dimen>
-    <dimen name="tvview_block_vertical_spacing">15dp</dimen>
+    <dimen name="tvview_block_text_padding_top">15dp</dimen>
     <dimen name="tvview_block_text_size">16sp</dimen>
     <dimen name="shrunken_tvview_block_icon_width">60dp</dimen>
     <dimen name="shrunken_tvview_block_icon_height">60dp</dimen>
-    <dimen name="shrunken_tvview_block_vertical_spacing">24dp</dimen>
+    <dimen name="shrunken_tvview_block_text_padding_top">24dp</dimen>
 
     <!-- PIP view -->
     <dimen name="pipview_margin_horizontal">56dp</dimen>
@@ -317,13 +311,4 @@
          + lb_onboarding_welcome_shadow_margin_top(16dp)
          + margin from tv_container(70dp) -->
     <dimen name="onboarding_welcome_arrow_margin_bottom">243dp</dimen>
-
-    <!-- DVR screens -->
-    <eat-comment />
-    <dimen name="dvr_card_layout_width">200dp</dimen>
-    <dimen name="dvr_card_layout_height">200dp</dimen>
-    <!-- card width - margin-->
-    <dimen name="dvr_card_image_layout_width">196dp</dimen>
-    <dimen name="dvr_card_image_layout_height">140dp</dimen>
-
 </resources>

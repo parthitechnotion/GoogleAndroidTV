@@ -24,21 +24,10 @@
     android:paddingStart="@dimen/program_guide_table_header_column_padding_start"
     android:paddingEnd="@dimen/program_guide_table_header_column_padding_end">
 
-    <!-- The top margin is set to ensure input logo is in the same height as channel number.
-         Center gravity doesn't work when the row is selected. -->
-    <ImageView
-        android:id="@+id/input_logo"
-        android:layout_width="@dimen/program_guide_table_header_column_input_logo_width"
-        android:layout_height="@dimen/program_guide_table_header_column_input_logo_height"
-        android:layout_marginTop="@dimen/program_guide_table_header_column_input_logo_margin_top"
-        android:scaleType="fitCenter"
-        android:visibility="gone" />
-
     <TextView
         android:id="@+id/channel_number"
         android:layout_width="@dimen/program_guide_table_header_column_channel_number_width"
         android:layout_height="@dimen/program_guide_table_item_row_height"
-        android:layout_marginStart="@dimen/program_guide_table_header_column_channel_number_margin_start"
         android:gravity="start|center_vertical"
         android:fontFamily="@string/light_font"
         android:textSize="@dimen/program_guide_table_header_column_channel_number_large_font_size"
@@ -48,7 +37,7 @@
         android:id="@+id/channel_name"
         android:layout_width="@dimen/program_guide_table_header_column_channel_name_width"
         android:layout_height="@dimen/program_guide_table_item_row_height"
-        android:layout_marginStart="@dimen/program_guide_table_header_column_channel_name_margin_start"
+        android:layout_marginStart="@dimen/program_guide_table_header_column_channel_number_width"
         android:gravity="start|center_vertical"
         android:fontFamily="@string/condensed_font"
         android:textSize="@dimen/program_guide_table_header_column_channel_name_font_size"
@@ -60,7 +49,7 @@
         android:layout_width="@dimen/program_guide_table_header_column_channel_logo_width"
         android:layout_height="@dimen/program_guide_table_header_column_channel_logo_height"
         android:layout_marginTop="@dimen/program_guide_table_header_column_channel_logo_margin_top"
-        android:layout_marginStart="@dimen/program_guide_table_header_column_channel_name_margin_start"
+        android:layout_marginStart="@dimen/program_guide_table_header_column_channel_number_width"
         android:scaleType="fitStart"
         android:visibility="gone" />
 
@@ -69,7 +58,7 @@
         android:layout_width="@dimen/program_guide_table_header_column_channel_block_width"
         android:layout_height="@dimen/program_guide_table_header_column_channel_block_height"
         android:layout_marginTop="@dimen/program_guide_table_header_column_channel_block_margin_top"
-        android:layout_marginStart="@dimen/program_guide_table_header_column_channel_name_margin_start"
+        android:layout_marginStart="@dimen/program_guide_table_header_column_channel_number_width"
         android:scaleType="center"
         android:src="@drawable/ic_guide_lock"
         android:alpha="@dimen/program_guide_table_header_column_channel_block_opacity"

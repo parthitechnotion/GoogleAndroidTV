@@ -16,155 +16,68 @@
 
 package com.android.tv.dvr;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.MainThread;
-import android.util.ArraySet;
 import android.util.Log;
 
-import com.android.tv.common.SoftPreconditions;
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.common.feature.CommonFeatures;
-import com.android.tv.common.recording.RecordedProgram;
-import com.android.tv.util.Clock;
+import com.android.tv.util.SoftPreconditions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Base implementation of @{link DataManagerInternal}.
  */
 @MainThread
-@TargetApi(Build.VERSION_CODES.N)
 public abstract class BaseDvrDataManager implements WritableDvrDataManager {
     private final static String TAG = "BaseDvrDataManager";
     private final static boolean DEBUG = false;
-    protected final Clock mClock;
 
-    private final Set<ScheduledRecordingListener> mScheduledRecordingListeners = new ArraySet<>();
-    private final Set<RecordedProgramListener> mRecordedProgramListeners = new ArraySet<>();
+    private final Set<DvrDataManager.Listener> mListeners = CollectionUtils.createSmallSet();
 
-    BaseDvrDataManager(Context context, Clock clock) {
+    BaseDvrDataManager (Context context){
         SoftPreconditions.checkFeatureEnabled(context, CommonFeatures.DVR, TAG);
-        mClock = clock;
     }
 
     @Override
-    public final void addScheduledRecordingListener(ScheduledRecordingListener listener) {
-        mScheduledRecordingListeners.add(listener);
+    public final void addListener(DvrDataManager.Listener listener) {
+        mListeners.add(listener);
     }
 
     @Override
-    public final void removeScheduledRecordingListener(ScheduledRecordingListener listener) {
-        mScheduledRecordingListeners.remove(listener);
-    }
-
-    @Override
-    public final void addRecordedProgramListener(RecordedProgramListener listener) {
-        mRecordedProgramListeners.add(listener);
-    }
-
-    @Override
-    public final void removeRecordedProgramListener(RecordedProgramListener listener) {
-        mRecordedProgramListeners.remove(listener);
+    public final void removeListener(DvrDataManager.Listener listener) {
+        mListeners.remove(listener);
     }
 
     /**
-     * Calls {@link RecordedProgramListener#onRecordedProgramAdded(RecordedProgram)}
-     * for each listener.
+     * Calls {@link DvrDataManager.Listener#onRecordingAdded(Recording)} for each current listener.
      */
-    protected final void notifyRecordedProgramAdded(RecordedProgram recordedProgram) {
-        for (RecordedProgramListener l : mRecordedProgramListeners) {
-            if (DEBUG) Log.d(TAG, "notify " + l + "added " + recordedProgram);
-            l.onRecordedProgramAdded(recordedProgram);
+    protected final void notifyRecordingAdded(Recording recording) {
+        for (Listener l : mListeners) {
+            if (DEBUG) Log.d(TAG, "notify " + l + "added recording " + recording);
+            l.onRecordingAdded(recording);
         }
     }
 
     /**
-     * Calls {@link RecordedProgramListener#onRecordedProgramChanged(RecordedProgram)}
-     * for each listener.
+     * Calls {@link DvrDataManager.Listener#onRecordingRemoved(Recording)} for each current listener.
      */
-    protected final void notifyRecordedProgramChanged(RecordedProgram recordedProgram) {
-        for (RecordedProgramListener l : mRecordedProgramListeners) {
-            if (DEBUG) Log.d(TAG, "notify " + l + "changed " + recordedProgram);
-            l.onRecordedProgramChanged(recordedProgram);
+    protected final void notifyRecordingRemoved(Recording recording) {
+        for (Listener l : mListeners) {
+            if (DEBUG) Log.d(TAG, "notify " + l + "removed recording " + recording);
+            l.onRecordingRemoved(recording);
         }
     }
 
     /**
-     * Calls {@link RecordedProgramListener#onRecordedProgramRemoved(RecordedProgram)}
-     * for each  listener.
+     * Calls {@link DvrDataManager.Listener#onRecordingStatusChanged(Recording)} for each current
+     * listener.
      */
-    protected final void notifyRecordedProgramRemoved(RecordedProgram recordedProgram) {
-        for (RecordedProgramListener l : mRecordedProgramListeners) {
-            if (DEBUG) Log.d(TAG, "notify " + l + "removed " + recordedProgram);
-            l.onRecordedProgramRemoved(recordedProgram);
+    protected final void notifyRecordingStatusChanged(Recording recording) {
+        for (Listener l : mListeners) {
+            if (DEBUG) Log.d(TAG, "notify " + l + "changed recording " + recording);
+            l.onRecordingStatusChanged(recording);
         }
     }
-
-    /**
-     * Calls {@link ScheduledRecordingListener#onScheduledRecordingAdded(ScheduledRecording)}
-     * for each listener.
-     */
-    protected final void notifyScheduledRecordingAdded(ScheduledRecording scheduledRecording) {
-        for (ScheduledRecordingListener l : mScheduledRecordingListeners) {
-            if (DEBUG) Log.d(TAG, "notify " + l + "added  " + scheduledRecording);
-            l.onScheduledRecordingAdded(scheduledRecording);
-        }
-    }
-
-    /**
-     * Calls {@link ScheduledRecordingListener#onScheduledRecordingRemoved(ScheduledRecording)}
-     * for each listener.
-     */
-    protected final void notifyScheduledRecordingRemoved(ScheduledRecording scheduledRecording) {
-        for (ScheduledRecordingListener l : mScheduledRecordingListeners) {
-            if (DEBUG) {
-                Log.d(TAG, "notify " + l + "removed " + scheduledRecording);
-            }
-            l.onScheduledRecordingRemoved(scheduledRecording);
-        }
-    }
-
-    /**
-     * Calls
-     * {@link ScheduledRecordingListener#onScheduledRecordingStatusChanged(ScheduledRecording)}
-     * for each listener.
-     */
-    protected final void notifyScheduledRecordingStatusChanged(
-            ScheduledRecording scheduledRecording) {
-        for (ScheduledRecordingListener l : mScheduledRecordingListeners) {
-            if (DEBUG) Log.d(TAG, "notify " + l + "changed " + scheduledRecording);
-            l.onScheduledRecordingStatusChanged(scheduledRecording);
-        }
-    }
-
-    /**
-     * Returns a new list with only {@link ScheduledRecording} with a {@link
-     * ScheduledRecording#getEndTimeMs() endTime} after now.
-     */
-    private List<ScheduledRecording> filterEndTimeIsPast(List<ScheduledRecording> originals) {
-        List<ScheduledRecording> results = new ArrayList<>(originals.size());
-        for (ScheduledRecording r : originals) {
-            if (r.getEndTimeMs() > mClock.currentTimeMillis()) {
-                results.add(r);
-            }
-        }
-        return results;
-    }
-
-    @Override
-    public List<ScheduledRecording> getStartedRecordings() {
-        return filterEndTimeIsPast(
-                getRecordingsWithState(ScheduledRecording.STATE_RECORDING_IN_PROGRESS));
-    }
-
-    @Override
-    public List<ScheduledRecording> getNonStartedScheduledRecordings() {
-        return filterEndTimeIsPast(
-                getRecordingsWithState(ScheduledRecording.STATE_RECORDING_NOT_STARTED));
-    }
-
-    protected abstract List<ScheduledRecording> getRecordingsWithState(int state);
 }

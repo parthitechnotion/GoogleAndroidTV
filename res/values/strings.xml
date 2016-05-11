@@ -392,6 +392,21 @@
     <!-- Menu item that shows the application version(eg 1.2.03-final) as a second line below this title [CHAR LIMIT=35] -->
     <string name="settings_menu_version">Version</string>
 
+    <!-- menu for "Developer options" -->
+    <eat-comment />
+    <!--  Title of "Developer options" option. [CHAR LIMIT=30] -->
+    <string name="side_panel_title_developer">Developer options</string>
+    <!-- Menu switch to turn on/off USB TV tuner feature. [CHAR LIMIT=60] -->
+    <string name="developer_menu_enable_usb_tv_tuner">Enable USB TV tuner</string>
+    <!-- Menu switch description of USB TV tuner switch. [CHAR LIMIT=120] -->
+    <string name="developer_menu_enable_usb_tv_tuner_description">To hear sound of USB TV tuner, your TV should support AC3 passthrough.</string>
+    <!-- Menu item to shows AC3 passthrough capability. [CHAR LIMIT=60] -->
+    <string name="developer_menu_ac3_support">AC3 audio capability</string>
+    <!-- Menu item description when the user's TV supports AC3 passthrough. [CHAR LIMIT=120] -->
+    <string name="developer_menu_ac3_support_yes">Your TV supports AC3 passthrough.</string>
+    <!-- Menu item to shows that the user's TV doesn't support AC3 passthrough. [CHAR LIMIT=120] -->
+    <string name="developer_menu_ac3_support_no">Your TV doesn\'t support AC3 passthrough.</string>
+
     <!-- opt out preferences -->
     <eat-comment />
 
@@ -424,11 +439,6 @@
     <!-- The text message which is shown when the current program is audio only one.
          i.e. The program doesn't have a video. [CHAR LIMIT=NONE] -->
     <string name="tvview_msg_audio_only">Audio only</string>
-    <!-- Message displayed when current channel's signal is too weak to use. [CHAR LIMIT=NONE] -->
-    <string name="tvview_msg_weak_signal">Weak signal</string>
-    <!-- The text message which is shown when the internet connection fails.
-         This message is shown at the center of the screen. [CHAR LIMIT=NONE] -->
-    <string name="tvview_msg_no_internet_connection">No internet connection</string>
 
     <!-- Channel Banner -->
     <eat-comment />
@@ -436,6 +446,8 @@
     <string name="channel_banner_no_title">No title</string>
     <!-- The text used when a channel is locked and program title needs to be hidden. [CHAR LIMIT=NONE] -->
     <string name="channel_banner_locked_channel_title">Channel blocked</string>
+    <!-- The episode title format displayed on the info banner. For example, "S1: Ep. 1 Winter is coming". -->
+    <string name="episode_format">S<xliff:g id="season_number" example="1">%1$d</xliff:g>: Ep. <xliff:g id="episode_number" example="1">%2$d</xliff:g> <xliff:g id="episode_title" example="Winder is coming">%3$s</xliff:g></string>
 
     <!-- Setup Sources Fragment -->
     <eat-comment />
@@ -502,6 +514,8 @@
     <string name="msg_missing_app">No app was found to handle this action.</string>
     <!-- Message when all channels are hidden. [CHAR LIMIT=NONE] -->
     <string name="msg_all_channels_hidden">All source channels are hidden.\nSelect at least one channel to watch.</string>
+    <!-- Message displayed when availability is changed by weak signal. [CHAR LIMIT=NONE] -->
+    <string name="msg_channel_unavailable_weak_signal">Unavailable due to weak video signal</string>
     <!-- Message displayed when availability is changed by unknown reason. [CHAR LIMIT=NONE] -->
     <string name="msg_channel_unavailable_unknown">The video is unexpectedly unavailable</string>
     <!-- Message to notify the different use of Back Button: Home Button(To exit) Back button
@@ -538,14 +552,6 @@
 
     <!-- DVR TODO(DVR): make translatable true. -->
     <eat-comment />
-    <!-- Dialog message to ask to remove the selected recording schedule. -->
-    <string name="epg_dvr_dialog_message_remove_recording_schedule" translatable="false">Remove the scheduled recording?</string>
-    <!-- Dialog message to ask to stop the current recording. -->
-    <string name="epg_dvr_dialog_message_stop_recording" translatable="false">Stop the recording?</string>
-    <!-- Dialog message to ask to schedule the recording of the selected program. -->
-    <string name="epg_dvr_dialog_message_schedule_recording" translatable="false">Schedule the program recording?</string>
-    <!-- Dialog message to ask to delecte the recorded program. -->
-    <string name="epg_dvr_dialog_message_delete_schedule" translatable="false">Delete the recording schedule?</string>
     <!-- Item label to schedule program recording. -->
     <string name="epg_dvr_record_program" translatable="false">Record program</string>
     <!-- Item label to schedule whole season recording of a TV show. -->
@@ -555,22 +561,7 @@
     <string name="epg_dvr_delete_program" translatable="false">Delete schedule</string>
 
     <!-- Menu item label to start DVR manager UI. -->
-    <string name="channels_item_dvr" translatable="false">Recorded programs</string>
-    <!-- Menu item label to start recording of the current channel. -->
-    <string name="channels_item_record_start" translatable="false">Start recording</string>
-    <!-- Menu item label to start recording of the current channel. -->
-    <string name="channels_item_record_stop" translatable="false">Stop recording</string>
-
-    <!-- Item of record start dialog item for 10 min recording. -->
-    <string name="recording_start_dialog_10_min_duration" translatable="false">10 min.</string>
-    <!-- Item of record start dialog item for 30 min recording. -->
-    <string name="recording_start_dialog_30_min_duration" translatable="false">30 min.</string>
-    <!-- Item of record start dialog item for 1 hour recording. -->
-    <string name="recording_start_dialog_1_hour_duration" translatable="false">1 hour</string>
-    <!-- Item of record start dialog item for 3 min recording. -->
-    <string name="recording_start_dialog_3_hours_duration" translatable="false">3 hours</string>
-    <!-- Item of record start dialog item until the end of the current program. -->
-    <string name="recording_start_dialog_till_end_of_program" translatable="false">End of program</string>
+    <string name="channels_item_dvr" translatable="false">DVR</string>
 
     <!--TODO(DVR): decide if translation needed Name of DVR service [CHAR LIMIT=NONE]  -->
     <string name="dvr_service_name" translatable="false">DVR Service</string>

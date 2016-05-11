@@ -18,7 +18,6 @@ package com.android.tv.ui.sidepanel.parentalcontrols;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.ArrayMap;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -42,7 +41,6 @@ import com.android.tv.util.TvSettings.ContentRatingLevel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class RatingsFragment extends SideFragment {
     private static final SparseIntArray sLevelResourceIdMap;
@@ -75,9 +73,6 @@ public class RatingsFragment extends SideFragment {
     }
 
     private final List<RatingLevelItem> mRatingLevelItems = new ArrayList<>();
-    // A map from the rating system ID string to RatingItem objects.
-    private final Map<String, List<RatingItem>> mContentRatingSystemItemMap = new ArrayMap<>();
-    private ParentalControlSettings mParentalControlSettings;
 
     public static String getDescription(MainActivity tvActivity) {
         @ContentRatingLevel int currentLevel =
@@ -109,32 +104,18 @@ public class RatingsFragment extends SideFragment {
         updateRatingLevels();
         items.addAll(mRatingLevelItems);
 
-        mContentRatingSystemItemMap.clear();
-
         List<ContentRatingSystem> contentRatingSystems =
                 getMainActivity().getContentRatingsManager().getContentRatingSystems();
         Collections.sort(contentRatingSystems, ContentRatingSystem.DISPLAY_NAME_COMPARATOR);
 
         for (ContentRatingSystem s : contentRatingSystems) {
-            if (mParentalControlSettings.isContentRatingSystemEnabled(s)) {
-                List<RatingItem> ratingItems = new ArrayList<>();
-                boolean hasSubRating = false;
+            if (getMainActivity().getParentalControlSettings().isContentRatingSystemEnabled(s)) {
                 items.add(new DividerItem(s.getDisplayName()));
                 for (Rating rating : s.getRatings()) {
-                    RatingItem item = rating.getSubRatings().isEmpty() ?
+                    RatingItem item = rating.getSubRatings().size() == 0 ?
                             new RatingItem(s, rating) :
                             new RatingWithSubItem(s, rating);
                     items.add(item);
-                    if (rating.getSubRatings().isEmpty()) {
-                        ratingItems.add(item);
-                    } else {
-                        hasSubRating = true;
-                    }
-                }
-                // Only include rating systems that don't contain any sub ratings in the map for
-                // simplicity.
-                if (!hasSubRating) {
-                    mContentRatingSystemItemMap.put(s.getId(), ratingItems);
                 }
             }
         }
@@ -150,8 +131,7 @@ public class RatingsFragment extends SideFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mParentalControlSettings = getMainActivity().getParentalControlSettings();
-        mParentalControlSettings.loadRatings();
+        getMainActivity().getParentalControlSettings().loadRatings();
     }
 
     @Override
@@ -166,24 +146,10 @@ public class RatingsFragment extends SideFragment {
     }
 
     private void updateRatingLevels() {
-        @ContentRatingLevel int ratingLevel = mParentalControlSettings.getContentRatingLevel();
+        @ContentRatingLevel int ratingLevel =
+                getMainActivity().getParentalControlSettings().getContentRatingLevel();
         for (RatingLevelItem ratingLevelItem : mRatingLevelItems) {
             ratingLevelItem.setChecked(ratingLevel == ratingLevelItem.mRatingLevel);
-        }
-    }
-
-    private void updateDependentRatingItems(ContentRatingSystem.Order order,
-            int selectedRatingOrderIndex, String contentRatingSystemId, boolean isChecked) {
-        List<RatingItem> ratingItems = mContentRatingSystemItemMap.get(contentRatingSystemId);
-        if (ratingItems != null) {
-            for (RatingItem item : ratingItems) {
-                int ratingOrderIndex = item.getRatingOrderIndex(order);
-                if (ratingOrderIndex != -1
-                        && ((ratingOrderIndex > selectedRatingOrderIndex && isChecked)
-                        || (ratingOrderIndex < selectedRatingOrderIndex && !isChecked))) {
-                    item.setRatingBlocked(isChecked);
-                }
-            }
         }
     }
 
@@ -200,7 +166,7 @@ public class RatingsFragment extends SideFragment {
         @Override
         protected void onSelected() {
             super.onSelected();
-            mParentalControlSettings.setContentRatingLevel(
+            getMainActivity().getParentalControlSettings().setContentRatingLevel(
                     getMainActivity().getContentRatingsManager(), mRatingLevel);
             notifyItemsChanged(mRatingLevelItems.size());
         }
@@ -211,21 +177,12 @@ public class RatingsFragment extends SideFragment {
         protected final Rating mRating;
         private final Drawable mIcon;
         private CompoundButton mCompoundButton;
-        private final List<ContentRatingSystem.Order> mOrders = new ArrayList<>();
-        private final List<Integer> mOrderIndexes = new ArrayList<>();
 
         private RatingItem(ContentRatingSystem contentRatingSystem, Rating rating) {
             super(rating.getTitle(), rating.getDescription());
             mContentRatingSystem = contentRatingSystem;
             mRating = rating;
             mIcon = rating.getIcon();
-            for (ContentRatingSystem.Order order : mContentRatingSystem.getOrders()) {
-                int orderIndex = order.getRatingIndex(mRating);
-                if (orderIndex != -1) {
-                    mOrders.add(order);
-                    mOrderIndexes.add(orderIndex);
-                }
-            }
         }
 
         @Override
@@ -254,20 +211,16 @@ public class RatingsFragment extends SideFragment {
         protected void onUpdate() {
             super.onUpdate();
             mCompoundButton.setButtonDrawable(getButtonDrawable());
-            setChecked(mParentalControlSettings.isRatingBlocked(mContentRatingSystem, mRating));
+            setChecked(getMainActivity().getParentalControlSettings().isRatingBlocked(
+                    mContentRatingSystem, mRating));
         }
 
         @Override
         protected void onSelected() {
             super.onSelected();
-            if (mParentalControlSettings.setRatingBlocked(
-                    mContentRatingSystem, mRating, isChecked())) {
+            if (getMainActivity().getParentalControlSettings()
+                    .setRatingBlocked(mContentRatingSystem, mRating, isChecked())) {
                 updateRatingLevels();
-            }
-            // Automatically check/uncheck dependent ratings.
-            for (int i = 0; i < mOrders.size(); i++) {
-                updateDependentRatingItems(mOrders.get(i), mOrderIndexes.get(i),
-                        mContentRatingSystem.getId(), isChecked());
             }
         }
 
@@ -278,19 +231,6 @@ public class RatingsFragment extends SideFragment {
 
         protected int getButtonDrawable() {
             return R.drawable.btn_lock_material_anim;
-        }
-
-        private int getRatingOrderIndex(ContentRatingSystem.Order order) {
-            int orderIndex = mOrders.indexOf(order);
-            return orderIndex == -1 ? -1 : mOrderIndexes.get(orderIndex);
-        }
-
-        private void setRatingBlocked(boolean isChecked) {
-            if (isChecked() == isChecked) {
-                return;
-            }
-            mParentalControlSettings.setRatingBlocked(mContentRatingSystem, mRating, isChecked);
-            notifyUpdated();
         }
     }
 
@@ -307,7 +247,7 @@ public class RatingsFragment extends SideFragment {
 
         @Override
         protected int getButtonDrawable() {
-            int blockedStatus = mParentalControlSettings.getBlockedStatus(
+            int blockedStatus = getMainActivity().getParentalControlSettings().getBlockedStatus(
                     mContentRatingSystem, mRating);
             if (blockedStatus == ParentalControlSettings.RATING_BLOCKED) {
                 return R.drawable.btn_lock_material;

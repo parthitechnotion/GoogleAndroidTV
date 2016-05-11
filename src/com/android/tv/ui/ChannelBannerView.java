@@ -16,6 +16,8 @@
 
 package com.android.tv.ui;
 
+import static com.android.tv.util.ImageLoader.ImageLoaderCallback;
+
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
@@ -33,10 +35,8 @@ import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,13 +50,11 @@ import android.widget.TextView;
 
 import com.android.tv.MainActivity;
 import com.android.tv.R;
-import com.android.tv.common.recording.RecordedProgram;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
 import com.android.tv.util.ImageCache;
 import com.android.tv.util.ImageLoader;
-import com.android.tv.util.ImageLoader.ImageLoaderCallback;
 import com.android.tv.util.ImageLoader.LoadTvInputLogoTask;
 import com.android.tv.util.Utils;
 
@@ -68,8 +66,6 @@ import java.util.Objects;
  * A view to render channel banner.
  */
 public class ChannelBannerView extends FrameLayout implements TvTransitionManager.TransitionLayout {
-    private static final String TAG = "ChannelBannerView";
-    private static final boolean DEBUG = false;
 
     /**
      * Show all information at the channel banner.
@@ -115,7 +111,6 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
     private View mAnchorView;
     private Channel mCurrentChannel;
     private Program mLastUpdatedProgram;
-    private RecordedProgram mLastUpdatedRecordedProgram;
     private final Handler mHandler = new Handler();
 
     private int mLockType;
@@ -240,7 +235,6 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
 
     @Override
     protected void onAttachedToWindow() {
-        if (DEBUG) Log.d(TAG, "onAttachedToWindow");
         super.onAttachedToWindow();
         getContext().getContentResolver().registerContentObserver(TvContract.Programs.CONTENT_URI,
                 true, mProgramUpdateObserver);
@@ -248,7 +242,6 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
 
     @Override
     protected void onDetachedFromWindow() {
-        if (DEBUG) Log.d(TAG, "onDetachedToWindow");
         getContext().getContentResolver().unregisterContentObserver(mProgramUpdateObserver);
         super.onDetachedFromWindow();
     }
@@ -336,6 +329,8 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
 
     /**
      * Update channel banner view.
+     * Note that this only updates the channel banner contents,
+     * and use onBeforeShow() or onAfterHide() for showing/hiding.
      *
      * @param info A StreamInfo that includes stream information.
      * If it's {@code null}, only program information will be updated.
@@ -347,19 +342,19 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
             scheduleHide();
         }
         mCurrentChannel = channel;
+        if (channel == null) {
+            mLastUpdatedProgram = null;
+            updateProgramInfo(null);
+            return;
+        }
         mChannelView.setVisibility(VISIBLE);
         if (info != null) {
             // If the current channels between ChannelTuner and TvView are different,
             // the stream information should not be seen.
-            updateStreamInfo(channel != null && channel.equals(info.getCurrentChannel()) ? info
-                    : null);
+            updateStreamInfo(channel.equals(info.getCurrentChannel()) ? info : null);
             updateChannelInfo();
         }
-        if (mMainActivity.isRecordingPlayback()) {
-            updateProgramInfo(mMainActivity.getPlayingRecordedProgram());
-        } else {
-            updateProgramInfo(mMainActivity.getCurrentProgram());
-        }
+        updateProgramInfo(mMainActivity.getCurrentProgram());
     }
 
     private void updateStreamInfo(StreamInfo info) {
@@ -368,7 +363,7 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
             updateText(mClosedCaptionTextView, info.hasClosedCaption() ? sClosedCaptionMark
                     : EMPTY_STRING);
             updateText(mAspectRatioTextView,
-                    Utils.getAspectRatioString(info.getVideoDisplayAspectRatio()));
+                    Utils.getAspectRatioString(info.getVideoWidth(), info.getVideoHeight()));
             updateText(mResolutionTextView,
                     Utils.getVideoDefinitionLevelString(
                             mMainActivity, info.getVideoDefinitionLevel()));
@@ -385,24 +380,11 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
 
     private void updateChannelInfo() {
         // Update static information for a channel.
-        String displayNumber = EMPTY_STRING;
-        String displayName = EMPTY_STRING;
-        if (mCurrentChannel != null) {
-            displayNumber = mCurrentChannel.getDisplayNumber();
-            if (displayNumber == null) {
-                displayNumber = EMPTY_STRING;
-            }
-            displayName = mCurrentChannel.getDisplayName();
-            if (displayName == null) {
-                displayName = EMPTY_STRING;
-            }
+        String displayNumber = mCurrentChannel.getDisplayNumber();
+        if (displayNumber == null) {
+            displayNumber = EMPTY_STRING;
         }
 
-        if (displayNumber.isEmpty()) {
-            mChannelNumberTextView.setVisibility(GONE);
-        } else {
-            mChannelNumberTextView.setVisibility(VISIBLE);
-        }
         if (displayNumber.length() <= 3) {
             updateTextView(
                     mChannelNumberTextView,
@@ -420,9 +402,14 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
                     R.dimen.channel_banner_channel_number_small_margin_top);
         }
         mChannelNumberTextView.setText(displayNumber);
+        String displayName = mCurrentChannel.getDisplayName();
+        if (displayName == null) {
+            displayName = EMPTY_STRING;
+        }
         mChannelNameTextView.setText(displayName);
+
         TvInputInfo info = mMainActivity.getTvInputManagerHelper().getTvInputInfo(
-                getCurrentInputId());
+                mCurrentChannel.getInputId());
         if (info == null || !ImageLoader.loadBitmap(createTvInputLogoLoaderCallback(info, this),
                         new LoadTvInputLogoTask(getContext(), ImageCache.getInstance(), info))) {
             mTvInputLogoImageView.setVisibility(View.GONE);
@@ -430,24 +417,9 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
         }
         mChannelLogoImageView.setImageBitmap(null);
         mChannelLogoImageView.setVisibility(View.GONE);
-        if (mCurrentChannel != null) {
-            mCurrentChannel.loadBitmap(getContext(), Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO,
-                    mChannelLogoImageViewWidth, mChannelLogoImageViewHeight,
-                    createChannelLogoCallback(this, mCurrentChannel));
-        }
-    }
-
-    private String getCurrentInputId() {
-        Channel channel = mMainActivity.getCurrentChannel();
-        if (channel != null) {
-            return channel.getInputId();
-        } else if (mMainActivity.isRecordingPlayback()) {
-            RecordedProgram recordedProgram = mMainActivity.getPlayingRecordedProgram();
-            if (recordedProgram != null) {
-                return recordedProgram.getInputId();
-            }
-        }
-        return null;
+        mCurrentChannel.loadBitmap(getContext(), Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO,
+                mChannelLogoImageViewWidth, mChannelLogoImageViewHeight,
+                createChannelLogoCallback(this, mCurrentChannel));
     }
 
     private void updateTvInputLogo(Bitmap bitmap) {
@@ -460,8 +432,8 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
         return new ImageLoaderCallback<ChannelBannerView>(channelBannerView) {
             @Override
             public void onBitmapLoaded(ChannelBannerView channelBannerView, Bitmap bitmap) {
-                if (bitmap != null && channelBannerView.mCurrentChannel != null
-                        && info.getId().equals(channelBannerView.mCurrentChannel.getInputId())) {
+                if (bitmap != null && info.getId()
+                        .equals(channelBannerView.mCurrentChannel.getInputId())) {
                     channelBannerView.updateTvInputLogo(bitmap);
                 }
             }
@@ -538,7 +510,7 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
         if (mLastUpdatedProgram == null
                 || !TextUtils.equals(program.getTitle(), mLastUpdatedProgram.getTitle())
                 || !TextUtils.equals(program.getEpisodeDisplayTitle(getContext()),
-                mLastUpdatedProgram.getEpisodeDisplayTitle(getContext()))) {
+                        mLastUpdatedProgram.getEpisodeDisplayTitle(getContext()))) {
             updateProgramTextView(program);
         }
         updateProgramTimeInfo(program);
@@ -547,7 +519,7 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
         // cancel the animation.
         boolean isProgramChanged = !Objects.equals(mLastUpdatedProgram, program);
         if (mResizeAnimator != null && isProgramChanged) {
-            setLastUpdatedProgram(program);
+            mLastUpdatedProgram = program;
             mProgramInfoUpdatePendingByResizing = true;
             mResizeAnimator.cancel();
         } else if (mResizeAnimator == null) {
@@ -565,73 +537,16 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
         } else {
             mProgramInfoUpdatePendingByResizing = true;
         }
-        setLastUpdatedProgram(program);
-    }
-
-    private void updateProgramInfo(RecordedProgram recordedProgram) {
-        if (mLockType == LOCK_CHANNEL_INFO) {
-            updateProgramInfo(sLockedChannelProgram);
-            return;
-        } else if (recordedProgram == null) {
-            updateProgramInfo(sNoProgram);
-            return;
-        }
-
-        if (mLastUpdatedRecordedProgram == null
-                || !TextUtils.equals(recordedProgram.getTitle(),
-                mLastUpdatedRecordedProgram.getTitle())
-                || !TextUtils.equals(recordedProgram.getEpisodeDisplayTitle(getContext()),
-                mLastUpdatedRecordedProgram.getEpisodeDisplayTitle(getContext()))) {
-            updateProgramTextView(recordedProgram);
-        }
-        updateProgramTimeInfo(recordedProgram);
-
-        // When the program is changed, but the previous resize animation has not ended yet,
-        // cancel the animation.
-        boolean isProgramChanged = !Objects.equals(mLastUpdatedRecordedProgram, recordedProgram);
-        if (mResizeAnimator != null && isProgramChanged) {
-            setLastUpdatedRecordedProgram(recordedProgram);
-            mProgramInfoUpdatePendingByResizing = true;
-            mResizeAnimator.cancel();
-        } else if (mResizeAnimator == null) {
-            if (mLockType != LOCK_NONE
-                    || TextUtils.isEmpty(recordedProgram.getShortDescription())) {
-                mProgramDescriptionTextView.setVisibility(GONE);
-                mProgramDescriptionText = "";
-            } else {
-                mProgramDescriptionTextView.setVisibility(VISIBLE);
-                mProgramDescriptionText = recordedProgram.getShortDescription();
-            }
-            String description = mProgramDescriptionTextView.getText().toString();
-            boolean needFadeAnimation = isProgramChanged
-                    || !description.equals(mProgramDescriptionText);
-            updateBannerHeight(needFadeAnimation);
-        } else {
-            mProgramInfoUpdatePendingByResizing = true;
-        }
-        setLastUpdatedRecordedProgram(recordedProgram);
+        mLastUpdatedProgram = program;
     }
 
     private void updateProgramTextView(Program program) {
         if (program == null) {
             return;
         }
-        updateProgramTextView(program == sLockedChannelProgram, program.getTitle(),
-                program.getEpisodeTitle(), program.getEpisodeDisplayTitle(getContext()));
-    }
 
-    private void updateProgramTextView(RecordedProgram recordedProgram) {
-        if (recordedProgram == null) {
-            return;
-        }
-        updateProgramTextView(false, recordedProgram.getTitle(), recordedProgram.getEpisodeTitle(),
-                recordedProgram.getEpisodeDisplayTitle(getContext()));
-    }
-
-    private void updateProgramTextView(boolean dimText, String title, String episodeTitle,
-            String episodeDisplayTitle) {
         mProgramTextView.setVisibility(View.VISIBLE);
-        if (dimText) {
+        if (program == sLockedChannelProgram) {
             mProgramTextView.setTextColor(mChannelBannerDimTextColor);
         } else {
             mProgramTextView.setTextColor(mChannelBannerTextColor);
@@ -639,15 +554,17 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
         updateTextView(mProgramTextView,
                 R.dimen.channel_banner_program_large_text_size,
                 R.dimen.channel_banner_program_large_margin_top);
-        if (TextUtils.isEmpty(episodeTitle)) {
-            mProgramTextView.setText(title);
+        if (TextUtils.isEmpty(program.getEpisodeTitle())) {
+            mProgramTextView.setText(program.getTitle());
         } else {
-            String fullTitle = title + "  " + episodeDisplayTitle;
+            String title = program.getTitle();
+            String episodeTitle = program.getEpisodeDisplayTitle(getContext());
+            String fullTitle = title + "  " + episodeTitle;
 
             SpannableString text = new SpannableString(fullTitle);
             text.setSpan(new TextAppearanceSpan(getContext(),
                             R.style.text_appearance_channel_banner_episode_title),
-                    fullTitle.length() - episodeDisplayTitle.length(), fullTitle.length(),
+                    fullTitle.length() - episodeTitle.length(), fullTitle.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             mProgramTextView.setText(text);
         }
@@ -698,38 +615,6 @@ public class ChannelBannerView extends FrameLayout implements TvTransitionManage
             mProgramTimeTextView.setVisibility(View.GONE);
             mRemainingTimeView.setVisibility(View.GONE);
         }
-    }
-
-    private void updateProgramTimeInfo(RecordedProgram recordedProgram) {
-        long durationMs = recordedProgram.getDurationMillis();
-        if (mLockType != LOCK_CHANNEL_INFO && durationMs > 0) {
-            mProgramTimeTextView.setVisibility(View.VISIBLE);
-            mRemainingTimeView.setVisibility(View.VISIBLE);
-
-            mProgramTimeTextView.setText(DateUtils.formatElapsedTime(durationMs / 1000));
-
-            long currTimeMs = mMainActivity.getCurrentPlayingPosition();
-            if (currTimeMs <= 0) {
-                mRemainingTimeView.setProgress(0);
-            } else if (currTimeMs >= durationMs) {
-                mRemainingTimeView.setProgress(100);
-            } else {
-                mRemainingTimeView.setProgress((int) (100 * currTimeMs / durationMs));
-            }
-        } else {
-            mProgramTimeTextView.setVisibility(View.GONE);
-            mRemainingTimeView.setVisibility(View.GONE);
-        }
-    }
-
-    private void setLastUpdatedProgram(Program program) {
-        mLastUpdatedProgram = program;
-        mLastUpdatedRecordedProgram = null;
-    }
-
-    private void setLastUpdatedRecordedProgram(RecordedProgram recordedProgram) {
-        mLastUpdatedProgram = null;
-        mLastUpdatedRecordedProgram = recordedProgram;
     }
 
     private void updateBannerHeight(boolean needFadeAnimation) {

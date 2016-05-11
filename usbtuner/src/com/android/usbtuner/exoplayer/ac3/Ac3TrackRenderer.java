@@ -22,11 +22,9 @@ import android.util.Log;
 
 import com.google.android.exoplayer.CodecCounters;
 import com.google.android.exoplayer.ExoPlaybackException;
-import com.google.android.exoplayer.MediaClock;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
-import com.google.android.exoplayer.MediaFormatUtil;
 import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
 import com.google.android.exoplayer.TrackRenderer;
@@ -41,8 +39,7 @@ import java.nio.ByteBuffer;
 /**
  * Decodes and renders AC3 audio.
  */
-public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.DecodeListener,
-        MediaClock {
+public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.DecodeListener {
     public static final int MSG_SET_VOLUME = MediaCodecAudioTrackRenderer.MSG_SET_VOLUME;
     public static final int MSG_SET_AUDIO_TRACK = MSG_SET_VOLUME + 1;
 
@@ -83,14 +80,14 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
     private static final long ESTIMATED_TRACK_RENDERING_DELAY_US = 500000;
 
     private final CodecCounters mCodecCounters;
-    private final SampleSource.SampleSourceReader mSource;
+    private final SampleSource mSource;
     private final SampleHolder mSampleHolder;
     private final MediaFormatHolder mFormatHolder;
     private final EventListener mEventListener;
     private final Handler mEventHandler;
     private final boolean mIsSoftware;
     private final AudioTrackMonitor mMonitor;
-    private final AudioClock mAudioClock;
+    private final MediaClock mMediaClock;
 
     private MediaFormat mFormat;
     private Ac3Decoder mDecoder;
@@ -109,62 +106,52 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
 
     public Ac3TrackRenderer(SampleSource source, Handler eventHandler,
             EventListener listener, boolean isSoftware) {
-        mSource = source.register();
+        mSource = source;
         mEventHandler = eventHandler;
         mEventListener = listener;
         mDecoder = Ac3Decoder.createAc3Decoder(isSoftware);
         mIsSoftware = isSoftware;
-        mTrackIndex = -1;
         mSampleHolder = new SampleHolder(SampleHolder.BUFFER_REPLACEMENT_MODE_DIRECT);
-        mSampleHolder.ensureSpaceForWrite(DEFAULT_INPUT_BUFFER_SIZE);
+        mSampleHolder.replaceBuffer(DEFAULT_INPUT_BUFFER_SIZE);
         mOutputBuffer = ByteBuffer.allocate(DEFAULT_OUTPUT_BUFFER_SIZE);
         mFormatHolder = new MediaFormatHolder();
         AUDIO_TRACK.restart();
         mCodecCounters = new CodecCounters();
         mMonitor = new AudioTrackMonitor();
-        mAudioClock = new AudioClock();
+        mMediaClock = new MediaClock();
     }
 
     @Override
-    protected MediaClock getMediaClock() {
-        return this;
-    }
-
-    private static boolean handlesMimeType(String mimeType) {
-        return mimeType.equals(MimeTypes.AUDIO_AC3) || mimeType.equals(MimeTypes.AUDIO_E_AC3);
-    }
-
-    @Override
-    protected boolean doPrepare(long positionUs) throws ExoPlaybackException {
-        boolean sourcePrepared = mSource.prepare(positionUs);
-        if (!sourcePrepared) {
-            return false;
-        }
-        for (int i = 0; i < mSource.getTrackCount(); i++) {
-            if (handlesMimeType(mSource.getFormat(i).mimeType)) {
-                mTrackIndex = i;
-                return true;
-            }
-        }
-
-        // TODO: Check this case. Source does not have the proper mime type.
+    protected boolean isTimeSource() {
         return true;
     }
 
-    @Override
-    protected int getTrackCount() {
-        return mTrackIndex < 0 ? 0 : 1;
+    private static boolean handlesMimeType(String mimeType) {
+        return mimeType.equals(MimeTypes.AUDIO_AC3) || mimeType.equals(MimeTypes.AUDIO_EC3);
     }
 
     @Override
-    protected MediaFormat getFormat(int track) {
-        Assertions.checkArgument(mTrackIndex != -1 && track == 0);
-        return mSource.getFormat(mTrackIndex);
+    protected int doPrepare(long positionUs) throws ExoPlaybackException {
+        try {
+            boolean sourcePrepared = mSource.prepare(positionUs);
+            if (!sourcePrepared) {
+                return TrackRenderer.STATE_UNPREPARED;
+            }
+        } catch (IOException e) {
+            throw new ExoPlaybackException(e);
+        }
+        for (int i = 0; i < mSource.getTrackCount(); i++) {
+            if (handlesMimeType(mSource.getTrackInfo(i).mimeType)) {
+                mTrackIndex = i;
+                return TrackRenderer.STATE_PREPARED;
+            }
+        }
+
+        return TrackRenderer.STATE_IGNORE;
     }
 
     @Override
-    protected void onEnabled(int track, long positionUs, boolean joining) {
-        Assertions.checkArgument(mTrackIndex != -1 && track == 0);
+    protected void onEnabled(long positionUs, boolean joining) {
         mSource.enable(mTrackIndex, positionUs);
         mDecoder.startDecoder(this);
         seekToInternal(positionUs);
@@ -183,6 +170,7 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
         AUDIO_TRACK.release();
         mSource.release();
     }
+
 
     @Override
     protected boolean isEnded() {
@@ -204,7 +192,7 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
         mPreviousPositionUs = 0;
         mCurrentPositionUs = Long.MIN_VALUE;
         mInterpolatedTimeUs = Long.MIN_VALUE;
-        mAudioClock.setPositionUs(positionUs);
+        mMediaClock.setPositionUs(positionUs);
     }
 
     @Override
@@ -221,22 +209,13 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
     @Override
     protected void onStarted() {
         AUDIO_TRACK.play();
-        mAudioClock.start();
+        mMediaClock.start();
     }
 
     @Override
     protected void onStopped() {
         AUDIO_TRACK.pause();
-        mAudioClock.stop();
-    }
-
-    @Override
-    protected void maybeThrowError() throws ExoPlaybackException {
-        try {
-            mSource.maybeThrowError();
-        } catch (IOException e) {
-            throw new ExoPlaybackException(e);
-        }
+        mMediaClock.stop();
     }
 
     @Override
@@ -252,7 +231,7 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
                     throw new ExoPlaybackException("Much time has elapsed after EoS");
                 }
             }
-            boolean continueBuffering = mSource.continueBuffering(mTrackIndex, positionUs);
+            boolean continueBuffering = mSource.continueBuffering(positionUs);
             if (mSourceStateReady != continueBuffering) {
                 mSourceStateReady = continueBuffering;
                 if (DEBUG) {
@@ -310,7 +289,7 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
 
     private void readFormat() throws IOException, ExoPlaybackException {
         int result = mSource.readData(mTrackIndex, mCurrentPositionUs,
-                mFormatHolder, mSampleHolder);
+                mFormatHolder, mSampleHolder, false);
         if (result == SampleSource.FORMAT_READ) {
             onInputFormatChanged(mFormatHolder);
         }
@@ -320,8 +299,9 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
             throws ExoPlaybackException {
         MediaFormat format = formatHolder.format;
         if (mIsSoftware) {
-            mFormat = MediaFormatUtil.createAudioMediaFormat(MimeTypes.AUDIO_RAW, format.durationUs,
-                    format.channelCount, format.sampleRate);
+            mFormat = MediaFormat.createAudioFormat(MimeTypes.AUDIO_RAW,
+                    MediaFormat.NO_VALUE, format.durationUs,
+                    format.channelCount, format.sampleRate, null);
         } else {
             mFormat = format;
         }
@@ -337,24 +317,20 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
             return false;
         }
 
-        long discontinuity = mSource.readDiscontinuity(mTrackIndex);
-        if (discontinuity != SampleSource.NO_DISCONTINUITY) {
-            // TODO: handle input discontinuity for trickplay.
-            Log.i(TAG, "Read discontinuity happened");
-            AUDIO_TRACK.handleDiscontinuity();
-            mPresentationTimeUs = discontinuity;
-            mPresentationCount = 0;
-            clearDecodeState();
-            return false;
-        }
-
         mSampleHolder.data.clear();
         mSampleHolder.size = 0;
         int result = mSource.readData(mTrackIndex, mPresentationTimeUs, mFormatHolder,
-                mSampleHolder);
+                mSampleHolder, false);
         switch (result) {
             case SampleSource.NOTHING_READ: {
                 return false;
+            }
+            case SampleSource.DISCONTINUITY_READ: {
+                // TODO: handle input discontinuity for trickplay.
+                Log.i(TAG, "Read discontinuity happened");
+                AUDIO_TRACK.handleDiscontinuity();
+                clearDecodeState();
+                return true;
             }
             case SampleSource.FORMAT_READ: {
                 Log.i(TAG, "Format was read again");
@@ -414,20 +390,20 @@ public class Ac3TrackRenderer extends TrackRenderer implements Ac3Decoder.Decode
 
     @Override
     protected long getDurationUs() {
-        return mSource.getFormat(mTrackIndex).durationUs;
+        return mSource.getTrackInfo(mTrackIndex).durationUs;
     }
 
     @Override
     protected long getBufferedPositionUs() {
         long pos = mSource.getBufferedPositionUs();
         return pos == UNKNOWN_TIME_US || pos == END_OF_TRACK_US
-                ? pos : Math.max(pos, getPositionUs());
+                ? pos : Math.max(pos, getCurrentPositionUs());
     }
 
     @Override
-    public long getPositionUs() {
+    protected long getCurrentPositionUs() {
         if (!AUDIO_TRACK.isInitialized()) {
-            return mAudioClock.getPositionUs();
+            return mMediaClock.getPositionUs();
         } if (!AUDIO_TRACK.isEnabled()) {
             if (mInterpolatedTimeUs > 0) {
                 return mInterpolatedTimeUs - ESTIMATED_TRACK_RENDERING_DELAY_US;

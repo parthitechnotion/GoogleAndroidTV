@@ -144,6 +144,12 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"Oopbronlisensies"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Oopbronlisensies"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"Weergawe"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Ontwikkelaaropsies"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Aktiveer USB-TV-ontvanger"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Jou TV moet AC3-deurgang steun om USB-TV-ontvanger se klank te hoor."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3-oudiovermoë"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Jou TV steun AC3-deurgang."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Jou TV steun nie AC3-deurgang nie."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Help om Regstreekse Kanale te verbeter"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Deel anonieme gebruik- en diagnostiese data met Google sodat ons Regstreekse Kanale beter kan maak en kwessies soos omval en vries kan voorkom."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Druk Regs en voer jou PIN in om hierdie kanaal te kyk"</string>
@@ -155,10 +161,9 @@
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Program is geblokkeer"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Hierdie program is <xliff:g id="RATING">%1$s</xliff:g> gegradeer"</string>
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Net oudio"</string>
-    <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"Swak sein"</string>
-    <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"Geen internetverbinding nie"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Titelloos"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Kanaal is geblokkeer"</string>
+    <string name="episode_format" msgid="4881195874563241096">"S<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Ep. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
     <string name="setup_category_new" msgid="2899355289563443627">"Nuut"</string>
     <string name="setup_category_done" msgid="4750902502852212319">"Bronne"</string>
     <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
@@ -185,6 +190,7 @@
     <string name="msg_tune_failed" msgid="3277419551849972252">"Kon nie instel nie"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"Geen program is gevind om hierdie handeling te behartig nie."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"Alle bronkanale is versteek.\nKies minstens een kanaal om te kyk."</string>
+    <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Onbeskikbaar weens swak videosein"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Die video is onverwags onbeskikbaar"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"TERUG-sleutel is vir gekoppelde toestelle. Druk TUIS-knoppie om uit te gaan."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Regstreekse kanale word nie op hierdie toestel met Android Lollipop gesteun nie."</string>

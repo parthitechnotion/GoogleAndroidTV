@@ -26,44 +26,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tests for {@link DvrDataManagerImpl}
+ * Tests for {@link DvrDataManagerImplTest}
  */
 @SmallTest
 public class DvrDataManagerImplTest extends TestCase {
-    private static final int CHANNEL_ID = 273;
-
     public void testGetNextScheduledStartTimeAfter() throws Exception {
         long id = 1;
-        List<ScheduledRecording> scheduledRecordings = new ArrayList<>();
-        assertNextStartTime(scheduledRecordings, 0L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
-        scheduledRecordings.add(RecordingTestUtils
-                .createTestRecordingWithIdAndPeriod(id++, CHANNEL_ID, 10L, 20L));
-        assertNextStartTime(scheduledRecordings, 9L, 10L);
-        assertNextStartTime(scheduledRecordings, 10L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
-        scheduledRecordings.add(RecordingTestUtils
-                .createTestRecordingWithIdAndPeriod(id++, CHANNEL_ID, 20L, 30L));
-        assertNextStartTime(scheduledRecordings, 9L, 10L);
-        assertNextStartTime(scheduledRecordings, 10L, 20L);
-        assertNextStartTime(scheduledRecordings, 20L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
-        scheduledRecordings.add(RecordingTestUtils
-                .createTestRecordingWithIdAndPeriod(id++, CHANNEL_ID, 30L, 40L));
-        assertNextStartTime(scheduledRecordings, 9L, 10L);
-        assertNextStartTime(scheduledRecordings, 10L, 20L);
-        assertNextStartTime(scheduledRecordings, 20L, 30L);
-        assertNextStartTime(scheduledRecordings, 30L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
-        scheduledRecordings.clear();
-        scheduledRecordings.add(RecordingTestUtils
-                .createTestRecordingWithIdAndPeriod(id++, CHANNEL_ID, 10L, 20L));
-        scheduledRecordings.add(RecordingTestUtils
-                .createTestRecordingWithIdAndPeriod(id++, CHANNEL_ID, 10L, 20L));
-        scheduledRecordings.add(RecordingTestUtils
-                .createTestRecordingWithIdAndPeriod(id++, CHANNEL_ID, 10L, 20L));
-        assertNextStartTime(scheduledRecordings, 9L, 10L);
-        assertNextStartTime(scheduledRecordings, 10L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
+        List<Recording> recordings = new ArrayList<>();
+        assertNextStartTime(recordings, 0L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
+        assertNextStartTime(recordings, 9L, 10L);
+        assertNextStartTime(recordings, 10L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 20L, 30L));
+        assertNextStartTime(recordings, 9L, 10L);
+        assertNextStartTime(recordings, 10L, 20L);
+        assertNextStartTime(recordings, 20L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 30L, 40L));
+        assertNextStartTime(recordings, 9L, 10L);
+        assertNextStartTime(recordings, 10L, 20L);
+        assertNextStartTime(recordings, 20L, 30L);
+        assertNextStartTime(recordings, 30L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
+        recordings.clear();
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
+        recordings.add(RecordingTestUtils.createTestRecordingWithIdAndPeriod(id++, 10L, 20L));
+        assertNextStartTime(recordings, 9L, 10L);
+        assertNextStartTime(recordings, 10L, DvrDataManager.NEXT_START_TIME_NOT_FOUND);
     }
 
-    private void assertNextStartTime(List<ScheduledRecording> scheduledRecordings, long startTime, long expected) {
+    private void assertNextStartTime(List<Recording> recordings, long startTime, long expected) {
         assertEquals("getNextScheduledStartTimeAfter()", expected,
-                DvrDataManagerImpl.getNextStartTimeAfter(scheduledRecordings, startTime));
+                DvrDataManagerImpl.getNextStartTimeAfter(recordings, startTime));
     }
 }
