@@ -16,7 +16,7 @@
 
 package com.android.usbtuner.exoplayer;
 
-import android.content.Context;
+import android.media.MediaCodec;
 import android.media.MediaDataSource;
 
 import com.google.android.exoplayer.SampleSource;
@@ -24,20 +24,21 @@ import com.google.android.exoplayer.TrackRenderer;
 import com.android.usbtuner.exoplayer.MpegTsPlayer.RendererBuilder;
 import com.android.usbtuner.exoplayer.MpegTsPlayer.RendererBuilderCallback;
 import com.android.usbtuner.exoplayer.ac3.Ac3TrackRenderer;
-import com.android.usbtuner.exoplayer.cache.CacheManager;
 import com.android.usbtuner.tvinput.PlaybackCacheListener;
 
 /**
  * Builder class for AC3 Passthrough track renderer objects.
  */
 public class MpegTsPassthroughAc3RendererBuilder implements RendererBuilder {
-    private final Context mContext;
+    private static final int NUM_TRACKS = 3;
+    private static final int VIDEO_PLAYBACK_DEADLINE_IN_MS = 5000;
+    private static final int DROPPED_FRAMES_NOTIFICATION_THRESHOLD = 50;
+
     private final CacheManager mCacheManager;
     private final PlaybackCacheListener mCacheListener;
 
-    public MpegTsPassthroughAc3RendererBuilder(Context context, CacheManager cacheManager,
+    public MpegTsPassthroughAc3RendererBuilder(CacheManager cacheManager,
             PlaybackCacheListener cacheListener) {
-        mContext = context;
         mCacheManager = cacheManager;
         mCacheListener = cacheListener;
     }
@@ -49,17 +50,26 @@ public class MpegTsPassthroughAc3RendererBuilder implements RendererBuilder {
         SampleExtractor extractor = dataSource == null ?
                 new MpegTsSampleSourceExtractor(mCacheManager, mCacheListener) :
                 new MpegTsSampleSourceExtractor(dataSource, mCacheManager, mCacheListener);
-        SampleSource sampleSource = new MpegTsSampleSource(extractor);
-        MpegTsVideoTrackRenderer videoRenderer = new MpegTsVideoTrackRenderer(mContext,
-                sampleSource, mpegTsPlayer.getMainHandler(), mpegTsPlayer);
-        Ac3TrackRenderer audioRenderer = new Ac3TrackRenderer(sampleSource,
-                mpegTsPlayer.getMainHandler(), mpegTsPlayer, false);
+        SampleSource sampleSource = new DefaultSampleSource(extractor,
+                mpegTsPlayer.isAc3Playable() ? NUM_TRACKS : NUM_TRACKS - 1);
+        MediaCodecVideoTrackRenderer videoRenderer =
+                new MediaCodecVideoTrackRenderer(sampleSource, null, true,
+                        MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, VIDEO_PLAYBACK_DEADLINE_IN_MS,
+                        null, mpegTsPlayer.getMainHandler(), mpegTsPlayer,
+                        DROPPED_FRAMES_NOTIFICATION_THRESHOLD);
+        Ac3TrackRenderer audioRenderer = null;
+        if (mpegTsPlayer.isAc3Playable()) {
+            audioRenderer = new Ac3TrackRenderer(sampleSource,
+                    mpegTsPlayer.getMainHandler(), mpegTsPlayer, false);
+        } else {
+            mpegTsPlayer.onAudioUnplayable();
+        }
         Cea708TextTrackRenderer textRenderer = new Cea708TextTrackRenderer(sampleSource);
 
         TrackRenderer[] renderers = new TrackRenderer[MpegTsPlayer.RENDERER_COUNT];
         renderers[MpegTsPlayer.TRACK_TYPE_VIDEO] = videoRenderer;
         renderers[MpegTsPlayer.TRACK_TYPE_AUDIO] = audioRenderer;
         renderers[MpegTsPlayer.TRACK_TYPE_TEXT] = textRenderer;
-        callback.onRenderers(null, renderers);
+        callback.onRenderers(null, null, renderers);
     }
 }

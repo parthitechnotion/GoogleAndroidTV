@@ -3,12 +3,10 @@ package com.android.tv.data;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
@@ -44,8 +42,8 @@ public class WatchedHistoryManager {
     private boolean mStarted;
     private boolean mLoaded;
     private SharedPreferences mSharedPreferences;
-    private final OnSharedPreferenceChangeListener mOnSharedPreferenceChangeListener =
-            new OnSharedPreferenceChangeListener() {
+    private SharedPreferences.OnSharedPreferenceChangeListener mOnSharedPreferenceChangeListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 @MainThread
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
@@ -82,7 +80,7 @@ public class WatchedHistoryManager {
     private final Context mContext;
     private Listener mListener;
     private final int mMaxHistorySize;
-    private final Handler mHandler;
+    private Handler mHandler;
 
     public WatchedHistoryManager(Context context) {
         this(context, MAX_HISTORY_SIZE);
@@ -199,7 +197,6 @@ public class WatchedHistoryManager {
      * Returns watched history in the ascending order of time. In other words, the first element
      * is the oldest and the last element is the latest record.
      */
-    @NonNull
     public List<WatchedRecord> getWatchedHistory() {
         return Collections.unmodifiableList(mWatchedHistory);
     }

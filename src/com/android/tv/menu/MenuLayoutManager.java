@@ -35,7 +35,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.TextView;
 
 import com.android.tv.R;
-import com.android.tv.common.SoftPreconditions;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
@@ -318,11 +318,6 @@ public class MenuLayoutManager {
         if (!indexValid) {
             return;
         }
-        MenuRow row = mMenuRows.get(position);
-        if (!row.isVisible()) {
-            Log.e(TAG, "Selecting invisible row: " + position);
-            return;
-        }
         if (Utils.isIndexValid(mMenuRowViews, mSelectedPosition)) {
             mMenuRowViews.get(mSelectedPosition).onDeselected();
         }
@@ -363,11 +358,6 @@ public class MenuLayoutManager {
         boolean newIndexValid = Utils.isIndexValid(mMenuRowViews, position);
         SoftPreconditions.checkArgument(newIndexValid, TAG, "position " + position);
         if (!newIndexValid) {
-            return;
-        }
-        MenuRow row = mMenuRows.get(position);
-        if (!row.isVisible()) {
-            Log.e(TAG, "Moving to the invisible row: " + position);
             return;
         }
         if (mAnimatorSet != null) {
@@ -797,9 +787,9 @@ public class MenuLayoutManager {
     }
 
     private static final class ViewPropertyValueHolder {
-        public final Property<View, Float> property;
-        public final View view;
-        public final float value;
+        public Property<View, Float> property;
+        public View view;
+        public float value;
 
         public ViewPropertyValueHolder(Property<View, Float> property, View view, float value) {
             this.property = property;

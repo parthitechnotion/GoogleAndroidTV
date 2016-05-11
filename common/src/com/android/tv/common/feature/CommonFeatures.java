@@ -17,7 +17,7 @@
 package com.android.tv.common.feature;
 
 import static com.android.tv.common.feature.EngOnlyFeature.ENG_ONLY_FEATURE;
-import static com.android.tv.common.feature.FeatureUtils.OR;
+import static com.android.tv.common.feature.FeatureUtils.AND;
 import static com.android.tv.common.feature.TestableFeature.createTestableFeature;
 
 /**
@@ -32,12 +32,9 @@ public class CommonFeatures {
      * <p>See <a href="https://goto.google.com/atv-dvr-onepager">go/atv-dvr-onepager</a>
      */
     public static TestableFeature DVR = createTestableFeature(
-            OR(ENG_ONLY_FEATURE, Sdk.N_PRE_2_OR_HIGHER));
-
-    /**
-     * USE_SW_CODEC_FOR_SD
-     *
-     * Prefer software based codec for SD channels.
-     */
-    public static Feature USE_SW_CODEC_FOR_SD = new PropertyFeature("use_sw_codec_for_sd", true);
+            AND(
+                    ENG_ONLY_FEATURE,
+                    new PropertyFeature("dvr_enabled", false),
+                    Sdk.M_FEATURE  // TODO(dvr): Sdk.N_PREVIEW_FEATURE
+            ));
 }

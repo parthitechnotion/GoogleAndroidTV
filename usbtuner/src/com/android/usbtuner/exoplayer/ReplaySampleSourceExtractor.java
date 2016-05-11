@@ -16,44 +16,118 @@
 
 package com.android.usbtuner.exoplayer;
 
+import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
-import com.google.android.exoplayer.MediaFormatUtil;
 import com.google.android.exoplayer.SampleHolder;
-import com.android.usbtuner.exoplayer.cache.CacheManager;
-import com.android.usbtuner.exoplayer.cache.RecordingSampleBuffer;
+import com.google.android.exoplayer.SampleSource;
+import com.google.android.exoplayer.TrackInfo;
 import com.android.usbtuner.tvinput.PlaybackCacheListener;
 
+import junit.framework.Assert;
+
+import android.util.Log;
 import android.util.Pair;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A class that plays a recorded stream without using {@link MediaExtractor},
  * since all samples are extracted and stored to the permanent storage already.
  */
-public class ReplaySampleSourceExtractor implements SampleExtractor{
+public class ReplaySampleSourceExtractor implements SampleExtractor, CacheManager.EvictListener {
     private static final String TAG = "ReplaySampleSourceExt";
     private static final boolean DEBUG = false;
 
-    private int mTrackCount;
-    private android.media.MediaFormat[] mMediaFormats;
-    private MediaFormat[] mTrackFormats;
+    public static final long CHUNK_DURATION_US = TimeUnit.MILLISECONDS.toMicros(500);
 
+    private android.media.MediaFormat[] mMediaFormats;
+    private TrackInfo[] mTrackInfos;
+    private String[] mIds;
+
+    private boolean mEos;
     private boolean mReleased;
 
 
     private final CacheManager mCacheManager;
+
     private final PlaybackCacheListener mCacheListener;
-    private CacheManager.SampleBuffer mSampleBuffer;
+    private CachedSampleQueue[] mPlayingSampleQueues;
+    private final SamplePool mSamplePool = new SamplePool();
+    private long mLastBufferedPositionUs = C.UNKNOWN_TIME_US;
+    private long mCurrentPlaybackPositionUs = 0;
+
+    private class CachedSampleQueue extends SampleQueue {
+        private SampleCache mCache = null;
+
+        public CachedSampleQueue(SamplePool samplePool) {
+            super(samplePool);
+        }
+
+        public void setSource(SampleCache newCache) {
+            for (SampleCache cache = mCache; cache != null; cache = cache.getNext()) {
+                cache.clear();
+                cache.close();
+            }
+            mCache = newCache;
+            for (SampleCache cache = mCache; cache != null; cache = cache.getNext()) {
+                cache.resetRead();
+            }
+        }
+
+        public boolean maybeReadSample() {
+            if (isDurationGreaterThan(CHUNK_DURATION_US)) {
+                return false;
+            }
+            SampleHolder sample = mCache.maybeReadSample();
+            if (sample == null) {
+                if (!mCache.canReadMore()) {
+                    if (mCache.getNext() == null) {
+                        // reached the end of the recording
+                        setEos();
+                        return false;
+                    } else {
+                        mCache.clear();
+                        mCache.close();
+                        mCache = mCache.getNext();
+                        mCache.resetRead();
+                        return maybeReadSample();
+                    }
+                }
+                return false;
+            } else {
+                queueSample(sample);
+                return true;
+            }
+        }
+
+        public int dequeueSample(SampleHolder sample) {
+            maybeReadSample();
+            return super.dequeueSample(sample);
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            for (SampleCache cache = mCache; cache != null; cache = cache.getNext()) {
+                cache.clear();
+                cache.close();
+            }
+            mCache = null;
+        }
+
+        public long getSourceStartPositionUs() {
+            return mCache == null ? -1 : mCache.getStartPositionUs();
+        }
+    }
 
     public ReplaySampleSourceExtractor(
             CacheManager cacheManager, PlaybackCacheListener cacheListener) {
         mCacheManager = cacheManager;
         mCacheListener = cacheListener;
-        mTrackCount = -1;
+        cacheListener.onCacheStateChanged(true);  // Enable trickplay
     }
 
     @Override
@@ -63,69 +137,175 @@ public class ReplaySampleSourceExtractor implements SampleExtractor{
         if (trackInfos == null || trackInfos.size() <= 0) {
             return false;
         }
-        mTrackCount = trackInfos.size();
-        List<String> ids = new ArrayList<>();
-        mMediaFormats = new android.media.MediaFormat[mTrackCount];
-        mTrackFormats = new MediaFormat[mTrackCount];
-        for (int i = 0; i < mTrackCount; ++i) {
+        int trackCount = trackInfos.size();
+        mIds = new String[trackCount];
+        mMediaFormats = new android.media.MediaFormat[trackCount];
+        mTrackInfos = new TrackInfo[trackCount];
+        for (int i = 0; i < trackCount; ++i) {
             Pair<String, android.media.MediaFormat> pair = trackInfos.get(i);
-            ids.add(pair.first);
+            mIds[i] = pair.first;
             mMediaFormats[i] = pair.second;
-            mTrackFormats[i] = MediaFormatUtil.createMediaFormat(mMediaFormats[i]);
+
+            // TODO: save this according to recording length
+            long durationUs = mMediaFormats[i].containsKey(android.media.MediaFormat.KEY_DURATION)
+                    ? mMediaFormats[i].getLong(android.media.MediaFormat.KEY_DURATION)
+                    : C.UNKNOWN_TIME_US;
+            String mime = mMediaFormats[i].getString(android.media.MediaFormat.KEY_MIME);
+            mTrackInfos[i] = new TrackInfo(mime, durationUs);
         }
-        mSampleBuffer = new RecordingSampleBuffer(mCacheManager, mCacheListener, true,
-                RecordingSampleBuffer.CACHE_REASON_RECORDED_PLAYBACK);
-        mSampleBuffer.init(ids, null);
+        initOnLoad(trackCount);
         return true;
     }
 
     @Override
-    public MediaFormat[] getTrackFormats() {
-        return mTrackFormats;
+    public TrackInfo[] getTrackInfos() {
+        return mTrackInfos;
+    }
+
+    private void setEos() {
+        mEos = true;
+    }
+
+    public boolean getEos() {
+        return mEos;
     }
 
     @Override
-    public void getTrackMediaFormat(int track, MediaFormatHolder outMediaFormatHolder) {
-        outMediaFormatHolder.format = mTrackFormats[track];
-        outMediaFormatHolder.drmInitData = null;
+    public void getTrackMediaFormat(int track, MediaFormatHolder mediaFormatHolder) {
+        mediaFormatHolder.format =
+                MediaFormat.createFromFrameworkMediaFormatV16(mMediaFormats[track]);
+        mediaFormatHolder.drmInitData = null;
     }
 
     @Override
     public void release() {
         if (!mReleased) {
-            mSampleBuffer.release();
+            cleanUpImpl();
         }
         mReleased = true;
     }
 
+
+    private String getTrackId(int index) {
+        return mIds[index];
+    }
+
+    public void initOnLoad(int trackCount) throws IOException {
+        mPlayingSampleQueues = new CachedSampleQueue[trackCount];
+        for (int i = 0; i < trackCount; i++) {
+            mCacheManager.loadTrackFormStorage(mIds[i], mSamplePool);
+        }
+    }
+
     @Override
     public void selectTrack(int index) {
-        mSampleBuffer.selectTrack(index);
+        if (mPlayingSampleQueues[index] == null) {
+            String trackId = getTrackId(index);
+            mPlayingSampleQueues[index] = new CachedSampleQueue(mSamplePool);
+            mCacheManager.registerEvictListener(trackId, this);
+            seekIndividualTrack(index, mCurrentPlaybackPositionUs);
+            mPlayingSampleQueues[index].maybeReadSample();
+        }
     }
 
     @Override
     public void deselectTrack(int index) {
-        mSampleBuffer.deselectTrack(index);
+        if (mPlayingSampleQueues[index] != null) {
+            mPlayingSampleQueues[index].clear();
+            mPlayingSampleQueues[index] = null;
+            mCacheManager.unregisterEvictListener(getTrackId(index));
+        }
     }
 
     @Override
     public long getBufferedPositionUs() {
-        return mSampleBuffer.getBufferedPositionUs();
+        Long result = null;
+        for (CachedSampleQueue queue : mPlayingSampleQueues) {
+            if (queue == null) {
+                continue;
+            }
+            Long bufferedPositionUs = queue.getEndPositionUs();
+            if (bufferedPositionUs == null) {
+                continue;
+            }
+            if (result == null || result > bufferedPositionUs) {
+                result = bufferedPositionUs;
+            }
+        }
+        if (result == null) {
+            return mLastBufferedPositionUs;
+        } else {
+            return (mLastBufferedPositionUs = result);
+        }
     }
 
     @Override
     public void seekTo(long positionUs) {
-        mSampleBuffer.seekTo(positionUs);
+        // Seek video track first
+        for (int i = 0; i < mPlayingSampleQueues.length; ++i) {
+            CachedSampleQueue queue = mPlayingSampleQueues[i];
+            if (queue == null) {
+                continue;
+            }
+            seekIndividualTrack(i, positionUs);
+            if (DEBUG) {
+                Log.d(TAG, "start time = " + queue.getSourceStartPositionUs());
+            }
+        }
+        mLastBufferedPositionUs = positionUs;
+    }
+
+    private void seekIndividualTrack(int index, long positionUs) {
+        CachedSampleQueue queue = mPlayingSampleQueues[index];
+        if (queue == null) {
+            return;
+        }
+        queue.clear();
+        queue.setSource(mCacheManager.getReadFile(getTrackId(index), positionUs));
+        queue.maybeReadSample();
     }
 
     @Override
     public int readSample(int track, SampleHolder sampleHolder) {
-        return mSampleBuffer.readSample(track, sampleHolder);
+        CachedSampleQueue queue = mPlayingSampleQueues[track];
+        Assert.assertNotNull(queue);
+        queue.maybeReadSample();
+        int result = queue.dequeueSample(sampleHolder);
+        if (result != SampleSource.SAMPLE_READ && getEos()) {
+            return SampleSource.END_OF_STREAM;
+        }
+        return result;
     }
 
+    public void cleanUpImpl() {
+        mCacheManager.close();
+        for (int i = 0; i < mIds.length; ++i) {
+            mCacheManager.unregisterEvictListener(getTrackId(i));
+            mCacheManager.clearTrack(getTrackId(i));
+        }
+    }
 
     @Override
     public boolean continueBuffering(long positionUs) {
-        return mSampleBuffer.continueBuffering(positionUs);
+        boolean hasSamples = true;
+        mCurrentPlaybackPositionUs = positionUs;
+        for (CachedSampleQueue queue : mPlayingSampleQueues) {
+            if (queue == null) {
+                continue;
+            }
+            queue.maybeReadSample();
+            if (queue.isEmpty()) {
+                hasSamples = false;
+            }
+        }
+        return hasSamples;
+    }
+
+    // CacheEvictListener
+    // TODO: Remove this. It will not be called.
+    @Override
+    public void onCacheEvicted(String id, long createdTimeMs) {
+        mCacheListener.onCacheStartTimeChanged(
+                createdTimeMs + TimeUnit.MICROSECONDS.toMillis(CHUNK_DURATION_US));
     }
 }

@@ -33,6 +33,7 @@ import android.util.Log;
 
 import com.android.tv.common.CollectionUtils;
 import com.android.tv.common.TvCommonConstants;
+import com.android.tv.dvr.provider.DvrContract;
 import com.android.tv.util.ImageLoader;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
@@ -74,17 +75,17 @@ public final class Channel {
     private static final String INVALID_PACKAGE_NAME = "packageName";
 
     private static final String[] PROJECTION_BASE = {
-            // Columns must match what is read in Channel.fromCursor()
-            TvContract.Channels._ID,
-            TvContract.Channels.COLUMN_PACKAGE_NAME,
-            TvContract.Channels.COLUMN_INPUT_ID,
-            TvContract.Channels.COLUMN_TYPE,
-            TvContract.Channels.COLUMN_DISPLAY_NUMBER,
-            TvContract.Channels.COLUMN_DISPLAY_NAME,
-            TvContract.Channels.COLUMN_DESCRIPTION,
-            TvContract.Channels.COLUMN_VIDEO_FORMAT,
-            TvContract.Channels.COLUMN_BROWSABLE,
-            TvContract.Channels.COLUMN_LOCKED,
+        // Columns must match what is read in Channel.fromCursor()
+        TvContract.Channels._ID,
+        TvContract.Channels.COLUMN_PACKAGE_NAME,
+        TvContract.Channels.COLUMN_INPUT_ID,
+        TvContract.Channels.COLUMN_TYPE,
+        TvContract.Channels.COLUMN_DISPLAY_NUMBER,
+        TvContract.Channels.COLUMN_DISPLAY_NAME,
+        TvContract.Channels.COLUMN_DESCRIPTION,
+        TvContract.Channels.COLUMN_VIDEO_FORMAT,
+        TvContract.Channels.COLUMN_BROWSABLE,
+        TvContract.Channels.COLUMN_LOCKED,
     };
 
     // Additional fields added in MNC.
@@ -107,6 +108,15 @@ public final class Channel {
             return PROJECTION_BASE;
         }
     }
+
+    /**
+     * Use this projection if you want to create {@link Channel} object using
+     * {@link #fromDvrCursor}.
+     */
+    public static final String[] PROJECTION_DVR = {
+        // Columns must match what is read in Channel.fromDvrCursor()
+        DvrContract.DvrChannels._ID
+    };
 
     /**
      * Creates {@code Channel} object from cursor.
@@ -251,13 +261,6 @@ public final class Channel {
      */
     public long getDvrId() {
         return mDvrId;
-    }
-
-    /**
-     * Checks whether this channel is physical tuner channel or not.
-     */
-    public boolean isPhysicalTunerChannel() {
-        return !TextUtils.isEmpty(mType) && !TvContract.Channels.TYPE_OTHER.equals(mType);
     }
 
     /**

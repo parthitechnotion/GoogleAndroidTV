@@ -117,11 +117,10 @@ public class MenuView extends FrameLayout implements IMenuView {
         }
         initializeChildren();
         update(true);
-        int position = getItemPosition(rowIdToSelect);
-        if (position == -1 || !mMenuRows.get(position).isVisible()) {
-            // Channels row is always visible.
-            position = getItemPosition(ChannelsRow.ID);
+        if (rowIdToSelect == null) {
+            rowIdToSelect = ChannelsRow.ID;
         }
+        int position = getItemPosition(rowIdToSelect);
         setSelectedPosition(position);
         // Change the visibility as late as possible to avoid the unnecessary animation.
         setVisibility(VISIBLE);

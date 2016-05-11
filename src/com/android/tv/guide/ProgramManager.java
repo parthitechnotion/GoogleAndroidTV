@@ -17,17 +17,14 @@
 package com.android.tv.guide;
 
 import android.support.annotation.MainThread;
-import android.support.annotation.Nullable;
-import android.util.ArraySet;
 import android.util.Log;
 
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.GenreItems;
 import com.android.tv.data.Program;
 import com.android.tv.data.ProgramDataManager;
-import com.android.tv.dvr.DvrDataManager;
-import com.android.tv.dvr.ScheduledRecording;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -58,7 +55,6 @@ public class ProgramManager {
     private final TvInputManagerHelper mTvInputManagerHelper;
     private final ChannelDataManager mChannelDataManager;
     private final ProgramDataManager mProgramDataManager;
-    private final DvrDataManager mDvrDataManager;  // Only set if DVR is enabled
 
     private long mStartUtcMillis;
     private long mEndUtcMillis;
@@ -78,8 +74,6 @@ public class ProgramManager {
         /** Program corresponding to the entry. {@code null} means that this entry is a gap. */
         public final Program program;
 
-        public final ScheduledRecording scheduledRecording;
-
         /** Start time of entry in UTC milliseconds. */
         public final long entryStartUtcMillis;
 
@@ -88,36 +82,31 @@ public class ProgramManager {
 
         private final boolean mIsBlocked;
 
+        private TableEntry(long startUtcMillis, long endUtcMillis) {
+            this(INVALID_ID, null, startUtcMillis, endUtcMillis, false);
+        }
+
         private TableEntry(long channelId, long startUtcMillis, long endUtcMillis) {
             this(channelId, null, startUtcMillis, endUtcMillis, false);
         }
 
         private TableEntry(long channelId, long startUtcMillis, long endUtcMillis,
                 boolean blocked) {
-            this(channelId, null, null, startUtcMillis, endUtcMillis, blocked);
+            this(channelId, null, startUtcMillis, endUtcMillis, blocked);
         }
 
-        private TableEntry(long channelId, Program program, long entryStartUtcMillis,
-                long entryEndUtcMillis, boolean isBlocked) {
-            this(channelId, program, null, entryStartUtcMillis, entryEndUtcMillis, isBlocked);
+        private TableEntry(long channelId, Program program,
+                long entryStartUtcMillis, long entryEndUtcMillis) {
+            this(channelId, program, entryStartUtcMillis, entryEndUtcMillis, false);
         }
 
-        private TableEntry(long channelId, Program program, ScheduledRecording scheduledRecording,
+        private TableEntry(long channelId, Program program,
                 long entryStartUtcMillis, long entryEndUtcMillis, boolean isBlocked) {
             this.channelId = channelId;
             this.program = program;
-            this.scheduledRecording = scheduledRecording;
             this.entryStartUtcMillis = entryStartUtcMillis;
             this.entryEndUtcMillis = entryEndUtcMillis;
             mIsBlocked = isBlocked;
-        }
-
-        /**
-         * A stable id useful for {@link android.support.v7.widget.RecyclerView.Adapter}.
-         */
-        public long getId() {
-            // using a negative entryEndUtcMillis keeps it from conflicting with program Id
-            return program != null ? program.getId() : -entryEndUtcMillis;
         }
 
         /**
@@ -178,10 +167,9 @@ public class ProgramManager {
     // Should be matched with mSelectedGenreId always.
     private List<Channel> mFilteredChannels = mChannels;
 
-    private final Set<Listener> mListeners = new ArraySet<>();
-    private final Set<TableEntriesUpdatedListener> mTableEntriesUpdatedListeners = new ArraySet<>();
-
-    private final Set<TableEntryChangedListener> mTableEntryChangedListeners = new ArraySet<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
+    private final Set<TableEntriesUpdatedListener> mTableEntriesUpdatedListeners = CollectionUtils
+            .createSmallSet();
 
     private final ChannelDataManager.Listener mChannelDataManagerListener =
             new ChannelDataManager.Listener() {
@@ -209,49 +197,12 @@ public class ProgramManager {
                 }
             };
 
-    private final DvrDataManager.ScheduledRecordingListener mScheduledRecordingListener =
-            new DvrDataManager.ScheduledRecordingListener() {
-        @Override
-        public void onScheduledRecordingAdded(ScheduledRecording scheduledRecording) {
-            TableEntry oldEntry = getTableEntry(scheduledRecording);
-            if (oldEntry != null) {
-                TableEntry newEntry = new TableEntry(oldEntry.channelId, oldEntry.program,
-                        scheduledRecording, oldEntry.entryStartUtcMillis,
-                        oldEntry.entryEndUtcMillis, oldEntry.isBlocked());
-                updateEntry(oldEntry, newEntry);
-            }
-        }
-
-        @Override
-        public void onScheduledRecordingRemoved(ScheduledRecording scheduledRecording) {
-            TableEntry oldEntry = getTableEntry(scheduledRecording);
-            if (oldEntry != null) {
-                TableEntry newEntry = new TableEntry(oldEntry.channelId, oldEntry.program, null,
-                        oldEntry.entryStartUtcMillis, oldEntry.entryEndUtcMillis,
-                        oldEntry.isBlocked());
-                updateEntry(oldEntry, newEntry);
-            }
-        }
-
-        @Override
-        public void onScheduledRecordingStatusChanged(ScheduledRecording scheduledRecording) {
-            TableEntry oldEntry = getTableEntry(scheduledRecording);
-            if (oldEntry != null) {
-                TableEntry newEntry = new TableEntry(oldEntry.channelId, oldEntry.program,
-                        scheduledRecording, oldEntry.entryStartUtcMillis,
-                        oldEntry.entryEndUtcMillis, oldEntry.isBlocked());
-                updateEntry(oldEntry, newEntry);
-            }
-        }
-    };
-
     public ProgramManager(TvInputManagerHelper tvInputManagerHelper,
-            ChannelDataManager channelDataManager, ProgramDataManager programDataManager,
-            @Nullable DvrDataManager dvrDataManager) {
+            ChannelDataManager channelDataManager,
+            ProgramDataManager programDataManager) {
         mTvInputManagerHelper = tvInputManagerHelper;
         mChannelDataManager = channelDataManager;
         mProgramDataManager = programDataManager;
-        mDvrDataManager = dvrDataManager;
     }
 
     public void programGuideVisibilityChanged(boolean visible) {
@@ -259,58 +210,38 @@ public class ProgramManager {
         if (visible) {
             mChannelDataManager.addListener(mChannelDataManagerListener);
             mProgramDataManager.addListener(mProgramDataManagerListener);
-            if (mDvrDataManager != null) {
-                mDvrDataManager.addScheduledRecordingListener(mScheduledRecordingListener);
-            }
         } else {
             mChannelDataManager.removeListener(mChannelDataManagerListener);
             mProgramDataManager.removeListener(mProgramDataManagerListener);
-            if (mDvrDataManager != null) {
-                mDvrDataManager.removeScheduledRecordingListener(mScheduledRecordingListener);
-            }
         }
     }
 
     /**
-     * Adds a {@link Listener}.
+     * Add a {@link Listener}.
      */
     public void addListener(Listener listener) {
         mListeners.add(listener);
     }
 
     /**
-     * Registers a listener to be invoked when table entries are updated.
+     * Register a listener to be invoked when table entries are updated.
      */
     public void addTableEntriesUpdatedListener(TableEntriesUpdatedListener listener) {
         mTableEntriesUpdatedListeners.add(listener);
     }
 
     /**
-     * Registers a listener to be invoked when a table entry is changed.
-     */
-    public void addTableEntryChangedListener(TableEntryChangedListener listener) {
-        mTableEntryChangedListeners.add(listener);
-    }
-
-    /**
-     * Removes a {@link Listener}.
+     * Remove a {@link Listener}.
      */
     public void removeListener(Listener listener) {
         mListeners.remove(listener);
     }
 
     /**
-     * Removes a previously installed table entries update listener.
+     * Remove a previously installed table entries update listener.
      */
     public void removeTableEntriesUpdatedListener(TableEntriesUpdatedListener listener) {
         mTableEntriesUpdatedListeners.remove(listener);
-    }
-
-    /**
-     * Removes a previously installed table entry changed listener.
-     */
-    public void removeTableEntryChangedListener(TableEntryChangedListener listener) {
-        mTableEntryChangedListeners.remove(listener);
     }
 
     /**
@@ -435,7 +366,6 @@ public class ProgramManager {
                     } else if (lastEntry.entryEndUtcMillis == Long.MAX_VALUE) {
                         entries.remove(entries.size() - 1);
                         entries.add(new TableEntry(lastEntry.channelId, lastEntry.program,
-                                lastEntry.scheduledRecording,
                                 lastEntry.entryStartUtcMillis, mEndUtcMillis,
                                 lastEntry.mIsBlocked));
                     }
@@ -471,37 +401,6 @@ public class ProgramManager {
         for (TableEntriesUpdatedListener listener : mTableEntriesUpdatedListeners) {
             listener.onTableEntriesUpdated();
         }
-    }
-
-    private void notifyTableEntryUpdated(TableEntry entry) {
-        for (TableEntryChangedListener listener : mTableEntryChangedListeners) {
-            listener.onTableEntryChanged(entry);
-        }
-    }
-
-    private void updateEntry(TableEntry old, TableEntry newEntry) {
-        List<TableEntry> entries = mChannelIdEntriesMap.get(old.channelId);
-        int index = entries.indexOf(old);
-        entries.set(index, newEntry);
-        notifyTableEntryUpdated(newEntry);
-    }
-
-    @Nullable
-    private TableEntry getTableEntry(ScheduledRecording scheduledRecording) {
-        return getTableEntry(scheduledRecording.getChannelId(), scheduledRecording.getProgramId());
-    }
-
-    @Nullable
-    private TableEntry getTableEntry(long channelId, long entryId) {
-        List<TableEntry> entries = mChannelIdEntriesMap.get(channelId);
-        if (entries != null) {
-            for (TableEntry entry : entries) {
-                if (entry.getId() == entryId) {
-                    return entry;
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -572,14 +471,6 @@ public class ProgramManager {
     }
 
     /**
-     * Returns the index of channel with  {@code channelId} within the currently managed channels.
-     * Returns -1 if such a channel is not found.
-     */
-    public int getChannelIndex(long channelId) {
-        return getChannelIndex(mChannelDataManager.getChannel(channelId));
-    }
-
-    /**
      * Returns the number of "entries", which lies within the currently managed time range, for a
      * given {@code channelId}.
      */
@@ -620,10 +511,8 @@ public class ProgramManager {
                     lastProgramEndTime = programStartTime;
                 }
                 if (programEndTime > lastProgramEndTime) {
-                    ScheduledRecording scheduledRecording = mDvrDataManager == null ? null
-                            : mDvrDataManager.getScheduledRecordingForProgramId(program.getId());
-                    entries.add(new TableEntry(channelId, program, scheduledRecording,
-                            lastProgramEndTime, programEndTime, false));
+                    entries.add(new TableEntry(channelId, program, lastProgramEndTime,
+                            programEndTime));
                     lastProgramEndTime = programEndTime;
                 }
             }
@@ -636,8 +525,7 @@ public class ProgramManager {
                 // the first entry from UI perspective. So we clip it out.
                 entries.remove(0);
                 entries.set(0, new TableEntry(secondEntry.channelId, secondEntry.program,
-                        secondEntry.scheduledRecording, mStartUtcMillis,
-                        secondEntry.entryEndUtcMillis, secondEntry.mIsBlocked));
+                        mStartUtcMillis, secondEntry.entryEndUtcMillis));
             }
         }
         return entries;
@@ -665,10 +553,6 @@ public class ProgramManager {
 
     public interface TableEntriesUpdatedListener {
         void onTableEntriesUpdated();
-    }
-
-    public interface TableEntryChangedListener {
-        void onTableEntryChanged(TableEntry entry);
     }
 
     public static class ListenerAdapter implements Listener {
@@ -714,24 +598,9 @@ public class ProgramManager {
     }
 
     /**
-     * Returns the program index of the program with {@code entryId} or -1 if not found.
+     * Returns the program index of the program at {@code time}.
      */
-    public int getProgramIdIndex(long channelId, long entryId) {
-        List<TableEntry> entries = mChannelIdEntriesMap.get(channelId);
-        if (entries != null) {
-            for (int i = 0; i < entries.size(); i++) {
-                if (entries.get(i).getId() == entryId) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Returns the program index of the program at {@code time} or -1 if not found.
-     */
-    public int getProgramIndexAtTime(long channelId, long time) {
+    public int getProgramIndex(long channelId, long time) {
         List<TableEntry> entries = mChannelIdEntriesMap.get(channelId);
         for (int i = 0; i < entries.size(); ++i) {
             TableEntry entry = entries.get(i);

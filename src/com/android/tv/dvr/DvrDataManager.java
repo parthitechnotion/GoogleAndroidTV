@@ -20,8 +20,6 @@ import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.util.Range;
 
-import com.android.tv.common.recording.RecordedProgram;
-
 import java.util.List;
 
 /**
@@ -34,24 +32,24 @@ public interface DvrDataManager {
     boolean isInitialized();
 
     /**
+     * Returns recordings.
+     */
+    List<Recording> getRecordings();
+
+    /**
      * Returns past recordings.
      */
-    List<RecordedProgram> getRecordedPrograms();
+    List<Recording> getFinishedRecordings();
 
     /**
-     * Returns all {@link ScheduledRecording} regardless of state.
+     * Returns started recordings.
      */
-    List<ScheduledRecording> getAllScheduledRecordings();
+    List<Recording> getStartedRecordings();
 
     /**
-     * Returns started recordings that expired.
+     * Returns scheduled recordings
      */
-    List<ScheduledRecording> getStartedRecordings();
-
-    /**
-     * Returns scheduled but not started recordings that have not expired.
-     */
-    List<ScheduledRecording> getNonStartedScheduledRecordings();
+    List<Recording> getScheduledRecordings();
 
     /**
      * Returns season recordings.
@@ -75,60 +73,27 @@ public interface DvrDataManager {
      *
      * @param period a time period in milliseconds.
      */
-    List<ScheduledRecording> getRecordingsThatOverlapWith(Range<Long> period);
+    List<Recording> getRecordingsThatOverlapWith(Range<Long> period);
 
     /**
-     * Add a {@link ScheduledRecordingListener}.
+     * Add a {@link Listener}.
      */
-    void addScheduledRecordingListener(ScheduledRecordingListener scheduledRecordingListener);
+    void addListener(Listener listener);
 
     /**
-     * Remove a {@link ScheduledRecordingListener}.
+     * Remove a {@link Listener}.
      */
-    void removeScheduledRecordingListener(ScheduledRecordingListener scheduledRecordingListener);
+    void removeListener(Listener listener);
 
     /**
-     * Add a {@link RecordedProgramListener}.
-     */
-    void addRecordedProgramListener(RecordedProgramListener listener);
-
-    /**
-     * Remove a {@link RecordedProgramListener}.
-     */
-    void removeRecordedProgramListener(RecordedProgramListener listener);
-
-    /**
-     * Returns the scheduled recording program with the given recordingId or null if is not found.
+     * Returns the recording with the given recordingId or null if is not found
      */
     @Nullable
-    ScheduledRecording getScheduledRecording(long recordingId);
+    Recording getRecording(long recordingId);
 
-
-    /**
-     * Returns the scheduled recording program with the given programId or null if is not found.
-     */
-    @Nullable
-    ScheduledRecording getScheduledRecordingForProgramId(long programId);
-
-    /**
-     * Returns the recorded program with the given recordingId or null if is not found.
-     */
-    @Nullable
-    RecordedProgram getRecordedProgram(long recordingId);
-
-    interface ScheduledRecordingListener {
-        void onScheduledRecordingAdded(ScheduledRecording scheduledRecording);
-
-        void onScheduledRecordingRemoved(ScheduledRecording scheduledRecording);
-
-        void onScheduledRecordingStatusChanged(ScheduledRecording scheduledRecording);
-    }
-
-    interface RecordedProgramListener {
-        void onRecordedProgramAdded(RecordedProgram recordedProgram);
-
-        void onRecordedProgramChanged(RecordedProgram recordedProgram);
-
-        void onRecordedProgramRemoved(RecordedProgram recordedProgram);
+    interface Listener {
+        void onRecordingAdded(Recording recording);
+        void onRecordingRemoved(Recording recording);
+        void onRecordingStatusChanged(Recording recording);
     }
 }

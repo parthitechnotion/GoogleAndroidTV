@@ -321,13 +321,6 @@ public class ChannelDataManager implements Handler.Callback {
         channel.setChannelId(channelId);
         long currentTime = System.currentTimeMillis();
         List<EitItem> oldItems = getAllProgramsForChannel(channel);
-        // TODO: Find a right to check if the programs are added outside.
-        for (EitItem item : oldItems) {
-            if (item.getEventId() == 0) {
-                // The event has been added outside TV tuner. Do not update programs.
-                return;
-            }
-        }
         List<EitItem> outdatedOldItems = new ArrayList<>();
         List<EitItem> programsAddedToEPG = new ArrayList<>();
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();

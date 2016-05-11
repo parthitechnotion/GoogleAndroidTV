@@ -490,19 +490,6 @@ public class ContentRatingSystem {
             mRatingOrder = ratingOrder;
         }
 
-        /**
-         * Returns index of the rating in this order.
-         * Returns -1 if this order doesn't contain the rating.
-         */
-        public int getRatingIndex(Rating rating) {
-            for (int i = 0; i < mRatingOrder.size(); i++) {
-                if (mRatingOrder.get(i).getName().equals(rating.getName())) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         public static class Builder {
             private final List<String> mRatingNames = new ArrayList<>();
 

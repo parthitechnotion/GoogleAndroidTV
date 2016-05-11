@@ -28,17 +28,16 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.MainThread;
 import android.support.annotation.VisibleForTesting;
-import android.util.ArraySet;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.common.MemoryManageable;
-import com.android.tv.common.SoftPreconditions;
-import com.android.tv.data.epg.EpgFetcher;
 import com.android.tv.util.AsyncDbTask;
 import com.android.tv.util.Clock;
 import com.android.tv.util.MultiLongSparseArray;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
@@ -91,7 +90,7 @@ public class ProgramDataManager implements MemoryManageable {
     private final MultiLongSparseArray<OnCurrentProgramUpdatedListener>
             mChannelId2ProgramUpdatedListeners = new MultiLongSparseArray<>();
     private final Handler mHandler;
-    private final Set<Listener> mListeners = new ArraySet<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
 
     private final ContentObserver mProgramObserver;
 
@@ -109,12 +108,8 @@ public class ProgramDataManager implements MemoryManageable {
     private boolean mPauseProgramUpdate = false;
     private final LruCache<Long, Program> mZeroLengthProgramCache = new LruCache<>(10);
 
-    // TODO: Change to final.
-    private EpgFetcher mEpgFetcher;
-
     public ProgramDataManager(Context context) {
         this(context.getContentResolver(), Clock.SYSTEM, Looper.myLooper());
-        mEpgFetcher = new EpgFetcher(context);
     }
 
     @VisibleForTesting
@@ -133,8 +128,8 @@ public class ProgramDataManager implements MemoryManageable {
                 }
                 if (mPrefetchEnabled) {
                     // The delay time of an existing MSG_UPDATE_PREFETCH_PROGRAM could be quite long
-                    // up to PROGRAM_GUIDE_SNAP_TIME_MS. So we need to remove the existing message
-                    // and send MSG_UPDATE_PREFETCH_PROGRAM again.
+                    // up to PROGRAM_GUIDE_SNAP_TIME_MS. So we need to remove the existing message and
+                    // send MSG_UPDATE_PREFETCH_PROGRAM again.
                     mHandler.removeMessages(MSG_UPDATE_PREFETCH_PROGRAM);
                     mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
                 }
@@ -174,9 +169,6 @@ public class ProgramDataManager implements MemoryManageable {
         }
         mContentResolver.registerContentObserver(Programs.CONTENT_URI,
                 true, mProgramObserver);
-        if (mEpgFetcher != null) {
-            mEpgFetcher.start();
-        }
     }
 
     /**
@@ -190,9 +182,6 @@ public class ProgramDataManager implements MemoryManageable {
         }
         mStarted = false;
 
-        if (mEpgFetcher != null) {
-            mEpgFetcher.stop();
-        }
         mContentResolver.unregisterContentObserver(mProgramObserver);
         mHandler.removeCallbacksAndMessages(null);
 
@@ -209,18 +198,6 @@ public class ProgramDataManager implements MemoryManageable {
      */
     public Program getCurrentProgram(long channelId) {
         return mChannelIdCurrentProgramMap.get(channelId);
-    }
-
-    /**
-     * Reloads program data.
-     */
-    public void reload() {
-        if (!mHandler.hasMessages(MSG_UPDATE_CURRENT_PROGRAMS)) {
-            mHandler.sendEmptyMessage(MSG_UPDATE_CURRENT_PROGRAMS);
-        }
-        if (mPrefetchEnabled && !mHandler.hasMessages(MSG_UPDATE_PREFETCH_PROGRAM)) {
-            mHandler.sendEmptyMessage(MSG_UPDATE_PREFETCH_PROGRAM);
-        }
     }
 
     /**
@@ -621,22 +598,6 @@ public class ProgramDataManager implements MemoryManageable {
         protected void onPostExecute(Program program) {
             mProgramUpdateTaskMap.remove(mChannelId);
             updateCurrentProgram(mChannelId, program);
-        }
-    }
-
-    /**
-     * Gets an single {@link Program} from {@link TvContract.Programs#CONTENT_URI}.
-     */
-    public static class QueryProgramTask extends AsyncDbTask.AsyncQueryItemTask<Program> {
-
-        public QueryProgramTask(ContentResolver contentResolver, long programId) {
-            super(contentResolver, TvContract.buildProgramUri(programId), Program.PROJECTION, null,
-                    null, null);
-        }
-
-        @Override
-        protected Program fromCursor(Cursor c) {
-            return  Program.fromCursor(c);
         }
     }
 

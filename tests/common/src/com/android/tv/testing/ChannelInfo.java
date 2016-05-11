@@ -57,7 +57,6 @@ public final class ChannelInfo {
     public final int originalNetworkId;
     public final int videoWidth;
     public final int videoHeight;
-    public final float videoPixelAspectRatio;
     public final int audioChannel;
     public final int audioLanguageCount;
     public final boolean hasClosedCaption;
@@ -110,17 +109,15 @@ public final class ChannelInfo {
     }
 
     private ChannelInfo(String number, String name, String logoUrl, int originalNetworkId,
-            int videoWidth, int videoHeight, float videoPixelAspectRatio, int audioChannel,
-            int audioLanguageCount, boolean hasClosedCaption, ProgramInfo program,
-            String appLinkText, int appLinkColor, String appLinkIconUri, String appLinkPosterArtUri,
-            String appLinkIntentUri) {
+            int videoWidth, int videoHeight, int audioChannel, int audioLanguageCount,
+            boolean hasClosedCaption, ProgramInfo program, String appLinkText, int appLinkColor,
+            String appLinkIconUri, String appLinkPosterArtUri, String appLinkIntentUri) {
         this.number = number;
         this.name = name;
         this.logoUrl = logoUrl;
         this.originalNetworkId = originalNetworkId;
         this.videoWidth = videoWidth;
         this.videoHeight = videoHeight;
-        this.videoPixelAspectRatio = videoPixelAspectRatio;
         this.audioChannel = audioChannel;
         this.audioLanguageCount = audioLanguageCount;
         this.hasClosedCaption = hasClosedCaption;
@@ -196,7 +193,6 @@ public final class ChannelInfo {
         private int mOriginalNetworkId;
         private int mVideoWidth = 1920;  // Width for HD video.
         private int mVideoHeight = 1080;  // Height for HD video.
-        private float mVideoPixelAspectRatio = 1.0f; //default value
         private int mAudioChannel;
         private int mAudioLanguageCount;
         private boolean mHasClosedCaption;
@@ -217,7 +213,6 @@ public final class ChannelInfo {
             mOriginalNetworkId = other.originalNetworkId;
             mVideoWidth = other.videoWidth;
             mVideoHeight = other.videoHeight;
-            mVideoPixelAspectRatio = other.videoPixelAspectRatio;
             mAudioChannel = other.audioChannel;
             mAudioLanguageCount = other.audioLanguageCount;
             mHasClosedCaption = other.hasClosedCaption;
@@ -251,11 +246,6 @@ public final class ChannelInfo {
 
         public Builder setVideoHeight(int videoHeight) {
             mVideoHeight = videoHeight;
-            return this;
-        }
-
-        public Builder setVideoPixelAspectRatio(float videoPixelAspectRatio) {
-            mVideoPixelAspectRatio = videoPixelAspectRatio;
             return this;
         }
 
@@ -306,8 +296,8 @@ public final class ChannelInfo {
 
         public ChannelInfo build() {
             return new ChannelInfo(mNumber, mName, mLogoUrl, mOriginalNetworkId,
-                    mVideoWidth, mVideoHeight, mVideoPixelAspectRatio, mAudioChannel,
-                    mAudioLanguageCount, mHasClosedCaption, mProgram, mAppLinkText, mAppLinkColor,
+                    mVideoWidth, mVideoHeight, mAudioChannel, mAudioLanguageCount,
+                    mHasClosedCaption, mProgram, mAppLinkText, mAppLinkColor,
                     mAppLinkIconUri, mAppLinkPosterArtUri, mAppLinkIntentUri);
 
         }

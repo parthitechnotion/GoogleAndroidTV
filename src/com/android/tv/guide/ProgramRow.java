@@ -306,7 +306,7 @@ public class ProgramRow extends TimelineGridView {
     public void resetScroll(int scrollOffset) {
         long startTime = GuideUtils.convertPixelToMillis(scrollOffset)
                 + mProgramManager.getStartTime();
-        int position = mChannel == null ? -1 : mProgramManager.getProgramIndexAtTime(
+        int position = mChannel == null ? -1 : mProgramManager.getProgramIndex(
                 mChannel.getId(), startTime);
         if (position < 0) {
             getLayoutManager().scrollToPosition(0);

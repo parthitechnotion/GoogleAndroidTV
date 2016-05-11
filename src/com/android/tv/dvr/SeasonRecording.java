@@ -29,7 +29,7 @@ public class SeasonRecording {
      */
     private static final int ALL_SEASON = -1;
 
-    private List<ScheduledRecording> mSchedule;
+    private List<Recording> mSchedule;
     private String mTitle;
     private int mSeasonNumber;
 }
