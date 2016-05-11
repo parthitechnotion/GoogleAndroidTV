@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Iterator;
 
 public class CustomizeChannelListFragment extends SideFragment {
     private static final int GROUP_BY_SOURCE = 0;
@@ -158,21 +157,6 @@ public class CustomizeChannelListFragment extends SideFragment {
         return mItems;
     }
 
-    private void cleanUpOneChannelGroupItem(List<Item> items) {
-        Iterator<Item> iter = items.iterator();
-        while (iter.hasNext()) {
-            Item item = iter.next();
-            if (item instanceof SelectGroupItem) {
-                SelectGroupItem selectGroupItem = (SelectGroupItem) item;
-                if (selectGroupItem.mChannelItemsInGroup.size() == 1) {
-                    ((ChannelItem) selectGroupItem.mChannelItemsInGroup.get(0))
-                            .mSelectGroupItem = null;
-                    iter.remove();
-                }
-            }
-        }
-    }
-
     private void addItemForGroupBySource(List<Item> items) {
         items.add(new GroupBySubMenu(getString(R.string.edit_channels_group_by_sources)));
         SelectGroupItem selectGroupItem = null;
@@ -193,7 +177,6 @@ public class CustomizeChannelListFragment extends SideFragment {
             items.add(channelItem);
             selectGroupItem.addChannelItem(channelItem);
         }
-        cleanUpOneChannelGroupItem(items);
     }
 
     private void addItemForGroupByHdSd(List<Item> items) {
@@ -228,7 +211,6 @@ public class CustomizeChannelListFragment extends SideFragment {
             items.add(channelItem);
             selectGroupItem.addChannelItem(channelItem);
         }
-        cleanUpOneChannelGroupItem(items);
     }
 
     private static boolean isHdChannel(Channel channel) {
@@ -293,7 +275,7 @@ public class CustomizeChannelListFragment extends SideFragment {
     }
 
     private class ChannelItem extends ChannelCheckItem {
-        private SelectGroupItem mSelectGroupItem;
+        private final SelectGroupItem mSelectGroupItem;
 
         public ChannelItem(Channel channel, SelectGroupItem selectGroupItem) {
             super(channel, getChannelDataManager(), getProgramDataManager());
@@ -310,9 +292,7 @@ public class CustomizeChannelListFragment extends SideFragment {
         protected void onSelected() {
             super.onSelected();
             getChannelDataManager().updateBrowsable(getChannel().getId(), isChecked());
-            if (mSelectGroupItem != null) {
-                mSelectGroupItem.notifyUpdated();
-            }
+            mSelectGroupItem.notifyUpdated();
         }
 
         @Override

@@ -31,15 +31,15 @@ import android.os.Message;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.util.ArraySet;
 import android.util.Log;
 import android.util.MutableInt;
 
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.common.SharedPreferencesUtils;
-import com.android.tv.common.SoftPreconditions;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.util.AsyncDbTask;
 import com.android.tv.util.PermissionUtils;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -72,7 +72,7 @@ public class ChannelDataManager {
     private QueryAllChannelsTask mChannelsUpdateTask;
     private final List<Runnable> mPostRunnablesAfterChannelUpdate = new ArrayList<>();
 
-    private final Set<Listener> mListeners = new ArraySet<>();
+    private final Set<Listener> mListeners = CollectionUtils.createSmallSet();
     private final Map<Long, ChannelWrapper> mChannelWrapperMap = new HashMap<>();
     private final Map<String, MutableInt> mChannelCountMap = new HashMap<>();
     private final Channel.DefaultComparator mChannelComparator;
@@ -282,7 +282,7 @@ public class ChannelDataManager {
                 channels.add(channel);
             }
         }
-        return channels;
+        return Collections.unmodifiableList(channels);
     }
 
     /**
@@ -508,15 +508,6 @@ public class ChannelDataManager {
         mChannelsUpdateTask.executeOnDbThread();
     }
 
-    /**
-     * Reloads channel data.
-     */
-    public void reload() {
-        if (mDbLoadFinished && !mHandler.hasMessages(MSG_UPDATE_CHANNELS)) {
-            mHandler.sendEmptyMessage(MSG_UPDATE_CHANNELS);
-        }
-    }
-
     public interface Listener {
         /**
          * Called when data load is finished.
@@ -548,7 +539,7 @@ public class ChannelDataManager {
     }
 
     private class ChannelWrapper {
-        final Set<ChannelListener> mChannelListeners = new ArraySet<>();
+        final Set<ChannelListener> mChannelListeners = CollectionUtils.createSmallSet();
         final Channel mChannel;
         boolean mBrowsableInDb;
         boolean mLockedInDb;

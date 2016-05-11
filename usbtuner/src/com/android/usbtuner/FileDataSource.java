@@ -48,7 +48,6 @@ public class FileDataSource extends MediaDataSource implements InputStreamSource
     private static final int CIRCULAR_BUFFER_SIZE = MIN_READ_UNIT * 4000; // ~ 8MB
     private static final int PADDING_SIZE = MIN_READ_UNIT * 1000; // ~2MB
     private static final int READ_TIMEOUT_MS = 10000; // 10 secs.
-    private static final int BUFFER_UNDERRUN_SLEEP_MS = 10;
     private static final String FILE_DIR =
             new File(Environment.getExternalStorageDirectory(), "Streams").getAbsolutePath();
 
@@ -138,7 +137,6 @@ public class FileDataSource extends MediaDataSource implements InputStreamSource
                 mStreamingThread.join();
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -264,7 +262,6 @@ public class FileDataSource extends MediaDataSource implements InputStreamSource
                     mCircularBufferMonitor.wait(READ_TIMEOUT_MS);
                 } catch (InterruptedException e) {
                     // Wait again.
-                    Thread.currentThread().interrupt();
                 }
                 if (initialBytesFetched == mBytesFetched) {
                     Log.w(TAG, "No data update for " + READ_TIMEOUT_MS + "ms. returning -1.");
@@ -353,7 +350,6 @@ public class FileDataSource extends MediaDataSource implements InputStreamSource
                             mCircularBufferMonitor.wait();
                         } catch (InterruptedException e) {
                             // Wait again.
-                            Thread.currentThread().interrupt();
                         }
                     }
                     if (!mStreaming) {
@@ -363,13 +359,6 @@ public class FileDataSource extends MediaDataSource implements InputStreamSource
 
                 int bytesWritten = mSource.read(dataBuffer);
                 if (bytesWritten <= 0) {
-                    try {
-                        // When buffer is underrun, we sleep for short time to prevent
-                        // unnecessary CPU draining.
-                        sleep(BUFFER_UNDERRUN_SLEEP_MS);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
                     continue;
                 }
 

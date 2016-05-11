@@ -19,6 +19,7 @@ import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
+import com.google.android.exoplayer.TrackInfo;
 import com.google.android.exoplayer.TrackRenderer;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ import java.io.IOException;
  * Extractor for reading track metadata and samples stored in tracks.
  *
  * <p>Call {@link #prepare} until it returns {@code true}, then access track metadata via
- * {@link #getTrackFormats} and {@link #getTrackMediaFormat}.
+ * {@link #getTrackInfos} and {@link #getTrackMediaFormat}.
  *
  * <p>Pass indices of tracks to read from to {@link #selectTrack}. A track can later be deselected
  * by calling {@link #deselectTrack}. It is safe to select/deselect tracks after reading sample
@@ -47,7 +48,7 @@ public interface SampleExtractor {
     boolean prepare() throws IOException;
 
     /** Returns track information about all tracks that can be selected. */
-    MediaFormat[] getTrackFormats();
+    TrackInfo[] getTrackInfos();
 
     /** Selects the track at {@code index} for reading sample data. */
     void selectTrack(int index);
@@ -76,7 +77,7 @@ public interface SampleExtractor {
     void seekTo(long positionUs);
 
     /** Stores the {@link MediaFormat} of {@code track}. */
-    void getTrackMediaFormat(int track, MediaFormatHolder outMediaFormatHolder);
+    void getTrackMediaFormat(int track, MediaFormatHolder mediaFormatHolder);
 
     /**
     * Reads the next sample in the track at index {@code track} into {@code sampleHolder}, returning
@@ -91,8 +92,9 @@ public interface SampleExtractor {
     *     {@link SampleSource#END_OF_STREAM} if the last samples in all tracks have been read, or
     *     {@link SampleSource#NOTHING_READ} if the sample cannot be read immediately as it is not
     *     loaded.
+    * @throws {@link IOException} thrown if the source can't be read
     */
-    int readSample(int track, SampleHolder sampleHolder);
+    int readSample(int track, SampleHolder sampleHolder) throws IOException;
 
     /** Releases resources associated with this extractor. */
     void release();

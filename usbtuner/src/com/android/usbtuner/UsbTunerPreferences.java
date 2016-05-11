@@ -21,28 +21,20 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.AsyncTask;
-import android.os.Bundle;
 
-import com.android.tv.common.SoftPreconditions;
 import com.android.usbtuner.UsbTunerPreferenceProvider.Preferences;
 import com.android.usbtuner.util.TisConfiguration;
 
 /**
  * A helper class for the USB tuner preferences.
  */
-// TODO: Change this class to run on the worker thread.
 public class UsbTunerPreferences {
-    private static final String TAG = "UsbTunerPreferences";
-
     private static final String PREFS_KEY_CHANNEL_DATA_VERSION = "channel_data_version";
     private static final String PREFS_KEY_SCANNED_CHANNEL_COUNT = "scanned_channel_count";
     private static final String PREFS_KEY_SCAN_DONE = "scan_done";
     private static final String PREFS_KEY_LAUNCH_SETUP = "launch_setup";
 
     private static final String SHARED_PREFS_NAME = "com.android.usbtuner.preferences";
-
-    private static final Bundle PREFERENCE_VALUES = new Bundle();
 
     private static boolean useContentProvider(Context context) {
         // If TIS is a part of LC, it should use ContentProvider to resolve multiple process access.
@@ -140,16 +132,11 @@ public class UsbTunerPreferences {
             if (cursor != null && cursor.moveToFirst()) {
                 return cursor.getString(0);
             }
-        } catch (Exception e) {
-            SoftPreconditions.warn(TAG, "getPreference", "Error querying preference values", e);
         }
         return null;
     }
 
     private static int getPreferenceInt(Context context, String key) {
-        if (PREFERENCE_VALUES.containsKey(key)) {
-            return PREFERENCE_VALUES.getInt(key);
-        }
         try {
             return Integer.parseInt(getPreference(context, key));
         } catch (NumberFormatException e) {
@@ -158,38 +145,22 @@ public class UsbTunerPreferences {
     }
 
     private static boolean getPreferenceBoolean(Context context, String key) {
-        if (PREFERENCE_VALUES.containsKey(key)) {
-            return PREFERENCE_VALUES.getBoolean(key);
-        }
         return Boolean.valueOf(getPreference(context, key));
     }
 
-    private static void setPreference(final Context context, final String key, final String value) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                ContentResolver resolver = context.getContentResolver();
-                ContentValues values = new ContentValues();
-                values.put(Preferences.COLUMN_KEY, key);
-                values.put(Preferences.COLUMN_VALUE, value);
-                try {
-                    resolver.insert(Preferences.CONTENT_URI, values);
-                } catch (Exception e) {
-                    SoftPreconditions.warn(TAG, "setPreference", "Error writing preference values",
-                            e);
-                }
-                return null;
-            }
-        }.execute();
+    private static void setPreference(Context context, String key, String value) {
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(Preferences.COLUMN_KEY, key);
+        values.put(Preferences.COLUMN_VALUE, value);
+        resolver.insert(Preferences.CONTENT_URI, values);
     }
 
     private static void setPreference(Context context, String key, int value) {
-        PREFERENCE_VALUES.putInt(key, value);
         setPreference(context, key, Integer.toString(value));
     }
 
     private static void setPreference(Context context, String key, boolean value) {
-        PREFERENCE_VALUES.putBoolean(key, value);
         setPreference(context, key, Boolean.toString(value));
     }
 }

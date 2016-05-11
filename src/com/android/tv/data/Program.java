@@ -22,14 +22,13 @@ import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
-import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.tv.R;
 import com.android.tv.common.BuildConfig;
-import com.android.tv.common.CollectionUtils;
 import com.android.tv.common.TvContentRatingCache;
+import com.android.tv.dvr.provider.DvrContract;
 import com.android.tv.util.ImageLoader;
 import com.android.tv.util.Utils;
 
@@ -44,42 +43,32 @@ public final class Program implements Comparable<Program> {
     private static final boolean DEBUG_DUMP_DESCRIPTION = false;
     private static final String TAG = "Program";
 
-    private static final String[] PROJECTION_BASE = {
-            // Columns must match what is read in Program.fromCursor()
-            TvContract.Programs._ID,
-            TvContract.Programs.COLUMN_CHANNEL_ID,
-            TvContract.Programs.COLUMN_TITLE,
-            TvContract.Programs.COLUMN_EPISODE_TITLE,
-            TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
-            TvContract.Programs.COLUMN_POSTER_ART_URI,
-            TvContract.Programs.COLUMN_THUMBNAIL_URI,
-            TvContract.Programs.COLUMN_CANONICAL_GENRE,
-            TvContract.Programs.COLUMN_CONTENT_RATING,
-            TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
-            TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS,
-            TvContract.Programs.COLUMN_VIDEO_WIDTH,
-            TvContract.Programs.COLUMN_VIDEO_HEIGHT
+    public static final String[] PROJECTION = {
+        // Columns must match what is read in Program.fromCursor()
+        TvContract.Programs.COLUMN_CHANNEL_ID,
+        TvContract.Programs.COLUMN_TITLE,
+        TvContract.Programs.COLUMN_EPISODE_TITLE,
+        TvContract.Programs.COLUMN_SEASON_NUMBER,
+        TvContract.Programs.COLUMN_EPISODE_NUMBER,
+        TvContract.Programs.COLUMN_SHORT_DESCRIPTION,
+        TvContract.Programs.COLUMN_POSTER_ART_URI,
+        TvContract.Programs.COLUMN_THUMBNAIL_URI,
+        TvContract.Programs.COLUMN_CANONICAL_GENRE,
+        TvContract.Programs.COLUMN_CONTENT_RATING,
+        TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
+        TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS,
+        TvContract.Programs.COLUMN_VIDEO_WIDTH,
+        TvContract.Programs.COLUMN_VIDEO_HEIGHT
     };
 
-    // Columns which is deprecated in NYC
-    private static final String[] PROJECTION_DEPRECATED_IN_NYC = {
-            TvContract.Programs.COLUMN_SEASON_NUMBER,
-            TvContract.Programs.COLUMN_EPISODE_NUMBER
+    /**
+     * Use this projection if you want to create {@link Program} object using
+     * {@link #fromDvrCursor}.
+     */
+    public static final String[] PROJECTION_DVR = {
+        // Columns must match what is read in Channel.fromDvrCursor()
+        DvrContract.DvrPrograms._ID
     };
-
-    private static final String[] PROJECTION_ADDED_IN_NYC = {
-            TvContract.Programs.COLUMN_SEASON_DISPLAY_NUMBER,
-            TvContract.Programs.COLUMN_SEASON_TITLE,
-            TvContract.Programs.COLUMN_EPISODE_DISPLAY_NUMBER
-    };
-
-    public static final String[] PROJECTION = createProjection();
-
-    private static String[] createProjection() {
-        return CollectionUtils
-                .concatAll(PROJECTION_BASE, BuildCompat.isAtLeastN() ? PROJECTION_ADDED_IN_NYC
-                : PROJECTION_DEPRECATED_IN_NYC);
-    }
 
     /**
      * Creates {@code Program} object from cursor.
@@ -90,38 +79,39 @@ public final class Program implements Comparable<Program> {
         // Columns read must match the order of match {@link #PROJECTION}
         Builder builder = new Builder();
         int index = 0;
-        builder.setId(cursor.getLong(index++));
         builder.setChannelId(cursor.getLong(index++));
         builder.setTitle(cursor.getString(index++));
         builder.setEpisodeTitle(cursor.getString(index++));
+        builder.setSeasonNumber(cursor.getInt(index++));
+        builder.setEpisodeNumber(cursor.getInt(index++));
         builder.setDescription(cursor.getString(index++));
         builder.setPosterArtUri(cursor.getString(index++));
         builder.setThumbnailUri(cursor.getString(index++));
         builder.setCanonicalGenres(cursor.getString(index++));
-        builder.setContentRatings(
-                TvContentRatingCache.getInstance().getRatings(cursor.getString(index++)));
+        builder.setContentRatings(TvContentRatingCache.getInstance()
+                .getRatings(cursor.getString(index++)));
         builder.setStartTimeUtcMillis(cursor.getLong(index++));
         builder.setEndTimeUtcMillis(cursor.getLong(index++));
         builder.setVideoWidth((int) cursor.getLong(index++));
         builder.setVideoHeight((int) cursor.getLong(index++));
-        if (BuildCompat.isAtLeastN()) {
-            builder.setSeasonNumber(cursor.getString(index++));
-            builder.setSeasonTitle(cursor.getString(index++));
-            builder.setEpisodeNumber(cursor.getString(index++));
-        } else {
-            builder.setSeasonNumber(cursor.getString(index++));
-            builder.setEpisodeNumber(cursor.getString(index++));
-        }
         return builder.build();
     }
 
-    private long mId;
+    /**
+     * Creates a {@link Program} object from the DVR database.
+     */
+    public static Program fromDvrCursor(Cursor c) {
+        Program program = new Program();
+        int index = -1;
+        program.mDvrId = c.getLong(++index);
+        return program;
+    }
+
     private long mChannelId;
     private String mTitle;
     private String mEpisodeTitle;
-    private String mSeasonNumber;
-    private String mSeasonTitle;
-    private String mEpisodeNumber;
+    private int mSeasonNumber;
+    private int mEpisodeNumber;
     private long mStartTimeUtcMillis;
     private long mEndTimeUtcMillis;
     private String mDescription;
@@ -132,6 +122,8 @@ public final class Program implements Comparable<Program> {
     private int[] mCanonicalGenreIds;
     private TvContentRating[] mContentRatings;
 
+    private long mDvrId;
+
     /**
      * TODO(DVR): Need to fill the following data.
      */
@@ -140,10 +132,6 @@ public final class Program implements Comparable<Program> {
 
     private Program() {
         // Do nothing.
-    }
-
-    public long getId() {
-        return mId;
     }
 
     public long getChannelId() {
@@ -173,20 +161,11 @@ public final class Program implements Comparable<Program> {
     }
 
     public String getEpisodeDisplayTitle(Context context) {
-        if (!TextUtils.isEmpty(mSeasonNumber) && !TextUtils.isEmpty(mEpisodeNumber)
-                && !TextUtils.isEmpty(mEpisodeTitle)) {
+        if (mSeasonNumber > 0 && mEpisodeNumber > 0 && !TextUtils.isEmpty(mEpisodeTitle)) {
             return String.format(context.getResources().getString(R.string.episode_format),
                     mSeasonNumber, mEpisodeNumber, mEpisodeTitle);
         }
         return mEpisodeTitle;
-    }
-
-    public String getSeasonNumber() {
-        return mSeasonNumber;
-    }
-
-    public String getEpisodeNumber() {
-        return mEpisodeNumber;
     }
 
     public long getStartTimeUtcMillis() {
@@ -260,12 +239,19 @@ public final class Program implements Comparable<Program> {
         return false;
     }
 
+    /**
+     * Returns an ID in DVR database.
+     */
+    public long getDvrId() {
+        return mDvrId;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(mChannelId, mStartTimeUtcMillis, mEndTimeUtcMillis,
                 mTitle, mEpisodeTitle, mDescription, mVideoWidth, mVideoHeight,
                 mPosterArtUri, mThumbnailUri, Arrays.hashCode(mContentRatings),
-                Arrays.hashCode(mCanonicalGenreIds), mSeasonNumber, mSeasonTitle, mEpisodeNumber);
+                Arrays.hashCode(mCanonicalGenreIds), mSeasonNumber, mEpisodeNumber);
     }
 
     @Override
@@ -286,9 +272,8 @@ public final class Program implements Comparable<Program> {
                 && Objects.equals(mThumbnailUri, program.mThumbnailUri)
                 && Arrays.equals(mContentRatings, program.mContentRatings)
                 && Arrays.equals(mCanonicalGenreIds, program.mCanonicalGenreIds)
-                && Objects.equals(mSeasonNumber, program.mSeasonNumber)
-                && Objects.equals(mSeasonTitle, program.mSeasonTitle)
-                && Objects.equals(mEpisodeNumber, program.mEpisodeNumber);
+                && mSeasonNumber == program.mSeasonNumber
+                && mEpisodeNumber == program.mEpisodeNumber;
     }
 
     @Override
@@ -299,12 +284,11 @@ public final class Program implements Comparable<Program> {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Program[" + mId + "]{")
+        builder.append("Program{")
                 .append("channelId=").append(mChannelId)
                 .append(", title=").append(mTitle)
                 .append(", episodeTitle=").append(mEpisodeTitle)
                 .append(", seasonNumber=").append(mSeasonNumber)
-                .append(", seasonTitle=").append(mSeasonTitle)
                 .append(", episodeNumber=").append(mEpisodeNumber)
                 .append(", startTimeUtcSec=").append(Utils.toTimeString(mStartTimeUtcMillis))
                 .append(", endTimeUtcSec=").append(Utils.toTimeString(mEndTimeUtcMillis))
@@ -326,12 +310,10 @@ public final class Program implements Comparable<Program> {
             return;
         }
 
-        mId = other.mId;
         mChannelId = other.mChannelId;
         mTitle = other.mTitle;
         mEpisodeTitle = other.mEpisodeTitle;
         mSeasonNumber = other.mSeasonNumber;
-        mSeasonTitle = other.mSeasonTitle;
         mEpisodeNumber = other.mEpisodeNumber;
         mStartTimeUtcMillis = other.mStartTimeUtcMillis;
         mEndTimeUtcMillis = other.mEndTimeUtcMillis;
@@ -346,29 +328,22 @@ public final class Program implements Comparable<Program> {
 
     public static final class Builder {
         private final Program mProgram;
-        private long mId;
 
         public Builder() {
             mProgram = new Program();
             // Fill initial data.
             mProgram.mChannelId = Channel.INVALID_ID;
-            mProgram.mTitle = null;
-            mProgram.mSeasonNumber = null;
-            mProgram.mSeasonTitle = null;
-            mProgram.mEpisodeNumber = null;
+            mProgram.mTitle = "title";
+            mProgram.mSeasonNumber = -1;
+            mProgram.mEpisodeNumber = -1;
             mProgram.mStartTimeUtcMillis = -1;
             mProgram.mEndTimeUtcMillis = -1;
-            mProgram.mDescription = null;
+            mProgram.mDescription = "description";
         }
 
         public Builder(Program other) {
             mProgram = new Program();
             mProgram.copyFrom(other);
-        }
-
-        public Builder setId(long id) {
-            mProgram.mId = id;
-            return this;
         }
 
         public Builder setChannelId(long channelId) {
@@ -386,17 +361,12 @@ public final class Program implements Comparable<Program> {
             return this;
         }
 
-        public Builder setSeasonNumber(String seasonNumber) {
+        public Builder setSeasonNumber(int seasonNumber) {
             mProgram.mSeasonNumber = seasonNumber;
             return this;
         }
 
-        public Builder setSeasonTitle(String seasonTitle) {
-            mProgram.mSeasonTitle = seasonTitle;
-            return this;
-        }
-
-        public Builder setEpisodeNumber(String episodeNumber) {
+        public Builder setEpisodeNumber(int episodeNumber) {
             mProgram.mEpisodeNumber = episodeNumber;
             return this;
         }
@@ -503,10 +473,11 @@ public final class Program implements Comparable<Program> {
         boolean isDuplicate = p1.getChannelId() == p2.getChannelId()
                 && p1.getStartTimeUtcMillis() == p2.getStartTimeUtcMillis()
                 && p1.getEndTimeUtcMillis() == p2.getEndTimeUtcMillis();
-        if (DEBUG && BuildConfig.ENG && isDuplicate) {
+        if (BuildConfig.ENG && isDuplicate) {
             Log.w(TAG, "Duplicate programs detected! - \"" + p1.getTitle() + "\" and \""
                     + p2.getTitle() + "\"");
         }
         return isDuplicate;
     }
+
 }

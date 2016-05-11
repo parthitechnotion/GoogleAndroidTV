@@ -20,7 +20,6 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.media.tv.TvInputInfo;
 import android.os.Build;
-import android.support.v4.os.BuildCompat;
 
 import java.lang.reflect.Constructor;
 
@@ -35,8 +34,6 @@ public class TestUtils {
         // Note that mockito doesn't support mock/spy on final object.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return createTvInputInfoForLmp(service, id, parentId, type);
-        } else if (BuildCompat.isAtLeastN()) {
-            new RuntimeException("TOOD(dvr): implement");  // http://b/26903987
         }
         return createTvInputInfoForMnc(service, id, parentId, type, isHardwareInput);
     }
@@ -55,14 +52,6 @@ public class TestUtils {
                 ResolveInfo.class, String.class, String.class, int.class, boolean.class});
         constructor.setAccessible(true);
         return constructor.newInstance(service, id, parentId, type, isHardwareInput);
-    }
-
-    private static TvInputInfo createTvInputInfoForNpreview(ResolveInfo service, String id,
-            String parentId, int type) throws Exception {
-        Constructor<TvInputInfo> constructor = TvInputInfo.class.getDeclaredConstructor(
-                new Class[]{ResolveInfo.class, String.class, String.class, int.class});
-        constructor.setAccessible(true);
-        return constructor.newInstance(service, id, parentId, type);
     }
 
     public static ResolveInfo createResolveInfo(String packageName, String name) {

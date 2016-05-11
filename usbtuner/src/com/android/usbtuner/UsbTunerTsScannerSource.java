@@ -49,7 +49,7 @@ public class UsbTunerTsScannerSource implements InputStreamSource {
     private final AtomicLong mBytesFetched = new AtomicLong();
 
     public UsbTunerTsScannerSource(Context context, EventListener eventListener) {
-        mTunerHal = TunerHal.createInstance(context);
+        mTunerHal = TunerHal.getInstance(context);
         if (mTunerHal == null) {
             throw new RuntimeException("Failed to open a DVB device");
         }

@@ -16,40 +16,44 @@
 
 package com.android.usbtuner.tvinput;
 
-import android.media.tv.TvInputService;
+import android.os.Handler;
 import android.util.Log;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
-import com.android.usbtuner.exoplayer.cache.CacheManager;
+import com.android.tv.common.recording.RecordingTvInputService;
+import com.android.tv.common.recording.TvRecording;
+import com.android.usbtuner.exoplayer.CacheManager;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * {@link BaseTunerTvInputService} serves TV channels coming from a tuner device.
+ * {@link BaseTunerTvInputService} serves TV channels coming from a usb tuner device.
  */
-public abstract class BaseTunerTvInputService extends TvInputService
+public abstract class BaseTunerTvInputService extends RecordingTvInputService
         implements AudioCapabilitiesReceiver.Listener {
     private static final String TAG = "BaseTunerTvInputService";
     private static final boolean DEBUG = false;
 
     // WeakContainer for {@link TvInputSessionImpl}
-    private final Set<TunerSession> mTunerSessions = Collections.newSetFromMap(
-            new WeakHashMap<TunerSession, Boolean>());
+    private final Set<TvInputSessionImpl> mTvInputSessions = Collections.newSetFromMap(
+            new WeakHashMap<TvInputSessionImpl, Boolean>());
     private ChannelDataManager mChannelDataManager;
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
     private AudioCapabilities mAudioCapabilities;
-    private CacheManager mCacheManager;
+    protected CacheManager mCacheManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (DEBUG) Log.d(TAG, "onCreate");
+        if (DEBUG) {
+            Log.d(TAG, "onCreate");
+        }
         mChannelDataManager = new ChannelDataManager(getApplicationContext());
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(getApplicationContext(), this);
         mAudioCapabilitiesReceiver.register();
-        mCacheManager = createCacheManager();
+        maybeInitCacheManager();
         if (mCacheManager == null) {
             Log.i(TAG, "Trickplay is disabled");
         } else {
@@ -57,14 +61,13 @@ public abstract class BaseTunerTvInputService extends TvInputService
         }
     }
 
-    /**
-     * Creates {@CacheManager}. It returns null, if storage in not enough.
-     */
-    protected abstract CacheManager createCacheManager();
+    protected abstract void maybeInitCacheManager();
 
     @Override
     public void onDestroy() {
-        if (DEBUG) Log.d(TAG, "onDestroy");
+        if (DEBUG) {
+            Log.d(TAG, "onDestroy");
+        }
         super.onDestroy();
         mChannelDataManager.release();
         mAudioCapabilitiesReceiver.unregister();
@@ -74,27 +77,36 @@ public abstract class BaseTunerTvInputService extends TvInputService
     }
 
     @Override
-    public RecordingSession onCreateRecordingSession(String inputId) {
-        return new TunerRecordingSession(this, inputId, mChannelDataManager);
+    public TvRecording.RecordingSession onCreateDvrSession(String inputId) {
+        return new RecordingSessionImpl(this, inputId, mChannelDataManager);
     }
 
     @Override
-    public Session onCreateSession(String inputId) {
-        if (DEBUG) Log.d(TAG, "onCreateSession");
-        final TunerSession session = new TunerSession(
+    public RecordingTvInputService.PlaybackSession onCreatePlaybackSession(String inputId) {
+        if (DEBUG) {
+            Log.d(TAG, "onCreateSession");
+        }
+        final TvInputSessionImpl session = new TvInputSessionImpl(
                 this, mChannelDataManager, mCacheManager);
-        mTunerSessions.add(session);
-        session.setAudioCapabilities(mAudioCapabilities);
-        session.setOverlayViewEnabled(true);
+        mTvInputSessions.add(session);
+        session.notifyAudioCapabilitiesChanged(mAudioCapabilities);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                // STOPSHIP(DVR): Session methods cannot be called inside onCreatePlaybackSession.
+                // If DvrSession is added in API. we can call them inside onCreatePlaybackSession.
+                session.setOverlayViewEnabled(true);
+            }
+        });
         return session;
     }
 
     @Override
     public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
         mAudioCapabilities = audioCapabilities;
-        for (TunerSession session : mTunerSessions) {
+        for (TvInputSessionImpl session : mTvInputSessions) {
             if (!session.isReleased()) {
-                session.setAudioCapabilities(audioCapabilities);
+                session.notifyAudioCapabilitiesChanged(audioCapabilities);
             }
         }
     }

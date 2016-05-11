@@ -26,8 +26,8 @@ import java.util.List;
  * Sends ConfigurationInfo once a day.
  */
 public class SendConfigInfoRunnable implements Runnable {
-    private final Tracker mTracker;
-    private final TvInputManagerHelper mTvInputManagerHelper;
+    private Tracker mTracker;
+    private TvInputManagerHelper mTvInputManagerHelper;
 
     public SendConfigInfoRunnable(Tracker tracker, TvInputManagerHelper tvInputManagerHelper) {
         this.mTracker = tracker;

@@ -206,8 +206,6 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         channelListener.reset();
 
         // Test {@link ChannelDataManager#applyUpdatedValuesToDb}
-        // Disable the update notification to avoid the unwanted call of "onLoadFinished".
-        mContentResolver.mNotifyDisabled = true;
         mChannelDataManager.applyUpdatedValuesToDb();
         restart();
         browsableChannelList = mChannelDataManager.getBrowsableChannelList();
@@ -242,8 +240,6 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         assertFalse(browsableChannelList.contains(channel2));
 
         // Test {@link ChannelDataManager#applyUpdatedValuesToDb}
-        // Disable the update notification to avoid the unwanted call of "onLoadFinished".
-        mContentResolver.mNotifyDisabled = true;
         mChannelDataManager.applyUpdatedValuesToDb();
         restart();
         browsableChannelList = mChannelDataManager.getBrowsableChannelList();
@@ -274,8 +270,6 @@ public class ChannelDataManagerTest extends AndroidTestCase {
         assertTrue(mChannelDataManager.getChannel(channel.getId()).isLocked());
 
         // Test {@link ChannelDataManager#applyUpdatedValuesToDb}.
-        // Disable the update notification to avoid the unwanted call of "onLoadFinished".
-        mContentResolver.mNotifyDisabled = true;
         mChannelDataManager.applyUpdatedValuesToDb();
         restart();
         assertTrue(mChannelDataManager.getChannel(channel.getId()).isLocked());
@@ -349,17 +343,11 @@ public class ChannelDataManagerTest extends AndroidTestCase {
     }
 
     private class FakeContentResolver extends MockContentResolver {
-        boolean mNotifyDisabled;
-
         @Override
         public void notifyChange(Uri uri, ContentObserver observer, boolean syncToNetwork) {
             super.notifyChange(uri, observer, syncToNetwork);
             if (DEBUG) {
-                Log.d(TAG, "onChanged(uri=" + uri + ", observer=" + observer + ") - Notification "
-                        + (mNotifyDisabled ? "disabled" : "enabled"));
-            }
-            if (mNotifyDisabled) {
-                return;
+                Log.d(TAG, "onChanged(uri=" + uri + ", observer=" + observer + ")");
             }
             // Do not call {@link ContentObserver#onChange} directly to run it on the correct
             // thread.

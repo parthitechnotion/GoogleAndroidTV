@@ -20,7 +20,6 @@ import android.media.tv.TvContentRating;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
-import android.util.ArrayMap;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -43,7 +42,8 @@ public final class TvContentRatingCache implements MemoryManageable {
         return INSTANCE;
     }
 
-    private final Map<String, TvContentRating[]> mRatingsMultiMap = new ArrayMap<>();
+    private final Map<String, TvContentRating[]> mRatingsMultiMap = CollectionUtils
+            .createSmallMap();
 
     /**
      * Returns an array TvContentRatings from a string of comma separated set of rating strings

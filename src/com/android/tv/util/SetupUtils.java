@@ -27,13 +27,11 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.text.TextUtils;
-import android.util.ArraySet;
 import android.util.Log;
 
 import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
-import com.android.tv.common.SoftPreconditions;
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
 
@@ -69,13 +67,13 @@ public class SetupUtils {
     private SetupUtils(TvApplication tvApplication) {
         mTvApplication = tvApplication;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(tvApplication);
-        mSetUpInputs = new ArraySet<>();
+        mSetUpInputs = CollectionUtils.createSmallSet();
         mSetUpInputs.addAll(mSharedPreferences.getStringSet(PREF_KEY_SET_UP_INPUTS,
                 Collections.<String>emptySet()));
-        mKnownInputs = new ArraySet<>();
+        mKnownInputs = CollectionUtils.createSmallSet();
         mKnownInputs.addAll(mSharedPreferences.getStringSet(PREF_KEY_KNOWN_INPUTS,
                 Collections.<String>emptySet()));
-        mRecognizedInputs = new ArraySet<>();
+        mRecognizedInputs = CollectionUtils.createSmallSet();
         mRecognizedInputs.addAll(mSharedPreferences.getStringSet(PREF_KEY_RECOGNIZED_INPUTS,
                 mKnownInputs));
         mIsFirstTune = mSharedPreferences.getBoolean(PREF_KEY_IS_FIRST_TUNE, true);
@@ -264,25 +262,28 @@ public class SetupUtils {
      * @param context The Context used for granting permission.
      */
     public static void grantEpgPermissionToSetUpPackages(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            // Can't grant permission.
-            return;
-        }
-
-        // Find all already-verified packages.
-        Set<String> setUpPackages = new HashSet<>();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        for (String input : sp.getStringSet(PREF_KEY_SET_UP_INPUTS, Collections.EMPTY_SET)) {
-            if (!TextUtils.isEmpty(input)) {
-                ComponentName componentName = ComponentName.unflattenFromString(input);
-                if (componentName != null) {
-                    setUpPackages.add(componentName.getPackageName());
+        // TvProvider allows granting of Uri permissions starting from MNC.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(context);
+            Set<String> setUpInputs = new HashSet<>(sharedPreferences.getStringSet(
+                    PREF_KEY_SET_UP_INPUTS, new HashSet<String>()));
+            Set<String> setUpPackages = new HashSet<>();
+            for (String input : setUpInputs) {
+                ComponentName componentName = null;
+                try {
+                    componentName = ComponentName.unflattenFromString(input);
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to unflatten string to component name (" + input + ")", e);
                 }
+                if (componentName == null) {
+                    continue;
+                }
+                setUpPackages.add(componentName.getPackageName());
             }
-        }
-
-        for (String packageName : setUpPackages) {
-            grantEpgPermission(context, packageName);
+            for (String packageName : setUpPackages) {
+                grantEpgPermission(context, packageName);
+            }
         }
     }
 
@@ -345,7 +346,7 @@ public class SetupUtils {
             }
             mSharedPreferences.edit().putStringSet(PREF_KEY_SET_UP_INPUTS, mSetUpInputs)
                     .putStringSet(PREF_KEY_KNOWN_INPUTS, mKnownInputs)
-                    .putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mRecognizedInputs).apply();
+                    .putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mKnownInputs).apply();
         }
     }
 
@@ -359,7 +360,7 @@ public class SetupUtils {
         if (!mRecognizedInputs.contains(inputId)) {
             Log.i(TAG, "An unrecognized input's setup has been done. inputId=" + inputId);
             mRecognizedInputs.add(inputId);
-            mSharedPreferences.edit().putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mRecognizedInputs)
+            mSharedPreferences.edit().putStringSet(PREF_KEY_RECOGNIZED_INPUTS, mKnownInputs)
                     .apply();
         }
         if (!mKnownInputs.contains(inputId)) {

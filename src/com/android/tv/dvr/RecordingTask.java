@@ -16,8 +16,6 @@
 
 package com.android.tv.dvr;
 
-import android.media.tv.TvContract;
-import android.media.tv.TvRecordingClient;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,9 +24,10 @@ import android.support.annotation.VisibleForTesting;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
-import com.android.tv.common.SoftPreconditions;
+import com.android.tv.common.recording.TvRecording;
 import com.android.tv.data.Channel;
 import com.android.tv.util.Clock;
+import com.android.tv.util.SoftPreconditions;
 import com.android.tv.util.Utils;
 
 import java.util.concurrent.TimeUnit;
@@ -40,10 +39,9 @@ import java.util.concurrent.TimeUnit;
  * There is only one looper so messages must be handled quickly or start a separate thread.
  */
 @WorkerThread
-class RecordingTask extends TvRecordingClient.RecordingCallback
-        implements Handler.Callback, DvrManager.Listener {
+class RecordingTask extends TvRecording.ClientCallback implements Handler.Callback {
     private static final String TAG = "RecordingTask";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;  //STOPSHIP(DVR)
 
     @VisibleForTesting
     static final int MESSAGE_INIT = 1;
@@ -53,10 +51,11 @@ class RecordingTask extends TvRecordingClient.RecordingCallback
     static final int MESSAGE_STOP_RECORDING = 3;
 
     @VisibleForTesting
-    static final long MS_BEFORE_START = TimeUnit.SECONDS.toMillis(5);
+    static long MS_BEFORE_START = TimeUnit.SECONDS.toMillis(5);
     @VisibleForTesting
-    static final long MS_AFTER_END = TimeUnit.SECONDS.toMillis(5);
+    static long MS_AFTER_END = TimeUnit.SECONDS.toMillis(5);
 
+    //STOPSHIP(DVR)  don't use enums.
     @VisibleForTesting
     enum State {
         NOT_STARTED,
@@ -65,33 +64,27 @@ class RecordingTask extends TvRecordingClient.RecordingCallback
         CONNECTED,
         RECORDING_START_REQUESTED,
         RECORDING_STARTED,
-        RECORDING_STOP_REQUESTED,
         ERROR,
         RELEASED,
     }
     private final DvrSessionManager mSessionManager;
-    private final DvrManager mDvrManager;
 
     private final WritableDvrDataManager mDataManager;
     private final Handler mMainThreadHandler = new Handler(Looper.getMainLooper());
-    private TvRecordingClient mTvRecordingClient;
+    private TvRecording.TvRecordingClient mSession;
     private Handler mHandler;
-    private ScheduledRecording mScheduledRecording;
-    private final Channel mChannel;
+    private Recording mRecording;
     private State mState = State.NOT_STARTED;
     private final Clock mClock;
 
-    RecordingTask(ScheduledRecording scheduledRecording, Channel channel,
-            DvrManager dvrManager, DvrSessionManager sessionManager,
+    RecordingTask(Recording recording, DvrSessionManager sessionManager,
             WritableDvrDataManager dataManager, Clock clock) {
-        mScheduledRecording = scheduledRecording;
-        mChannel = channel;
+        mRecording = recording;
         mSessionManager = sessionManager;
         mDataManager = dataManager;
         mClock = clock;
-        mDvrManager = dvrManager;
 
-        if (DEBUG) Log.d(TAG, "created recording task " + mScheduledRecording);
+        if (DEBUG) Log.d(TAG, "created recording task " + mRecording);
     }
 
     public void setHandler(Handler handler) {
@@ -125,45 +118,60 @@ class RecordingTask extends TvRecordingClient.RecordingCallback
             }
             return true;
         } catch (Exception e) {
-            Log.w(TAG, "Error processing message " + msg + "  for " + mScheduledRecording, e);
+            Log.w(TAG, "Error processing message " + msg + "  for " + mRecording, e);
             failAndQuit();
         }
         return false;
     }
 
     @Override
-    public void onTuned(Uri channelUri) {
-        if (DEBUG) {
-            Log.d(TAG, "onTuned");
-        }
-        super.onTuned(channelUri);
+    public void onConnected() {
+        if (DEBUG) Log.d(TAG, "onConnected");
+        super.onConnected();
         mState = State.CONNECTED;
-        if (mHandler == null || !sendEmptyMessageAtAbsoluteTime(MESSAGE_START_RECORDING,
-                mScheduledRecording.getStartTimeMs() - MS_BEFORE_START)) {
-            mState = State.ERROR;
-            return;
-        }
-    }
-
-
-    @Override
-    public void onRecordingStopped(Uri recordedProgramUri) {
-        super.onRecordingStopped(recordedProgramUri);
-        mState = State.CONNECTED;
-        updateRecording(ScheduledRecording.buildFrom(mScheduledRecording)
-                .setState(ScheduledRecording.STATE_RECORDING_FINISHED).build());
-        sendRemove();
     }
 
     @Override
-    public void onError(int reason) {
-        if (DEBUG) Log.d(TAG, "onError reason " + reason);
-        super.onError(reason);
+    public void onDisconnected() {
+        if (DEBUG) Log.d(TAG, "onDisconnected");
+        super.onDisconnected();
+        //Do nothing
+    }
+
+    @Override
+    public void onRecordDeleted(Uri mediaUri) {
+        if (DEBUG) Log.d(TAG, "onRecordDeleted " + mediaUri);
+        super.onRecordDeleted(mediaUri);
+        SoftPreconditions.checkState(false, TAG, "unexpected onRecordDeleted");
+
+    }
+
+    @Override
+    public void onRecordDeleteFailed(Uri mediaUri, int reason) {
+        if (DEBUG) Log.d(TAG, "onRecordDeleteFailed " + mediaUri + ", " + reason);
+        super.onRecordDeleteFailed(mediaUri, reason);
+        SoftPreconditions.checkState(false, TAG, "unexpected onRecordDeleteFailed");
+    }
+
+    @Override
+    public void onRecordStarted(Uri mediaUri) {
+        if (DEBUG) Log.d(TAG, "onRecordStarted " + mediaUri);
+        super.onRecordStarted(mediaUri);
+        mState = State.RECORDING_STARTED;
+        updateRecording(Recording.buildFrom(mRecording)
+                .setState(Recording.STATE_RECORDING_IN_PROGRESS)
+                .build());
+    }
+
+    @Override
+    public void onRecordStopped(Uri mediaUri, @TvRecording.RecordStopReason int reason) {
+        if (DEBUG) Log.d(TAG, "onRecordStopped " + mediaUri + " reason " + reason);
+        super.onRecordStopped(mediaUri, reason);
         // TODO(dvr) handle success
         switch (reason) {
             default:
-                updateRecording(ScheduledRecording.buildFrom(mScheduledRecording)
-                        .setState(ScheduledRecording.STATE_RECORDING_FAILED)
+                updateRecording(Recording.buildFrom(mRecording)
+                        .setState(Recording.STATE_RECORDING_FAILED)
                         .build());
         }
         release();
@@ -171,78 +179,67 @@ class RecordingTask extends TvRecordingClient.RecordingCallback
     }
 
     private void handleInit() {
-        if (DEBUG) Log.d(TAG, "handleInit " + mScheduledRecording);
         //TODO check recording preconditions
-
-        if (mScheduledRecording.getEndTimeMs() < mClock.currentTimeMillis()) {
-            Log.w(TAG, "End time already past, not recording " + mScheduledRecording);
+        Channel channel = mRecording.getChannel();
+        if (channel == null) {
+            Log.w(TAG, "Null channel for " + mRecording);
             failAndQuit();
             return;
         }
 
-        if (mChannel == null) {
-            Log.w(TAG, "Null channel for " + mScheduledRecording);
-            failAndQuit();
-            return;
-        }
-        if (mChannel.getId() != mScheduledRecording.getChannelId()) {
-            Log.w(TAG, "Channel" + mChannel + " does not match scheduled recording "
-                    + mScheduledRecording);
-            failAndQuit();
-            return;
-        }
-
-        String inputId = mChannel.getInputId();
-        if (mSessionManager.canAcquireDvrSession(inputId, mChannel)) {
-            mTvRecordingClient = mSessionManager
-                    .createTvRecordingClient("recordingTask-" + mScheduledRecording.getId(), this,
-                            mHandler);
+        String inputId = channel.getInputId();
+        if (mSessionManager.canAcquireDvrSession(inputId, channel)) {
+            mSession = mSessionManager.acquireDvrSession(inputId, channel);
             mState = State.SESSION_ACQUIRED;
         } else {
-            Log.w(TAG, "Unable to acquire a session for " + mScheduledRecording);
+            Log.w(TAG, "Unable to acquire a session for " + mRecording);
             failAndQuit();
             return;
         }
-        mDvrManager.addListener(this, mHandler);
-        mTvRecordingClient.tune(inputId, mChannel.getUri());
+
+        mSession.connect(inputId, this);
         mState = State.CONNECTION_PENDING;
+
+        if (mHandler == null || !sendEmptyMessageAtAbsoluteTime(MESSAGE_START_RECORDING,
+                mRecording.getStartTimeMs() - MS_BEFORE_START)) {
+            mState = State.ERROR;
+            return;
+        }
     }
 
     private void failAndQuit() {
-        if (DEBUG) Log.d(TAG, "failAndQuit");
-        updateRecordingState(ScheduledRecording.STATE_RECORDING_FAILED);
+        updateRecordingState(Recording.STATE_RECORDING_FAILED);
         mState = State.ERROR;
         sendRemove();
     }
 
     private void sendRemove() {
-        if (DEBUG) Log.d(TAG, "sendRemove");
         if (mHandler != null) {
             mHandler.sendEmptyMessage(Scheduler.HandlerWrapper.MESSAGE_REMOVE);
         }
     }
 
     private void handleStartRecording() {
-        if (DEBUG) Log.d(TAG, "handleStartRecording " + mScheduledRecording);
+        if (DEBUG)Log.d(TAG, "handleStartRecording " + mRecording);
         // TODO(DVR) handle errors
-        long programId = mScheduledRecording.getProgramId();
-        mTvRecordingClient.startRecording(programId == ScheduledRecording.ID_NOT_SET ? null
-                : TvContract.buildProgramUri(programId));
-        updateRecording(ScheduledRecording.buildFrom(mScheduledRecording)
-                .setState(ScheduledRecording.STATE_RECORDING_IN_PROGRESS).build());
-        mState = State.RECORDING_STARTED;
-
+        Channel channel = mRecording.getChannel();
+        mSession.startRecord(channel.getUri(), getIdAsMediaUri(mRecording));
+        mState= State.RECORDING_START_REQUESTED;
         if (mHandler == null || !sendEmptyMessageAtAbsoluteTime(MESSAGE_STOP_RECORDING,
-                mScheduledRecording.getEndTimeMs() + MS_AFTER_END)) {
+                mRecording.getEndTimeMs() + MS_AFTER_END)) {
             mState = State.ERROR;
             return;
         }
     }
 
     private void handleStopRecording() {
-        if (DEBUG) Log.d(TAG, "handleStopRecording " + mScheduledRecording);
-        mTvRecordingClient.stopRecording();
-        mState = State.RECORDING_STOP_REQUESTED;
+        if (DEBUG)Log.d(TAG, "handleStopRecording " + mRecording);
+        mSession.stopRecord();
+        // TODO: once we add an API to notify successful completion of recording,
+        // the following parts need to be moved to the listener implementation.
+        updateRecording(Recording.buildFrom(mRecording)
+                .setState(Recording.STATE_RECORDING_FINISHED).build());
+        sendRemove();
     }
 
     @VisibleForTesting
@@ -251,10 +248,10 @@ class RecordingTask extends TvRecordingClient.RecordingCallback
     }
 
     private void release() {
-        if (mTvRecordingClient != null) {
-           mSessionManager.releaseTvRecordingClient(mTvRecordingClient);
+        if (mSession != null) {
+            mSession.release();
+            mSessionManager.releaseDvrSession(mSession);
         }
-        mDvrManager.removeListener(this);
     }
 
     private boolean sendEmptyMessageAtAbsoluteTime(int what, long when) {
@@ -267,55 +264,28 @@ class RecordingTask extends TvRecordingClient.RecordingCallback
         return mHandler.sendEmptyMessageDelayed(what, delay);
     }
 
-    private void updateRecordingState(@ScheduledRecording.RecordingState int state) {
-        updateRecording(ScheduledRecording.buildFrom(mScheduledRecording).setState(state).build());
+    private void updateRecordingState(@Recording.RecordingState int state) {
+        updateRecording(Recording.buildFrom(mRecording).setState(state).build());
     }
 
-    @VisibleForTesting
-    static Uri getIdAsMediaUri(ScheduledRecording scheduledRecording) {
+    @VisibleForTesting static Uri getIdAsMediaUri(Recording recording) {
             // TODO define the URI format
-        return new Uri.Builder().appendPath(String.valueOf(scheduledRecording.getId())).build();
+            return new Uri.Builder().appendPath(String.valueOf(recording.getId())).build();
     }
 
-    private void updateRecording(ScheduledRecording updatedScheduledRecording) {
-        if (DEBUG) Log.d(TAG, "updateScheduledRecording " + updatedScheduledRecording);
-        mScheduledRecording = updatedScheduledRecording;
+    private void updateRecording(Recording updatedRecording) {
+        if (DEBUG) Log.d(TAG, "updateRecording " + updatedRecording);
+        mRecording = updatedRecording;
         mMainThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                mDataManager.updateScheduledRecording(mScheduledRecording);
+                mDataManager.updateRecording(mRecording);
             }
         });
     }
 
     @Override
-    public void onStopRecordingRequested(ScheduledRecording recording) {
-        if (recording.getId() != mScheduledRecording.getId()) {
-            return;
-        }
-        switch (mState) {
-            case RECORDING_STARTED:
-                mHandler.removeMessages(MESSAGE_STOP_RECORDING);
-                handleStopRecording();
-                break;
-            case RECORDING_STOP_REQUESTED:
-                // Do nothing
-                break;
-            case NOT_STARTED:
-            case SESSION_ACQUIRED:
-            case CONNECTION_PENDING:
-            case CONNECTED:
-            case RECORDING_START_REQUESTED:
-            case ERROR:
-            case RELEASED:
-            default:
-                sendRemove();
-                break;
-        }
-    }
-
-    @Override
     public String toString() {
-        return getClass().getName() + "(" + mScheduledRecording + ")";
+        return getClass().getName() + "(" + mRecording + ")";
     }
 }

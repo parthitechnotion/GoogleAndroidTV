@@ -24,7 +24,6 @@ import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import com.android.tv.common.SharedPreferencesUtils;
-import com.android.tv.common.SoftPreconditions;
 
 import java.util.Date;
 

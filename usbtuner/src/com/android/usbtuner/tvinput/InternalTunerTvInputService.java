@@ -24,8 +24,8 @@ import android.media.tv.TvInputInfo;
 import android.os.Environment;
 import android.util.Log;
 
-import com.android.usbtuner.exoplayer.cache.CacheManager;
-import com.android.usbtuner.exoplayer.cache.TrickplayStorageManager;
+import com.android.usbtuner.exoplayer.CacheManager;
+import com.android.usbtuner.exoplayer.TrickplayStorageManager;
 import com.android.usbtuner.util.SystemPropertiesProxy;
 import com.android.usbtuner.util.TisConfiguration;
 import org.xmlpull.v1.XmlPullParserException;
@@ -57,7 +57,7 @@ public class InternalTunerTvInputService extends BaseTunerTvInputService {
     }
 
     @Override
-    protected CacheManager createCacheManager() {
+    protected void maybeInitCacheManager() {
         int maxCacheSizeMb = SystemPropertiesProxy.getInt(MAX_CACHE_SIZE_KEY, MAX_CACHE_SIZE_DEF);
         if (maxCacheSizeMb >= MIN_CACHE_SIZE_DEF) {
             boolean useExternalStorage = Environment.MEDIA_MOUNTED.equals(
@@ -67,20 +67,21 @@ public class InternalTunerTvInputService extends BaseTunerTvInputService {
             boolean allowToUseInternalStorage = true;
             if (useExternalStorage || allowToUseInternalStorage) {
                 File baseDir = useExternalStorage ? getExternalCacheDir() : getCacheDir();
-                return new CacheManager(
+                mCacheManager = new CacheManager(
                         new TrickplayStorageManager(getApplicationContext(), baseDir,
                                 1024L * 1024 * maxCacheSizeMb));
             }
         }
-        return null;
     }
 
     @Override
     public TvInputInfo onHardwareAdded(TvInputHardwareInfo hardwareInfo) {
         if (DEBUG) Log.d(TAG, "onHardwareAdded: " + hardwareInfo.toString());
+
         if (mTvInputId != null) {
             return null;
         }
+
         TvInputInfo info = null;
         if (hardwareInfo.getType() == TvInputHardwareInfo.TV_INPUT_TYPE_TUNER &&
                 TisConfiguration.getTunerHwDeviceId(this) == hardwareInfo.getDeviceId()) {
@@ -100,6 +101,7 @@ public class InternalTunerTvInputService extends BaseTunerTvInputService {
     @Override
     public String onHardwareRemoved(TvInputHardwareInfo hardwareInfo) {
         if (DEBUG) Log.d(TAG, "onHardwareRemoved: " + hardwareInfo.toString());
+
         return null;
     }
 }

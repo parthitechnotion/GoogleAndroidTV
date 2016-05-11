@@ -145,7 +145,7 @@ public class Recommender implements RecommendationDataManager.Listener {
             mChannelSortKey.put(records.get(i).first.getId(), String.format(sortKeyFormat, i));
             results.add(records.get(i).first);
         }
-        return results;
+        return Collections.unmodifiableList(results);
     }
 
     /**
