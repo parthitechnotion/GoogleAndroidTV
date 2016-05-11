@@ -16,6 +16,7 @@
 
 package com.android.tv.dvr;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.argThat;
@@ -25,8 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import android.media.tv.TvRecordingClient;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -35,8 +34,8 @@ import android.support.test.filters.SdkSuppress;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import com.android.tv.common.recording.TvRecording;
 import com.android.tv.data.Channel;
-import com.android.tv.data.Program;
 import com.android.tv.dvr.RecordingTask.State;
 import com.android.tv.testing.FakeClock;
 import com.android.tv.testing.dvr.RecordingTestUtils;
@@ -53,18 +52,19 @@ import java.util.concurrent.TimeUnit;
  * Tests for {@link RecordingTask}.
  */
 @SmallTest
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.N)
+@SdkSuppress(minSdkVersion = 23)
 public class RecordingTaskTest extends AndroidTestCase {
     private static final long DURATION = TimeUnit.MINUTES.toMillis(30);
     private static final long START_OFFSET = Scheduler.MS_TO_WAKE_BEFORE_START;
-    public static final int CHANNEL_ID = 273;
 
     private FakeClock mFakeClock;
     private DvrDataManagerInMemoryImpl mDataManager;
-    @Mock Handler mMockHandler;
-    @Mock DvrManager mDvrManager;
-    @Mock DvrSessionManager mMockSessionManager;
-    @Mock TvRecordingClient mMockTvRecordingClient;
+    @Mock
+    Handler mMockHandler;
+    @Mock
+    DvrSessionManager mMockSessionManager;
+    @Mock
+    TvRecording.TvRecordingClient mMockTvRecordingClient;
 
     @Override
     protected void setUp() throws Exception {
@@ -74,16 +74,17 @@ public class RecordingTaskTest extends AndroidTestCase {
         }
         MockitoAnnotations.initMocks(this);
         mFakeClock = FakeClock.createWithCurrentTime();
-        mDataManager = new DvrDataManagerInMemoryImpl(getContext(), mFakeClock);
+        mDataManager = new DvrDataManagerInMemoryImpl(getContext());
     }
 
+
     public void testHandle_init() {
-        Channel channel = createTestChannel();
-        ScheduledRecording r = createRecording(channel);
-        RecordingTask task = createRecordingTask(r, channel);
+        Recording r = createRecording();
+        RecordingTask task = createRecordingTask(r);
+        Channel channel = r.getChannel();
         String inputId = channel.getInputId();
         when(mMockSessionManager.canAcquireDvrSession(inputId, channel)).thenReturn(true);
-        when(mMockSessionManager.createTvRecordingClient("tag", task, null))
+        when(mMockSessionManager.acquireDvrSession(inputId, channel))
                 .thenReturn(mMockTvRecordingClient);
         when(mMockHandler.sendEmptyMessageDelayed(anyInt(), anyLong())).thenReturn(true);
 
@@ -93,59 +94,49 @@ public class RecordingTaskTest extends AndroidTestCase {
 
         assertEquals(State.CONNECTION_PENDING, task.getState());
         verify(mMockSessionManager).canAcquireDvrSession(inputId, channel);
-        verify(mMockSessionManager).createTvRecordingClient("tag", task, null);
-        verify(mMockTvRecordingClient).tune(eq(inputId), eq(channel.getUri()));
+        verify(mMockSessionManager).acquireDvrSession(inputId, channel);
+        verify(mMockTvRecordingClient).connect(eq(inputId), any(TvRecording.ClientCallback.class));
 
         verifySendMessageAt(RecordingTask.MESSAGE_START_RECORDING, uptime + delay);
         verifyNoMoreInteractions(mMockHandler, mMockTvRecordingClient, mMockSessionManager);
     }
 
-    private static Channel createTestChannel() {
-        return new Channel.Builder().setId(CHANNEL_ID).setDisplayName("Test Ch " + CHANNEL_ID)
-                .build();
-    }
 
     public void testHandle_init_cannotAcquireSession() {
-        Channel channel = createTestChannel();
-        ScheduledRecording r = createRecording(channel);
-        r = mDataManager.addScheduledRecordingInternal(r);
-        RecordingTask task = createRecordingTask(r, channel);
+        Recording r = createRecording();
+        r = mDataManager.addRecordingInternal(r);
+        RecordingTask task = createRecordingTask(r);
 
-        when(mMockSessionManager.canAcquireDvrSession(channel.getInputId(), channel))
+        when(mMockSessionManager.canAcquireDvrSession(r.getChannel().getInputId(), r.getChannel()))
                 .thenReturn(false);
 
         assertTrue(task.handleMessage(createMessage(RecordingTask.MESSAGE_INIT)));
 
         assertEquals(State.ERROR, task.getState());
         verifySendMessage(Scheduler.HandlerWrapper.MESSAGE_REMOVE);
-        ScheduledRecording updatedScheduledRecording = mDataManager
-                .getScheduledRecording(r.getId());
-        assertEquals("status", ScheduledRecording.STATE_RECORDING_FAILED,
-                updatedScheduledRecording.getState());
+        Recording updatedRecording = mDataManager.getRecording(r.getId());
+        assertEquals("status", Recording.STATE_RECORDING_FAILED, updatedRecording.getState());
     }
 
     public void testOnConnected() {
-        Channel channel = createTestChannel();
-        ScheduledRecording r = createRecording(channel);
-        mDataManager.addScheduledRecording(r);
-        RecordingTask task = createRecordingTask(r, channel);
+        Recording r = createRecording();
+        mDataManager.addRecording(r);
+        RecordingTask task = createRecordingTask(r);
 
-        task.onTuned(channel.getUri());
+        task.onConnected();
 
         assertEquals(State.CONNECTED, task.getState());
     }
 
-    private ScheduledRecording createRecording(Channel c) {
+    private Recording createRecording() {
         long startTime = mFakeClock.currentTimeMillis() + START_OFFSET;
         long endTime = startTime + DURATION;
-        return RecordingTestUtils.createTestRecordingWithPeriod(c.getId(), startTime, endTime);
+        return RecordingTestUtils.createTestRecordingWithPeriod(startTime, endTime);
     }
 
-    private RecordingTask createRecordingTask(ScheduledRecording r, Channel channel) {
-        Program p = r.getProgramId() == ScheduledRecording.ID_NOT_SET ? null
-                : new Program.Builder().setId(r.getId()).build();
-        RecordingTask recordingTask = new RecordingTask(r, channel, mDvrManager,
-                mMockSessionManager, mDataManager, mFakeClock);
+    private RecordingTask createRecordingTask(Recording r) {
+        RecordingTask recordingTask = new RecordingTask(r, mMockSessionManager, mDataManager,
+                mFakeClock);
         recordingTask.setHandler(mMockHandler);
         return recordingTask;
     }

@@ -48,6 +48,7 @@ public class FullscreenDialogFragment extends SafeDismissDialogFragment {
         return f;
     }
 
+    private int mViewLayoutResId;
     private String mTrackerLabel;
     private DialogView mDialogView;
 
@@ -57,9 +58,9 @@ public class FullscreenDialogFragment extends SafeDismissDialogFragment {
                 new FullscreenDialog(getActivity(), R.style.Theme_TV_dialog_Fullscreen);
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         Bundle args = getArguments();
+        mViewLayoutResId = args.getInt(VIEW_LAYOUT_ID);
         mTrackerLabel = args.getString(TRACKER_LABEL);
-        int viewLayoutResId = args.getInt(VIEW_LAYOUT_ID);
-        View v = inflater.inflate(viewLayoutResId, null);
+        View v = inflater.inflate(mViewLayoutResId, null);
         dialog.setContentView(v);
         mDialogView = (DialogView) v;
         mDialogView.initialize((MainActivity) getActivity(), dialog);

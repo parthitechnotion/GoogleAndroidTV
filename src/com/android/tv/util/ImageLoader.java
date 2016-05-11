@@ -28,23 +28,18 @@ import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
-import android.util.ArraySet;
 import android.util.Log;
 
 import com.android.tv.R;
+import com.android.tv.common.CollectionUtils;
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This class wraps up completing some arbitrary long running work when loading a bitmap. It
@@ -53,39 +48,6 @@ import java.util.concurrent.TimeUnit;
 public final class ImageLoader {
     private static final String TAG = "ImageLoader";
     private static final boolean DEBUG = false;
-
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    // We want at least 2 threads and at most 4 threads in the core pool,
-    // preferring to have 1 less than the CPU count to avoid saturating
-    // the CPU with background work
-    private static final int CORE_POOL_SIZE = Math.max(2, Math.min(CPU_COUNT - 1, 4));
-    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
-    private static final int KEEP_ALIVE_SECONDS = 30;
-
-    private static final ThreadFactory sThreadFactory = new NamedThreadFactory("ImageLoader");
-
-    private static final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<Runnable>(
-            128);
-
-    /**
-     * An private {@link Executor} that can be used to execute tasks in parallel.
-     *
-     * <p>{@code IMAGE_THREAD_POOL_EXECUTOR} setting are copied from {@link AsyncTask}
-     * Since we do a lot of concurrent image loading we can exhaust a thread pool.
-     * ImageLoader catches the error, and just leaves the image blank.
-     * However other tasks will fail and crash the application.
-     *
-     * <p>Using a separate thread pool prevents image loading from causing other tasks to fail.
-     */
-    private static final Executor IMAGE_THREAD_POOL_EXECUTOR;
-
-    static {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE,
-                MAXIMUM_POOL_SIZE, KEEP_ALIVE_SECONDS, TimeUnit.SECONDS, sPoolWorkQueue,
-                sThreadFactory);
-        threadPoolExecutor.allowCoreThreadTimeOut(true);
-        IMAGE_THREAD_POOL_EXECUTOR = threadPoolExecutor;
-    }
 
     private static Handler sMainHandler;
 
@@ -186,7 +148,7 @@ public final class ImageLoader {
             Log.d(TAG, "loadBitmap() " + uriString);
         }
         return doLoadBitmap(context, uriString, maxWidth, maxHeight, callback,
-                IMAGE_THREAD_POOL_EXECUTOR);
+                AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private static boolean doLoadBitmap(Context context, String uriString,
@@ -217,7 +179,7 @@ public final class ImageLoader {
         if (DEBUG) {
             Log.d(TAG, "loadBitmap() " + loadBitmapTask);
         }
-        return doLoadBitmap(callback, IMAGE_THREAD_POOL_EXECUTOR, loadBitmapTask);
+        return doLoadBitmap(callback, AsyncTask.THREAD_POOL_EXECUTOR, loadBitmapTask);
     }
 
     /**
@@ -264,7 +226,7 @@ public final class ImageLoader {
         protected final Context mAppContext;
         protected final int mMaxWidth;
         protected final int mMaxHeight;
-        private final Set<ImageLoaderCallback> mCallbacks = new ArraySet<>();
+        private final Set<ImageLoaderCallback> mCallbacks = CollectionUtils.createSmallSet();
         private final ImageCache mImageCache;
         private final String mKey;
 

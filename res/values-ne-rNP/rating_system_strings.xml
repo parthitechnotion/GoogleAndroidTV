@@ -17,22 +17,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- no translation found for description_fr_dvb_u (8232083238497153682) -->
-    <skip />
-    <!-- no translation found for description_es_dvb_all (4821183217465284547) -->
-    <skip />
-    <!-- no translation found for description_es_dvb_c (1367395312248365855) -->
-    <skip />
-    <!-- no translation found for description_es_dvb_x (438890727939582714) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_all (3048365195196820853) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_7 (5892929693766504059) -->
-    <skip />
-    <!-- no translation found for description_kr_tv_12 (1883893246941826597) -->
-    <skip />
-    <string name="description_kr_tv_15" msgid="5888141153573158322">"कार्यक्रमहरूमा १५ वर्ष भन्दा मुनिका दर्शकहरूका लागि अनुपयुक्त सामग्री समावेश हुन सक्छ र त्यसैले तिनीहरूको लागि अभिभावकको स्वविवेक प्रयोग गरिनुपर्छ।"</string>
-    <string name="description_kr_tv_19" msgid="9197085158053054550">"कार्यक्रममा १९ वर्ष भन्दा मुनिका दर्शकहरूका लागि अनुपयुक्त सामग्री समावेश हुन सक्छ र त्यसैले यी १९ वर्ष भन्दा मुनिका युवाहरूका लागि उपयुक्त छैनन्।"</string>
     <string name="description_us_tv_d" msgid="12333789157204816">"अश्लील संवाद"</string>
     <string name="description_us_tv_l" msgid="4105102855627964319">"भद्दा भाषा"</string>
     <string name="description_us_tv_s" msgid="7552447251273237176">"यौन सामग्री"</string>

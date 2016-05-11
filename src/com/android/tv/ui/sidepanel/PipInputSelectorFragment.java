@@ -156,11 +156,8 @@ public class PipInputSelectorFragment extends SideFragment {
             // If this input shares the same parent with the current main input, you cannot select
             // it. (E.g. two HDMI CEC devices that are connected to HDMI port 1 through an A/V
             // receiver.)
-            PipInput pipInput = mPipInputManager.getPipInput(getMainActivity().getCurrentChannel());
-            if (pipInput == null) {
-                return false;
-            }
-            TvInputInfo mainInputInfo = pipInput.getInputInfo();
+            TvInputInfo mainInputInfo = mPipInputManager.getPipInput(
+                    getMainActivity().getCurrentChannel()).getInputInfo();
             TvInputInfo pipInputInfo = mPipInput.getInputInfo();
             return mainInputInfo == null || pipInputInfo == null
                     || !TextUtils.equals(mainInputInfo.getId(), pipInputInfo.getId())

@@ -144,6 +144,12 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"Licenzas de código aberto"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Licenzas de código aberto"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"Versión"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"Opcións de programador"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Activar sintonizador de televisión USB"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Para escoitar o son do sintonizador de televisión USB, a túa televisión debe ser compatible coa conexión AC3."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Compatibilidade con audio AC3"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"A túa televisión é compatible coa conexión AC3."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"A túa televisión non é compatible coa conexión AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Axudar a mellorar Canles en directo"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Comparte datos de uso e de diagnóstico anónimos con Google para que poidamos mellorar a TV en directo e evitar bloqueos e fallos."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Para ver esta canle, preme na tecla cara á dereita e introduce o PIN"</string>
@@ -155,10 +161,9 @@
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"O programa está bloqueado"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Este programa está clasificado como <xliff:g id="RATING">%1$s</xliff:g>."</string>
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Só audio"</string>
-    <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"Sinal feble"</string>
-    <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"Non hai conexión a Internet"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Sen título"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Canle bloqueada"</string>
+    <string name="episode_format" msgid="4881195874563241096">"T<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: Ep. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
     <string name="setup_category_new" msgid="2899355289563443627">"Novas"</string>
     <string name="setup_category_done" msgid="4750902502852212319">"Fontes"</string>
     <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
@@ -185,6 +190,7 @@
     <string name="msg_tune_failed" msgid="3277419551849972252">"Erro de sintonización"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"Non se encontrou ningunha aplicación para procesar esta acción."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"Todas as canles de orixe están ocultas.\nSelecciona polo menos unha canle para ver."</string>
+    <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Non dispoñible debido a un sinal de vídeo feble"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"O vídeo deixou de estar dispoñible de forma inesperada"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"A tecla Atrás aplícase ao dispositivo conectado. Preme o botón de inicio para saír."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"As canles en directo non son compatibles neste dispositivo con Android Lollipop."</string>

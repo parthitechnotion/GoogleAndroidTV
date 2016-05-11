@@ -42,6 +42,7 @@ public class UsbTunerDebug {
     private long mAudioPtsUsRate;
     private long mVideoPtsUsRate;
 
+
     private UsbTunerDebug() {
         mVideoFrameDrop = 0;
         mLastCheckTimestampMs = SystemClock.elapsedRealtime();

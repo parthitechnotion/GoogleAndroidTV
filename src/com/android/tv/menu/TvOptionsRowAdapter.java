@@ -19,7 +19,6 @@ package com.android.tv.menu;
 import android.content.Context;
 import android.media.tv.TvTrackInfo;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.os.BuildCompat;
 
 import com.android.tv.Features;
 import com.android.tv.R;
@@ -40,13 +39,10 @@ import java.util.List;
  */
 public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
     private int mPositionPipAction;
-    // If mInAppPipAction is false, system-wide PIP is used.
-    private boolean mInAppPipAction = true;
-    private final Context mContext;
+    private boolean mHasPipAction = true;
 
     public TvOptionsRowAdapter(Context context, List<CustomAction> customActions) {
         super(context, customActions);
-        mContext = context;
     }
 
     @Override
@@ -56,8 +52,8 @@ public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
         setOptionChangedListener(MenuAction.SELECT_CLOSED_CAPTION_ACTION);
         actionList.add(MenuAction.SELECT_DISPLAY_MODE_ACTION);
         setOptionChangedListener(MenuAction.SELECT_DISPLAY_MODE_ACTION);
-        actionList.add(MenuAction.PIP_IN_APP_ACTION);
-        setOptionChangedListener(MenuAction.PIP_IN_APP_ACTION);
+        actionList.add(MenuAction.PIP_ACTION);
+        setOptionChangedListener(MenuAction.PIP_ACTION);
         mPositionPipAction = actionList.size() - 1;
         actionList.add(MenuAction.SELECT_AUDIO_LANGUAGE_ACTION);
         setOptionChangedListener(MenuAction.SELECT_AUDIO_LANGUAGE_ACTION);
@@ -110,39 +106,34 @@ public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
         // Case 1
         PipInputManager pipInputManager = getMainActivity().getPipInputManager();
         if (pipInputManager.getPipInputSize(false) < 2) {
-            if (mInAppPipAction) {
+            if (mHasPipAction) {
                 removeAction(mPositionPipAction);
-                mInAppPipAction = false;
-                if (BuildCompat.isAtLeastN()) {
-                    addAction(mPositionPipAction, MenuAction.SYSTEMWIDE_PIP_ACTION);
-                }
+                mHasPipAction = false;
                 return true;
             }
-            return false;
         } else {
-            if (!mInAppPipAction) {
-                removeAction(mPositionPipAction);
-                addAction(mPositionPipAction, MenuAction.PIP_IN_APP_ACTION);
-                mInAppPipAction = true;
+            if (!mHasPipAction) {
+                addAction(mPositionPipAction, MenuAction.PIP_ACTION);
+                mHasPipAction = true;
                 changed = true;
             }
         }
 
         // Case 2
         boolean isPipEnabled = getMainActivity().isPipEnabled();
-        boolean oldEnabled = MenuAction.PIP_IN_APP_ACTION.isEnabled();
+        boolean oldEnabled = MenuAction.PIP_ACTION.isEnabled();
         boolean newEnabled = pipInputManager.getPipInputSize(true) > 0;
         if (oldEnabled != newEnabled) {
             // Should not disable the item if the PIP is already turned on so that the user can
             // force exit it.
             if (newEnabled || !isPipEnabled) {
-                MenuAction.PIP_IN_APP_ACTION.setEnabled(newEnabled);
+                MenuAction.PIP_ACTION.setEnabled(newEnabled);
                 changed = true;
             }
         }
 
         // Case 3 & 4 - we just need to update the icon.
-        MenuAction.PIP_IN_APP_ACTION.setDrawableResId(
+        MenuAction.PIP_ACTION.setDrawableResId(
                 isPipEnabled ? R.drawable.ic_tvoption_pip : R.drawable.ic_tvoption_pip_off);
         return changed;
     }
@@ -182,11 +173,8 @@ public class TvOptionsRowAdapter extends CustomizableOptionsRowAdapter {
                 getMainActivity().getOverlayManager().getSideFragmentManager().show(
                         new DisplayModeFragment());
                 break;
-            case TvOptionsManager.OPTION_IN_APP_PIP:
+            case TvOptionsManager.OPTION_PIP:
                 getMainActivity().togglePipView();
-                break;
-            case TvOptionsManager.OPTION_SYSTEMWIDE_PIP:
-                getMainActivity().enterPictureInPictureMode();
                 break;
             case TvOptionsManager.OPTION_MULTI_AUDIO:
                 getMainActivity().getOverlayManager().getSideFragmentManager().show(

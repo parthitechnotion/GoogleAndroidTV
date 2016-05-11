@@ -28,9 +28,7 @@ import android.util.Log;
 import android.util.Range;
 
 import com.android.tv.analytics.Tracker;
-import com.android.tv.common.SoftPreconditions;
 import com.android.tv.common.WeakHandler;
-import com.android.tv.common.recording.RecordedProgram;
 import com.android.tv.data.Channel;
 import com.android.tv.data.OnCurrentProgramUpdatedListener;
 import com.android.tv.data.Program;
@@ -181,7 +179,7 @@ public class TimeShiftManager {
         tvView.setOnScreenBlockedListener(new TunableTvView.OnScreenBlockingChangedListener() {
             @Override
             public void onScreenBlockingChanged(boolean blocked) {
-                mPlayController.onAvailabilityChanged();
+                onAvailabilityChanged();
             }
         });
     }
@@ -197,7 +195,7 @@ public class TimeShiftManager {
      * Checks if the trick play is available for the current channel.
      */
     public boolean isAvailable() {
-        return mPlayController.mAvailable;
+        return mPlayController.isAvailable();
     }
 
     /**
@@ -229,6 +227,11 @@ public class TimeShiftManager {
         } else {
             return mPlayController.mRecordEndTimeMs;
         }
+    }
+
+    public boolean isPlayForRecording() {
+        // TODO: need to find better way to check if it's for recording playback.
+        return mPlayController.mRecordEndTimeMs != CURRENT_TIME;
     }
 
     /**
@@ -467,18 +470,11 @@ public class TimeShiftManager {
     }
 
     /**
-     * Checks whether the TV is playing the recorded content.
-     */
-    public boolean isRecordingPlayback() {
-        return mPlayController.mRecordingPlayback;
-    }
-
-    /**
      * Returns {@code true} if the trick play is available and it's playing to the forward direction
      * with normal speed, otherwise {@code false}.
      */
     public boolean isNormalPlaying() {
-        return mPlayController.mAvailable
+        return mPlayController.isAvailable()
                 && mPlayController.mPlayStatus == PLAY_STATUS_PLAYING
                 && mPlayController.mPlayDirection == PLAY_DIRECTION_FORWARD
                 && mPlayController.mDisplayedPlaySpeed == PLAY_SPEED_1X;
@@ -488,7 +484,7 @@ public class TimeShiftManager {
      * Checks if the trick play is available and it's playback status is paused.
      */
     public boolean isPaused() {
-        return mPlayController.mAvailable && mPlayController.mPlayStatus == PLAY_STATUS_PAUSED;
+        return mPlayController.isAvailable() && mPlayController.mPlayStatus == PLAY_STATUS_PAUSED;
     }
 
     /**
@@ -506,9 +502,8 @@ public class TimeShiftManager {
     }
 
     void onAvailabilityChanged() {
-        mProgramManager.onAvailabilityChanged(mPlayController.mAvailable,
-                mPlayController.mRecordingPlayback ? null : mPlayController.getCurrentChannel(),
-                mPlayController.mRecordStartTimeMs);
+        mProgramManager.onAvailabilityChanged(mPlayController.isAvailable(),
+                mPlayController.getCurrentChannel(), mPlayController.mRecordStartTimeMs);
         updateActions();
         // Availability change notification should be always sent
         // even if mNotificationEnabled is false.
@@ -518,7 +513,7 @@ public class TimeShiftManager {
     }
 
     void onRecordTimeRangeChanged() {
-        if (mPlayController.mAvailable) {
+        if (mPlayController.isAvailable()) {
             mProgramManager.onRecordTimeRangeChanged(mPlayController.mRecordStartTimeMs,
                     mPlayController.mRecordEndTimeMs);
         }
@@ -595,6 +590,7 @@ public class TimeShiftManager {
     private class PlayController {
         private final TunableTvView mTvView;
 
+        private long mPossibleStartTimeMs;
         private long mRecordStartTimeMs;
         private long mRecordEndTimeMs;
 
@@ -602,8 +598,6 @@ public class TimeShiftManager {
         @PlaySpeed private int mDisplayedPlaySpeed = PLAY_SPEED_1X;
         @PlayDirection private int mPlayDirection = PLAY_DIRECTION_FORWARD;
         private int mPlaybackSpeed;
-        private boolean mAvailable;
-        private boolean mRecordingPlayback;
 
         /**
          * Indicates that the trick play is not playing the current time position.
@@ -619,11 +613,47 @@ public class TimeShiftManager {
             mTvView.setTimeShiftListener(new TimeShiftListener() {
                 @Override
                 public void onAvailabilityChanged() {
-                    PlayController.this.onAvailabilityChanged();
+                    // Do not send the notifications while the availability is changing,
+                    // because the variables are in the intermediate state.
+                    // For example, the current program can be null.
+                    mNotificationEnabled = false;
+                    mDisplayedPlaySpeed = PLAY_SPEED_1X;
+                    mPlaybackSpeed = 1;
+                    mPlayDirection = PLAY_DIRECTION_FORWARD;
+                    mIsPlayOffsetChanged = false;
+                    mPossibleStartTimeMs = System.currentTimeMillis();
+                    mRecordStartTimeMs = mPossibleStartTimeMs;
+                    mRecordEndTimeMs = CURRENT_TIME;
+                    mCurrentPositionMediator.initialize(mPossibleStartTimeMs);
+                    mHandler.removeMessages(MSG_GET_CURRENT_POSITION);
+
+                    if (isAvailable()) {
+                        // When the media availability message has come.
+                        mPlayController.setPlayStatus(PLAY_STATUS_PLAYING);
+                        mHandler.sendEmptyMessageDelayed(MSG_GET_CURRENT_POSITION,
+                                REQUEST_CURRENT_POSITION_INTERVAL);
+                    } else {
+                        // When the tune command is sent.
+                        mPlayController.setPlayStatus(PLAY_STATUS_PAUSED);
+                    }
+                    TimeShiftManager.this.onAvailabilityChanged();
+                    mNotificationEnabled = true;
                 }
 
                 @Override
                 public void onRecordStartTimeChanged(long recordStartTimeMs) {
+                    if (mRecordEndTimeMs == CURRENT_TIME &&
+                            recordStartTimeMs < mPossibleStartTimeMs) {
+                        // Do not warn in this case because it can happen in normal cases.
+                        if (DEBUG) {
+                            Log.d(TAG, "Record start time is less then the time when it became "
+                                    + "available. {availableStartTime="
+                                    + Utils.toTimeString(mPossibleStartTimeMs)
+                                    + ", recordStartTimeMs=" + Utils.toTimeString(recordStartTimeMs)
+                                    + "}");
+                        }
+                        recordStartTimeMs = mPossibleStartTimeMs;
+                    }
                     if (mRecordStartTimeMs == recordStartTimeMs) {
                         return;
                     }
@@ -645,48 +675,26 @@ public class TimeShiftManager {
                         TimeShiftManager.this.play();
                     }
                 }
+
+                @Override
+                public void onRecordEndTimeChanged(long recordEndTimeMs) {
+                    if (mRecordEndTimeMs == recordEndTimeMs) {
+                        return;
+                    }
+                    mRecordEndTimeMs = recordEndTimeMs;
+                    TimeShiftManager.this.onRecordTimeRangeChanged();
+
+                    if (mPlayStatus == PLAY_STATUS_PLAYING &&
+                            mRecordEndTimeMs - getCurrentPositionMs()
+                            < RECORDING_BOUNDARY_THRESHOLD) {
+                        TimeShiftManager.this.pause();
+                    }
+                }
             });
         }
 
-        void onAvailabilityChanged() {
-            boolean newAvailable = mTvView.isTimeShiftAvailable() && !mTvView.isScreenBlocked();
-            if (mAvailable == newAvailable) {
-                return;
-            }
-            mAvailable = newAvailable;
-            // Do not send the notifications while the availability is changing,
-            // because the variables are in the intermediate state.
-            // For example, the current program can be null.
-            mNotificationEnabled = false;
-            mDisplayedPlaySpeed = PLAY_SPEED_1X;
-            mPlaybackSpeed = 1;
-            mPlayDirection = PLAY_DIRECTION_FORWARD;
-            mRecordingPlayback = mTvView.isRecordingPlayback();
-            if (mRecordingPlayback) {
-                RecordedProgram recordedProgram = mTvView.getPlayingRecordedProgram();
-                SoftPreconditions.checkNotNull(recordedProgram);
-                mIsPlayOffsetChanged = true;
-                mRecordStartTimeMs = 0;
-                mRecordEndTimeMs = recordedProgram.getDurationMillis();
-            } else {
-                mIsPlayOffsetChanged = false;
-                mRecordStartTimeMs = System.currentTimeMillis();
-                mRecordEndTimeMs = CURRENT_TIME;
-            }
-            mCurrentPositionMediator.initialize(mRecordStartTimeMs);
-            mHandler.removeMessages(MSG_GET_CURRENT_POSITION);
-
-            if (mAvailable) {
-                // When the media availability message has come.
-                mPlayController.setPlayStatus(PLAY_STATUS_PLAYING);
-                mHandler.sendEmptyMessageDelayed(MSG_GET_CURRENT_POSITION,
-                        REQUEST_CURRENT_POSITION_INTERVAL);
-            } else {
-                // When the tune command is sent.
-                mPlayController.setPlayStatus(PLAY_STATUS_PAUSED);
-            }
-            TimeShiftManager.this.onAvailabilityChanged();
-            mNotificationEnabled = true;
+        boolean isAvailable() {
+            return mTvView.isTimeShiftAvailable() && !mTvView.isScreenBlocked();
         }
 
         void handleGetCurrentPosition() {
@@ -847,25 +855,18 @@ public class TimeShiftManager {
         private final List<Program> mPrograms = new ArrayList<>();
         private final Queue<Range<Long>> mProgramLoadQueue = new LinkedList<>();
         private LoadProgramsForCurrentChannelTask mProgramLoadTask = null;
-        private int mEmptyFetchCount = 0;
 
         ProgramManager(ProgramDataManager programDataManager) {
             mProgramDataManager = programDataManager;
         }
 
         void onAvailabilityChanged(boolean available, Channel channel, long currentPositionMs) {
-            if (DEBUG) {
-                Log.d(TAG, "onAvailabilityChanged(" + available + "+," + channel + ", "
-                        + currentPositionMs + ")");
-            }
-
             mProgramLoadQueue.clear();
             if (mProgramLoadTask != null) {
                 mProgramLoadTask.cancel(true);
             }
             mHandler.removeMessages(MSG_PREFETCH_PROGRAM);
             mPrograms.clear();
-            mEmptyFetchCount = 0;
             mChannel = channel;
             if (channel == null || channel.isPassthrough()) {
                 return;
@@ -1132,37 +1133,17 @@ public class TimeShiftManager {
             }
             Program lastValidProgram = getLastValidProgram();
             if (DEBUG) Log.d(TAG, "Last valid program = " + lastValidProgram);
-            final long delay;
             if (lastValidProgram != null) {
-                delay = lastValidProgram.getEndTimeUtcMillis()
+                long delay = lastValidProgram.getEndTimeUtcMillis()
                         - PREFETCH_TIME_OFFSET_FROM_PROGRAM_END - System.currentTimeMillis();
+                mHandler.sendEmptyMessageDelayed(MSG_PREFETCH_PROGRAM, delay);
+                if (DEBUG) Log.d(TAG, "Scheduling with " + delay + "(ms) delays.");
             } else {
-                // Since there might not be any program data delay the retry 5 seconds,
-                // then 30 seconds then 5 minutes
-                switch (mEmptyFetchCount) {
-                    case 0:
-                        delay = 0;
-                        break;
-                    case 1:
-                        delay = TimeUnit.SECONDS.toMillis(5);
-                        break;
-                    case 2:
-                        delay = TimeUnit.SECONDS.toMillis(30);
-                        break;
-                    default:
-                        delay = TimeUnit.MINUTES.toMillis(5);
-                        break;
-                }
-                if (DEBUG) {
-                    Log.d(TAG,
-                            "No last valid  program. Already tried " + mEmptyFetchCount + " times");
-                }
+                mHandler.sendEmptyMessage(MSG_PREFETCH_PROGRAM);
+                if (DEBUG) Log.d(TAG, "Scheduling promptly.");
             }
-            mHandler.sendEmptyMessageDelayed(MSG_PREFETCH_PROGRAM, delay);
-            if (DEBUG) Log.d(TAG, "Scheduling with " + delay + "(ms) delays.");
         }
 
-        // Prefecth programs within PREFETCH_DURATION_FOR_NEXT from now.
         private void prefetchPrograms() {
             long startTimeMs;
             Program lastValidProgram = getLastValidProgram();
@@ -1172,13 +1153,11 @@ public class TimeShiftManager {
                 startTimeMs = lastValidProgram.getEndTimeUtcMillis();
             }
             long endTimeMs = System.currentTimeMillis() + PREFETCH_DURATION_FOR_NEXT;
-            if (startTimeMs <= endTimeMs) {
-                if (DEBUG) {
-                    Log.d(TAG, "Prefetch task starts: {startTime=" + Utils.toTimeString(startTimeMs)
-                            + ", endTime=" + Utils.toTimeString(endTimeMs) + "}");
-                }
-                mProgramLoadQueue.add(Range.create(startTimeMs, endTimeMs));
+            if (DEBUG) {
+                Log.d(TAG, "Prefetch task starts: {startTime=" + Utils.toTimeString(startTimeMs)
+                        + ", endTime=" + Utils.toTimeString(endTimeMs) + "}");
             }
+            mProgramLoadQueue.add(Range.create(startTimeMs, endTimeMs));
             startTaskIfNeeded();
         }
 
@@ -1206,8 +1185,8 @@ public class TimeShiftManager {
                         it.remove();
                     }
                 }
-                if (programs == null || programs.isEmpty()) {
-                    mEmptyFetchCount++;
+                if (programs == null || programs.isEmpty() || mPrograms.isEmpty()) {
+                    mPrograms.addAll(programs);
                     if (addDummyPrograms(mPeriod)) {
                         TimeShiftManager.this.onProgramInfoChanged();
                     }
@@ -1215,22 +1194,19 @@ public class TimeShiftManager {
                     startNextLoadingIfNeeded();
                     return;
                 }
-                mEmptyFetchCount = 0;
-                if(!mPrograms.isEmpty()) {
-                    removeDummyPrograms();
-                    removeOverlappedPrograms(programs);
-                    Program loadedProgram = programs.get(0);
-                    for (int i = 0; i < mPrograms.size() && !programs.isEmpty(); ++i) {
-                        Program program = mPrograms.get(i);
-                        while (program.getStartTimeUtcMillis() > loadedProgram
-                                .getStartTimeUtcMillis()) {
-                            mPrograms.add(i++, loadedProgram);
-                            programs.remove(0);
-                            if (programs.isEmpty()) {
-                                break;
-                            }
-                            loadedProgram = programs.get(0);
+                removeDummyPrograms();
+                removeOverlappedPrograms(programs);
+                Program loadedProgram = programs.get(0);
+                for (int i = 0; i < mPrograms.size() && !programs.isEmpty(); ++i) {
+                    Program program = mPrograms.get(i);
+                    while (program.getStartTimeUtcMillis() > loadedProgram
+                            .getStartTimeUtcMillis()) {
+                        mPrograms.add(i++, loadedProgram);
+                        programs.remove(0);
+                        if (programs.isEmpty()) {
+                            break;
                         }
+                        loadedProgram = programs.get(0);
                     }
                 }
                 mPrograms.addAll(programs);
