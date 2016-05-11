@@ -144,6 +144,12 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"ஓப்பன் சோர்ஸ் உரிமங்கள்"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ஓப்பன் சோர்ஸ் உரிமங்கள்"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"பதிப்பு"</string>
+    <string name="side_panel_title_developer" msgid="7287627759979090359">"டெவெலப்பர் விருப்பங்கள்"</string>
+    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"USB டிவி ட்யூனரை இயக்கு"</string>
+    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"USB டிவி ட்யூனரின் ஒலியைக் கேட்க, டிவி AC3 அசல் ஒலியை ஆதரிக்க வேண்டும்."</string>
+    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"AC3 ஆடியோ திறன்"</string>
+    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"உங்கள் டிவி AC3 அசல் ஒலியை ஆதரிக்கிறது."</string>
+    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"உங்கள் டிவி AC3 அசல் ஒலியை ஆதரிக்காது."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"நேரலைச் சேனல்களை மேம்படுத்த உதவு"</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"உபயோகம் மற்றும் பிழை ஆய்வுகள் தரவை அநாமதேயமாக Google உடன் பகிரும், இதன் மூலம் எங்களால் நேரலை சேனல்களை மேலும் சிறப்பாக்க முடியும் மற்றும் சிதைவு, செயல்படாமல் இருத்தல் போன்ற சிக்கல்களைத் தடுக்க முடியும்."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"இந்தச் சேனலைப் பார்க்க, வலது பக்கம் அழுத்தி, உங்கள் PINஐ உள்ளிடவும்"</string>
@@ -155,10 +161,9 @@
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"நிகழ்ச்சி தடுக்கப்பட்டுள்ளது"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"இந்த நிகழ்ச்சி <xliff:g id="RATING">%1$s</xliff:g> என மதிப்பிடப்பட்டுள்ளது"</string>
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"ஆடியோ மட்டும்"</string>
-    <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"வலுவற்ற சிக்னல்"</string>
-    <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"இணைய இணைப்பு இல்லை"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"தலைப்பு இல்லை"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"சேனல் தடுக்கப்பட்டது"</string>
+    <string name="episode_format" msgid="4881195874563241096">"சீ<xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: எபி. <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>
     <string name="setup_category_new" msgid="2899355289563443627">"புதியவை"</string>
     <string name="setup_category_done" msgid="4750902502852212319">"மூலங்கள்"</string>
     <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
@@ -185,6 +190,7 @@
     <string name="msg_tune_failed" msgid="3277419551849972252">"ட்யூன் செய்ய முடியவில்லை"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"இந்தச் செயலைச் செய்வதற்கான பயன்பாடு எதுவுமில்லை."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"எல்லா சேனல்களும் மறைக்கப்பட்டுள்ளன.\nபார்க்க, ஒரு சேனலையாவது தேர்ந்தெடுக்கவும்."</string>
+    <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"வலுவற்ற சிக்னலால் வீடியோ கிடைக்கவில்லை"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"வீடியோ கிடைக்கவில்லை"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Back விசை இணைத்த சாதனத்திற்கானது. வெளியேற, Home பட்டனை அழுத்துக."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Android Lollipop இல் இயங்கும் இந்தச் சாதனத்தில் நேரலைச் சேனல்களுக்கு ஆதரவில்லை."</string>

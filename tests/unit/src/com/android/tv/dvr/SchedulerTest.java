@@ -24,13 +24,11 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.os.Build;
 import android.os.Looper;
 import android.support.test.filters.SdkSuppress;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.android.tv.data.ChannelDataManager;
 import com.android.tv.testing.FakeClock;
 import com.android.tv.testing.dvr.RecordingTestUtils;
 
@@ -43,27 +41,22 @@ import java.util.concurrent.TimeUnit;
  * Tests for {@link Scheduler}.
  */
 @SmallTest
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.N)
+@SdkSuppress(minSdkVersion = 23)
 public class SchedulerTest extends AndroidTestCase {
-    private static final int CHANNEL_ID = 273;
-
-    private FakeClock mFakeClock;
+    private FakeClock mClock;
     private DvrDataManagerInMemoryImpl mDataManager;
     private Scheduler mScheduler;
-    @Mock DvrManager mDvrManager;
     @Mock DvrSessionManager mSessionManager;
     @Mock AlarmManager mMockAlarmManager;
-    @Mock
-    ChannelDataManager mChannelDataManager;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         MockitoAnnotations.initMocks(this);
-        mFakeClock = FakeClock.createWithCurrentTime();
-        mDataManager = new DvrDataManagerInMemoryImpl(getContext(), mFakeClock);
-        mScheduler = new Scheduler(Looper.myLooper(), mDvrManager, mSessionManager, mDataManager,
-                mChannelDataManager, getContext(), mFakeClock, mMockAlarmManager);
+        mClock = FakeClock.createWithCurrentTime();
+        mDataManager = new DvrDataManagerInMemoryImpl(getContext());
+        mScheduler = new Scheduler(Looper.myLooper(), mSessionManager, mDataManager, getContext(),
+                mClock, mMockAlarmManager);
     }
 
     public void testUpdate_none() throws Exception {
@@ -72,12 +65,11 @@ public class SchedulerTest extends AndroidTestCase {
     }
 
     public void testUpdate_nextIn12Hours() throws Exception {
-        long now = mFakeClock.currentTimeMillis();
+        long now = mClock.currentTimeMillis();
         long startTime = now + TimeUnit.HOURS.toMillis(12);
-        ScheduledRecording r = RecordingTestUtils
-                .createTestRecordingWithPeriod(CHANNEL_ID, startTime,
+        Recording r = RecordingTestUtils.createTestRecordingWithPeriod(startTime,
                 startTime + TimeUnit.HOURS.toMillis(1));
-        mDataManager.addScheduledRecording(r);
+        mDataManager.addRecording(r);
         mScheduler.update();
         verify(mMockAlarmManager).set(
                 eq(AlarmManager.RTC_WAKEUP),
@@ -86,10 +78,10 @@ public class SchedulerTest extends AndroidTestCase {
     }
 
     public void testStartsWithin() throws Exception {
-        long now = mFakeClock.currentTimeMillis();
+        long now = mClock.currentTimeMillis();
         long startTime = now + 3;
-        ScheduledRecording r = RecordingTestUtils
-                .createTestRecordingWithPeriod(273, startTime, startTime + 100);
+        Recording r = RecordingTestUtils
+                .createTestRecordingWithPeriod(startTime, startTime + 100);
         assertFalse(mScheduler.startsWithin(r, 2));
         assertTrue(mScheduler.startsWithin(r, 3));
     }

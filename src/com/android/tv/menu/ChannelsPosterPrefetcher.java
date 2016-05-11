@@ -25,11 +25,11 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.tv.R;
-import com.android.tv.common.SoftPreconditions;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.ProgramDataManager;
+import com.android.tv.util.SoftPreconditions;
 
 import java.util.List;
 

@@ -223,9 +223,6 @@ public class FadeAndShortSlide extends Visibility {
         float startX = mSlideCalculator.getGoneX(sceneRoot, view, position, mDistance);
         final Animator slideAnimator = TranslationAnimationCreator.createAnimation(view, endValues,
                 left, startX, endX, APPEAR_INTERPOLATOR, this);
-        if (slideAnimator == null) {
-            return null;
-        }
         mFade.setInterpolator(APPEAR_INTERPOLATOR);
         final AnimatorSet set = new AnimatorSet();
         set.play(slideAnimator).with(mFade.onAppear(sceneRoot, view, startValues, endValues));
@@ -248,15 +245,9 @@ public class FadeAndShortSlide extends Visibility {
         float endX = mSlideCalculator.getGoneX(sceneRoot, view, position, mDistance);
         final Animator slideAnimator = TranslationAnimationCreator.createAnimation(view,
                 startValues, left, startX, endX, DISAPPEAR_INTERPOLATOR, this);
-        if (slideAnimator == null) { // slideAnimator is null if startX == endX
-            return null;
-        }
-
         mFade.setInterpolator(DISAPPEAR_INTERPOLATOR);
+        final AnimatorSet set = new AnimatorSet();
         final Animator fadeAnimator = mFade.onDisappear(sceneRoot, view, startValues, endValues);
-        if (fadeAnimator == null) {
-            return null;
-        }
         fadeAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animator) {
@@ -264,8 +255,6 @@ public class FadeAndShortSlide extends Visibility {
                 view.setAlpha(0.0f);
             }
         });
-
-        final AnimatorSet set = new AnimatorSet();
         set.play(slideAnimator).with(fadeAnimator);
         Long delay = (Long) startValues.values.get(PROPNAME_DELAY);
         if (delay != null) {

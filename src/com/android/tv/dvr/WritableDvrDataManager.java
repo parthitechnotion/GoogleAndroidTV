@@ -29,7 +29,7 @@ interface WritableDvrDataManager extends DvrDataManager {
     /**
      * Add a new recording.
      */
-    void addScheduledRecording(ScheduledRecording scheduledRecording);
+    void addRecording(Recording recording);
 
     /**
      * Add a season recording/
@@ -39,7 +39,7 @@ interface WritableDvrDataManager extends DvrDataManager {
     /**
      * Remove a recording.
      */
-    void removeScheduledRecording(ScheduledRecording ScheduledRecording);
+    void removeRecording(Recording Recording);
 
     /**
      * Remove a season schedule.
@@ -49,5 +49,5 @@ interface WritableDvrDataManager extends DvrDataManager {
     /**
      * Update an existing recording.
      */
-    void updateScheduledRecording(ScheduledRecording r);
+    void updateRecording(Recording r);
 }

@@ -21,7 +21,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.support.v4.os.BuildCompat;
 import android.util.Log;
 
 import com.android.tv.Features;
@@ -73,7 +72,8 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             }
         }
 
-        if (CommonFeatures.DVR.isEnabled(context) && BuildCompat.isAtLeastN()) {
+        // DVR
+        if (CommonFeatures.DVR.isEnabled(context)) {
             DvrRecordingService.startService(context);
         }
     }

@@ -61,19 +61,13 @@ public abstract class TunerHal implements AutoCloseable {
         System.loadLibrary("tunertvinput_jni");
     }
 
-    /**
-     * Creates a TunerHal instance.
-     * @param context context for creating the TunerHal instance
-     * @return the TunerHal instance
-     */
-    public static TunerHal createInstance(Context context) {
+    public static TunerHal getInstance(Context context) {
         TunerHal tunerHal;
         if (TisConfiguration.isPackagedWithLiveChannels(context)) {
             tunerHal = new UsbTunerHal(context);
         } else {
             tunerHal = new InternalTunerHal(context);
-        }
-        if (tunerHal.openFirstAvailable()) {
+        }        if (tunerHal.openFirstAvailable()) {
             return tunerHal;
         }
         return null;
