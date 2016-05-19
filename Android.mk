@@ -33,8 +33,8 @@ LOCAL_MIN_SDK_VERSION := 23  # M
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res \
     $(LOCAL_PATH)/common/res \
-    $(TOP)/prebuilts/sdk/current/support/v17/leanback/res \
-    $(TOP)/prebuilts/sdk/current/support/v7/recyclerview/res \
+    $(TOP)/frameworks/support/v17/leanback/res \
+    $(TOP)/frameworks/support/v7/recyclerview/res \
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-annotations \
