@@ -34,4 +34,6 @@
 -->
 
 <tv-input xmlns:android="http://schemas.android.com/apk/res/android"
-    android:setupActivity="com.android.usbtuner.setup.TunerSetupActivity" />
+    android:setupActivity="com.android.usbtuner.setup.TunerSetupActivity"
+    android:canRecord="true"
+    android:tunerCount="1" />

@@ -19,6 +19,7 @@ package com.android.tv.menu;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import com.android.tv.R;
 import com.android.tv.TimeShiftManager;
 import com.android.tv.TimeShiftManager.TimeShiftActionId;
+import com.android.tv.common.SoftPreconditions;
 import com.android.tv.data.Program;
 import com.android.tv.menu.Menu.MenuShowReason;
 
@@ -249,9 +251,16 @@ public class PlayControlsRowView extends MenuRowView {
     }
 
     private void initializeTimeline() {
-        Program program = mTimeShiftManager.getProgramAt(mTimeShiftManager.getCurrentPositionMs());
-        mProgramStartTimeMs = program.getStartTimeUtcMillis();
-        mProgramEndTimeMs = program.getEndTimeUtcMillis();
+        if (mTimeShiftManager.isRecordingPlayback()) {
+            mProgramStartTimeMs = mTimeShiftManager.getRecordStartTimeMs();
+            mProgramEndTimeMs = mTimeShiftManager.getRecordEndTimeMs();
+        } else {
+            Program program = mTimeShiftManager.getProgramAt(
+                    mTimeShiftManager.getCurrentPositionMs());
+            mProgramStartTimeMs = program.getStartTimeUtcMillis();
+            mProgramEndTimeMs = program.getEndTimeUtcMillis();
+        }
+        SoftPreconditions.checkArgument(mProgramStartTimeMs <= mProgramEndTimeMs);
     }
 
     private void updateMenuVisibility() {
@@ -357,14 +366,6 @@ public class PlayControlsRowView extends MenuRowView {
             mTimeIndicator.setVisibility(View.INVISIBLE);
             return;
         }
-        if (mTimeShiftManager.isPlayForRecording()) {
-            mProgramStartTimeMs = mTimeShiftManager.getRecordStartTimeMs();
-            mProgramEndTimeMs = Math.max(mProgramStartTimeMs,
-                    mTimeShiftManager.getRecordEndTimeMs());
-            if (mProgramStartTimeMs > mProgramEndTimeMs) {
-                mProgramEndTimeMs = mProgramStartTimeMs;
-            }
-        }
         long currentPositionMs = mTimeShiftManager.getCurrentPositionMs();
         ViewGroup.MarginLayoutParams params =
                 (ViewGroup.MarginLayoutParams) mTimeText.getLayoutParams();
@@ -422,15 +423,18 @@ public class PlayControlsRowView extends MenuRowView {
 
     private void updateRecTimeText() {
         if (isEnabled()) {
-            mProgramStartTimeText.setVisibility(View.VISIBLE);
+            if (mTimeShiftManager.isRecordingPlayback()) {
+                mProgramStartTimeText.setVisibility(View.GONE);
+            } else {
+                mProgramStartTimeText.setVisibility(View.VISIBLE);
+                mProgramStartTimeText.setText(getTimeString(mProgramStartTimeMs));
+            }
             mProgramEndTimeText.setVisibility(View.VISIBLE);
+            mProgramEndTimeText.setText(getTimeString(mProgramEndTimeMs));
         } else {
-            mProgramStartTimeText.setVisibility(View.INVISIBLE);
-            mProgramEndTimeText.setVisibility(View.INVISIBLE);
-            return;
+            mProgramStartTimeText.setVisibility(View.GONE);
+            mProgramEndTimeText.setVisibility(View.GONE);
         }
-        mProgramStartTimeText.setText(getTimeString(mProgramStartTimeMs));
-        mProgramEndTimeText.setText(getTimeString(mProgramEndTimeMs));
     }
 
     private void updateButtons() {
@@ -478,7 +482,9 @@ public class PlayControlsRowView extends MenuRowView {
     }
 
     private String getTimeString(long timeMs) {
-        return mTimeFormat.format(timeMs);
+        return mTimeShiftManager.isRecordingPlayback()
+                ? DateUtils.formatElapsedTime(timeMs / 1000)
+                : mTimeFormat.format(timeMs);
     }
 
     private int convertDurationToPixel(long duration) {

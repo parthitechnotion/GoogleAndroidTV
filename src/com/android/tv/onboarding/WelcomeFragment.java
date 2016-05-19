@@ -20,8 +20,11 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v17.leanback.app.OnboardingFragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +34,6 @@ import android.widget.ImageView;
 import com.android.tv.R;
 import com.android.tv.common.ui.setup.SetupActionHelper;
 import com.android.tv.common.ui.setup.animation.SetupAnimationHelper;
-import com.android.tv.common.ui.setup.leanback.OnboardingFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -580,7 +582,6 @@ public class WelcomeFragment extends OnboardingFragment {
     private ImageView mArrowView;
 
     private Animator mAnimator;
-    private boolean mNeedToEndAnimator;
 
     public WelcomeFragment() {
         setExitTransition(new SetupAnimationHelper.TransitionBuilder()
@@ -589,16 +590,63 @@ public class WelcomeFragment extends OnboardingFragment {
                 .build());
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mPageTitles = getResources().getStringArray(R.array.welcome_page_titles);
-        mPageDescriptions = getResources().getStringArray(R.array.welcome_page_descriptions);
-        return super.onCreateView(inflater, container, savedInstanceState);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        initialize();
     }
 
     @Override
-    protected void onStartEnterAnimation() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        initialize();
+    }
+
+    private void initialize() {
+        if (mPageTitles == null) {
+            mPageTitles = getResources().getStringArray(R.array.welcome_page_titles);
+            mPageDescriptions = getResources().getStringArray(R.array.welcome_page_descriptions);
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        setLogoResourceId(R.drawable.splash_logo);
+        if (savedInstanceState != null) {
+            switch (getCurrentPageIndex()) {
+                case 0:
+                    mTvContentView.setImageResource(
+                            TV_FRAMES_1_START[TV_FRAMES_1_START.length - 1]);
+                    break;
+                case 1:
+                    mTvContentView.setImageResource(
+                            TV_FRAMES_2_START[TV_FRAMES_2_START.length - 1]);
+                    break;
+                case 2:
+                    mTvContentView.setImageResource(
+                            TV_FRAMES_3_ORANGE_START[TV_FRAMES_3_ORANGE_START.length - 1]);
+                    mArrowView.setImageResource(TV_FRAMES_3_BLUE_ARROW[0]);
+                    break;
+                case 3:
+                default:
+                    mTvContentView.setImageResource(
+                            TV_FRAMES_4_START[TV_FRAMES_4_START.length - 1]);
+                    break;
+            }
+        }
+        return view;
+    }
+
+    @Override
+    public int onProvideTheme() {
+        return R.style.Theme_Leanback_Onboarding;
+    }
+
+    @Override
+    protected Animator onCreateEnterAnimation() {
         List<Animator> animators = new ArrayList<>();
         // Cloud 1
         View view = getActivity().findViewById(R.id.cloud1);
@@ -640,9 +688,7 @@ public class WelcomeFragment extends OnboardingFragment {
         animators.add(animator);
         AnimatorSet set = new AnimatorSet();
         set.playTogether(animators);
-        mAnimator = set;
-        mAnimator.start();
-        mNeedToEndAnimator = true;
+        return set;
     }
 
     @Nullable
@@ -683,23 +729,14 @@ public class WelcomeFragment extends OnboardingFragment {
     }
 
     @Override
-    protected int getLogoResourceId() {
-        return R.drawable.splash_logo;
-    }
-
-    @Override
     protected void onFinishFragment() {
         SetupActionHelper.onActionClick(WelcomeFragment.this, ACTION_CATEGORY, ACTION_NEXT);
     }
 
     @Override
-    protected void onStartPageChangeAnimation(int previousPage) {
+    protected void onPageChanged(int newPage, int previousPage) {
         if (mAnimator != null) {
-            if (mNeedToEndAnimator) {
-                mAnimator.end();
-            } else {
-                mAnimator.cancel();
-            }
+            mAnimator.cancel();
         }
         mArrowView.setVisibility(View.GONE);
         // TV screen hiding animator.
@@ -710,7 +747,7 @@ public class WelcomeFragment extends OnboardingFragment {
         // TV screen showing animator.
         AnimatorSet animatorSet = new AnimatorSet();
         int firstFrame;
-        switch (getCurrentPageIndex()) {
+        switch (newPage) {
             case 0:
                 animatorSet.playSequentially(hideAnimator,
                         SetupAnimationHelper.createFrameAnimator(mTvContentView,
@@ -762,6 +799,5 @@ public class WelcomeFragment extends OnboardingFragment {
         });
         mAnimator = SetupAnimationHelper.applyAnimationTimeScale(animatorSet);
         mAnimator.start();
-        mNeedToEndAnimator = false;
     }
 }

@@ -23,7 +23,9 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Range;
 
-import com.android.tv.util.SoftPreconditions;
+import com.android.tv.common.SoftPreconditions;
+import com.android.tv.common.recording.RecordedProgram;
+import com.android.tv.util.Clock;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,11 +42,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
     private final static String TAG = "DvrDataManagerInMemory";
     private final AtomicLong mNextId = new AtomicLong(1);
-    private final Map<Long, Recording> mRecordings = new HashMap<>();
-    private List<SeasonRecording> mSeasonSchedule = new ArrayList<>();
+    private final Map<Long, ScheduledRecording> mScheduledRecordings = new HashMap<>();
+    private final Map<Long, RecordedProgram> mRecordedPrograms = new HashMap<>();
+    private final List<SeasonRecording> mSeasonSchedule = new ArrayList<>();
 
-    public DvrDataManagerInMemoryImpl(Context context) {
-        super(context);
+    public DvrDataManagerInMemoryImpl(Context context, Clock clock) {
+        super(context, clock);
     }
 
     @Override
@@ -52,27 +55,20 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
         return true;
     }
 
-    @Override
-    public List<Recording> getRecordings() {
-        return new ArrayList(mRecordings.values());
+    private List<ScheduledRecording> getScheduledRecordingsPrograms() {
+        return new ArrayList(mScheduledRecordings.values());
     }
 
     @Override
-    public List<Recording> getFinishedRecordings() {
-        return getRecordingsWithState(Recording.STATE_RECORDING_FINISHED);
+    public List<RecordedProgram> getRecordedPrograms() {
+        return new ArrayList<>(mRecordedPrograms.values());
     }
 
     @Override
-    public List<Recording> getStartedRecordings() {
-        return getRecordingsWithState(Recording.STATE_RECORDING_IN_PROGRESS);
+    public List<ScheduledRecording> getAllScheduledRecordings() {
+        return new ArrayList<>(mScheduledRecordings.values());
     }
 
-    @Override
-    public List<Recording> getScheduledRecordings() {
-        return getRecordingsWithState(Recording.STATE_RECORDING_NOT_STARTED);
-    }
-
-    @Override
     public List<SeasonRecording> getSeasonRecordings() {
         return mSeasonSchedule;
     }
@@ -80,9 +76,9 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
     @Override
     public long getNextScheduledStartTimeAfter(long startTime) {
 
-        List<Recording> temp = getScheduledRecordings();
-        Collections.sort(temp, Recording.START_TIME_COMPARATOR);
-        for (Recording r : temp) {
+        List<ScheduledRecording> temp =  getNonStartedScheduledRecordings();
+        Collections.sort(temp, ScheduledRecording.START_TIME_COMPARATOR);
+        for (ScheduledRecording r : temp) {
             if (r.getStartTimeMs() > startTime) {
                 return r.getStartTimeMs();
             }
@@ -91,10 +87,10 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
     }
 
     @Override
-    public List<Recording> getRecordingsThatOverlapWith(Range<Long> period) {
-        List<Recording> temp = getRecordings();
-        List<Recording> result = new ArrayList<>();
-        for (Recording r : temp) {
+    public List<ScheduledRecording> getRecordingsThatOverlapWith(Range<Long> period) {
+        List<ScheduledRecording> temp = getScheduledRecordingsPrograms();
+        List<ScheduledRecording> result = new ArrayList<>();
+        for (ScheduledRecording r : temp) {
             if (r.isOverLapping(period)) {
                 result.add(r);
             }
@@ -103,20 +99,56 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
     }
 
     /**
-     * Add a new recording.
+     * Add a new scheduled recording.
      */
     @Override
-    public void addRecording(Recording recording) {
-        addRecordingInternal(recording);
+    public void addScheduledRecording(ScheduledRecording scheduledRecording) {
+        addScheduledRecordingInternal(scheduledRecording);
     }
 
-    public Recording addRecordingInternal(Recording recording) {
-        SoftPreconditions.checkState(recording.getId() == Recording.ID_NOT_SET, TAG,
-                "expected id of " + Recording.ID_NOT_SET + " but was " + recording);
-        recording = Recording.buildFrom(recording).setId(mNextId.incrementAndGet()).build();
-        mRecordings.put(recording.getId(), recording);
-        notifyRecordingAdded(recording);
-        return recording;
+
+    public void addRecordedProgram(RecordedProgram recordedProgram) {
+        addRecordedProgramInternal(recordedProgram);
+    }
+
+    public void updateRecordedProgram(RecordedProgram r) {
+        long id = r.getId();
+        if (mRecordedPrograms.containsKey(id)) {
+            mRecordedPrograms.put(id, r);
+            notifyRecordedProgramChanged(r);
+        } else {
+            throw new IllegalArgumentException("Recording not found:" + r);
+        }
+    }
+
+    public void removeRecordedProgram(RecordedProgram scheduledRecording) {
+        mRecordedPrograms.remove(scheduledRecording.getId());
+        notifyRecordedProgramRemoved(scheduledRecording);
+    }
+
+
+    public ScheduledRecording addScheduledRecordingInternal(ScheduledRecording scheduledRecording) {
+        SoftPreconditions
+                .checkState(scheduledRecording.getId() == ScheduledRecording.ID_NOT_SET, TAG,
+                        "expected id of " + ScheduledRecording.ID_NOT_SET + " but was "
+                                + scheduledRecording);
+        scheduledRecording = ScheduledRecording.buildFrom(scheduledRecording)
+                .setId(mNextId.incrementAndGet())
+                .build();
+        mScheduledRecordings.put(scheduledRecording.getId(), scheduledRecording);
+        notifyScheduledRecordingAdded(scheduledRecording);
+        return scheduledRecording;
+    }
+
+    public RecordedProgram addRecordedProgramInternal(RecordedProgram recordedProgram) {
+        SoftPreconditions.checkState(recordedProgram.getId() == RecordedProgram.ID_NOT_SET, TAG,
+                "expected id of " + RecordedProgram.ID_NOT_SET + " but was " + recordedProgram);
+        recordedProgram = RecordedProgram.buildFrom(recordedProgram)
+                .setId(mNextId.incrementAndGet())
+                .build();
+        mRecordedPrograms.put(recordedProgram.getId(), recordedProgram);
+        notifyRecordedProgramAdded(recordedProgram);
+        return recordedProgram;
     }
 
     @Override
@@ -125,9 +157,9 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
     }
 
     @Override
-    public void removeRecording(Recording recording) {
-        mRecordings.remove(recording.getId());
-        notifyRecordingRemoved(recording);
+    public void removeScheduledRecording(ScheduledRecording scheduledRecording) {
+        mScheduledRecordings.remove(scheduledRecording.getId());
+        notifyScheduledRecordingRemoved(scheduledRecording);
     }
 
     @Override
@@ -136,11 +168,11 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
     }
 
     @Override
-    public void updateRecording(Recording r) {
+    public void updateScheduledRecording(ScheduledRecording r) {
         long id = r.getId();
-        if (mRecordings.containsKey(id)) {
-            mRecordings.put(id, r);
-            notifyRecordingStatusChanged(r);
+        if (mScheduledRecordings.containsKey(id)) {
+            mScheduledRecordings.put(id, r);
+            notifyScheduledRecordingStatusChanged(r);
         } else {
             throw new IllegalArgumentException("Recording not found:" + r);
         }
@@ -148,14 +180,32 @@ public final class DvrDataManagerInMemoryImpl extends BaseDvrDataManager {
 
     @Nullable
     @Override
-    public Recording getRecording(long id) {
-        return mRecordings.get(id);
+    public ScheduledRecording getScheduledRecording(long id) {
+        return mScheduledRecordings.get(id);
     }
 
+    @Nullable
+    @Override
+    public ScheduledRecording getScheduledRecordingForProgramId(long programId) {
+        for (ScheduledRecording r : mScheduledRecordings.values()) {
+            if (r.getProgramId() == programId) {
+                    return r;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public RecordedProgram getRecordedProgram(long recordingId) {
+        return mRecordedPrograms.get(recordingId);
+    }
+
+    @Override
     @NonNull
-    private List<Recording> getRecordingsWithState(int state) {
-        ArrayList<Recording> result = new ArrayList<>();
-        for (Recording r : mRecordings.values()) {
+    protected List<ScheduledRecording> getRecordingsWithState(int state) {
+        ArrayList<ScheduledRecording> result = new ArrayList<>();
+        for (ScheduledRecording r : mScheduledRecordings.values()) {
             if(r.getState() == state){
                 result.add(r);
             }

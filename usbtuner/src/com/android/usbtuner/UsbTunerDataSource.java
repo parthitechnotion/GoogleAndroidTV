@@ -19,7 +19,6 @@ package com.android.usbtuner;
 import android.media.MediaDataSource;
 import android.util.Log;
 
-import com.google.android.exoplayer.upstream.DataSource;
 import com.android.usbtuner.ChannelScanFileParser.ScanChannel;
 import com.android.usbtuner.data.Channel;
 import com.android.usbtuner.data.TunerChannel;
@@ -32,8 +31,8 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * A {@link DataSource} implementation which provides the mpeg2ts stream from the tuner device to
- * demux.
+ * A {@link MediaDataSource} implementation which provides the mpeg2ts stream from the tuner device
+ * to {@link MediaExtractor}.
  */
 public class UsbTunerDataSource extends MediaDataSource implements InputStreamSource {
     private static final String TAG = "UsbTunerDataSource";
@@ -43,6 +42,7 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
     private static final int CIRCULAR_BUFFER_SIZE = MIN_READ_UNIT * 20000;  // ~ 30MB
 
     private static final int READ_TIMEOUT_MS = 5000; // 5 secs.
+    private static final int BUFFER_UNDERRUN_SLEEP_MS = 10;
 
     private static final int CACHE_KEY_VERSION = 1;
 
@@ -138,6 +138,9 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
                 mStreamingThread.join();
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            mTunerHal.stopTune();
         }
     }
 
@@ -154,7 +157,6 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
     }
 
     private class StreamingThread extends Thread {
-
         @Override
         public void run() {
             // Buffers for streaming data from the tuner and the internal buffer.
@@ -169,6 +171,13 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
 
                 int bytesWritten = mTunerHal.readTsStream(dataBuffer, dataBuffer.length);
                 if (bytesWritten <= 0) {
+                    try {
+                        // When buffer is underrun, we sleep for short time to prevent
+                        // unnecessary CPU draining.
+                        sleep(BUFFER_UNDERRUN_SLEEP_MS);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     continue;
                 }
 
@@ -214,6 +223,7 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
                     mCircularBufferMonitor.wait(READ_TIMEOUT_MS);
                 } catch (InterruptedException e) {
                     // Wait again.
+                    Thread.currentThread().interrupt();
                 }
                 if (initialBytesFetched == mBytesFetched) {
                     Log.w(TAG, "No data update for " + READ_TIMEOUT_MS + "ms. returning -1.");
@@ -260,7 +270,8 @@ public class UsbTunerDataSource extends MediaDataSource implements InputStreamSo
 
     @Override
     public void close() {
-        mTunerHal.stopTune();
+        // Called from system MediaExtractor. All the resource should be closed
+        // in stopStream() already.
     }
 
     @Override

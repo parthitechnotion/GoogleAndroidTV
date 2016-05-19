@@ -148,12 +148,6 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"Лицензии открытого ПО"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Лицензии открытого ПО"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"Версия"</string>
-    <string name="side_panel_title_developer" msgid="7287627759979090359">"Для разработчиков"</string>
-    <string name="developer_menu_enable_usb_tv_tuner" msgid="8380174840125430895">"Включить USB-тюнер"</string>
-    <string name="developer_menu_enable_usb_tv_tuner_description" msgid="7122833064850110134">"Для воспроизведения звука при использовании USB-тюнера телевизор должен поддерживать сквозную передачу в формате AC3."</string>
-    <string name="developer_menu_ac3_support" msgid="8542930057443915670">"Поддержка AC3"</string>
-    <string name="developer_menu_ac3_support_yes" msgid="8292133113564798078">"Ваш телевизор поддерживает сквозную передачу в формате AC3."</string>
-    <string name="developer_menu_ac3_support_no" msgid="6509302484099707809">"Ваш телевизор не поддерживает сквозную передачу в формате AC3."</string>
     <string name="about_menu_improve" msgid="3712578027009311401">"Не помогать улучшить \"Прямой эфир\""</string>
     <string name="about_menu_improve_summary" msgid="7548489011760588571">"Разрешите отправку анонимных отчетов об использовании и данных диагностики в Google, чтобы мы могли улучшить работу Телеканалов и устранить сбои и зависания."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Чтобы смотреть этот канал, нажмите стрелку вправо и введите PIN-код."</string>
@@ -165,9 +159,10 @@
     <string name="shrunken_tvview_content_locked" msgid="7686397981042364446">"Программа заблокирована"</string>
     <string name="shrunken_tvview_content_locked_format" msgid="3720284198877900916">"Возрастное ограничение этой программы: <xliff:g id="RATING">%1$s</xliff:g>"</string>
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Только аудио"</string>
+    <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"Слабый сигнал"</string>
+    <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"Нет доступа к Интернету"</string>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Без названия"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Канал заблокирован"</string>
-    <string name="episode_format" msgid="4881195874563241096">"Сезон <xliff:g id="SEASON_NUMBER">%1$d</xliff:g>: серия <xliff:g id="EPISODE_NUMBER">%2$d</xliff:g>, \"<xliff:g id="EPISODE_TITLE">%3$s</xliff:g>\""</string>
     <string name="setup_category_new" msgid="2899355289563443627">"Новые"</string>
     <string name="setup_category_done" msgid="4750902502852212319">"Источники"</string>
     <plurals name="setup_input_channels" formatted="false" msgid="1695941684075602971">
@@ -196,7 +191,6 @@
     <string name="msg_tune_failed" msgid="3277419551849972252">"Не удалось выполнить настройку"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"Действие не поддерживается ни в одном приложении."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"Все каналы скрыты.\nВыберите хотя бы один."</string>
-    <string name="msg_channel_unavailable_weak_signal" msgid="3935601939459171709">"Видео недоступно из-за слабого сигнала"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Видео недоступно из-за непредвиденной ошибки"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Кнопка \"Назад\" управляет подключенным устройством. Чтобы выйти, нажмите \"Главный экран\"."</string>
     <string name="msg_not_supported_device" msgid="4469404625040284722">"Прямой эфир не поддерживается на этом устройстве с Android 5.0."</string>

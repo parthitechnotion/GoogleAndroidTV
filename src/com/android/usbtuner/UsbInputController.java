@@ -23,10 +23,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
+import android.media.tv.TvInputService;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.os.BuildCompat;
 import android.util.Log;
 
 import com.android.tv.Features;
@@ -44,7 +48,7 @@ import java.util.Map;
  * to update the connection status of the supported USB TV tuners.
  */
 public class UsbInputController extends BroadcastReceiver {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final String TAG = "UsbInputController";
 
     private static final TunerDevice[] TUNER_DEVICES = {
@@ -58,7 +62,7 @@ public class UsbInputController extends BroadcastReceiver {
     private static final long DVB_DRIVER_CHECK_DELAY_MS = 300;
 
     private DvbDeviceAccessor mDvbDeviceAccessor;
-    private Handler mHandler = new Handler(Looper.getMainLooper()) {
+    private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -155,6 +159,10 @@ public class UsbInputController extends BroadcastReceiver {
         PackageManager pm  = context.getPackageManager();
         ComponentName USBTUNER = new ComponentName(context, UsbTunerTvInputService.class);
 
+        // Don't kill app by enabling/disabling TvActivity. If LC is killed by enabling/disabling
+        // TvActivity, the following pm.setComponentEnabledSetting doesn't work.
+        ((TvApplication) context.getApplicationContext()).handleInputCountChanged(
+                true, enabled, true);
         // Since PackageManager.DONT_KILL_APP delays the operation by 10 seconds
         // (PackageManagerService.BROADCAST_DELAY), we'd better avoid using it. It is used only
         // when the LiveChannels app is active since we don't want to kill the running app.
@@ -165,10 +173,17 @@ public class UsbInputController extends BroadcastReceiver {
         if (newState != pm.getComponentEnabledSetting(USBTUNER)) {
             // Send/cancel the USB tuner TV input setup recommendation card.
             TunerSetupActivity.onTvInputEnabled(context, enabled);
-
             // Enable/disable the USB tuner TV input.
             pm.setComponentEnabledSetting(USBTUNER, newState, flags);
             if (DEBUG) Log.d(TAG, "Status updated:" + enabled);
+        }
+        if (enabled && BuildCompat.isAtLeastN()) {
+            TvInputInfo info = mDvbDeviceAccessor.buildTvInputInfo(context);
+            if (info != null) {
+                Log.i(TAG, "TvInputInfo updated: " + info.toString());
+                ((TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE))
+                        .updateTvInputInfo(info);
+            }
         }
     }
 }

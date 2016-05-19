@@ -17,7 +17,23 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="description_us_tv_d" msgid="12333789157204816">"Naznačujúce dialógy"</string>
+    <!-- no translation found for description_fr_dvb_u (8232083238497153682) -->
+    <skip />
+    <!-- no translation found for description_es_dvb_all (4821183217465284547) -->
+    <skip />
+    <!-- no translation found for description_es_dvb_c (1367395312248365855) -->
+    <skip />
+    <!-- no translation found for description_es_dvb_x (438890727939582714) -->
+    <skip />
+    <!-- no translation found for description_kr_tv_all (3048365195196820853) -->
+    <skip />
+    <!-- no translation found for description_kr_tv_7 (5892929693766504059) -->
+    <skip />
+    <!-- no translation found for description_kr_tv_12 (1883893246941826597) -->
+    <skip />
+    <string name="description_kr_tv_15" msgid="5888141153573158322">"Programy môžu obsahovať materiál nevhodný pre publikum do 15 rokov, preto sa odporúča rodičovský dohľad."</string>
+    <string name="description_kr_tv_19" msgid="9197085158053054550">"Programy môžu obsahovať materiál nevhodný pre publikum do 19 rokov, a preto nie sú vhodné pre mladistvých do 19 rokov."</string>
+    <string name="description_us_tv_d" msgid="12333789157204816">"Dialógy so sexuálnym podtextom"</string>
     <string name="description_us_tv_l" msgid="4105102855627964319">"Hrubý jazyk"</string>
     <string name="description_us_tv_s" msgid="7552447251273237176">"Sexuálny obsah"</string>
     <string name="description_us_tv_v" msgid="4799470820740236198">"Násilie"</string>

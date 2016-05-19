@@ -26,7 +26,9 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.media.tv.TvContentRating;
+import android.media.tv.TvInputInfo;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.RecycledViewPool;
@@ -43,11 +45,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.tv.R;
+import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.guide.ProgramManager.TableEntriesUpdatedListener;
 import com.android.tv.parental.ParentalControlSettings;
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter;
+import com.android.tv.util.ImageCache;
+import com.android.tv.util.ImageLoader;
+import com.android.tv.util.ImageLoader.LoadTvInputLogoTask;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -57,8 +63,8 @@ import java.util.List;
 /**
  * Adapts the {@link ProgramListAdapter} list to the body of the program guide table.
  */
-public class ProgramTableAdapter extends
-        RecyclerView.Adapter<ProgramTableAdapter.ProgramRowHolder> {
+public class ProgramTableAdapter extends RecyclerView.Adapter<ProgramTableAdapter.ProgramRowHolder>
+        implements ProgramManager.TableEntryChangedListener {
     private static final String TAG = "ProgramTableAdapter";
     private static final boolean DEBUG = false;
 
@@ -84,10 +90,10 @@ public class ProgramTableAdapter extends
     private final int mDetailPadding;
     private final TextAppearanceSpan mEpisodeTitleStyle;
 
-    public ProgramTableAdapter(Context context, TvInputManagerHelper tvInputManagerHelper,
-            ProgramManager programManager, ProgramGuide programGuide) {
+    public ProgramTableAdapter(Context context, ProgramManager programManager,
+            ProgramGuide programGuide) {
         mContext = context;
-        mTvInputManagerHelper = tvInputManagerHelper;
+        mTvInputManagerHelper = TvApplication.getSingletons(context).getTvInputManagerHelper();
         mProgramManager = programManager;
         mProgramGuide = programGuide;
 
@@ -140,6 +146,7 @@ public class ProgramTableAdapter extends
             }
         });
         update();
+        mProgramManager.addTableEntryChangedListener(this);
     }
 
     private void update() {
@@ -149,7 +156,8 @@ public class ProgramTableAdapter extends
         }
         mProgramListAdapters.clear();
         for (int i = 0; i < mProgramManager.getChannelCount(); i++) {
-            ProgramListAdapter listAdapter = new ProgramListAdapter(mContext, mProgramManager, i);
+            ProgramListAdapter listAdapter = new ProgramListAdapter(mContext.getResources(),
+                    mProgramManager, i);
             mProgramManager.addTableEntriesUpdatedListener(listAdapter);
             mProgramListAdapters.add(listAdapter);
         }
@@ -177,6 +185,14 @@ public class ProgramTableAdapter extends
         ProgramRow programRow = (ProgramRow) itemView.findViewById(R.id.row);
         programRow.setRecycledViewPool(mRecycledViewPool);
         return new ProgramRowHolder(itemView);
+    }
+
+    @Override
+    public void onTableEntryChanged(ProgramManager.TableEntry tableEntry) {
+        int channelIndex = mProgramManager.getChannelIndex(tableEntry.channelId);
+        int pos = mProgramManager.getProgramIdIndex(tableEntry.channelId, tableEntry.getId());
+        if (DEBUG) Log.d(TAG, "update(" + channelIndex + ", " + pos + ")");
+        mProgramListAdapters.get(channelIndex).notifyItemChanged(pos, tableEntry);
     }
 
     // TODO: make it static
@@ -223,6 +239,9 @@ public class ProgramTableAdapter extends
         private final TextView mChannelNameView;
         private final ImageView mChannelLogoView;
         private final ImageView mChannelBlockView;
+        private final ImageView mInputLogoView;
+
+        private boolean mIsInputLogoVisible;
 
         public ProgramRowHolder(View itemView) {
             super(itemView);
@@ -244,6 +263,7 @@ public class ProgramTableAdapter extends
             mChannelNameView = (TextView) mContainer.findViewById(R.id.channel_name);
             mChannelLogoView = (ImageView) mContainer.findViewById(R.id.channel_logo);
             mChannelBlockView = (ImageView) mContainer.findViewById(R.id.channel_block);
+            mInputLogoView = (ImageView) mContainer.findViewById(R.id.input_logo);
         }
 
         public void onBind(int position) {
@@ -267,6 +287,8 @@ public class ProgramTableAdapter extends
             if (DEBUG) Log.d(TAG, "onBindChannel " + channel);
 
             mChannel = channel;
+            mInputLogoView.setVisibility(View.GONE);
+            mIsInputLogoVisible = false;
             if (channel == null) {
                 mChannelNumberView.setVisibility(View.GONE);
                 mChannelNameView.setVisibility(View.GONE);
@@ -467,6 +489,43 @@ public class ProgramTableAdapter extends
             }
         }
 
+        /**
+         * Update tv input logo. It should be called when the visible child item in ProgramGrid
+         * changed.
+         */
+        public void updateInputLogo(int lastPosition, boolean forceShow) {
+            if (mChannel == null) {
+                mInputLogoView.setVisibility(View.GONE);
+                mIsInputLogoVisible = false;
+                return;
+            }
+
+            boolean showLogo = forceShow;
+            if (!showLogo) {
+                Channel lastChannel = mProgramManager.getChannel(lastPosition);
+                if (lastChannel == null
+                        || !mChannel.getInputId().equals(lastChannel.getInputId())) {
+                    showLogo = true;
+                }
+            }
+
+            if (showLogo) {
+                if (!mIsInputLogoVisible) {
+                    mIsInputLogoVisible = true;
+                    TvInputInfo info = mTvInputManagerHelper.getTvInputInfo(mChannel.getInputId());
+                    if (info != null) {
+                        LoadTvInputLogoTask task = new LoadTvInputLogoTask(
+                                itemView.getContext(), ImageCache.getInstance(), info);
+                        ImageLoader.loadBitmap(createTvInputLogoLoadedCallback(info, this), task);
+                    }
+                }
+            } else {
+                mInputLogoView.setVisibility(View.GONE);
+                mInputLogoView.setImageDrawable(null);
+                mIsInputLogoVisible = false;
+            }
+        }
+
         private void updateTextView(TextView textView, String text) {
             if (!TextUtils.isEmpty(text)) {
                 textView.setVisibility(View.VISIBLE);
@@ -485,6 +544,14 @@ public class ProgramTableAdapter extends
             mChannelLogoView.setImageBitmap(logo);
             mChannelNameView.setVisibility(View.GONE);
             mChannelLogoView.setVisibility(View.VISIBLE);
+        }
+
+        private void updateInputLogoInternal(@NonNull Bitmap tvInputLogo) {
+            if (!mIsInputLogoVisible) {
+                return;
+            }
+            mInputLogoView.setImageBitmap(tvInputLogo);
+            mInputLogoView.setVisibility(View.VISIBLE);
         }
 
         private void onHorizontalScrolled() {
@@ -523,6 +590,19 @@ public class ProgramTableAdapter extends
                     return;
                 }
                 holder.updateChannelLogo(logo);
+            }
+        };
+    }
+
+    private static ImageLoaderCallback<ProgramRowHolder> createTvInputLogoLoadedCallback(
+            final TvInputInfo info, ProgramRowHolder holder) {
+        return new ImageLoaderCallback<ProgramRowHolder>(holder) {
+            @Override
+            public void onBitmapLoaded(ProgramRowHolder holder, @Nullable Bitmap logo) {
+                if (logo != null && info.getId()
+                        .equals(holder.mChannel.getInputId())) {
+                    holder.updateInputLogoInternal(logo);
+                }
             }
         };
     }

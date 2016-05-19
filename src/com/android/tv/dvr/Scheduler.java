@@ -28,6 +28,8 @@ import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.Range;
 
+import com.android.tv.data.Channel;
+import com.android.tv.data.ChannelDataManager;
 import com.android.tv.util.Clock;
 
 import java.util.List;
@@ -37,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * The core class to manage schedule and run actual recording.
  */
 @VisibleForTesting
-public class Scheduler implements DvrDataManager.Listener {
+public class Scheduler implements DvrDataManager.ScheduledRecordingListener {
     private static final String TAG = "Scheduler";
     private static final boolean DEBUG = false;
 
@@ -51,9 +53,9 @@ public class Scheduler implements DvrDataManager.Listener {
         public static final int MESSAGE_REMOVE = 999;
         private final long mId;
 
-        HandlerWrapper(Looper looper, Recording recording, RecordingTask recordingTask) {
+        HandlerWrapper(Looper looper, ScheduledRecording scheduledRecording, RecordingTask recordingTask) {
             super(looper, recordingTask);
-            mId = recording.getId();
+            mId = scheduledRecording.getId();
         }
 
         @Override
@@ -73,27 +75,32 @@ public class Scheduler implements DvrDataManager.Listener {
     private final Looper mLooper;
     private final DvrSessionManager mSessionManager;
     private final WritableDvrDataManager mDataManager;
+    private final DvrManager mDvrManager;
+    private final ChannelDataManager mChannelDataManager;
     private final Context mContext;
     private final Clock mClock;
     private final AlarmManager mAlarmManager;
 
-    public Scheduler(Looper looper, DvrSessionManager sessionManager,
-            WritableDvrDataManager dataManager, Context context, Clock clock,
+    public Scheduler(Looper looper, DvrManager dvrManager, DvrSessionManager sessionManager,
+            WritableDvrDataManager dataManager, ChannelDataManager channelDataManager,
+            Context context, Clock clock,
             AlarmManager alarmManager) {
         mLooper = looper;
+        mDvrManager = dvrManager;
         mSessionManager = sessionManager;
         mDataManager = dataManager;
+        mChannelDataManager = channelDataManager;
         mContext = context;
         mClock = clock;
         mAlarmManager = alarmManager;
     }
 
     private void updatePendingRecordings() {
-        List<Recording> recordings = mDataManager.getRecordingsThatOverlapWith(
+        List<ScheduledRecording> scheduledRecordings = mDataManager.getRecordingsThatOverlapWith(
                 new Range(mClock.currentTimeMillis(),
                         mClock.currentTimeMillis() + SOON_DURATION_IN_MS));
         // TODO(DVR): handle removing and updating exiting recordings.
-        for (Recording r : recordings) {
+        for (ScheduledRecording r : scheduledRecordings) {
             scheduleRecordingSoon(r);
         }
     }
@@ -108,18 +115,18 @@ public class Scheduler implements DvrDataManager.Listener {
     }
 
     @Override
-    public void onRecordingAdded(Recording recording) {
-        if (DEBUG) Log.d(TAG, "added " + recording);
-        if (startsWithin(recording, SOON_DURATION_IN_MS)) {
-            scheduleRecordingSoon(recording);
+    public void onScheduledRecordingAdded(ScheduledRecording scheduledRecording) {
+        if (DEBUG) Log.d(TAG, "added " + scheduledRecording);
+        if (startsWithin(scheduledRecording, SOON_DURATION_IN_MS)) {
+            scheduleRecordingSoon(scheduledRecording);
         } else {
             updateNextAlarm();
         }
     }
 
     @Override
-    public void onRecordingRemoved(Recording recording) {
-        long id = recording.getId();
+    public void onScheduledRecordingRemoved(ScheduledRecording scheduledRecording) {
+        long id = scheduledRecording.getId();
         HandlerWrapper wrapper = mPendingRecordings.get(id);
         if (wrapper != null) {
             wrapper.removeCallbacksAndMessages(null);
@@ -130,16 +137,18 @@ public class Scheduler implements DvrDataManager.Listener {
     }
 
     @Override
-    public void onRecordingStatusChanged(Recording recording) {
+    public void onScheduledRecordingStatusChanged(ScheduledRecording scheduledRecording) {
         //TODO(DVR): implement
     }
 
-    private void scheduleRecordingSoon(Recording recording) {
-        RecordingTask recordingTask = new RecordingTask(recording, mSessionManager, mDataManager,
-                mClock);
-        HandlerWrapper handlerWrapper = new HandlerWrapper(mLooper, recording, recordingTask);
+    private void scheduleRecordingSoon(ScheduledRecording scheduledRecording) {
+        Channel channel = mChannelDataManager.getChannel(scheduledRecording.getChannelId());
+        RecordingTask recordingTask = new RecordingTask(scheduledRecording, channel, mDvrManager,
+                mSessionManager, mDataManager, mClock);
+        HandlerWrapper handlerWrapper = new HandlerWrapper(mLooper, scheduledRecording,
+                recordingTask);
         recordingTask.setHandler(handlerWrapper);
-        mPendingRecordings.put(recording.getId(), handlerWrapper);
+        mPendingRecordings.put(scheduledRecording.getId(), handlerWrapper);
         handlerWrapper.sendEmptyMessage(RecordingTask.MESSAGE_INIT);
     }
 
@@ -164,7 +173,7 @@ public class Scheduler implements DvrDataManager.Listener {
     }
 
     @VisibleForTesting
-    boolean startsWithin(Recording recording, long durationInMs) {
-        return mClock.currentTimeMillis() >= recording.getStartTimeMs() - durationInMs;
+    boolean startsWithin(ScheduledRecording scheduledRecording, long durationInMs) {
+        return mClock.currentTimeMillis() >= scheduledRecording.getStartTimeMs() - durationInMs;
     }
 }
