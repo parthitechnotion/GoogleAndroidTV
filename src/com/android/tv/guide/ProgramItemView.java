@@ -16,9 +16,7 @@
 
 package com.android.tv.guide;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -26,6 +24,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.os.BuildCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -43,15 +42,14 @@ import com.android.tv.TvApplication;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.data.Channel;
-import com.android.tv.data.Program;
 import com.android.tv.dvr.DvrManager;
-import com.android.tv.dvr.Recording;
+import com.android.tv.dvr.ui.DvrDialogFragment;
+import com.android.tv.dvr.ui.DvrRecordDeleteFragment;
+import com.android.tv.dvr.ui.DvrRecordScheduleFragment;
 import com.android.tv.guide.ProgramManager.TableEntry;
 import com.android.tv.util.Utils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ProgramItemView extends TextView {
@@ -59,9 +57,6 @@ public class ProgramItemView extends TextView {
 
     private static final long FOCUS_UPDATE_FREQUENCY = TimeUnit.SECONDS.toMillis(1);
     private static final int MAX_PROGRESS = 10000; // From android.widget.ProgressBar.MAX_VALUE
-
-    private static final int ACTION_RECORD_PROGRAM = 100;
-    private static final int ACTION_RECORD_SEASON = 101;
 
     // State indicating the focused program is the current program
     private static final int[] STATE_CURRENT_PROGRAM = { R.attr.state_current_program };
@@ -89,6 +84,10 @@ public class ProgramItemView extends TextView {
         @Override
         public void onClick(final View view) {
             TableEntry entry = ((ProgramItemView) view).mTableEntry;
+            if (entry == null) {
+                //do nothing
+                return;
+            }
             ApplicationSingletons singletons = TvApplication.getSingletons(view.getContext());
             Tracker tracker = singletons.getTracker();
             tracker.sendEpgItemClicked();
@@ -105,78 +104,38 @@ public class ProgramItemView extends TextView {
                 }, entry.getWidth() > ((ProgramItemView) view).mMaxWidthForRipple ? 0
                         : view.getResources()
                                 .getInteger(R.integer.program_guide_ripple_anim_duration));
-            } else if (CommonFeatures.DVR.isEnabled(view.getContext())) {
+            } else if (CommonFeatures.DVR.isEnabled(view.getContext()) && BuildCompat
+                    .isAtLeastN()) {
                 final MainActivity tvActivity = (MainActivity) view.getContext();
                 final DvrManager dvrManager = singletons.getDvrManager();
                 final Channel channel = tvActivity.getChannelDataManager()
                         .getChannel(entry.channelId);
-                if (dvrManager.canRecord(channel.getInputId())) {
-                    showDvrDialog(view, entry, dvrManager);
+                if (dvrManager.canRecord(channel.getInputId()) && entry.program != null) {
+                    if (entry.scheduledRecording == null) {
+                        showDvrDialog(view, entry);
+                    } else {
+                        showRecordDeleteDialog(view, entry);
+                    }
                 }
             }
         }
 
-        private void showDvrDialog(final View view, TableEntry entry, final DvrManager dvrManager) {
-            List<CharSequence> items = new ArrayList<>();
-            final List<Integer> actions = new ArrayList<>();
-            // TODO: the items can be changed by the state of the program. For example,
-            // if the program is already added in scheduler, we need to show an item to
-            // delete the recording schedule.
-            items.add(view.getResources().getString(R.string.epg_dvr_record_program));
-            actions.add(ACTION_RECORD_PROGRAM);
-            items.add(view.getResources().getString(R.string.epg_dvr_record_season));
-            actions.add(ACTION_RECORD_SEASON);
+        private void showDvrDialog(final View view, TableEntry entry) {
+            Utils.showToastMessageForDeveloperFeature(view.getContext());
+            DvrRecordScheduleFragment dvrRecordScheduleFragment =
+                    new DvrRecordScheduleFragment(entry);
+            DvrDialogFragment dvrDialogFragment = new DvrDialogFragment(dvrRecordScheduleFragment);
+            ((MainActivity) view.getContext()).getOverlayManager().showDialogFragment(
+                    DvrDialogFragment.DIALOG_TAG, dvrDialogFragment, true, true);
+        }
 
-            final Program program = entry.program;
-            final List<Recording> conflicts = dvrManager
-                    .getScheduledRecordingsThatConflict(program);
-            // TODO: it is a tentative UI. Don't publish the UI.
-            DialogInterface.OnClickListener onClickListener
-                    = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dialog, int which) {
-                    if (actions.get(which) == ACTION_RECORD_PROGRAM) {
-                        if (conflicts.isEmpty()) {
-                            dvrManager.addSchedule(program, conflicts);
-                        } else {
-                            showConflictDialog(view, dvrManager, program, conflicts);
-                        }
-                    } else if (actions.get(which) == ACTION_RECORD_SEASON) {
-                        dvrManager.addSeasonSchedule(program);
-                    }
-                    dialog.dismiss();
-                }
-            };
-            new AlertDialog.Builder(view.getContext())
-                    .setItems(items.toArray(new CharSequence[items.size()]), onClickListener)
-                    .create()
-                    .show();
+        private void showRecordDeleteDialog(final View view, final TableEntry entry) {
+            DvrRecordDeleteFragment recordDeleteDialogFragment = new DvrRecordDeleteFragment(entry);
+            DvrDialogFragment dvrDialogFragment = new DvrDialogFragment(recordDeleteDialogFragment);
+            ((MainActivity) view.getContext()).getOverlayManager().showDialogFragment(
+                    DvrDialogFragment.DIALOG_TAG, dvrDialogFragment, true, true);
         }
     };
-
-    private static void showConflictDialog(final View view, final DvrManager dvrManager,
-            final Program program, final List<Recording> conflicts) {
-        DialogInterface.OnClickListener conflictClickListener
-                = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (which == AlertDialog.BUTTON_POSITIVE) {
-                    dvrManager.addSchedule(program, conflicts);
-                    dialog.dismiss();
-                }
-            }
-        };
-        StringBuilder sb = new StringBuilder();
-        for (Recording r : conflicts) {
-            sb.append(r.toString()).append('\n');
-        }
-        new AlertDialog.Builder(view.getContext()).setTitle(R.string.dvr_epg_conflict_dialog_title)
-                .setMessage(sb.toString())
-                .setPositiveButton(R.string.dvr_epg_record, conflictClickListener)
-                .setNegativeButton(R.string.dvr_epg_do_not_record, conflictClickListener)
-                .create()
-                .show();
-    }
 
     private static final View.OnFocusChangeListener ON_FOCUS_CHANGED =
             new View.OnFocusChangeListener() {
@@ -198,6 +157,10 @@ public class ProgramItemView extends TextView {
         public void run() {
             refreshDrawableState();
             TableEntry entry = mTableEntry;
+            if (entry == null) {
+                //do nothing
+                return;
+            }
             if (entry.isCurrentProgram()) {
                 Drawable background = getBackground();
                 int progress = getProgress(entry.entryStartUtcMillis, entry.entryEndUtcMillis);
@@ -220,6 +183,8 @@ public class ProgramItemView extends TextView {
 
     public ProgramItemView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setOnClickListener(ON_CLICKED);
+        setOnFocusChangeListener(ON_FOCUS_CHANGED);
     }
 
     private void initIfNeeded() {
@@ -282,11 +247,9 @@ public class ProgramItemView extends TextView {
         return mTableEntry;
     }
 
-    public void onBind(TableEntry entry, ProgramListAdapter adapter) {
+    public void setValues(TableEntry entry, int selectedGenreId, long fromUtcMillis,
+            long toUtcMillis, String gapTitle) {
         mTableEntry = entry;
-        setOnClickListener(ON_CLICKED);
-        setOnFocusChangeListener(ON_FOCUS_CHANGED);
-        ProgramManager programManager = adapter.getProgramManager();
 
         ViewGroup.LayoutParams layoutParams = getLayoutParams();
         layoutParams.width = entry.getWidth();
@@ -303,15 +266,18 @@ public class ProgramItemView extends TextView {
             setText(null);
         } else {
             if (entry.isGap()) {
-                if (entry.isBlocked()) {
-                    title = adapter.getBlockedProgramTitle();
-                } else {
-                    title = adapter.getNoInfoProgramTitle();
-                }
+                title = gapTitle;
                 episode = null;
-            } else if (entry.hasGenre(programManager.getSelectedGenreId())) {
+            } else if (entry.hasGenre(selectedGenreId)) {
                 titleStyle = sProgramTitleStyle;
                 episodeStyle = sEpisodeTitleStyle;
+            }
+            if (TextUtils.isEmpty(title)) {
+                title = getResources().getString(R.string.program_title_for_no_information);
+            }
+            if (mTableEntry.scheduledRecording != null) {
+                //TODO(dvr): use a proper icon for UI status.
+                title = "®" + title;
             }
 
             SpannableStringBuilder description = new SpannableStringBuilder();
@@ -340,12 +306,11 @@ public class ProgramItemView extends TextView {
         measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
         mTextWidth = getMeasuredWidth() - getPaddingStart() - getPaddingEnd();
         int start = GuideUtils.convertMillisToPixel(entry.entryStartUtcMillis);
-        int guideStart = GuideUtils.convertMillisToPixel(programManager.getFromUtcMillis());
+        int guideStart = GuideUtils.convertMillisToPixel(fromUtcMillis);
         layoutVisibleArea(guideStart - start);
 
         // Maximum width for us to use a ripple
-        mMaxWidthForRipple = GuideUtils.convertMillisToPixel(
-                programManager.getFromUtcMillis(), programManager.getToUtcMillis());
+        mMaxWidthForRipple = GuideUtils.convertMillisToPixel(fromUtcMillis, toUtcMillis);
     }
 
     /**
@@ -374,14 +339,13 @@ public class ProgramItemView extends TextView {
         }
     }
 
-    public void onUnbind() {
+    public void clearValues() {
         if (getHandler() != null) {
             getHandler().removeCallbacks(mUpdateFocus);
         }
 
         setTag(null);
-        setOnFocusChangeListener(null);
-        setOnClickListener(null);
+        mTableEntry = null;
     }
 
     private static int getProgress(long start, long end) {

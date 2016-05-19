@@ -24,10 +24,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.database.Cursor;
-import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
 import android.media.tv.TvInputInfo;
@@ -42,18 +42,16 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-import com.android.tv.Features;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
-import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -336,6 +334,19 @@ public class Utils {
         return "";
     }
 
+    public static String getAspectRatioString(float videoDisplayAspectRatio) {
+        if (videoDisplayAspectRatio <= 0) {
+            return "";
+        }
+
+        for (AspectRatio ratio : AspectRatio.values()) {
+            if (Math.abs((float) ratio.width / ratio.height - videoDisplayAspectRatio) < 0.05f) {
+                return ratio.toString();
+            }
+        }
+        return "";
+    }
+
     public static int getVideoDefinitionLevelFromSize(int width, int height) {
         if (width >= VIDEO_ULTRA_HD_WIDTH && height >= VIDEO_ULTRA_HD_HEIGHT) {
             return StreamInfo.VIDEO_DEFINITION_LEVEL_ULTRA_HD;
@@ -609,67 +620,46 @@ public class Utils {
     }
 
     /**
-     * Returns input ID of {@link UsbTunerTvInputService}.
+     * Returns a localized version of the text resource specified by resourceId.
      */
-    @Nullable
-    public static String getUsbTunerInputId(Context context) {
-        if (!Features.USB_TUNER.isEnabled(context)) {
-            return null;
+    public static CharSequence getTextForLocale(Context context, Locale locale, int resourceId) {
+        if (locale.equals(context.getResources().getConfiguration().locale)) {
+            return context.getText(resourceId);
         }
-        return TvContract.buildInputId(new ComponentName(context.getPackageName(),
-                UsbTunerTvInputService.class.getName()));
+        Configuration config = new Configuration(context.getResources().getConfiguration());
+        config.setLocale(locale);
+        return context.createConfigurationContext(config).getText(resourceId);
     }
 
     /**
-     * Returns {@link TvInputInfo} object of {@link UsbTunerTvInputService}.
+     * Returns the internal TV inputs.
      */
-    @Nullable
-    public static TvInputInfo getUsbTunerInputInfo(Context context) {
-        if (!Features.USB_TUNER.isEnabled(context)) {
-            return null;
+    public static List<TvInputInfo> getInternalTvInputs(Context context, boolean tunerInputOnly) {
+        List<TvInputInfo> inputs = new ArrayList<>();
+        String contextPackageName = context.getPackageName();
+        for (TvInputInfo input : TvApplication.getSingletons(context).getTvInputManagerHelper()
+                .getTvInputInfos(true, tunerInputOnly)) {
+            if (contextPackageName.equals(ComponentName.unflattenFromString(input.getId())
+                    .getPackageName())) {
+                inputs.add(input);
+            }
         }
-        TvInputManagerHelper helper = TvApplication.getSingletons(context)
-                .getTvInputManagerHelper();
-        return helper.getTvInputInfo(getUsbTunerInputId(context));
+        return inputs;
     }
 
-    private static final class SyncRunnable implements Runnable {
-        private final Runnable mTarget;
-        private boolean mComplete;
+    /**
+     * Checks whether the input is internal or not.
+     */
+    public static boolean isInternalTvInput(Context context, String inputId) {
+        return context.getPackageName().equals(ComponentName.unflattenFromString(inputId)
+                .getPackageName());
+    }
 
-        public SyncRunnable(Runnable target) {
-            mTarget = target;
-        }
-
-        @Override
-        public void run() {
-            try {
-                mTarget.run();
-            } finally {
-                synchronized (this) {
-                    mComplete = true;
-                    notifyAll();
-                }
-            }
-        }
-
-        public void waitForComplete() {
-            boolean interrupted = false;
-            synchronized (this) {
-                try {
-                    while (!mComplete) {
-                        try {
-                            wait();
-                        } catch (InterruptedException e) {
-                            interrupted = true;
-                        }
-                    }
-                } finally {
-                    if (interrupted) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }
-        }
+    /**
+     * Shows a toast message to notice that the current feature is a developer feature.
+     */
+    public static void showToastMessageForDeveloperFeature(Context context) {
+        Toast.makeText(context, "This feature is for developer preview.", Toast.LENGTH_SHORT)
+                .show();
     }
 }

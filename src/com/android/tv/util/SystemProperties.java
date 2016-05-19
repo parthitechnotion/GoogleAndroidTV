@@ -58,13 +58,6 @@ public final class SystemProperties {
     public static final BooleanSystemProperty USE_TRACKER = new BooleanSystemProperty(
             "tv_use_tracker", true);
 
-    /**
-     * Selects using {@link com.android.tv.dvr.DvrDataManagerInMemoryImpl}
-     * instead of {@link com.android.tv.dvr.DvrDataManagerImpl}
-     */
-    public static final BooleanSystemProperty USE_IN_MEMORY_DVR_DB = new BooleanSystemProperty(
-            "tv_use_in_memory_dvr_db", false); // STOPSHIP(DVR)
-
     static {
         updateSystemProperties();
     }
