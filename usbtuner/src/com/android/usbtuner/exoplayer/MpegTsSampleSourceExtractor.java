@@ -18,12 +18,13 @@ package com.android.usbtuner.exoplayer;
 
 import android.media.MediaDataSource;
 
-import com.google.android.exoplayer.C;
+import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
+import com.google.android.exoplayer.MediaFormatUtil;
 import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
-import com.google.android.exoplayer.TrackInfo;
 import com.google.android.exoplayer.util.MimeTypes;
+import com.android.usbtuner.exoplayer.cache.CacheManager;
 import com.android.usbtuner.tvinput.PlaybackCacheListener;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
     private static final int CC_BUFFER_SIZE_IN_BYTES = 9600 / 8;
 
     private final SampleExtractor mSampleExtractor;
-    private TrackInfo[] mTrackInfos;
+    private MediaFormat[] mTrackFormats;
     private boolean[] mGotEos;
     private int mVideoTrackIndex;
     private int mCea708TextTrackIndex;
@@ -56,16 +57,34 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
         mCea708TextTrackSelected = false;
     }
 
+    /**
+     * Creates MpegTsSampleSourceExtractor for {@link MediaDataSource}.
+     *
+     * @param source the {@link MediaDataSource} to extract from
+     * @param cacheManager the manager for reading & writing samples backed by physical storage
+     * @param cacheListener the {@link com.android.usbtuner.tvinput.PlaybackCacheListener}
+     *                      to notify cache storage status change
+     */
     public MpegTsSampleSourceExtractor(MediaDataSource source,
             CacheManager cacheManager, PlaybackCacheListener cacheListener) {
         if (cacheManager == null || cacheManager.isDisabled()) {
-            mSampleExtractor = new SimpleSampleSourceExtractor(source, cacheListener);
+            mSampleExtractor =
+                    new PlaySampleExtractor(source, cacheManager, cacheListener, false);
+
         } else {
-            mSampleExtractor = new CachedSampleSourceExtractor(source, cacheManager, cacheListener);
+            mSampleExtractor =
+                    new PlaySampleExtractor(source, cacheManager, cacheListener, true);
         }
         init();
     }
 
+    /**
+     * Creates MpegTsSampleSourceExtractor for a recorded program.
+     *
+     * @param cacheManager the samples provider which is stored in physical storage
+     * @param cacheListener the {@link com.android.usbtuner.tvinput.PlaybackCacheListener}
+     *                      to notify cache storage status change
+     */
     public MpegTsSampleSourceExtractor(CacheManager cacheManager,
             PlaybackCacheListener cacheListener) {
         mSampleExtractor = new ReplaySampleSourceExtractor(cacheManager, cacheListener);
@@ -74,13 +93,15 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
 
     @Override
     public boolean prepare() throws IOException {
-        mSampleExtractor.prepare();
-        TrackInfo trackInfos[] = mSampleExtractor.getTrackInfos();
-        int trackCount = trackInfos.length;
+        if(!mSampleExtractor.prepare()) {
+            return false;
+        }
+        MediaFormat trackFormats[] = mSampleExtractor.getTrackFormats();
+        int trackCount = trackFormats.length;
         mGotEos = new boolean[trackCount];
 
         for (int i = 0; i < trackCount; ++i) {
-            String mime = trackInfos[i].mimeType;
+            String mime = trackFormats[i].mimeType;
             if (MimeTypes.isVideo(mime) && mVideoTrackIndex == -1) {
                 mVideoTrackIndex = i;
                 if (android.media.MediaFormat.MIMETYPE_VIDEO_MPEG2.equals(mime)) {
@@ -94,18 +115,18 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
         if (mVideoTrackIndex != -1) {
             mCea708TextTrackIndex = trackCount;
         }
-        mTrackInfos = new TrackInfo[mCea708TextTrackIndex < 0 ? trackCount : trackCount + 1];
-        System.arraycopy(trackInfos, 0, mTrackInfos, 0, trackCount);
+        mTrackFormats = new MediaFormat[mCea708TextTrackIndex < 0 ? trackCount : trackCount + 1];
+        System.arraycopy(trackFormats, 0, mTrackFormats, 0, trackCount);
         if (mCea708TextTrackIndex >= 0) {
-            mTrackInfos[trackCount] = new TrackInfo(MIMETYPE_TEXT_CEA_708,
-                    trackCount > 0 ? mTrackInfos[0].durationUs : C.UNKNOWN_TIME_US);
+            mTrackFormats[trackCount] = MediaFormatUtil.createTextMediaFormat(MIMETYPE_TEXT_CEA_708,
+                    mTrackFormats[0].durationUs);
         }
         return true;
     }
 
     @Override
-    public TrackInfo[] getTrackInfos() {
-        return mTrackInfos;
+    public MediaFormat[] getTrackFormats() {
+        return mTrackFormats;
     }
 
     @Override
@@ -137,9 +158,9 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
     }
 
     @Override
-    public void getTrackMediaFormat(int track, MediaFormatHolder mediaFormatHolder) {
+    public void getTrackMediaFormat(int track, MediaFormatHolder outMediaFormatHolder) {
         if (track != mCea708TextTrackIndex) {
-            mSampleExtractor.getTrackMediaFormat(track, mediaFormatHolder);
+            mSampleExtractor.getTrackMediaFormat(track, outMediaFormatHolder);
         }
     }
 
@@ -163,12 +184,7 @@ public final class MpegTsSampleSourceExtractor implements SampleExtractor {
             return mGotEos[track] ? SampleSource.END_OF_STREAM : SampleSource.NOTHING_READ;
         }
 
-        int result;
-        try {
-            result = mSampleExtractor.readSample(track, sampleHolder);
-        } catch (IOException ex) {
-            return SampleSource.NOTHING_READ;
-        }
+        int result = mSampleExtractor.readSample(track, sampleHolder);
         switch (result) {
             case SampleSource.END_OF_STREAM: {
                 mGotEos[track] = true;

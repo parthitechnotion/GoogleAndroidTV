@@ -16,10 +16,12 @@
 
 package com.android.tv.data;
 
+import android.annotation.SuppressLint;
 import android.content.pm.ResolveInfo;
 import android.media.tv.TvInputInfo;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.Suppress;
 import android.util.Pair;
 
 import com.android.tv.testing.ComparatorTester;
@@ -40,6 +42,7 @@ import java.util.LinkedHashMap;
  */
 @SmallTest
 public class TvInputNewComparatorTest extends AndroidTestCase {
+    @Suppress  // http://b/26903987
     public void testComparator() throws Exception {
         final LinkedHashMap<String, Pair<Boolean, Boolean>> INPUT_ID_TO_NEW_INPUT =
                 new LinkedHashMap<>();

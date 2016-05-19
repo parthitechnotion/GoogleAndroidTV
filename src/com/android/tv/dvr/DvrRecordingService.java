@@ -31,7 +31,8 @@ import com.android.tv.ApplicationSingletons;
 import com.android.tv.TvApplication;
 import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.util.Clock;
-import com.android.tv.util.SoftPreconditions;
+import com.android.tv.util.RecurringRunner;
+import com.android.tv.common.SoftPreconditions;
 
 /**
  * DVR Scheduler service.
@@ -57,6 +58,8 @@ public class DvrRecordingService extends Service {
         context.startService(dvrSchedulerIntent);
     }
 
+    private final Clock mClock = Clock.SYSTEM;
+    private RecurringRunner mReaperRunner;
     private WritableDvrDataManager mDataManager;
 
     /**
@@ -86,14 +89,16 @@ public class DvrRecordingService extends Service {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         // mScheduler may have been set for testing.
         if (mScheduler == null) {
-            DvrSessionManager sessionManager = singletons.getDvrSessionManger();
             mHandlerThread = new HandlerThread(HANDLER_THREAD_NAME);
             mHandlerThread.start();
-            mScheduler = new Scheduler(mHandlerThread.getLooper(), sessionManager, mDataManager,
-                    this, Clock.SYSTEM,
-                    alarmManager);
+            mScheduler = new Scheduler(mHandlerThread.getLooper(), singletons.getDvrManager(),
+                    singletons.getDvrSessionManger(), mDataManager,
+                    singletons.getChannelDataManager(), this, mClock, alarmManager);
         }
-        mDataManager.addListener(mScheduler);
+        mDataManager.addScheduledRecordingListener(mScheduler);
+        mReaperRunner = new RecurringRunner(this, java.util.concurrent.TimeUnit.DAYS.toMillis(1),
+                new ScheduledProgramReaper(mDataManager, mClock), null);
+        mReaperRunner.start();
     }
 
     @Override
@@ -106,7 +111,8 @@ public class DvrRecordingService extends Service {
     @Override
     public void onDestroy() {
         if (DEBUG) Log.d(TAG, "onDestroy");
-        mDataManager.removeListener(mScheduler);
+        mReaperRunner.stop();
+        mDataManager.removeScheduledRecordingListener(mScheduler);
         mScheduler = null;
         if (mHandlerThread != null) {
             mHandlerThread.quit();

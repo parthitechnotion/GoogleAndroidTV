@@ -73,35 +73,11 @@ public class OnboardingActivity extends SetupActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Make the channels of the new inputs which have been setup outside Live TV
-        // browsable.
-        mChannelDataManager = TvApplication.getSingletons(this).getChannelDataManager();
-        if (mChannelDataManager.isDbLoadFinished()) {
-            SetupUtils.getInstance(this).markNewChannelsBrowsable();
-        } else {
-            mChannelDataManager.addListener(mChannelListener);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        mChannelDataManager.removeListener(mChannelListener);
-        super.onDestroy();
-    }
-
-    @Override
-    protected Fragment onCreateInitialFragment() {
-        return OnboardingUtils.isFirstRunWithCurrentVersion(this) ? new WelcomeFragment()
-                : new SetupSourcesFragment();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         if (!PermissionUtils.hasAccessAllEpg(this)) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 Toast.makeText(this, R.string.msg_not_supported_device, Toast.LENGTH_LONG).show();
                 finish();
+                return;
             } else if (checkSelfPermission(PERMISSION_READ_TV_LISTINGS)
                     != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{PERMISSION_READ_TV_LISTINGS},
@@ -111,10 +87,41 @@ public class OnboardingActivity extends SetupActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (mChannelDataManager != null) {
+            mChannelDataManager.removeListener(mChannelListener);
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected Fragment onCreateInitialFragment() {
+        if (PermissionUtils.hasAccessAllEpg(this) || PermissionUtils.hasReadTvListings(this)) {
+            // Make the channels of the new inputs which have been setup outside Live TV
+            // browsable.
+            mChannelDataManager = TvApplication.getSingletons(this).getChannelDataManager();
+            if (mChannelDataManager.isDbLoadFinished()) {
+                SetupUtils.getInstance(this).markNewChannelsBrowsable();
+            } else {
+                mChannelDataManager.addListener(mChannelListener);
+            }
+            return OnboardingUtils.isFirstRunWithCurrentVersion(this) ? new WelcomeFragment()
+                    : new SetupSourcesFragment();
+        }
+        return null;
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_READ_TV_LISTINGS) {
-            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            if (grantResults != null && grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                finish();
+                Intent intentForNextActivity = getIntent().getParcelableExtra(
+                        KEY_INTENT_AFTER_COMPLETION);
+                startActivity(buildIntent(this, intentForNextActivity));
+            } else {
                 Toast.makeText(this, R.string.msg_read_tv_listing_permission_denied,
                         Toast.LENGTH_LONG).show();
                 finish();

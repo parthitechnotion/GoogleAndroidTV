@@ -35,10 +35,11 @@ import java.util.Locale;
 public class TvOptionsManager {
     public static final int OPTION_CLOSED_CAPTIONS = 0;
     public static final int OPTION_DISPLAY_MODE = 1;
-    public static final int OPTION_PIP = 2;
-    public static final int OPTION_MULTI_AUDIO = 3;
-    public static final int OPTION_MORE_CHANNELS = 4;
-    public static final int OPTION_SETTINGS = 5;
+    public static final int OPTION_IN_APP_PIP = 2;
+    public static final int OPTION_SYSTEMWIDE_PIP = 3;
+    public static final int OPTION_MULTI_AUDIO = 4;
+    public static final int OPTION_MORE_CHANNELS = 5;
+    public static final int OPTION_SETTINGS = 6;
 
     public static final int OPTION_PIP_INPUT = 100;
     public static final int OPTION_PIP_SWAP = 101;
@@ -75,7 +76,7 @@ public class TvOptionsManager {
                         .isDisplayModeAvailable(mDisplayMode)
                         ? DisplayMode.getLabel(mDisplayMode, mContext)
                         : DisplayMode.getLabel(DisplayMode.MODE_NORMAL, mContext);
-            case OPTION_PIP:
+            case OPTION_IN_APP_PIP:
                 return mContext.getString(
                         mPip ? R.string.options_item_pip_on : R.string.options_item_pip_off);
             case OPTION_MULTI_AUDIO:
@@ -130,7 +131,7 @@ public class TvOptionsManager {
 
     public void onPipChanged(boolean pip) {
         mPip = pip;
-        notifyOptionChanged(OPTION_PIP);
+        notifyOptionChanged(OPTION_IN_APP_PIP);
     }
 
     public void onMultiAudioChanged(String multiAudio) {

@@ -83,14 +83,12 @@ public class AudioTrackWrapper {
         if (!mIsEnabled) {
             return true;
         }
-        return !mAudioTrack.hasPendingData() || !mAudioTrack.hasEnoughDataToBeginPlayback();
+        return !mAudioTrack.hasPendingData();
     }
 
     public boolean isReady() {
-        if (!mIsEnabled) {
-            return false;
-        }
-        return mAudioTrack.hasPendingData();
+        // In the case of not playing actual audio data, Audio track is always ready.
+        return !mIsEnabled || mAudioTrack.hasPendingData();
     }
 
     public void play() {
@@ -118,7 +116,15 @@ public class AudioTrackWrapper {
         if (!mIsEnabled) {
             return;
         }
-        mAudioTrack.reconfigure(format);
+        // TODO: Handle non-AC3 or non-passthrough audio.
+        if (MediaFormat.MIMETYPE_AUDIO_AC3.equalsIgnoreCase(format.getString(MediaFormat.KEY_MIME))
+                && format.getInteger(MediaFormat.KEY_CHANNEL_COUNT) == 1) {
+            // Workarounds b/25955476 .
+            // Since all devices and platforms does not support AC3 mono passthrough,
+            // It is safe to fake AC3 mono as AC3 stereo which is default passthrough mode.
+            format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 2);
+        }
+        mAudioTrack.configure(format, true);
     }
 
     public void handleDiscontinuity() {

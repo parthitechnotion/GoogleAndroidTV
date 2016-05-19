@@ -85,6 +85,9 @@ public abstract class BaseCardView<T> extends LinearLayout implements ItemListRo
     }
 
     @Override
+    public void onRecycled() { }
+
+    @Override
     public void onSelected() {
         if (isAttachedToWindow() && getVisibility() == View.VISIBLE) {
             startFocusAnimation(SCALE_FACTOR_1F);
