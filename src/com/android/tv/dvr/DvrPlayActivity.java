@@ -24,7 +24,7 @@ import com.android.tv.R;
 import com.android.tv.TvApplication;
 
 /**
- * Simple Activity to play a {@link Recording}.
+ * Simple Activity to play a {@link ScheduledRecording}.
  */
 public class DvrPlayActivity extends Activity {
 
@@ -35,11 +35,11 @@ public class DvrPlayActivity extends Activity {
 
         DvrDataManager dvrDataManager = TvApplication.getSingletons(this).getDvrDataManager();
         // TODO(DVR) handle errors.
-        long recordingId = getIntent().getLongExtra(Recording.RECORDING_ID_EXTRA, 0);
-        Recording recording = dvrDataManager.getRecording(recordingId);
+        long recordingId = getIntent().getLongExtra(ScheduledRecording.RECORDING_ID_EXTRA, 0);
+        ScheduledRecording scheduledRecording = dvrDataManager.getScheduledRecording(recordingId);
         TextView textView = (TextView) findViewById(R.id.placeHolderText);
-        if (recording != null) {
-            textView.setText(recording.toString());
+        if (scheduledRecording != null) {
+            textView.setText(scheduledRecording.toString());
         } else {
             textView.setText(R.string.ut_result_not_found_title);  // TODO(DVR) update error text
         }

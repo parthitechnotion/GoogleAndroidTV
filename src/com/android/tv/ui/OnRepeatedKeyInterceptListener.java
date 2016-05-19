@@ -35,8 +35,8 @@ public class OnRepeatedKeyInterceptListener implements VerticalGridView.OnKeyInt
     private static final int[] MAX_SKIPPED_VIEW_COUNT = { 1, 4 };
     private static final int MSG_MOVE_FOCUS = 1000;
 
-    private VerticalGridView mView;
-    private MyHandler mHandler = new MyHandler(this);
+    private final VerticalGridView mView;
+    private final MyHandler mHandler = new MyHandler(this);
     private int mDirection;
     private boolean mFocusAccelerated;
     private long mRepeatedKeyInterval;

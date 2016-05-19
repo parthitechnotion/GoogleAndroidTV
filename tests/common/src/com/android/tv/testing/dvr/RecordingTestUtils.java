@@ -16,43 +16,48 @@
 
 package com.android.tv.testing.dvr;
 
-import android.support.annotation.RequiresPermission;
-
-import com.android.tv.data.Channel;
-import com.android.tv.dvr.Recording;
+import com.android.tv.dvr.DvrDataManagerInMemoryImpl;
+import com.android.tv.dvr.ScheduledRecording;
 
 import junit.framework.Assert;
 
-import java.util.Collections;
-
 /**
- * Static utils for using {@link Recording} in tests.
+ * Static utils for using {@link ScheduledRecording} in tests.
  */
 public final class RecordingTestUtils {
-    public static Recording createTestRecordingWithIdAndPeriod(long id, long startTime,
-            long endTime) {
-        return Recording.builder(new Channel.Builder().build(), startTime, endTime)
+    public static ScheduledRecording createTestRecordingWithIdAndPeriod(long id, long channelId,
+            long startTime, long endTime) {
+        return ScheduledRecording.builder(startTime, endTime)
                 .setId(id)
-                .setPrograms(Collections.EMPTY_LIST)
+                .setChannelId(channelId)
                 .build();
     }
 
-    public static Recording createTestRecordingWithPeriod(long startTime, long endTime) {
-        return createTestRecordingWithIdAndPeriod(Recording.ID_NOT_SET, startTime, endTime);
+    public static ScheduledRecording createTestRecordingWithPeriod(long channelId, long startTime,
+            long endTime) {
+        return createTestRecordingWithIdAndPeriod(ScheduledRecording.ID_NOT_SET, channelId,
+                startTime, endTime);
     }
 
-    public static Recording normalizePriority(Recording orig){
-        return Recording.buildFrom(orig).setPriority(orig.getId()).build();
+    public static ScheduledRecording addScheduledRecording(
+            DvrDataManagerInMemoryImpl dvrDataManager, long channelId, long startTime,
+            long endTime) {
+        ScheduledRecording recording = createTestRecordingWithPeriod(channelId, startTime, endTime);
+        recording = dvrDataManager.addScheduledRecordingInternal(recording);
+        return recording;
     }
 
-    public static void assertRecordingEquals(Recording expected, Recording actual) {
+    public static ScheduledRecording normalizePriority(ScheduledRecording orig){
+        return ScheduledRecording.buildFrom(orig).setPriority(orig.getId()).build();
+    }
+
+    public static void assertRecordingEquals(ScheduledRecording expected, ScheduledRecording actual) {
         Assert.assertEquals("id", expected.getId(), actual.getId());
-        Assert.assertEquals("uri", expected.getUri(), actual.getUri());
-        Assert.assertEquals("channel", expected.getChannel(), actual.getChannel());
-        Assert.assertEquals("programs", expected.getPrograms(), actual.getPrograms());
+        Assert.assertEquals("channel", expected.getChannelId(), actual.getChannelId());
+        Assert.assertEquals("programId", expected.getProgramId(), actual.getProgramId());
+        Assert.assertEquals("priority", expected.getPriority(), actual.getPriority());
         Assert.assertEquals("start time", expected.getStartTimeMs(), actual.getStartTimeMs());
         Assert.assertEquals("end time", expected.getEndTimeMs(), actual.getEndTimeMs());
-        Assert.assertEquals("media size", expected.getSize(), actual.getSize());
         Assert.assertEquals("state", expected.getState(), actual.getState());
         Assert.assertEquals("parent season recording", expected.getParentSeasonRecording(),
                 actual.getParentSeasonRecording());

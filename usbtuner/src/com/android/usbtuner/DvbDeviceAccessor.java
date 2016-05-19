@@ -16,14 +16,23 @@
 
 package com.android.usbtuner;
 
+import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Context;
+import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.os.BuildCompat;
 import android.util.Log;
 
+import com.android.tv.common.SoftPreconditions;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.common.recording.RecordingCapability;
+import com.android.usbtuner.tvinput.UsbTunerTvInputService;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -126,6 +135,22 @@ public class DvbDeviceAccessor {
                 .setMaxConcurrentTunedSessions(deviceList.size())
                 .setMaxConcurrentSessionsOfAllTypes(deviceList.size() + 1)
                 .build();
+    }
+
+    @Nullable
+    @TargetApi(Build.VERSION_CODES.N)
+    public TvInputInfo buildTvInputInfo(Context context) {
+        List<DvbDeviceInfoWrapper> deviceList = getDvbDeviceList();
+        TvInputInfo.Builder builder = new TvInputInfo.Builder(context, new ComponentName(context,
+                        UsbTunerTvInputService.class));
+        if (deviceList.size() > 0) {
+            return builder.setCanRecord(
+                    CommonFeatures.DVR.isEnabled(context) && BuildCompat.isAtLeastN())
+                    .setTunerCount(deviceList.size())
+                    .build();
+        } else {
+            return null;
+        }
     }
 
     public static class DvbDeviceInfoWrapper implements Comparable<DvbDeviceInfoWrapper> {

@@ -29,6 +29,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -46,6 +47,7 @@ import com.android.tv.TimeShiftManager;
 import com.android.tv.TvApplication;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.common.WeakHandler;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.common.ui.setup.OnActionClickListener;
 import com.android.tv.common.ui.setup.SetupFragment;
 import com.android.tv.common.ui.setup.SetupMultiPaneFragment;
@@ -54,7 +56,9 @@ import com.android.tv.dialog.FullscreenDialogFragment;
 import com.android.tv.dialog.PinDialogFragment;
 import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.dialog.SafeDismissDialogFragment;
+import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.dvr.ui.DvrActivity;
+import com.android.tv.dvr.ui.HalfSizedDialogFragment;
 import com.android.tv.guide.ProgramGuide;
 import com.android.tv.menu.Menu;
 import com.android.tv.menu.Menu.MenuShowReason;
@@ -133,6 +137,7 @@ public class TvOverlayManager {
         AVAILABLE_DIALOG_TAGS.add(FullscreenDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(SettingsFragment.LicenseActionItem.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(RatingsFragment.AttributionItem.DIALOG_TAG);
+        AVAILABLE_DIALOG_TAGS.add(HalfSizedDialogFragment.DIALOG_TAG);
     }
 
     private final MainActivity mMainActivity;
@@ -155,7 +160,7 @@ public class TvOverlayManager {
 
     private @TvOverlayType int mOpenedOverlays;
 
-    private List<Runnable> mPendingActions = new ArrayList<>();
+    private final List<Runnable> mPendingActions = new ArrayList<>();
 
     public TvOverlayManager(MainActivity mainActivity, ChannelTuner channelTuner,
             KeypadChannelSwitchView keypadChannelSwitchView,
@@ -227,9 +232,13 @@ public class TvOverlayManager {
                 onOverlayClosed(OVERLAY_TYPE_GUIDE);
             }
         };
+        DvrDataManager dvrDataManager =
+                CommonFeatures.DVR.isEnabled(mainActivity) && BuildCompat.isAtLeastN() ? singletons
+                .getDvrDataManager() : null;
         mProgramGuide = new ProgramGuide(mainActivity, channelTuner,
                 singletons.getTvInputManagerHelper(), mChannelDataManager,
-                singletons.getProgramDataManager(), singletons.getTracker(), preShowRunnable,
+                singletons.getProgramDataManager(), dvrDataManager, singletons.getTracker(),
+                preShowRunnable,
                 postHideRunnable);
         mSetupFragment = new SetupSourcesFragment();
         mSetupFragment.setOnActionClickListener(new OnActionClickListener() {
@@ -346,9 +355,17 @@ public class TvOverlayManager {
      */
     public void showDialogFragment(String tag, SafeDismissDialogFragment dialog,
             boolean keepSidePanelHistory) {
+        showDialogFragment(tag, dialog, keepSidePanelHistory, false);
+    }
+
+    public void showDialogFragment(String tag, SafeDismissDialogFragment dialog,
+            boolean keepSidePanelHistory, boolean keepProgramGuide) {
         int flags = FLAG_HIDE_OVERLAYS_KEEP_DIALOG;
         if (keepSidePanelHistory) {
             flags |= FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANEL_HISTORY;
+        }
+        if (keepProgramGuide) {
+            flags |= FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE;
         }
         hideOverlays(flags);
         // A tag for dialog must be added to AVAILABLE_DIALOG_TAGS to make it launchable from TV.
@@ -422,7 +439,6 @@ public class TvOverlayManager {
     public void showSetupFragment() {
         if (DEBUG) Log.d(TAG, "showSetupFragment");
         mSetupFragmentActive = true;
-        SetupSourcesFragment.setTheme(R.style.Theme_TV_GuidedStep);
         mSetupFragment.enableFragmentTransition(SetupFragment.FRAGMENT_ENTER_TRANSITION
                 | SetupFragment.FRAGMENT_EXIT_TRANSITION | SetupFragment.FRAGMENT_RETURN_TRANSITION
                 | SetupFragment.FRAGMENT_REENTER_TRANSITION);
@@ -437,7 +453,6 @@ public class TvOverlayManager {
             return;
         }
         mSetupFragmentActive = false;
-        SetupSourcesFragment.setTheme(SetupSourcesFragment.DEFAULT_THEME);
         closeFragment(removeFragment ? mSetupFragment : null);
         if (mChannelDataManager.getChannelCount() == 0) {
             mMainActivity.finish();

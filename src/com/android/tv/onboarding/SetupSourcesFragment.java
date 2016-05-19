@@ -30,7 +30,6 @@ import android.support.v17.leanback.widget.GuidanceStylist.Guidance;
 import android.support.v17.leanback.widget.GuidedAction;
 import android.support.v17.leanback.widget.GuidedActionsStylist;
 import android.support.v17.leanback.widget.VerticalGridView;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,15 +59,13 @@ import java.util.List;
  * A fragment for channel source info/setup.
  */
 public class SetupSourcesFragment extends SetupMultiPaneFragment {
+    private static final String TAG = "SetupSourcesFragment";
+
     public static final String ACTION_CATEGORY =
             "com.android.tv.onboarding.SetupSourcesFragment";
     public static final int ACTION_PLAY_STORE = 1;
 
-    public static final int DEFAULT_THEME = -1;
-
     private static final String SETUP_TRACKER_LABEL = "Setup fragment";
-
-    private static int sTheme = DEFAULT_THEME;
 
     private InputSetupRunnable mInputSetupRunnable;
 
@@ -77,12 +74,7 @@ public class SetupSourcesFragment extends SetupMultiPaneFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        LayoutInflater localInflater = inflater;
-        if (sTheme != -1) {
-            ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(), sTheme);
-            localInflater = inflater.cloneInContext(themeWrapper);
-        }
-        View view = super.onCreateView(localInflater, container, savedInstanceState);
+        View view = super.onCreateView(inflater, container, savedInstanceState);
         TvApplication.getSingletons(getActivity()).getTracker().sendScreenView(SETUP_TRACKER_LABEL);
         return view;
     }
@@ -97,23 +89,16 @@ public class SetupSourcesFragment extends SetupMultiPaneFragment {
     @Override
     protected SetupGuidedStepFragment onCreateContentFragment() {
         mContentFragment = new ContentFragment();
+        mContentFragment.setParentFragment(this);
         Bundle arguments = new Bundle();
         arguments.putBoolean(SetupGuidedStepFragment.KEY_THREE_PANE, true);
         mContentFragment.setArguments(arguments);
-        mContentFragment.setParentFragment(this);
         return mContentFragment;
     }
 
     @Override
     protected String getActionCategory() {
         return ACTION_CATEGORY;
-    }
-
-    /**
-     * Sets the custom theme dynamically.
-     */
-    public static void setTheme(int theme) {
-        sTheme = theme;
     }
 
     /**
@@ -170,6 +155,11 @@ public class SetupSourcesFragment extends SetupMultiPaneFragment {
 
             @Override
             public void onInputRemoved(String inputId) {
+                handleInputChanged();
+            }
+
+            @Override
+            public void onInputUpdated(String inputId) {
                 handleInputChanged();
             }
 
@@ -393,11 +383,6 @@ public class SetupSourcesFragment extends SetupMultiPaneFragment {
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             updateActions();
-        }
-
-        @Override
-        public int onProvideTheme() {
-            return sTheme == DEFAULT_THEME ? super.onProvideTheme() : sTheme;
         }
 
         void executePendingAction() {

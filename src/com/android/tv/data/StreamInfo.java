@@ -30,6 +30,7 @@ public interface StreamInfo {
     int getVideoWidth();
     int getVideoHeight();
     float getVideoFrameRate();
+    float getVideoDisplayAspectRatio();
     int getVideoDefinitionLevel();
     int getAudioChannelCount();
     boolean hasClosedCaption();

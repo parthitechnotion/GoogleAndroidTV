@@ -28,6 +28,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.tv.TvInputInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -51,6 +52,7 @@ import com.android.tv.data.Program;
 import com.android.tv.util.BitmapUtils;
 import com.android.tv.util.BitmapUtils.ScaledBitmapInfo;
 import com.android.tv.util.ImageLoader;
+import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
@@ -127,6 +129,12 @@ public class NotificationService extends Service implements Recommender.Listener
     public void onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate");
         super.onCreate();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                && !PermissionUtils.hasAccessAllEpg(this)) {
+            Log.w(TAG, "Live TV requires the system permission on this platform.");
+            stopSelf();
+            return;
+        }
 
         mCurrentNotificationCount = 0;
         mNotificationChannels = new long[NOTIFICATION_COUNT];

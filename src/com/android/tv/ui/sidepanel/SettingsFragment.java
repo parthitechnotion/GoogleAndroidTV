@@ -16,13 +16,9 @@
 
 package com.android.tv.ui.sidepanel;
 
-import android.content.res.Resources;
-import android.os.Build;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.tv.Features;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
@@ -154,19 +150,6 @@ public class SettingsFragment extends SideFragment {
         }
         if (LicenseUtils.hasLicenses(activity.getAssets())) {
             items.add(new LicenseActionItem(activity));
-        }
-        boolean developerOptionEnabled = Settings.Secure.getInt(getActivity().getContentResolver(),
-                Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
-        if (Features.DEVELOPER_OPTION.isEnabled(getActivity()) && developerOptionEnabled
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Resources res = getActivity().getResources();
-            items.add(new ActionItem(res.getString(R.string.side_panel_title_developer)) {
-                @Override
-                protected void onSelected() {
-                    getMainActivity().getOverlayManager().getSideFragmentManager().show(
-                            new DeveloperFragment());
-                }
-            });
         }
         // Show version.
         items.add(new SimpleItem(getString(R.string.settings_menu_version),
