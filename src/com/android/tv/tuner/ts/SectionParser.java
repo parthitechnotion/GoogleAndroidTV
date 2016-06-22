@@ -22,7 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.android.tv.tuner.data.Channel;
+import com.android.tv.tuner.data.nano.Channel;
 import com.android.tv.tuner.data.PsiData.PatItem;
 import com.android.tv.tuner.data.PsiData.PmtItem;
 import com.android.tv.tuner.data.PsipData.Ac3AudioDescriptor;
@@ -39,8 +39,8 @@ import com.android.tv.tuner.data.PsipData.RatingRegion;
 import com.android.tv.tuner.data.PsipData.RegionalRating;
 import com.android.tv.tuner.data.PsipData.TsDescriptor;
 import com.android.tv.tuner.data.PsipData.VctItem;
-import com.android.tv.tuner.data.Track.AtscAudioTrack;
-import com.android.tv.tuner.data.Track.AtscCaptionTrack;
+import com.android.tv.tuner.data.nano.Track.AtscAudioTrack;
+import com.android.tv.tuner.data.nano.Track.AtscCaptionTrack;
 import com.android.tv.tuner.util.ByteArrayBuffer;
 
 import com.ibm.icu.text.UnicodeDecompressor;

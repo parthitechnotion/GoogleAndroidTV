@@ -19,10 +19,10 @@ package com.android.tv.tuner.data;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.android.tv.tuner.data.Channel;
-import com.android.tv.tuner.data.Channel.TunerChannelProto;
-import com.android.tv.tuner.data.Track.AtscAudioTrack;
-import com.android.tv.tuner.data.Track.AtscCaptionTrack;
+import com.android.tv.tuner.data.nano.Channel;
+import com.android.tv.tuner.data.nano.Channel.TunerChannelProto;
+import com.android.tv.tuner.data.nano.Track.AtscAudioTrack;
+import com.android.tv.tuner.data.nano.Track.AtscCaptionTrack;
 import com.android.tv.tuner.util.Ints;
 import com.android.tv.tuner.util.StringUtils;
 import com.google.protobuf.nano.MessageNano;
