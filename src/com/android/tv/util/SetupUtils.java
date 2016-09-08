@@ -272,7 +272,7 @@ public class SetupUtils {
         // Find all already-verified packages.
         Set<String> setUpPackages = new HashSet<>();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        for (String input : sp.getStringSet(PREF_KEY_SET_UP_INPUTS, Collections.EMPTY_SET)) {
+        for (String input : sp.getStringSet(PREF_KEY_SET_UP_INPUTS, Collections.<String>emptySet())) {
             if (!TextUtils.isEmpty(input)) {
                 ComponentName componentName = ComponentName.unflattenFromString(input);
                 if (componentName != null) {
