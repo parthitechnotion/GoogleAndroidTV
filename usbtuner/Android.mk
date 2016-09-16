@@ -1,15 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 
 # --------------------------------------------------------------
-# Use prebuilt aprotoc to compile .proto files
-
-ifeq ($(HOST_OS),darwin)
-PROTOC := $(TOPDIR)prebuilts/misc/darwin-x86/protobuf/aprotoc
-else
-PROTOC := $(TOPDIR)prebuilts/misc/linux-x86/protobuf/aprotoc
-endif
-
-# --------------------------------------------------------------
 # Build the apk. This generates an standalone apk for USB tuner
 # input service.
 include $(CLEAR_VARS)
