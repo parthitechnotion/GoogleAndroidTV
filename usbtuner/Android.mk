@@ -28,7 +28,7 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay \
     --extra-packages com.android.tv.common
 
 LOCAL_JNI_SHARED_LIBRARIES := \
-    libtunertvinput_jni
+    libusbtuner_jni
 
 LOCAL_PROGUARD_ENABLED := disabled
 
