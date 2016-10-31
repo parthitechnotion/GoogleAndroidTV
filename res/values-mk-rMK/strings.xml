@@ -31,7 +31,6 @@
     <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"Претходно"</string>
     <string name="channels_item_program_guide" msgid="2889807207930678418">"Програмски водич"</string>
     <string name="channels_item_setup" msgid="6557412175737379022">"Достапни се нови канали"</string>
-    <string name="channels_item_app_link_no_app_link" msgid="1884830234777824408">"Не е достапна врска"</string>
     <string name="channels_item_app_link_app_launcher" msgid="1395352122187670523">"Отвори <xliff:g id="APP_NAME">%1$s</xliff:g>"</string>
     <string name="options_item_closed_caption" msgid="5945274655046367170">"Затворени титли"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"Реж. на прикаж."</string>
@@ -102,7 +101,7 @@
     <string name="option_channels_unlock_all" msgid="6839513296447567623">"Одблокирај ги сите"</string>
     <string name="option_channels_subheader_hidden" msgid="4669425935426972078">"Сокриени канали"</string>
     <string name="option_program_restrictions" msgid="241342023067364108">"Прог. ограничувања"</string>
-    <string name="option_change_pin" msgid="2881594075631152566">"Измени ПИН"</string>
+    <string name="option_change_pin" msgid="2881594075631152566">"Измени PIN"</string>
     <string name="option_country_rating_systems" msgid="7288569813945260224">"Систем за процена"</string>
     <string name="option_ratings" msgid="4009116954188688616">"Проценки"</string>
     <string name="option_see_all_rating_systems" msgid="7702673500014877288">"Види ги сите сист."</string>
@@ -122,19 +121,20 @@
     <skip />
     <string name="option_subrating_title" msgid="5485055507818077595">"%1$s и под-рејтинг"</string>
     <string name="option_subrating_header" msgid="4637961301549615855">"Под-рејтинг"</string>
-    <string name="pin_enter_unlock_channel" msgid="4797922378296393173">"Внесете го вашиот ПИН за да го гледате каналот"</string>
-    <string name="pin_enter_unlock_program" msgid="7311628843209871203">"Внесете го вашиот ПИН за да ја гледате програмата"</string>
-    <string name="pin_enter_pin" msgid="249314665028035038">"Внесете го вашиот ПИН"</string>
-    <string name="pin_enter_create_pin" msgid="3385754356793309946">"За да поставите родителска контрола, креирајте ПИН."</string>
-    <string name="pin_enter_new_pin" msgid="1739471585849790384">"Внесете го новиот ПИН"</string>
-    <string name="pin_enter_again" msgid="2618999754723090427">"Потврдете го вашиот ПИН"</string>
-    <string name="pin_enter_old_pin" msgid="4588282612931041919">"Внесете го тековниот ПИН"</string>
+    <string name="pin_enter_unlock_channel" msgid="4797922378296393173">"Внесете го вашиот PIN за да го гледате каналот"</string>
+    <string name="pin_enter_unlock_program" msgid="7311628843209871203">"Внесете го вашиот PIN за да ја гледате програмата"</string>
+    <string name="pin_enter_unlock_dvr" msgid="1637468108723176684">"Програмава е оценета со <xliff:g id="RATING">%1$s</xliff:g>. Внесете го PIN-кодот за да ја гледате"</string>
+    <string name="pin_enter_pin" msgid="249314665028035038">"Внесете го вашиот PIN"</string>
+    <string name="pin_enter_create_pin" msgid="3385754356793309946">"За да поставите родителска контрола, креирајте PIN."</string>
+    <string name="pin_enter_new_pin" msgid="1739471585849790384">"Внесете го новиот PIN"</string>
+    <string name="pin_enter_again" msgid="2618999754723090427">"Потврдете го вашиот PIN"</string>
+    <string name="pin_enter_old_pin" msgid="4588282612931041919">"Внесете го тековниот PIN"</string>
     <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
-      <item quantity="one">Внесовте погрешен ПИН-код 5 пати.\nОбидете се повторно за <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> секунда.</item>
-      <item quantity="other">Внесовте погрешен ПИН-код 5 пати.\nОбидете се повторно за <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> секунди.</item>
+      <item quantity="one">Внесовте погрешен PIN-код 5 пати.\nОбидете се повторно за <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> секунда.</item>
+      <item quantity="other">Внесовте погрешен PIN-код 5 пати.\nОбидете се повторно за <xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> секунди.</item>
     </plurals>
-    <string name="pin_toast_wrong" msgid="2126295626095048746">"ПИН-кодот е погрешен. Обидете се повторно."</string>
-    <string name="pin_toast_not_match" msgid="4283624338659521768">"Обидете се повторно, ПИН-кодот не се совпаѓа"</string>
+    <string name="pin_toast_wrong" msgid="2126295626095048746">"PIN-кодот е погрешен. Обидете се повторно."</string>
+    <string name="pin_toast_not_match" msgid="4283624338659521768">"Обидете се повторно, PIN-кодот не се совпаѓа"</string>
     <string name="side_panel_title_settings" msgid="8244327316510918755">"Поставки"</string>
     <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"Приспособи го списокот канали"</string>
     <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Изберете канали за програмскиот водич"</string>
@@ -144,11 +144,9 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"Лиценци за софтвер со отворен код"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Лиценци за отворен код"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"Верзија"</string>
-    <string name="about_menu_improve" msgid="3712578027009311401">"Помогнете да се подобрат каналите во живо"</string>
-    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Споделувајте анонимни употреба и дијагностика со Google за да можеме да ги подобриме ТВ каналите во живо и да спречиме проблеми како падови и замрзнување."</string>
-    <string name="tvview_channel_locked" msgid="6486375335718400728">"За да го гледате овој канал, притиснете Во ред и внесете го вашиот ПИН"</string>
-    <string name="tvview_content_locked" msgid="391823084917017730">"За да ја гледате оваа програма, притиснете Во ред и внесете го вашиот ПИН"</string>
-    <string name="tvview_content_locked_format" msgid="3741874636031338247">"Оваа програма е оценета <xliff:g id="RATING">%1$s</xliff:g>.\nЗа да ја гледате оваа програма, притиснете Во ред и внесете го ПИН-от."</string>
+    <string name="tvview_channel_locked" msgid="6486375335718400728">"За да го гледате овој канал, притиснете Во ред и внесете го вашиот PIN"</string>
+    <string name="tvview_content_locked" msgid="391823084917017730">"За да ја гледате оваа програма, притиснете Во ред и внесете го вашиот PIN"</string>
+    <string name="tvview_content_locked_format" msgid="3741874636031338247">"Оваа програма е оценета <xliff:g id="RATING">%1$s</xliff:g>.\nЗа да ја гледате оваа програма, притиснете Во ред и внесете го PIN-от."</string>
     <string name="tvview_channel_locked_no_permission" msgid="677653135227590620">"За да го гледате овој канал, користете ја стандардната апликација за телевизија во живо."</string>
     <string name="tvview_content_locked_no_permission" msgid="2279126235895507764">"За да ја гледате програмава, користете ја стандардната апликација за телевизија во живо."</string>
     <string name="tvview_content_locked_format_no_permission" msgid="5690794624572767106">"Оваа програма е оценета <xliff:g id="RATING">%1$s</xliff:g>.\nЗа да ја гледате програмава, користете ја стандардната апликација за телевизија во живо."</string>
@@ -157,6 +155,10 @@
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"Само звук"</string>
     <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"Слаб сигнал"</string>
     <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"Нема интернет-врска"</string>
+    <plurals name="tvview_msg_input_no_resource" formatted="false" msgid="8581894855153658823">
+      <item quantity="one">Каналов не може да се пушти сѐ до <xliff:g id="END_TIME_1">%1$s</xliff:g> бидејќи се снимаат други канали. \n\nДопрете “Десно“ за приспособување на распоредот на снимање.</item>
+      <item quantity="other">Каналов не може да се пушти сѐ до <xliff:g id="END_TIME_1">%1$s</xliff:g> бидејќи се снимаат други канали. \n\nДопрете “Десно“ за приспособување на распоредот на снимање.</item>
+    </plurals>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"Без наслов"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"Каналот е блокиран"</string>
     <string name="setup_category_new" msgid="2899355289563443627">"Нов"</string>
@@ -168,8 +170,8 @@
     <string name="setup_input_no_channels" msgid="1669327912393163331">"Нема достапни канали"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"Нов"</string>
     <string name="setup_input_setup_now" msgid="1772000402336958967">"Не е поставен"</string>
-    <string name="setup_play_store_action_title" msgid="859347291072224673">"Земете повеќе извори"</string>
-    <string name="setup_play_store_action_description" msgid="2472226338824629506">"Прелистувајте апликации што нудат канали во живо"</string>
+    <string name="setup_store_action_title" msgid="4083402039720973414">"Преземете повеќе извори"</string>
+    <string name="setup_store_action_description" msgid="6820482635042445297">"Прелистувајте апликации што нудат канали во живо"</string>
     <string name="new_sources_title" msgid="3878933676500061895">"Достапни се нови извори на канали"</string>
     <string name="new_sources_description" msgid="749649005588426813">"Нови извори на канали имаат понуда на канали.\nПоставете ги сега или направете го тоа подоцна во поставките за извори на канали."</string>
     <string name="new_sources_action_setup" msgid="177693761664016811">"Постави сега"</string>
@@ -187,8 +189,162 @@
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"Сите изворни канали се сокриени.\nИзберете барем еден канал за да го гледате."</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"Видеото е неочекувано недостапно"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"Копчето НАЗАД е за поврзаниот уред. Притиснете на копчето ПОЧЕТНА СТРАНИЦА за да излезете."</string>
-    <string name="msg_not_supported_device" msgid="4469404625040284722">"Каналите во живо не се поддржани на уредов со Android Lollipop."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"На каналите во живо им е потребна дозвола за да ги читаат ТВ-листите."</string>
     <string name="setup_sources_text" msgid="4988039637873759839">"Поставете ги изворите"</string>
     <string name="setup_sources_description" msgid="5695518946225445202">"ТВ каналите во живо го комбинираат искуството на традиционалните ТВ канали со преносот на канали што го овозможуваат апликациите. \n\nЗапочнете со поставување на изворите на канали што се веќе инсталирани. Или прелистајте во Google Play Store за повеќе апликации што нудат ТВ канали во живо."</string>
+    <string name="channels_item_dvr" msgid="8911915252648532469">"Снимки и распореди"</string>
+    <string name="recording_start_dialog_10_min_duration" msgid="5739636508245795292">"10 минути"</string>
+    <string name="recording_start_dialog_30_min_duration" msgid="4691127772622189977">"30 минути"</string>
+    <string name="recording_start_dialog_1_hour_duration" msgid="7159533207022355641">"1 час"</string>
+    <string name="recording_start_dialog_3_hours_duration" msgid="295984419320006238">"3 часа"</string>
+    <string name="dvr_main_recent" msgid="2553805424822806495">"Неодамнешни"</string>
+    <string name="dvr_main_scheduled" msgid="7837260963086408492">"Закажани"</string>
+    <string name="dvr_main_series" msgid="8278256687595691676">"Серии"</string>
+    <string name="dvr_main_others" msgid="2970835573614038153">"Други"</string>
+    <string name="dvr_msg_cannot_record_channel" msgid="6836291367918532447">"Каналот не може да се сними."</string>
+    <string name="dvr_msg_cannot_record_program" msgid="4184046342810946090">"Програмата не може да се сними."</string>
+    <string name="dvr_msg_program_scheduled" msgid="3800847542300367572">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> е закажана за снимање."</string>
+    <string name="dvr_msg_current_program_scheduled" msgid="2505247201782991463">"Се снима <xliff:g id="PROGRAMNAME">%1$s</xliff:g> од сега до <xliff:g id="ENDTIME">%2$s</xliff:g>"</string>
+    <string name="dvr_full_schedule_card_view_title" msgid="7198521806965950089">"Целосен распоред"</string>
+    <plurals name="dvr_full_schedule_card_view_content" formatted="false" msgid="790788122541080768">
+      <item quantity="one">Следниот %1$d ден</item>
+      <item quantity="other">Следните %1$d дена</item>
+    </plurals>
+    <plurals name="dvr_program_duration" formatted="false" msgid="6742119148312354741">
+      <item quantity="one">%1$d минута</item>
+      <item quantity="other">%1$d минути</item>
+    </plurals>
+    <plurals name="dvr_count_new_recordings" formatted="false" msgid="3569310208305402815">
+      <item quantity="one">%1$d ново снимање</item>
+      <item quantity="other">%1$d нови снимања</item>
+    </plurals>
+    <plurals name="dvr_count_recordings" formatted="false" msgid="7417379223468131391">
+      <item quantity="one">%1$d снимање</item>
+      <item quantity="other">%1$d снимања</item>
+    </plurals>
+    <plurals name="dvr_count_scheduled_recordings" formatted="false" msgid="1650330290765214511">
+      <item quantity="one">%1$d закажано снимање</item>
+      <item quantity="other">%1$d закажани снимања</item>
+    </plurals>
+    <string name="dvr_detail_watch" msgid="7085694764364338215">"Часовник"</string>
+    <string name="dvr_detail_play_from_beginning" msgid="8475543568260411836">"Репродуцирај отпочеток"</string>
+    <string name="dvr_detail_resume_play" msgid="875591300274416373">"Прод. репродукција"</string>
+    <string name="dvr_detail_delete" msgid="4535881013528321898">"Избриши"</string>
+    <string name="dvr_detail_series_delete" msgid="4831926831670312674">"Избриши ги снимките"</string>
+    <string name="dvr_detail_series_resume" msgid="6935136228671386246">"Продолжи"</string>
+    <string name="dvr_detail_series_season_title" msgid="5474850936497854790">"Сезона <xliff:g id="SEASON_NUMBER">%1$s</xliff:g>"</string>
+    <string name="dvr_detail_view_schedule" msgid="7137536927421904426">"Види распоред"</string>
+    <string name="dvr_detail_read_more" msgid="2588920758094498544">"Прочитајте повеќе"</string>
+    <string name="dvr_series_deletion_title" msgid="7672649492494507574">"Избриши ги снимките"</string>
+    <string name="dvr_series_deletion_description" msgid="994839237906552969">"Изберете ги епизодите што сакате да ги избришете. Не може да се вратат откако ќе се избришат."</string>
+    <string name="dvr_series_deletion_no_recordings" msgid="481210819034514">"Нема снимки за бришење."</string>
+    <string name="dvr_series_select_watched" msgid="3608122404146716502">"Изберете ги гледаните епизоди"</string>
+    <string name="dvr_series_select_all" msgid="5415749261739544048">"Изберете ги сите епизоди"</string>
+    <string name="dvr_series_deselect_all" msgid="1680395960166387572">"Откажи избор на сите епизоди"</string>
+    <string name="dvr_series_watched_info_minutes" msgid="5656926431901526030">"Изгледани се <xliff:g id="WATCHED">%1$d</xliff:g> од <xliff:g id="DURATION">%2$d</xliff:g> минути"</string>
+    <string name="dvr_series_watched_info_seconds" msgid="2667537184197566662">"Изгледани се <xliff:g id="WATCHED">%1$d</xliff:g> од <xliff:g id="DURATION">%2$d</xliff:g> секунди"</string>
+    <string name="dvr_series_never_watched" msgid="6086008065876122655">"Никогаш не се гледани"</string>
+    <plurals name="dvr_msg_episodes_deleted" formatted="false" msgid="5627112959798353905">
+      <item quantity="one">%1$d од %2$d епизода се избришани</item>
+      <item quantity="other">%1$d од %2$d епизоди се избришани</item>
+    </plurals>
+    <string name="dvr_series_settings_priority" msgid="5836437092774185710">"Приоритет"</string>
+    <string name="dvr_series_settings_priority_highest" msgid="1072006447796648382">"Највисок"</string>
+    <string name="dvr_series_settings_priority_lowest" msgid="6003996497908810225">"Најнизок"</string>
+    <string name="dvr_series_settings_priority_rank" msgid="667778382820956116">"Бр. <xliff:g id="RANK">%1$d</xliff:g>"</string>
+    <string name="dvr_series_settings_channels" msgid="3164900110165729909">"Канали"</string>
+    <string name="dvr_series_settings_channels_all" msgid="656434955168572976">"Кој било"</string>
+    <string name="dvr_priority_title" msgid="1537886929061487213">"Изберете приоритет"</string>
+    <string name="dvr_priority_description" msgid="8362040921417154645">"Кога има повеќе програми што треба да се снимаат во исто време, ќе се снимат само оние со повисок приоритет."</string>
+    <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"Зачувај"</string>
+    <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"Еднократните снимања имаат највисок приоритет"</string>
+    <string name="dvr_action_cancel" msgid="8094060199570272625">"Откажи"</string>
+    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"Откажи"</string>
+    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"Заборави"</string>
+    <string name="dvr_action_stop" msgid="1378723485295471381">"Сопри"</string>
+    <string name="dvr_action_view_schedules" msgid="7442990695392774263">"Прикажи распоред на снимање"</string>
+    <string name="dvr_action_record_episode" msgid="8596182676610326327">"Само оваа програма"</string>
+    <string name="dvr_action_record_episode_from_now_description" msgid="5125122951529985697">"сега - <xliff:g id="ENDTIME">%1$s</xliff:g>"</string>
+    <string name="dvr_action_record_series" msgid="8501991316179436899">"Целата серија…"</string>
+    <string name="dvr_action_record_anyway" msgid="991470058034937231">"Сепак закажи"</string>
+    <string name="dvr_action_record_instead" msgid="6821164728752215738">"Наместо неа, снимај ја оваа"</string>
+    <string name="dvr_action_record_cancel" msgid="8644254745772185288">"Откажете го снимањево"</string>
+    <string name="dvr_action_watch_now" msgid="7181211920959075976">"Гледајте сега"</string>
+    <string name="dvr_epg_program_recordable" msgid="609229576209476903">"Може да се снима"</string>
+    <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"Снимањето е закажано"</string>
+    <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"Конфликт при снимање"</string>
+    <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"Се снима"</string>
+    <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"Неуспешно снимање"</string>
+    <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"Се читаат програми за да се создадат распореди за снимање"</string>
+    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"Се читаат програми"</string>
+    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
+    <skip />
+    <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"Потребна е поголема меморија за DVR"</string>
+    <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"Ќе може да снимате програми со DVR. Но во моментов нема доволно простор на вашиот уред за да може DVR да функционира. Поврзете надворешна податочна едница од <xliff:g id="STORAGE_SIZE">%1$s</xliff:g> GB или повеќе и следете ги чекорите за да ја форматирате како меморија на уредот."</string>
+    <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"Недостасува простор"</string>
+    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"Недостасува дел од просторот што го користи DVR. Поврзете го надворешниот диск што го користевте претходно за да овозможите DVR повторно. Во спротивно, може да изберете да се заборави просторот ако веќе не е достапен."</string>
+    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"Да се заборави просторот?"</string>
+    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"Сите ваши снимени содржини и распореди ќе се изгубат."</string>
+    <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"Да се сопре со снимање?"</string>
+    <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"Снимените содржини ќе се зачуваат."</string>
+    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
+    <skip />
+    <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"Снимањето е закажано, но постојат конфликти"</string>
+    <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"Снимањето започна, но постојат конфликти"</string>
+    <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> ќе се сними."</string>
+    <string name="dvr_channel_conflict_dialog_description_prefix" msgid="212344250779878791">"<xliff:g id="CHANNELNAME">%1$s</xliff:g> се снима."</string>
+    <string name="dvr_program_conflict_dialog_description_1" msgid="2278200346765501164">"Некои делови од <xliff:g id="CONFLICTPROGRAMNAME">%1$s</xliff:g> нема да се снимат."</string>
+    <string name="dvr_program_conflict_dialog_description_2" msgid="5648524408147235696">"Некои делови од <xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g> и <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g> нема да се снимат."</string>
+    <string name="dvr_program_conflict_dialog_description_3" msgid="6879199850098595108">"Некои делови од <xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g> и уште една закажана нема да се снимат."</string>
+    <plurals name="dvr_program_conflict_dialog_description_many" formatted="false" msgid="1008340710252647947">
+      <item quantity="one">Некои делови од <xliff:g id="CONFLICTPROGRAMNAME_1_2">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_3">%2$s</xliff:g> и уште %4$d закажана нема да се снимат.</item>
+      <item quantity="other">Некои делови од <xliff:g id="CONFLICTPROGRAMNAME_1_2">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_3">%2$s</xliff:g> и уште %4$d закажани нема да се снимат.</item>
+    </plurals>
+    <string name="dvr_schedule_dialog_title" msgid="5235629824986156058">"Што би сакале да снимите?"</string>
+    <string name="dvr_channel_record_duration_dialog_title" msgid="4601361040431047918">"Колку долго би сакале да снимате?"</string>
+    <string name="dvr_already_scheduled_dialog_title" msgid="4525318291210934311">"Веќе е закажана"</string>
+    <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"Истата програма е веќе закажана за снимање во <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g>."</string>
+    <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"Веќе е снимена"</string>
+    <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"Програмава е веќе снимена. Достапна е во DVR-збирката."</string>
+    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
+    <skip />
+    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_program_not_found" msgid="3282879532038010202">"Снимената програма не е пронајдена."</string>
+    <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"Поврзани снимки"</string>
+    <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(Нема опис на програмата)"</string>
+    <plurals name="dvr_schedules_section_subtitle" formatted="false" msgid="9180744010405976007">
+      <item quantity="one">%1$d снимка</item>
+      <item quantity="other">%1$d снимки</item>
+    </plurals>
+    <string name="dvr_schedules_information_separator" msgid="1669116853379998479">" / "</string>
+    <string name="dvr_schedules_deletion_info" msgid="2837586459900271031">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> е отстранета од распоредот на снимање"</string>
+    <string name="dvr_schedules_tuner_conflict_will_be_partially_recorded" msgid="5280490298546908729">"Ќе се сними делумно поради конфликти со приемникот."</string>
+    <string name="dvr_schedules_tuner_conflict_will_not_be_recorded_info" msgid="5065400564003201095">"Нема да се сними поради конфликти со приемникот."</string>
+    <string name="dvr_schedules_empty_state" msgid="1291529283469462741">"Сѐ уште нема закажани снимања.\nМоже да закажете снимање од програмскиот водич."</string>
+    <plurals name="dvr_series_schedules_header_description" formatted="false" msgid="9077188267856194114">
+      <item quantity="one">%1$d конфликт на снимање</item>
+      <item quantity="other">%1$d конфликти на снимање</item>
+    </plurals>
+    <string name="dvr_series_schedules_settings" msgid="4868501926847903985">"Поставки за серии"</string>
+    <string name="dvr_series_schedules_start" msgid="8458768834047133835">"Започни со снимање серија"</string>
+    <string name="dvr_series_schedules_stop" msgid="3427479298317584961">"Сопри го снимањето серија"</string>
+    <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"Да се сопре снимањето на серијата?"</string>
+    <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"Снимените епизоди ќе останат достапни во DVR-збирката."</string>
+    <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"Сопри"</string>
+    <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"Не се достапни епизоди.\nЌе се снимат штом ќе бидат достапни."</string>
+    <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
+      <item quantity="one">(%1$d минута)</item>
+      <item quantity="other">(%1$d минути)</item>
+    </plurals>
+    <string name="dvr_date_today" msgid="7691050705354303471">"Денес"</string>
+    <string name="dvr_date_tomorrow" msgid="4136735681186981844">"Утре"</string>
+    <string name="dvr_date_yesterday" msgid="2127672919053118239">"Вчера"</string>
+    <string name="dvr_date_today_time" msgid="8359696776305244535">"<xliff:g id="TIME_RANGE">%1$s</xliff:g> денес"</string>
+    <string name="dvr_date_tomorrow_time" msgid="8364654556105292594">"<xliff:g id="TIME_RANGE">%1$s</xliff:g> утре"</string>
+    <string name="program_guide_critic_score" msgid="340530743913585150">"Оценка"</string>
 </resources>
