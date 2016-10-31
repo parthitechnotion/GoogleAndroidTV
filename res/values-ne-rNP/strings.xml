@@ -31,7 +31,6 @@
     <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"अघिल्लो"</string>
     <string name="channels_item_program_guide" msgid="2889807207930678418">"कार्यक्रम गाइड"</string>
     <string name="channels_item_setup" msgid="6557412175737379022">"नयाँ च्यानलहरू उपलब्ध"</string>
-    <string name="channels_item_app_link_no_app_link" msgid="1884830234777824408">"कुनै लिंक उपलब्ध छैनन्"</string>
     <string name="channels_item_app_link_app_launcher" msgid="1395352122187670523">"<xliff:g id="APP_NAME">%1$s</xliff:g> खोल्नुहोस्"</string>
     <string name="options_item_closed_caption" msgid="5945274655046367170">"बन्द क्याप्सनहरु"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"डिस्प्ले मोड"</string>
@@ -124,10 +123,11 @@
     <string name="option_subrating_header" msgid="4637961301549615855">"सहायक स्तर निर्धारण"</string>
     <string name="pin_enter_unlock_channel" msgid="4797922378296393173">"यो च्यानल हेर्न तपाईँको PIN प्रविष्टि गर्नुहोस्"</string>
     <string name="pin_enter_unlock_program" msgid="7311628843209871203">"यो कार्यक्रम हेर्न तपाईँको PIN प्रविष्टि गर्नुहोस्"</string>
+    <string name="pin_enter_unlock_dvr" msgid="1637468108723176684">"यस कार्यक्रमलाई <xliff:g id="RATING">%1$s</xliff:g> भनेर मूल्याङ्कन गरिएको छ। यो कार्यक्रम हेर्न आफ्नो PIN प्रविष्ट गर्नुहोस्"</string>
     <string name="pin_enter_pin" msgid="249314665028035038">"आफ्नो पिन प्रविष्ट गर्नुहोस्"</string>
     <string name="pin_enter_create_pin" msgid="3385754356793309946">"अभिभावकत्वको नियन्त्रण सेट गर्न, एउटा PIN सिर्जना गर्नुहोस्"</string>
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"नयाँ PIN प्रविष्टि गर्नुहोस्"</string>
-    <string name="pin_enter_again" msgid="2618999754723090427">"तपाईँको PIN निश्चित गर्नुहोस्"</string>
+    <string name="pin_enter_again" msgid="2618999754723090427">"तपाईँको PIN को पुष्टि गर्नुहोस्"</string>
     <string name="pin_enter_old_pin" msgid="4588282612931041919">"तपाईंको हालको पिन प्रविष्ट गर्नुहोस्"</string>
     <plurals name="pin_enter_countdown" formatted="false" msgid="3415233538538544309">
       <item quantity="other">तपाईंले ५ पटक गलत PIN प्रविष्ट गर्नुभयो।\n<xliff:g id="REMAINING_SECONDS_1">%1$d</xliff:g> सेकेन्डमा पुन: प्रयास गर्नुहोस्।</item>
@@ -144,8 +144,6 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"स्रोतका इजाजतपत्रहरू खोल्नुहोस्"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"खुला स्रोत इजाजतपत्रहरू"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"संस्करण"</string>
-    <string name="about_menu_improve" msgid="3712578027009311401">"लाइभ च्यानलहरु सुधार गर्न मद्दत गर्नुहोस्"</string>
-    <string name="about_menu_improve_summary" msgid="7548489011760588571">"Google सँग अज्ञात प्रयोग डेटा र लक्षण पहिचान गर्न डेटा साझेदारी गर्नुहोस् ताकि हामी लाइभ च्यानलहरू राम्रो बनाउन र क्र्यास हुने तथा स्थिर हुने समस्याहरूलाई रोक्न सक्छौं।"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"यो च्यानल हेर्न, दायाँ प्रेस गर्नुहोस् र आफ्नो पिन प्रविष्ट गर्नुहोस्"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"यो कार्यक्रम हेर्न, दायाँ प्रेस गर्नुहोस् र आफ्नो पिन प्रविष्ट गर्नुहोस्"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"यो कार्यक्रम मूल्याङ्कन <xliff:g id="RATING">%1$s</xliff:g> गरिएको छ।\nयो कार्यक्रम हेर्न, दायाँ थिच्नुहोस् र आफ्नो PIN प्रविष्ट गर्नुहोस्।"</string>
@@ -157,6 +155,10 @@
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"अडियो मात्र"</string>
     <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"सिग्नल कमजोर छ"</string>
     <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"इन्टरनेटमा जडान गर्न सकिएन"</string>
+    <plurals name="tvview_msg_input_no_resource" formatted="false" msgid="8581894855153658823">
+      <item quantity="other">अन्य च्यानलहरू रेकर्ड भइरहेका हुनाले <xliff:g id="END_TIME_1">%1$s</xliff:g> सम्म यो च्यानल प्ले गर्न सकिँदैन। \n\nरेकर्डिङको समय तालिकालाई समायोजन गर्न दायाँ बटन थिच्नुहोस्।</item>
+      <item quantity="one">अर्को च्यानल रेकर्ड भइरहेको हुनाले <xliff:g id="END_TIME_0">%1$s</xliff:g> सम्म यो च्यानल प्ले गर्न सकिँदैन। \n\nरेकर्डिङको समय तालिकालाई समायोजन गर्न दायाँ बटन थिच्नुहोस्।</item>
+    </plurals>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"शीर्षक छैन"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"च्यानल अवरुद्ध"</string>
     <string name="setup_category_new" msgid="2899355289563443627">"नयाँ"</string>
@@ -168,8 +170,8 @@
     <string name="setup_input_no_channels" msgid="1669327912393163331">"कुनै च्यानलहरू उपलब्ध छैनन्"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"नयाँ"</string>
     <string name="setup_input_setup_now" msgid="1772000402336958967">"सेटअप गरिएको छैन"</string>
-    <string name="setup_play_store_action_title" msgid="859347291072224673">"थप स्रोतहरु प्राप्त गर्नुहोस्"</string>
-    <string name="setup_play_store_action_description" msgid="2472226338824629506">"प्रत्यक्ष च्यानलहरूको प्रस्ताव गर्ने अनुप्रयोगहरू ब्राउज गर्नुहोस्"</string>
+    <string name="setup_store_action_title" msgid="4083402039720973414">"थप स्रोतहरू प्राप्त गर्नुहोस्"</string>
+    <string name="setup_store_action_description" msgid="6820482635042445297">"लाइभ च्यानलहरू प्रस्तुत गर्ने अनुप्रयोगहरू ब्राउज गर्नुहोस्"</string>
     <string name="new_sources_title" msgid="3878933676500061895">"उपलब्ध नयाँ च्यानलका स्रोतहरू"</string>
     <string name="new_sources_description" msgid="749649005588426813">"नयाँ च्यानलका स्रोतहरुसँग प्रस्ताव गर्न च्यानलहरू छन्। \n अहिले तिनीहरूलाई सेट गर्नुहोस् वा च्यानल स्रोतहरुका सेटिङमा पछि गर्नुहोस्।"</string>
     <string name="new_sources_action_setup" msgid="177693761664016811">"अब सेटअप गर्नुहोस्"</string>
@@ -184,11 +186,165 @@
     <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ट्यूनर प्रकार अनुपयुक्त। कृपया ट्यूनर प्रकार टिभी स्रोतको लागि Live TV को अनुप्रयोग सुरु गर्नुहोस।"</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"ट्युन गर्न असफल"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"यो कार्य सम्हाल्न कुनै पनि अनुप्रयोग भेटिएन।"</string>
-    <string name="msg_all_channels_hidden" msgid="777397634062471936">"सबै स्रोत च्यानलहरू लुकेको छन्। \n हेर्नको लागि कम्तिमा एक च्यानल चयन गर्नुहोस्।"</string>
+    <string name="msg_all_channels_hidden" msgid="777397634062471936">"सबै स्रोत च्यानलहरू लुकेको छन्। \n हेर्नको लागि कम्तीमा एक च्यानल चयन गर्नुहोस्।"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"भिडियो अप्रत्याशित रूपमा अनुपलब्ध।"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"BACK कुञ्जी जडान भएका उपकरणका लागि हो। बाहिर निस्कनका लागि गृह बटन थिच्नुहोस्।"</string>
-    <string name="msg_not_supported_device" msgid="4469404625040284722">"लाइभ च्यानलहरु Android Lollipop भएको यस यन्त्रमा समर्थित छैन।"</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"लाइभ च्यानलहरुलाई TV सूचीहरूलाई पढ्न अनुमति आवश्यक पदर्छ।"</string>
     <string name="setup_sources_text" msgid="4988039637873759839">"आफ्नो स्रोतहरू सेट अप गर्नुहोस्"</string>
     <string name="setup_sources_description" msgid="5695518946225445202">"लाइभ च्यानलहरूले TV च्यानलहरूसँगै उपलब्ध गराइएका प्रवाह भइरहेका च्यानलहरूको परम्परागत अनुभवलाई संयोजन गर्छ। \n\nपहिले नै स्थापित च्यानल स्रोतहरू सेट अप गरेर सुरू गरौं। वा लाइभ च्यानलहरू प्रस्ताव गर्ने अझ बढी अनुप्रयोगहरूका लागि Google Play स्टोर ब्राउज गर्नुहोस्।"</string>
+    <string name="channels_item_dvr" msgid="8911915252648532469">"रेकर्डिङ र समयतालिकाहरू"</string>
+    <string name="recording_start_dialog_10_min_duration" msgid="5739636508245795292">"१० मिनेट"</string>
+    <string name="recording_start_dialog_30_min_duration" msgid="4691127772622189977">"३० मिनेट"</string>
+    <string name="recording_start_dialog_1_hour_duration" msgid="7159533207022355641">"१ घन्टा"</string>
+    <string name="recording_start_dialog_3_hours_duration" msgid="295984419320006238">"३ घन्टा"</string>
+    <string name="dvr_main_recent" msgid="2553805424822806495">"हालको"</string>
+    <string name="dvr_main_scheduled" msgid="7837260963086408492">"तालिकाबद्ध गरिएको"</string>
+    <string name="dvr_main_series" msgid="8278256687595691676">"श्रृंखला"</string>
+    <string name="dvr_main_others" msgid="2970835573614038153">"अन्य"</string>
+    <string name="dvr_msg_cannot_record_channel" msgid="6836291367918532447">"यो च्यानल रेकर्ड गर्न सकिँदैन।"</string>
+    <string name="dvr_msg_cannot_record_program" msgid="4184046342810946090">"यो कार्यक्रम रेकर्ड गर्न सकिँदैन।"</string>
+    <string name="dvr_msg_program_scheduled" msgid="3800847542300367572">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> लाई रेकर्ड गर्ने कार्यतालिका निर्धारण गरिएको छ"</string>
+    <string name="dvr_msg_current_program_scheduled" msgid="2505247201782991463">"अहिले देखि <xliff:g id="ENDTIME">%2$s</xliff:g> सम्म <xliff:g id="PROGRAMNAME">%1$s</xliff:g> नामक कार्यक्रम रेकर्ड गर्दै"</string>
+    <string name="dvr_full_schedule_card_view_title" msgid="7198521806965950089">"समय सहितको पूर्ण कार्यतालिका"</string>
+    <plurals name="dvr_full_schedule_card_view_content" formatted="false" msgid="790788122541080768">
+      <item quantity="other">आगामी %1$d दिन</item>
+      <item quantity="one">आगामी %1$d दिन</item>
+    </plurals>
+    <plurals name="dvr_program_duration" formatted="false" msgid="6742119148312354741">
+      <item quantity="other">%1$d मिनेट</item>
+      <item quantity="one">%1$d मिनेट</item>
+    </plurals>
+    <plurals name="dvr_count_new_recordings" formatted="false" msgid="3569310208305402815">
+      <item quantity="other">%1$d नयाँ रेकर्डिङहरू</item>
+      <item quantity="one">%1$d नयाँ रेकर्डिङ</item>
+    </plurals>
+    <plurals name="dvr_count_recordings" formatted="false" msgid="7417379223468131391">
+      <item quantity="other">%1$d रेकर्डिङहरू</item>
+      <item quantity="one">%1$d रेकर्डिङ</item>
+    </plurals>
+    <plurals name="dvr_count_scheduled_recordings" formatted="false" msgid="1650330290765214511">
+      <item quantity="other">%1$d रेकर्डिङहरूको समय निर्धारण गरियो</item>
+      <item quantity="one">%1$d रेकर्डिङको समय निर्धारण गरियो</item>
+    </plurals>
+    <string name="dvr_detail_watch" msgid="7085694764364338215">"हेर्नुहोस्"</string>
+    <string name="dvr_detail_play_from_beginning" msgid="8475543568260411836">"सुरुबाट चलाउनुहोस्"</string>
+    <string name="dvr_detail_resume_play" msgid="875591300274416373">"पुनःसुरु गर्नुहोस्"</string>
+    <string name="dvr_detail_delete" msgid="4535881013528321898">"मेट्नुहोस्"</string>
+    <string name="dvr_detail_series_delete" msgid="4831926831670312674">"रेकर्डिङहरू मेट्नुहोस्"</string>
+    <string name="dvr_detail_series_resume" msgid="6935136228671386246">"पुनःसुरु गर्नु"</string>
+    <string name="dvr_detail_series_season_title" msgid="5474850936497854790">"सत्र <xliff:g id="SEASON_NUMBER">%1$s</xliff:g>"</string>
+    <string name="dvr_detail_view_schedule" msgid="7137536927421904426">"समयतालिका हेर्नु"</string>
+    <string name="dvr_detail_read_more" msgid="2588920758094498544">"थप पढ्नुहोस्"</string>
+    <string name="dvr_series_deletion_title" msgid="7672649492494507574">"रेकर्डिङ मेट्नुहोस्"</string>
+    <string name="dvr_series_deletion_description" msgid="994839237906552969">"तपाईँले मेट्न चाहनुहुने एपिसोडहरूलाई चयन गर्नुहोस्। एक पटक मेटाएपछि तिनीहरूलाई पुन:प्राप्त गर्न सकिँदैन।"</string>
+    <string name="dvr_series_deletion_no_recordings" msgid="481210819034514">"मेट्नका लागि कुनै रेकर्डिङ छैन।"</string>
+    <string name="dvr_series_select_watched" msgid="3608122404146716502">"हेरिएका एपिसोड चयन गर्नुहोस्"</string>
+    <string name="dvr_series_select_all" msgid="5415749261739544048">"सबै एपिसोडहरू चयन गर्नुहोस्"</string>
+    <string name="dvr_series_deselect_all" msgid="1680395960166387572">"सबै एपिसोडहरू चयन नगर्नुहोस्"</string>
+    <string name="dvr_series_watched_info_minutes" msgid="5656926431901526030">"<xliff:g id="DURATION">%2$d</xliff:g> मिनेट मध्ये <xliff:g id="WATCHED">%1$d</xliff:g> मिनेट हेरियो"</string>
+    <string name="dvr_series_watched_info_seconds" msgid="2667537184197566662">"<xliff:g id="DURATION">%2$d</xliff:g> सेकेन्ड मध्ये <xliff:g id="WATCHED">%1$d</xliff:g> सेकेन्ड हेरियो"</string>
+    <string name="dvr_series_never_watched" msgid="6086008065876122655">"कहिल्यै नहेरिएका"</string>
+    <plurals name="dvr_msg_episodes_deleted" formatted="false" msgid="5627112959798353905">
+      <item quantity="other">%2$d मध्ये %1$d एपिसोडहरू मेटाइए</item>
+      <item quantity="one">%2$d मध्ये %1$d एपिसोड मेटाइयो</item>
+    </plurals>
+    <string name="dvr_series_settings_priority" msgid="5836437092774185710">"प्राथमिकता"</string>
+    <string name="dvr_series_settings_priority_highest" msgid="1072006447796648382">"सबैभन्दा उच्च"</string>
+    <string name="dvr_series_settings_priority_lowest" msgid="6003996497908810225">"सबैभन्दा न्यून"</string>
+    <string name="dvr_series_settings_priority_rank" msgid="667778382820956116">"नम्बर <xliff:g id="RANK">%1$d</xliff:g>"</string>
+    <string name="dvr_series_settings_channels" msgid="3164900110165729909">"च्यानलहरू"</string>
+    <string name="dvr_series_settings_channels_all" msgid="656434955168572976">"जुनसुकै"</string>
+    <string name="dvr_priority_title" msgid="1537886929061487213">"प्राथमिकता छान्नुहोस्"</string>
+    <string name="dvr_priority_description" msgid="8362040921417154645">"एकै समयमा अत्यन्त धेरै कार्यक्रमहरू रेकर्ड गर्नुपर्ने भएकाले उच्च प्राथमिकता भएका कार्यक्रमहरूलाई मात्र रेकर्ड गरिनेछ।"</string>
+    <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"सुरक्षित गर्नुहोस्"</string>
+    <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"एक-पटके रेकर्डिङहरूलाई सबैभन्दा उच्च प्राथमिकता दिइन्छ"</string>
+    <string name="dvr_action_cancel" msgid="8094060199570272625">"रद्द गर्नु"</string>
+    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"रद्द गर्नुहोस्"</string>
+    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"बिर्सनुहोस्"</string>
+    <string name="dvr_action_stop" msgid="1378723485295471381">"रोक्नुहोस्"</string>
+    <string name="dvr_action_view_schedules" msgid="7442990695392774263">"रेकर्डिङको समयतालिका हेर्नुहोस्"</string>
+    <string name="dvr_action_record_episode" msgid="8596182676610326327">"यो कार्यक्रम मात्र"</string>
+    <string name="dvr_action_record_episode_from_now_description" msgid="5125122951529985697">"अहिले - <xliff:g id="ENDTIME">%1$s</xliff:g>"</string>
+    <string name="dvr_action_record_series" msgid="8501991316179436899">"सम्पूर्ण शृंखला…"</string>
+    <string name="dvr_action_record_anyway" msgid="991470058034937231">"जे भए पनि समय निर्धारण गर्नुहोस्"</string>
+    <string name="dvr_action_record_instead" msgid="6821164728752215738">"बरु यो रेकर्ड गर्नुहोस्"</string>
+    <string name="dvr_action_record_cancel" msgid="8644254745772185288">"यस रेकर्डिङलाई रद्द गर्नुहोस्"</string>
+    <string name="dvr_action_watch_now" msgid="7181211920959075976">"अहिले हेर्नुहोस्"</string>
+    <string name="dvr_epg_program_recordable" msgid="609229576209476903">"रेकर्ड गर्न मिल्ने"</string>
+    <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"रेकर्डिङको कार्यतालिका निर्धारण गरिएको छ"</string>
+    <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"रेकर्डिङ सम्बन्धी असहमति"</string>
+    <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"रेकर्ड गर्दै"</string>
+    <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"रेकर्डिङ गर्न सकिएन"</string>
+    <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"रेकर्डिङका समय तालिकाहरू सिर्जना गर्न कार्यक्रमहरू पढ्दै"</string>
+    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"कार्यक्रमहरूको जानकारी पढ्दै"</string>
+    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
+    <skip />
+    <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR लाई थप भण्डारण चाहिन्छ"</string>
+    <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"तपाईँले DVR मार्फत कार्यक्रमहरू रेकर्ड गर्न सक्नुहुनेछ। यद्यपि, अहिले तपाईँको यन्त्रमा DVR ले काम गर्न पुग्ने गरी पर्याप्त भण्डारण छैन। कृपया <xliff:g id="STORAGE_SIZE">%1$s</xliff:g> जि.बि.वा सो भन्दा बढी भण्डारण क्षमता भएको कुनै बाह्य ड्राइभ जडान गर्नुहोस् र त्यसलाई यन्त्रको भण्डारणका रूपमा फर्म्याट गर्न आवश्यक कदमहरू चाल्नुहोस्।"</string>
+    <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"भण्डारण उपलब्ध छैन"</string>
+    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"DVR ले प्रयोग गरेको केही भण्डारण उपलब्ध छैन। DVR लाई पुन: सक्षम पार्न कृपया तपाईँले पहिले प्रयोग गर्नुभएको बाह्य ड्राइभलाई जडान गर्नुहोस्। वैकल्पिक रूपमा, यदि अब भण्डारण उपलब्ध छैन भने तपाईँ त्यसलाई बिर्सने विकल्प छान्न सक्नुहुन्छ।"</string>
+    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"भण्डारण बिर्सने हो?"</string>
+    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"तपाईँका रेकर्ड गरिएका सबै सामग्री र समय सहितका कार्यतालिकाहरू हराउने छन्।"</string>
+    <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"रेकर्डिङ रोक्ने हो?"</string>
+    <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"रेकर्ड गरिएको सामग्रीलाई सुरक्षित गरिनेछ।"</string>
+    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
+    <skip />
+    <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"रेकर्डिङको कार्यतालिका निर्धारण गरिएको छ तर यसमा असहमतिहरू छन्"</string>
+    <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"रेकर्डिङ सुरु भएको छ तर यसमा असहमतिहरू छन्"</string>
+    <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> लाई रेकर्ड गरिनेछ।"</string>
+    <string name="dvr_channel_conflict_dialog_description_prefix" msgid="212344250779878791">"<xliff:g id="CHANNELNAME">%1$s</xliff:g> लाई रेकर्ड गरिँदै छ।"</string>
+    <string name="dvr_program_conflict_dialog_description_1" msgid="2278200346765501164">"<xliff:g id="CONFLICTPROGRAMNAME">%1$s</xliff:g> का केही भागहरूलाई रेकर्ड गरिने छैन।"</string>
+    <string name="dvr_program_conflict_dialog_description_2" msgid="5648524408147235696">"<xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g> र <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g> का केही भागहरूलाई रेकर्ड गरिने छैन।"</string>
+    <string name="dvr_program_conflict_dialog_description_3" msgid="6879199850098595108">"<xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g> र थप एक कार्यक्रमका केही भागहरूलाई रेकर्ड गरिने छैन।"</string>
+    <plurals name="dvr_program_conflict_dialog_description_many" formatted="false" msgid="1008340710252647947">
+      <item quantity="other"><xliff:g id="CONFLICTPROGRAMNAME_1_2">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_3">%2$s</xliff:g> र थप %3$d कार्यक्रमहरूलाई रेकर्ड गरिने छैन।</item>
+      <item quantity="one"><xliff:g id="CONFLICTPROGRAMNAME_1_0">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_1">%2$s</xliff:g> र थप %3$d कार्यक्रमलाई रेकर्ड गरिने छैन।</item>
+    </plurals>
+    <string name="dvr_schedule_dialog_title" msgid="5235629824986156058">"तपाईँ के रेकर्ड गर्न चाहनुहुन्छ?"</string>
+    <string name="dvr_channel_record_duration_dialog_title" msgid="4601361040431047918">"तपाईँ कति बेरसम्म रेकर्ड गर्न चाहनुहुन्छ?"</string>
+    <string name="dvr_already_scheduled_dialog_title" msgid="4525318291210934311">"पहिले नै समय सहितको कार्यतालिका निर्धारण गरिएको छ"</string>
+    <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"यस कार्यक्रमलाई पहिले नै <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g> मा रेकर्ड गर्न समय सहितको कार्यतालिका निर्धारण गरिएको छ।"</string>
+    <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"पहिले नै रेकर्ड गरिएको छ"</string>
+    <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"यस कार्यक्रमलाई पहिले नै रेकर्ड गरिएको छ। यो DVR को लाइब्रेरीमा उपलब्ध छ।"</string>
+    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
+    <skip />
+    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_program_not_found" msgid="3282879532038010202">"रेकर्ड गरिएको कार्यक्रम भेट्टिएन।"</string>
+    <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"सम्बन्धित रेकर्डिङहरू"</string>
+    <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(कार्यक्रम सम्बन्धी वर्णन छैन)"</string>
+    <plurals name="dvr_schedules_section_subtitle" formatted="false" msgid="9180744010405976007">
+      <item quantity="other">%1$d रेकर्डिङ</item>
+      <item quantity="one">%1$d रेकर्डिङ</item>
+    </plurals>
+    <string name="dvr_schedules_information_separator" msgid="1669116853379998479">" / "</string>
+    <string name="dvr_schedules_deletion_info" msgid="2837586459900271031">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> लाई रेकर्डिङको समय सहितको कार्यतालिकाबाट हटाइयो"</string>
+    <string name="dvr_schedules_tuner_conflict_will_be_partially_recorded" msgid="5280490298546908729">"ट्युनर सम्बन्धी असहमतिका कारण आंशिक रूपमा रेकर्ड गरिनेछ।"</string>
+    <string name="dvr_schedules_tuner_conflict_will_not_be_recorded_info" msgid="5065400564003201095">"ट्युनर सम्बन्धी असहमतिका कारण रेकर्ड गरिने छैन।"</string>
+    <string name="dvr_schedules_empty_state" msgid="1291529283469462741">"अहिलेसम्म समय सहितको कार्यतालिका निर्धारण गरिएको कुनै रेकर्डिङ छैन।\nतपाईँ कार्यक्रम निर्देशिका मार्फत रेकर्डिङको समय सहितको कार्यतालिका निर्धारण गर्न सक्नुहुन्छ।"</string>
+    <plurals name="dvr_series_schedules_header_description" formatted="false" msgid="9077188267856194114">
+      <item quantity="other">रेकर्डिङ सम्बन्धी %1$d असहमतिहरू</item>
+      <item quantity="one">रेकर्डिङ सम्बन्धी %1$d असहमति</item>
+    </plurals>
+    <string name="dvr_series_schedules_settings" msgid="4868501926847903985">"शृंखला सम्बन्धी सेटिङहरू"</string>
+    <string name="dvr_series_schedules_start" msgid="8458768834047133835">"शृंखलाको रेकर्डिङ सुरु गर्नुहोस्"</string>
+    <string name="dvr_series_schedules_stop" msgid="3427479298317584961">"शृंखलाको रेकर्डिङ रोक्नुहोस्"</string>
+    <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"शृंखलाको रेकर्डिङ रोक्ने हो?"</string>
+    <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"रेकर्ड गरिएका एपिसोडहरू DVR सम्बन्धी लाइब्रेरीमा उपलब्ध रहनेछन्।"</string>
+    <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"रोक्नुहोस्"</string>
+    <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"कुनै एपिसोड उपलब्ध छैन।\nएपिसोडहरू उपलब्ध भएपछि तिनीहरूलाई रेकर्ड गरिनेछ।"</string>
+    <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
+      <item quantity="other">(%1$d मिनेट)</item>
+      <item quantity="one">(%1$d मिनेट) </item>
+    </plurals>
+    <string name="dvr_date_today" msgid="7691050705354303471">"आज"</string>
+    <string name="dvr_date_tomorrow" msgid="4136735681186981844">"भोलि"</string>
+    <string name="dvr_date_yesterday" msgid="2127672919053118239">"हिजो"</string>
+    <string name="dvr_date_today_time" msgid="8359696776305244535">"आज <xliff:g id="TIME_RANGE">%1$s</xliff:g>"</string>
+    <string name="dvr_date_tomorrow_time" msgid="8364654556105292594">"भोलि <xliff:g id="TIME_RANGE">%1$s</xliff:g>"</string>
+    <string name="program_guide_critic_score" msgid="340530743913585150">"अङ्क"</string>
 </resources>

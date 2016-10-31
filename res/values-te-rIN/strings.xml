@@ -31,7 +31,6 @@
     <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"మునుపటి"</string>
     <string name="channels_item_program_guide" msgid="2889807207930678418">"ప్రోగ్రామ్ గైడ్"</string>
     <string name="channels_item_setup" msgid="6557412175737379022">"కొత్త ఛానె. ఉన్నప్పుడు"</string>
-    <string name="channels_item_app_link_no_app_link" msgid="1884830234777824408">"లింక్ అందుబాటులో లేదు"</string>
     <string name="channels_item_app_link_app_launcher" msgid="1395352122187670523">"<xliff:g id="APP_NAME">%1$s</xliff:g>ని తెరువు"</string>
     <string name="options_item_closed_caption" msgid="5945274655046367170">"సంవృత శీర్షికలు"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"ప్రదర్శన మోడ్"</string>
@@ -124,6 +123,7 @@
     <string name="option_subrating_header" msgid="4637961301549615855">"సబ్-రేటింగ్‌లు"</string>
     <string name="pin_enter_unlock_channel" msgid="4797922378296393173">"ఈ ఛానెల్‌ని చూడటానికి మీ పిన్‌ని నమోదు చేయండి"</string>
     <string name="pin_enter_unlock_program" msgid="7311628843209871203">"ఈ కార్యక్రమాన్ని చూడటానికి మీ పిన్‌ని నమోదు చేయండి"</string>
+    <string name="pin_enter_unlock_dvr" msgid="1637468108723176684">"ఈ కార్యక్రమానికి <xliff:g id="RATING">%1$s</xliff:g> అని రేట్ చేయబడింది. ఈ కార్యక్రమాన్ని చూడటానికి మీ PINని నమోదు చేయండి"</string>
     <string name="pin_enter_pin" msgid="249314665028035038">"మీ పిన్‌ని నమోదు చేయండి"</string>
     <string name="pin_enter_create_pin" msgid="3385754356793309946">"తల్లిదండ్రుల నియంత్రణలను సెట్ చేయడానికి, పిన్‌ని సృష్టించండి"</string>
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"కొత్త పిన్‌ని నమోదు చేయండి"</string>
@@ -144,8 +144,6 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"సంస్కరణ"</string>
-    <string name="about_menu_improve" msgid="3712578027009311401">"ప్రత్యక్ష ప్రసార ఛానెల్‌లను మెరుగుపరచడంలో సహాయపడండి"</string>
-    <string name="about_menu_improve_summary" msgid="7548489011760588571">"అనామక వినియోగ మరియు విశ్లేషణల డేటాను Googleతో భాగస్వామ్యం చేయండి, తద్వారా మేము లైవ్ ఛానెల్‌లను మెరుగ్గా చేయగలము అలాగే క్రాష్ కావడం మరియు స్తంభించడం వంటి సమస్యలను నిరోధించగలము."</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ఈ ఛానెల్‌ను చూడటానికి, కుడివైపు బటన్ నొక్కి, మీ పిన్‌ని నమోదు చేయండి"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"ఈ ప్రోగ్రామ్‌ని చూడటానికి, కుడివైపు బటన్ నొక్కి, మీ పిన్‌ని నమోదు చేయండి"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"ఈ కార్యక్రమం <xliff:g id="RATING">%1$s</xliff:g> అని రేట్ చేయబడింది.\nఈ కార్యక్రమాన్ని చూడటానికి, కుడివైపు బటన్ నొక్కి, మీ PINని నమోదు చేయండి."</string>
@@ -157,6 +155,10 @@
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"ఆడియో మాత్రమే"</string>
     <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"సిగ్నల్ బలహీనంగా ఉంది"</string>
     <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"ఇంటర్నెట్ కనెక్షన్ లేదు"</string>
+    <plurals name="tvview_msg_input_no_resource" formatted="false" msgid="8581894855153658823">
+      <item quantity="other">ఇతర ఛానెల్‌లు రికార్డ్ అవుతున్నందున ఈ ఛానెల్‌ని <xliff:g id="END_TIME_1">%1$s</xliff:g> వరకు ప్లే చేయలేరు. \n\nరికార్డింగ్ షెడ్యూల్‌ను సర్దుబాటు చేయడానికి కుడివైపు నొక్కండి.</item>
+      <item quantity="one">మరొక ఛానెల్ రికార్డ్ అవుతున్నందున ఈ ఛానెల్‌ని <xliff:g id="END_TIME_0">%1$s</xliff:g> వరకు ప్లే చేయలేరు. \n\nరికార్డింగ్ షెడ్యూల్‌ను సర్దుబాటు చేయడానికి కుడివైపు నొక్కండి.</item>
+    </plurals>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"శీర్షిక లేదు"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"ఛానెల్ బ్లాక్ చేయబడింది"</string>
     <string name="setup_category_new" msgid="2899355289563443627">"కొత్తవి"</string>
@@ -168,8 +170,8 @@
     <string name="setup_input_no_channels" msgid="1669327912393163331">"ఛానెల్‌లు ఏవీ అందుబాటులో లేవు"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"కొత్తవి"</string>
     <string name="setup_input_setup_now" msgid="1772000402336958967">"సెటప్ చేయలేదు"</string>
-    <string name="setup_play_store_action_title" msgid="859347291072224673">"మరిన్ని మూలాలను పొందండి"</string>
-    <string name="setup_play_store_action_description" msgid="2472226338824629506">"ప్రత్యక్ష ప్రసార ఛానెల్‌లను అందించే అనువర్తనాలను బ్రౌజ్ చేయండి"</string>
+    <string name="setup_store_action_title" msgid="4083402039720973414">"మరిన్ని మూలాధారాలను పొందండి"</string>
+    <string name="setup_store_action_description" msgid="6820482635042445297">"ప్రత్యక్ష ప్రసార ఛానెల్‌లను అందించే అనువర్తనాలను బ్రౌజ్ చేయండి"</string>
     <string name="new_sources_title" msgid="3878933676500061895">"కొత్త ఛానెల్ మూలాలు అందుబాటులో ఉన్నాయి"</string>
     <string name="new_sources_description" msgid="749649005588426813">"కొత్త ఛానెల్ మూలాలు అందించడానికి ఛానెల్‌లను కలిగి ఉన్నాయి.\nవాటిని ఇప్పుడే సెటప్ చేయండి లేదా ఛానెల్ మూలాల సెట్టింగ్‌లో దీన్ని తర్వాత చేయండి."</string>
     <string name="new_sources_action_setup" msgid="177693761664016811">"ఇప్పుడే సెటప్ చేయి"</string>
@@ -187,8 +189,162 @@
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"అన్ని మూల ఛానెల్‌లు దాచబడ్డాయి.\nచూడటానికి కనీసం ఒక ఛానెల్‌ను ఎంచుకోండి."</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"వీడియో ఊహించని విధంగా అందుబాటులో లేకుండా పోయింది"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"BACK కీ కనెక్ట్ చేయబడిన పరికరం కోసం ఉద్దేశించినది. నిష్క్రమించడానికి HOME బటన్‌ను నొక్కండి."</string>
-    <string name="msg_not_supported_device" msgid="4469404625040284722">"Android Lollipop అమలులో ఉన్న ఈ పరికరంలో ప్రత్యక్ష ప్రసార ఛానెల్‌లకు మద్దతు లేదు."</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"టీవీ జాబితాలను చదవడానికి ప్రత్యక్ష ప్రసార ఛానెల్‌లకు అనుమతి అవసరం."</string>
     <string name="setup_sources_text" msgid="4988039637873759839">"మీ మూలాధారాలను సెటప్ చేయండి"</string>
     <string name="setup_sources_description" msgid="5695518946225445202">"ప్రత్యక్ష ప్రసార ఛానెల్‌లు అనువర్తనాల ద్వారా అందించబడే ప్రసార ఛానెల్‌ల్లో సాంప్రదాయక టీవీ ఛానెల్‌ల అనుభూతి కలగలిపి అందించబడతాయి. \n\nఇప్పటికే ఇన్‌స్టాల్ చేసుకున్న ఛానెల్ మూలాధారాలను సెటప్ చేయడం ద్వారా ప్రారంభించండి. లేదా ప్రత్యక్ష ప్రసార ఛానెల్‌లను ఆఫర్ చేసే మరిన్ని అనువర్తనాల కోసం Google Play స్టోర్‌లో బ్రౌజ్ చేయండి."</string>
+    <string name="channels_item_dvr" msgid="8911915252648532469">"రికార్డింగ్‌లు &amp; షెడ్యూల్‌లు"</string>
+    <string name="recording_start_dialog_10_min_duration" msgid="5739636508245795292">"10 నిమిషాలు"</string>
+    <string name="recording_start_dialog_30_min_duration" msgid="4691127772622189977">"30 నిమిషాలు"</string>
+    <string name="recording_start_dialog_1_hour_duration" msgid="7159533207022355641">"1 గంట"</string>
+    <string name="recording_start_dialog_3_hours_duration" msgid="295984419320006238">"3 గంటలు"</string>
+    <string name="dvr_main_recent" msgid="2553805424822806495">"ఇటీవలివి"</string>
+    <string name="dvr_main_scheduled" msgid="7837260963086408492">"షెడ్యూల్ చేసినవి"</string>
+    <string name="dvr_main_series" msgid="8278256687595691676">"సిరీస్"</string>
+    <string name="dvr_main_others" msgid="2970835573614038153">"ఇతరం"</string>
+    <string name="dvr_msg_cannot_record_channel" msgid="6836291367918532447">"ఛానెల్‌ను రికార్డ్ చేయడం సాధ్యపడదు."</string>
+    <string name="dvr_msg_cannot_record_program" msgid="4184046342810946090">"కార్యక్రమాన్ని రికార్డ్ చేయడం సాధ్యపడదు."</string>
+    <string name="dvr_msg_program_scheduled" msgid="3800847542300367572">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> రికార్డ్ చేయడం కోసం షెడ్యూల్ చేయబడింది"</string>
+    <string name="dvr_msg_current_program_scheduled" msgid="2505247201782991463">"ఇప్పటి నుండి <xliff:g id="ENDTIME">%2$s</xliff:g> వరకు <xliff:g id="PROGRAMNAME">%1$s</xliff:g> రికార్డ్ చేస్తుంది"</string>
+    <string name="dvr_full_schedule_card_view_title" msgid="7198521806965950089">"పూర్తి షెడ్యూల్"</string>
+    <plurals name="dvr_full_schedule_card_view_content" formatted="false" msgid="790788122541080768">
+      <item quantity="other">తదుపరి %1$d రోజులు</item>
+      <item quantity="one">తదుపరి %1$d రోజు</item>
+    </plurals>
+    <plurals name="dvr_program_duration" formatted="false" msgid="6742119148312354741">
+      <item quantity="other">%1$d నిమిషాలు</item>
+      <item quantity="one">%1$d నిమిషం</item>
+    </plurals>
+    <plurals name="dvr_count_new_recordings" formatted="false" msgid="3569310208305402815">
+      <item quantity="other">%1$d కొత్త రికార్డింగ్‌లు</item>
+      <item quantity="one">%1$d కొత్త రికార్డింగ్</item>
+    </plurals>
+    <plurals name="dvr_count_recordings" formatted="false" msgid="7417379223468131391">
+      <item quantity="other">%1$d రికార్డింగ్‌లు</item>
+      <item quantity="one">%1$d రికార్డింగ్</item>
+    </plurals>
+    <plurals name="dvr_count_scheduled_recordings" formatted="false" msgid="1650330290765214511">
+      <item quantity="other">%1$d రికార్డింగ్‌లు చేయాలి</item>
+      <item quantity="one">%1$d రికార్డింగ్ చేయాలి</item>
+    </plurals>
+    <string name="dvr_detail_watch" msgid="7085694764364338215">"చూడండి"</string>
+    <string name="dvr_detail_play_from_beginning" msgid="8475543568260411836">"మొదటి నుండి ప్లే చేయి"</string>
+    <string name="dvr_detail_resume_play" msgid="875591300274416373">"ప్లే చేయడం కొనసాగించు"</string>
+    <string name="dvr_detail_delete" msgid="4535881013528321898">"తొలగించు"</string>
+    <string name="dvr_detail_series_delete" msgid="4831926831670312674">"రికార్డింగ్‌లను తొలగించు"</string>
+    <string name="dvr_detail_series_resume" msgid="6935136228671386246">"పునఃప్రారంభించు"</string>
+    <string name="dvr_detail_series_season_title" msgid="5474850936497854790">"సీజన్ <xliff:g id="SEASON_NUMBER">%1$s</xliff:g>"</string>
+    <string name="dvr_detail_view_schedule" msgid="7137536927421904426">"షెడ్యూల్ చూడండి"</string>
+    <string name="dvr_detail_read_more" msgid="2588920758094498544">"మరింత చదవండి"</string>
+    <string name="dvr_series_deletion_title" msgid="7672649492494507574">"రికార్డింగ్‌లు తొలగించు"</string>
+    <string name="dvr_series_deletion_description" msgid="994839237906552969">"మీరు తొలగించాలనుకునే ఎపిసోడ్‌లను ఎంచుకోండి. వీటిని ఒకసారి తొలగించాక తిరిగి పునరుద్ధరించలేరు."</string>
+    <string name="dvr_series_deletion_no_recordings" msgid="481210819034514">"తొలగించడానికి రికార్డింగ్‌లు ఏవీ లేవు."</string>
+    <string name="dvr_series_select_watched" msgid="3608122404146716502">"చూసిన ఎపిసోడ్‌లను ఎంచుకోండి"</string>
+    <string name="dvr_series_select_all" msgid="5415749261739544048">"అన్ని ఎపిసోడ్‌లను ఎంచుకోండి"</string>
+    <string name="dvr_series_deselect_all" msgid="1680395960166387572">"అన్ని ఎపిసోడ్‌ల ఎంపిక తీసివేయి"</string>
+    <string name="dvr_series_watched_info_minutes" msgid="5656926431901526030">"<xliff:g id="DURATION">%2$d</xliff:g> నిమిషాల్లో <xliff:g id="WATCHED">%1$d</xliff:g> సమయం చూసారు"</string>
+    <string name="dvr_series_watched_info_seconds" msgid="2667537184197566662">"<xliff:g id="DURATION">%2$d</xliff:g> సెకన్లలో <xliff:g id="WATCHED">%1$d</xliff:g> సమయం చూసారు"</string>
+    <string name="dvr_series_never_watched" msgid="6086008065876122655">"ఎప్పుడూ చూడలేదు"</string>
+    <plurals name="dvr_msg_episodes_deleted" formatted="false" msgid="5627112959798353905">
+      <item quantity="other">%2$dలో %1$d ఎపిసోడ్‌లు తొలగించబడ్డాయి</item>
+      <item quantity="one">%2$dలో %1$d ఎపిసోడ్ తొలగించబడింది</item>
+    </plurals>
+    <string name="dvr_series_settings_priority" msgid="5836437092774185710">"ప్రాధాన్యత"</string>
+    <string name="dvr_series_settings_priority_highest" msgid="1072006447796648382">"అత్యధికం"</string>
+    <string name="dvr_series_settings_priority_lowest" msgid="6003996497908810225">"అతి తక్కువ"</string>
+    <string name="dvr_series_settings_priority_rank" msgid="667778382820956116">"వద్దు. <xliff:g id="RANK">%1$d</xliff:g>"</string>
+    <string name="dvr_series_settings_channels" msgid="3164900110165729909">"ఛానెల్‌లు"</string>
+    <string name="dvr_series_settings_channels_all" msgid="656434955168572976">"ఏదైనా"</string>
+    <string name="dvr_priority_title" msgid="1537886929061487213">"ప్రాధాన్యతను ఎంచుకోండి"</string>
+    <string name="dvr_priority_description" msgid="8362040921417154645">"ఒకే సమయంలో చాలా ఎక్కువ కార్యక్రమాలు రికార్డ్ చేయాల్సినప్పుడు, అధిక ప్రాధాన్యతలు గలవి మాత్రమే రికార్డ్ చేయబడతాయి."</string>
+    <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"సేవ్ చేయి"</string>
+    <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"ఒక పర్యాయ రికార్డింగ్‌లు అత్యధిక ప్రాధాన్యతను కలిగి ఉంటాయి"</string>
+    <string name="dvr_action_cancel" msgid="8094060199570272625">"రద్దు చేయి"</string>
+    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"రద్దు చేయి"</string>
+    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"విస్మరించు"</string>
+    <string name="dvr_action_stop" msgid="1378723485295471381">"ఆపివేయి"</string>
+    <string name="dvr_action_view_schedules" msgid="7442990695392774263">"రికార్డింగ్ షెడ్యూల్ చూడండి"</string>
+    <string name="dvr_action_record_episode" msgid="8596182676610326327">"ఈ ఒక్క కార్యక్రమం"</string>
+    <string name="dvr_action_record_episode_from_now_description" msgid="5125122951529985697">"ఇప్పటి నుండి - <xliff:g id="ENDTIME">%1$s</xliff:g> వరకు"</string>
+    <string name="dvr_action_record_series" msgid="8501991316179436899">"మొత్తం సిరీస్…"</string>
+    <string name="dvr_action_record_anyway" msgid="991470058034937231">"ఏదేమైనా షెడ్యూల్ చేయి"</string>
+    <string name="dvr_action_record_instead" msgid="6821164728752215738">"బదులుగా దీన్ని రికార్డ్ చేయి"</string>
+    <string name="dvr_action_record_cancel" msgid="8644254745772185288">"ఈ రికార్డింగ్‌ను రద్దు చేయి"</string>
+    <string name="dvr_action_watch_now" msgid="7181211920959075976">"ఇప్పుడే చూడండి"</string>
+    <string name="dvr_epg_program_recordable" msgid="609229576209476903">"రికార్డ్ చేయవచ్చు"</string>
+    <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"రికార్డింగ్ షెడ్యూల్ చేయబడింది"</string>
+    <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"రికార్డింగ్ వైరుధ్యం"</string>
+    <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"రికార్డ్ అవుతోంది"</string>
+    <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"రికార్డింగ్ విఫలమైంది"</string>
+    <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"రికార్డింగ్ షెడ్యూళ్లను రూపొందించడానికి కార్యక్రమాలను చదువుతోంది"</string>
+    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"కార్యక్రమాలను చదువుతోంది"</string>
+    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
+    <skip />
+    <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVRకు మరింత నిల్వ అవసరం"</string>
+    <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"మీరు DVRతో కార్యక్రమాలను రికార్డ్ చేయగలుగుతారు. అయితే, ప్రస్తుతం DVR పని చేయడానికి మీ పరికరంలో తగినంత నిల్వ ఖాళీ లేదు. దయచేసి <xliff:g id="STORAGE_SIZE">%1$s</xliff:g>GB లేదా అంతకంటే ఎక్కువ ఖాళీ స్థలం గల బయటి డ్రైవ్‌ను కనెక్ట్ చేసి, ఆపై దాన్ని పరికర నిల్వగా ఫార్మాట్ చేయడానికి సూచనలను అనుసరించండి."</string>
+    <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"నిల్వ కనిపించడం లేదు"</string>
+    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"DVR ద్వారా ఉపయోగించబడిన కొంత నిల్వ కనిపించడం లేదు. దయచేసి DVRని పునఃప్రారంభించడానికి మీరు ఇంతకుముందు ఉపయోగించిన బయటి డిస్క్‌ను కనెక్ట్ చేయండి. లేదంటే, అది అందుబాటులో లేని పక్షంలో మీరు ఆ నిల్వను విస్మరించమని ఎంచుకోవచ్చు."</string>
+    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"నిల్వను విస్మరించాలా?"</string>
+    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"మీ మొత్తం రికార్డ్ చేసిన కంటెంట్‌ను మరియు షెడ్యూల్‌లను కోల్పోతారు."</string>
+    <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"రికార్డింగ్ ఆపివేయాలా?"</string>
+    <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"రికార్డ్ అయిన కంటెంట్ సేవ్ చేయబడుతుంది."</string>
+    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
+    <skip />
+    <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"రికార్డింగ్ షెడ్యూల్ చేయబడింది కానీ మిగిలిన వాటితో వైరుధ్యాలను కలిగి ఉంది"</string>
+    <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"రికార్డింగ్ ప్రారంభమైంది, కానీ వైరుధ్యాలను కలిగి ఉంది"</string>
+    <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> రికార్డ్ చేయబడుతుంది."</string>
+    <string name="dvr_channel_conflict_dialog_description_prefix" msgid="212344250779878791">"<xliff:g id="CHANNELNAME">%1$s</xliff:g> రికార్డ్ అవుతోంది."</string>
+    <string name="dvr_program_conflict_dialog_description_1" msgid="2278200346765501164">"<xliff:g id="CONFLICTPROGRAMNAME">%1$s</xliff:g>లో కొన్ని భాగాలు రికార్డ్ చేయబడవు."</string>
+    <string name="dvr_program_conflict_dialog_description_2" msgid="5648524408147235696">"<xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g> మరియు <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g>లో కొన్ని భాగాలు రికార్డ్ చేయబడవు."</string>
+    <string name="dvr_program_conflict_dialog_description_3" msgid="6879199850098595108">"<xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g>లో కొన్ని భాగాలు మరియు మరొక షెడ్యూల్ రికార్డ్ చేయబడవు."</string>
+    <plurals name="dvr_program_conflict_dialog_description_many" formatted="false" msgid="1008340710252647947">
+      <item quantity="other"><xliff:g id="CONFLICTPROGRAMNAME_1_2">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_3">%2$s</xliff:g>లో కొన్ని భాగాలు మరియు మరో %3$d షెడ్యూల్‌లు రికార్డ్ చేయబడవు.</item>
+      <item quantity="one"><xliff:g id="CONFLICTPROGRAMNAME_1_0">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_1">%2$s</xliff:g>లో కొన్ని భాగాలు మరియు మరో %3$d షెడ్యూల్ రికార్డ్ చేయబడవు.</item>
+    </plurals>
+    <string name="dvr_schedule_dialog_title" msgid="5235629824986156058">"మీరు ఏమి రికార్డ్ చేయాలనుకుంటున్నారు?"</string>
+    <string name="dvr_channel_record_duration_dialog_title" msgid="4601361040431047918">"మీరు ఎంత సమయం రికార్డ్ చేయాలనుకుంటున్నారు?"</string>
+    <string name="dvr_already_scheduled_dialog_title" msgid="4525318291210934311">"ఇప్పటికే షెడ్యూల్ చేయబడింది"</string>
+    <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"ఇదే కార్యక్రమం ఇప్పటికే <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g>కి రికార్డ్ చేయడానికి షెడ్యూల్ చేయబడింది."</string>
+    <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"ఇప్పటికే రికార్డ్ అయింది"</string>
+    <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"ఈ ప్రోగ్రామ్ ఇప్పటికే రికార్డ్ అయింది. ఇది DVR లైబ్రరీలో అందుబాటులో ఉంది."</string>
+    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
+    <skip />
+    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_program_not_found" msgid="3282879532038010202">"రికార్డ్ చేసిన కార్యక్రమం కనుగొనబడలేదు."</string>
+    <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"సంబంధిత రికార్డింగ్‌లు"</string>
+    <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(కార్యక్రమం వివరణ లేదు)"</string>
+    <plurals name="dvr_schedules_section_subtitle" formatted="false" msgid="9180744010405976007">
+      <item quantity="other">%1$d రికార్డింగ్‌లు</item>
+      <item quantity="one">%1$d రికార్డింగ్</item>
+    </plurals>
+    <string name="dvr_schedules_information_separator" msgid="1669116853379998479">" / "</string>
+    <string name="dvr_schedules_deletion_info" msgid="2837586459900271031">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> రికార్డింగ్ షెడ్యూల్ నుండి తీసివేయబడింది"</string>
+    <string name="dvr_schedules_tuner_conflict_will_be_partially_recorded" msgid="5280490298546908729">"ట్యూనర్ వైరుధ్యాల కారణంగా పాక్షికంగా రికార్డ్ చేయబడుతుంది."</string>
+    <string name="dvr_schedules_tuner_conflict_will_not_be_recorded_info" msgid="5065400564003201095">"ట్యూనర్ వైరుధ్యాల కారణంగా రికార్డ్ చేయబడదు."</string>
+    <string name="dvr_schedules_empty_state" msgid="1291529283469462741">"ఇంకా షెడ్యూల్ చేసిన రికార్డింగ్‌లు ఏవీ లేవు.\nమీరు కార్యక్రమాల గైడ్ నుండి రికార్డింగ్‌ను షెడ్యూల్ చేయవచ్చు."</string>
+    <plurals name="dvr_series_schedules_header_description" formatted="false" msgid="9077188267856194114">
+      <item quantity="other">%1$d రికార్డింగ్ వైరుధ్యాలు ఉన్నాయి</item>
+      <item quantity="one">%1$d రికార్డింగ్ వైరుధ్యం ఉంది</item>
+    </plurals>
+    <string name="dvr_series_schedules_settings" msgid="4868501926847903985">"సిరీస్ సెట్టింగ్‌లు"</string>
+    <string name="dvr_series_schedules_start" msgid="8458768834047133835">"సిరీస్ రికార్డింగ్ ఆరంభించు"</string>
+    <string name="dvr_series_schedules_stop" msgid="3427479298317584961">"సిరీస్ రికార్డింగ్ ఆపివేయి"</string>
+    <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"సిరీస్ రికార్డింగ్‌ను ఆపివేయాలా?"</string>
+    <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"రికార్డ్ అయిన ఎపిసోడ్‌లు DVR లైబ్రరీలో అలాగే అందుబాటులో ఉంటాయి."</string>
+    <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"ఆపివేయి"</string>
+    <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"ఎపిసోడ్‌లు ఏవీ అందుబాటులో లేవు.\nఇవి అందుబాటులోకి వచ్చిన వెంటనే రికార్డ్ చేయబడతాయి."</string>
+    <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
+      <item quantity="other">(%1$d నిమిషాలు)</item>
+      <item quantity="one">(%1$d నిమిషం) </item>
+    </plurals>
+    <string name="dvr_date_today" msgid="7691050705354303471">"ఈ రోజు"</string>
+    <string name="dvr_date_tomorrow" msgid="4136735681186981844">"రేపు"</string>
+    <string name="dvr_date_yesterday" msgid="2127672919053118239">"నిన్న"</string>
+    <string name="dvr_date_today_time" msgid="8359696776305244535">"<xliff:g id="TIME_RANGE">%1$s</xliff:g> ఈ రోజు"</string>
+    <string name="dvr_date_tomorrow_time" msgid="8364654556105292594">"<xliff:g id="TIME_RANGE">%1$s</xliff:g> రేపు"</string>
+    <string name="program_guide_critic_score" msgid="340530743913585150">"స్కోర్"</string>
 </resources>
