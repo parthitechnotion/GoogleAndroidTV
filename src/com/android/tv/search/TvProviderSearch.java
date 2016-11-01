@@ -28,6 +28,7 @@ import android.media.tv.TvContract.WatchedPrograms;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
@@ -54,8 +55,8 @@ import java.util.Set;
  * An implementation of {@link SearchInterface} to search query from TvProvider directly.
  */
 public class TvProviderSearch implements SearchInterface {
-    private static final boolean DEBUG = false;
     private static final String TAG = "TvProviderSearch";
+    private static final boolean DEBUG = false;
 
     private static final int NO_LIMIT = 0;
 
@@ -159,6 +160,8 @@ public class TvProviderSearch implements SearchInterface {
 
     @WorkerThread
     private List<SearchResult> searchChannels(String query, Set<Long> channels, int limit) {
+        if (DEBUG) Log.d(TAG, "Searching channels: '" + query + "'");
+        long time = SystemClock.elapsedRealtime();
         List<SearchResult> results = new ArrayList<>();
         if (TextUtils.isDigitsOnly(query)) {
             results.addAll(searchChannels(query, new String[] { Channels.COLUMN_DISPLAY_NUMBER },
@@ -177,6 +180,10 @@ public class TvProviderSearch implements SearchInterface {
         }
         for (SearchResult result : results) {
             fillProgramInfo(result);
+        }
+        if (DEBUG) {
+            Log.d(TAG, "Found " + results.size() + " channels. Elapsed time for searching" +
+                    " channels: " + (SystemClock.elapsedRealtime() - time) + "(msec)");
         }
         return results;
     }
@@ -305,6 +312,8 @@ public class TvProviderSearch implements SearchInterface {
     @WorkerThread
     private List<SearchResult> searchPrograms(String query, String[] columnForExactMatching,
             String[] columnForPartialMatching, Set<Long> channelsFound, int limit) {
+        if (DEBUG) Log.d(TAG, "Searching programs: '" + query + "'");
+        long time = SystemClock.elapsedRealtime();
         Assert.assertTrue(
                 (columnForExactMatching != null && columnForExactMatching.length > 0) ||
                 (columnForPartialMatching != null && columnForPartialMatching.length > 0));
@@ -395,6 +404,10 @@ public class TvProviderSearch implements SearchInterface {
                 }
             }
         }
+        if (DEBUG) {
+            Log.d(TAG, "Found " + searchResults.size() + " programs. Elapsed time for searching" +
+                    " programs: " + (SystemClock.elapsedRealtime() - time) + "(msec)");
+        }
         return searchResults;
     }
 
@@ -420,9 +433,8 @@ public class TvProviderSearch implements SearchInterface {
     }
 
     private List<SearchResult> searchInputs(String query, int limit) {
-        if (DEBUG) {
-            Log.d(TAG, "searchInputs(" + query + ", limit=" + limit + ")");
-        }
+        if (DEBUG) Log.d(TAG, "Searching inputs: '" + query + "'");
+        long time = SystemClock.elapsedRealtime();
 
         query = canonicalizeLabel(query);
         List<TvInputInfo> inputList = mTvInputManager.getTvInputList();
@@ -435,6 +447,11 @@ public class TvProviderSearch implements SearchInterface {
             if (TextUtils.equals(query, label) || TextUtils.equals(query, customLabel)) {
                 results.add(buildSearchResultForInput(input.getId()));
                 if (results.size() >= limit) {
+                    if (DEBUG) {
+                        Log.d(TAG, "Found " + results.size() + " inputs. Elapsed time for" +
+                                " searching inputs: " + (SystemClock.elapsedRealtime() - time) +
+                                "(msec)");
+                    }
                     return results;
                 }
             }
@@ -448,9 +465,18 @@ public class TvProviderSearch implements SearchInterface {
                     (customLabel != null && customLabel.contains(query))) {
                 results.add(buildSearchResultForInput(input.getId()));
                 if (results.size() >= limit) {
+                    if (DEBUG) {
+                        Log.d(TAG, "Found " + results.size() + " inputs. Elapsed time for" +
+                                " searching inputs: " + (SystemClock.elapsedRealtime() - time) +
+                                "(msec)");
+                    }
                     return results;
                 }
             }
+        }
+        if (DEBUG) {
+            Log.d(TAG, "Found " + results.size() + " inputs. Elapsed time for searching" +
+                    " inputs: " + (SystemClock.elapsedRealtime() - time) + "(msec)");
         }
         return results;
     }
