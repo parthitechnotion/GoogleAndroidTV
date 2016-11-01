@@ -31,7 +31,6 @@
     <string name="play_controls_description_skip_previous" msgid="3858447678278021381">"មុន"</string>
     <string name="channels_item_program_guide" msgid="2889807207930678418">"ការ​ណែនាំ​កម្មវិធី"</string>
     <string name="channels_item_setup" msgid="6557412175737379022">"មានប៉ុស្តិ៍ថ្មី"</string>
-    <string name="channels_item_app_link_no_app_link" msgid="1884830234777824408">"មិនមានតំណទេ"</string>
     <string name="channels_item_app_link_app_launcher" msgid="1395352122187670523">"បើក <xliff:g id="APP_NAME">%1$s</xliff:g>"</string>
     <string name="options_item_closed_caption" msgid="5945274655046367170">"ចំណងជើង​បិទ"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"របៀប​បង្ហាញ"</string>
@@ -124,6 +123,7 @@
     <string name="option_subrating_header" msgid="4637961301549615855">"ការ​វាយ​តម្លៃ​រង"</string>
     <string name="pin_enter_unlock_channel" msgid="4797922378296393173">"បញ្ចូល​កូដ PIN របស់​អ្នក​ដើម្បី​មើល​​ឆានែល​នេះ"</string>
     <string name="pin_enter_unlock_program" msgid="7311628843209871203">"បញ្ចូល​កូដ PIN របស់​អ្នក​ដើម្បី​មើល​កម្មវិធី​នេះ"</string>
+    <string name="pin_enter_unlock_dvr" msgid="1637468108723176684">"កម្មវិធីនេះត្រូវបានវាយតម្លៃ <xliff:g id="RATING">%1$s</xliff:g>។ បញ្ចូលកូដ PIN របស់អ្នកដើម្បីមើលកម្មវិធីនេះ"</string>
     <string name="pin_enter_pin" msgid="249314665028035038">"បញ្ចូល​កូដ PIN របស់​អ្នក"</string>
     <string name="pin_enter_create_pin" msgid="3385754356793309946">"ដើម្បី​កំណត់​ការ​ពិនិត្យ​របស់​ឪពុកម្ដាយ អ្នក​ត្រូវ​បង្កើត​កូដ PIN"</string>
     <string name="pin_enter_new_pin" msgid="1739471585849790384">"បញ្ចូល​កូដ PIN ថ្មី"</string>
@@ -144,8 +144,6 @@
     <string name="settings_menu_licenses" msgid="1257646083838406103">"អាជ្ញាប័ណ្ណប្រភពកូដបើកចំហ"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"អាជ្ញាប័ណ្ណប្រភពកូដចំហ"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"កំណែ"</string>
-    <string name="about_menu_improve" msgid="3712578027009311401">"ជួយធ្វើឲ្យប៉ុស្តិ៍ផ្សាយផ្ទាល់ប្រសើងជាងមុន"</string>
-    <string name="about_menu_improve_summary" msgid="7548489011760588571">"ចែករំលែកទិន្នន័យវិនិច្ឆ័យ និងទិន្នន័យប្រើប្រាស់អនាមិកជាមួយ Google នោះយើងនឹងអាចធ្វើឲ្យប៉ុស្តិ៍ផ្សាយបន្តផ្ទាល់ប្រសើរឡើង និងទប់ស្កាត់បញ្ហាដូចជា៖ ការគាំង និងការមិនដំណើរការជាដើម។"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ដើម្បី​មើល​ឆានែល​នេះ អ្នក​ត្រូវ​ចុច​កណ្ដុរស្ដាំ រួច​បញ្ចូល​កូដ PIN របស់​អ្នក"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"ដើម្បី​មើល​កម្មវិធី​នេះ អ្នក​ត្រូវ​ចុច​កណ្ដុរស្ដាំ រួច​បញ្ចូល​កូដ PIN របស់​អ្នក"</string>
     <string name="tvview_content_locked_format" msgid="3741874636031338247">"កម្មវិធីនេះត្រូវបានវាយតម្លៃ <xliff:g id="RATING">%1$s</xliff:g>។\n ដើម្បីមើលកម្មវិធីនេះ សូមចុច ស្តាំ រួចបញ្ចូលកូដ PIN របស់អ្នក។"</string>
@@ -157,6 +155,10 @@
     <string name="tvview_msg_audio_only" msgid="1356866203687173329">"តែ​អូឌីយ៉ូ​ប៉ុណ្ណោះ"</string>
     <string name="tvview_msg_weak_signal" msgid="1095050812622908976">"សញ្ញា​ខ្សោយ"</string>
     <string name="tvview_msg_no_internet_connection" msgid="7655994401188888231">"គ្មានការតភ្ជាប់អ៊ីនធឺណិតទេ"</string>
+    <plurals name="tvview_msg_input_no_resource" formatted="false" msgid="8581894855153658823">
+      <item quantity="other">ប៉ុស្តិ៍នេះមិនអាចចាក់បានទេរហូតដល់ម៉ោង <xliff:g id="END_TIME_1">%1$s</xliff:g> ដោយសារតែប៉ុស្តិ៍ផ្សេងទៀតកំពុងត្រូវបានថត។ \n\nចុច ស្តាំ ដើម្បីកែសម្រួលកាលវិភាគថត។</item>
+      <item quantity="one">ប៉ុស្តិ៍នេះមិនអាចចាក់បានទេរហូតដល់ម៉ោង <xliff:g id="END_TIME_0">%1$s</xliff:g> ដោយសារតែប៉ុស្តិ៍ផ្សេងទៀតកំពុងត្រូវបានថត។ \n\nចុច ស្តាំ ដើម្បីកែសម្រួលកាលវិភាគថត។</item>
+    </plurals>
     <string name="channel_banner_no_title" msgid="8660301979190693176">"គ្មាន​ចំណងជើង"</string>
     <string name="channel_banner_locked_channel_title" msgid="2006564967318945980">"បាន​ទប់​ស្កាត់​ឆានែល"</string>
     <string name="setup_category_new" msgid="2899355289563443627">"ថ្មី"</string>
@@ -168,8 +170,8 @@
     <string name="setup_input_no_channels" msgid="1669327912393163331">"មិនមានប៉ុស្តិ៍ទេ"</string>
     <string name="setup_input_new" msgid="3337725672277046798">"ថ្មី"</string>
     <string name="setup_input_setup_now" msgid="1772000402336958967">"មិន​បាន​កំណត់"</string>
-    <string name="setup_play_store_action_title" msgid="859347291072224673">"ទទួលយកប្រភពច្រើនទៀត"</string>
-    <string name="setup_play_store_action_description" msgid="2472226338824629506">"រុករកកម្មវិធីដែលមានផ្តល់ជូនប៉ុស្តិ៍ផ្សាយផ្ទាល់"</string>
+    <string name="setup_store_action_title" msgid="4083402039720973414">"ទទួលយកប្រភពច្រើនទៀត"</string>
+    <string name="setup_store_action_description" msgid="6820482635042445297">"រុករកកម្មវិធីដែលមានផ្តល់ជូនប៉ុស្តិ៍ផ្សាយផ្ទាល់"</string>
     <string name="new_sources_title" msgid="3878933676500061895">"មានផ្តល់ជូនប្រភពប៉ុស្តិ៍ថ្មី"</string>
     <string name="new_sources_description" msgid="749649005588426813">"ប្រភពប៉ុស្តិ៍ថ្មីមានប៉ុស្តិ៍ដែលត្រូវផ្តល់ជូន។\nដំឡើងប៉ុស្តិ៍ទាំងនោះឥឡូវនេះ ឬដំឡើងពេលក្រោយនៅក្នុងការកំណត់ប្រភពប៉ុស្តិ៍។"</string>
     <string name="new_sources_action_setup" msgid="177693761664016811">"ដំឡើងឥឡូវនេះ"</string>
@@ -187,8 +189,162 @@
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"រាល់​​ឆានែល​ប្រភព​គឺ​​លាក់​។ \n ជ្រើស​ឆា​នែ​ល​យ៉ាង​ហោច​ណាស់​មួយ​​ដើម្បី​​មើល​។"</string>
     <string name="msg_channel_unavailable_unknown" msgid="765586450831081871">"មិនបានរំពឹងថាមិនមានវីដេអូនេះទេ"</string>
     <string name="msg_back_key_guide" msgid="7404682718828721924">"ប៊ូតុង​ថយក្រោយ​សម្រាប់​ឧបករណ៍​ដែល​បាន​ភ្ជាប់។ ចុច​ប៊ូតុង​ដើម ដើម្បី​ចាកចេញ។"</string>
-    <string name="msg_not_supported_device" msgid="4469404625040284722">"ប៉ុស្តិ៍ផ្សាយផ្ទាល់មិនត្រូវបានគាំទ្រលើឧបករណ៍ដែលដំណើរការដោយ Android Lollipop នេះទេ។"</string>
     <string name="msg_read_tv_listing_permission_denied" msgid="8882813301235518909">"ប៉ុស្តិ៍ផ្សាយផ្ទាល់ត្រូវការសិទ្ធិអនុញ្ញាតដើម្បីអានបញ្ជីទូរទស្សន៍។"</string>
     <string name="setup_sources_text" msgid="4988039637873759839">"កំណត់ប្រភពរបស់អ្នក"</string>
     <string name="setup_sources_description" msgid="5695518946225445202">"ប៉ុស្តិ៍ផ្សាយផ្ទាល់ផ្សាភ្ជាប់បទពិសោធន៍ប្រើប្រាស់ប៉ុស្តិ៍ទូរទស្សន៍លក្ខណៈបុរាណជាមួយប៉ុស្តិ៍ស្រ្ទីមដែលផ្តល់ដោយកម្មវិធី។ \n\nចាប់ផ្តើមដោយកំណត់ប្រភពប៉ុស្តិ៍ដែលបានដំឡើងរួចហើយ។ ឬរុករកក្នុងហាង Google Play ដើម្បីរកកម្មវិធីច្រើនទៀតដែលផ្តល់ជូនប៉ុស្តិ៍ផ្សាយផ្ទាល់។"</string>
+    <string name="channels_item_dvr" msgid="8911915252648532469">"ការថត និងកាលវិភាក"</string>
+    <string name="recording_start_dialog_10_min_duration" msgid="5739636508245795292">"10 នាទី"</string>
+    <string name="recording_start_dialog_30_min_duration" msgid="4691127772622189977">"30 នាទី"</string>
+    <string name="recording_start_dialog_1_hour_duration" msgid="7159533207022355641">"1 ម៉ោង"</string>
+    <string name="recording_start_dialog_3_hours_duration" msgid="295984419320006238">"3 ម៉ោង"</string>
+    <string name="dvr_main_recent" msgid="2553805424822806495">"ថ្មីៗ"</string>
+    <string name="dvr_main_scheduled" msgid="7837260963086408492">"បាន​កំណត់​ពេល"</string>
+    <string name="dvr_main_series" msgid="8278256687595691676">"ស៊េរី"</string>
+    <string name="dvr_main_others" msgid="2970835573614038153">"ផ្សេងៗ"</string>
+    <string name="dvr_msg_cannot_record_channel" msgid="6836291367918532447">"មិនអាចថតប៉ុស្តិ៍នេះបានទេ"</string>
+    <string name="dvr_msg_cannot_record_program" msgid="4184046342810946090">"មិនអាចថតកម្មវិធីនេះបានទេ"</string>
+    <string name="dvr_msg_program_scheduled" msgid="3800847542300367572">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> ត្រូវបានកំណត់ពេលដើម្បីថត"</string>
+    <string name="dvr_msg_current_program_scheduled" msgid="2505247201782991463">"ការថត <xliff:g id="PROGRAMNAME">%1$s</xliff:g> ពីឥឡូវនេះដល់ <xliff:g id="ENDTIME">%2$s</xliff:g>"</string>
+    <string name="dvr_full_schedule_card_view_title" msgid="7198521806965950089">"កាលវិភាគពេញហើយ"</string>
+    <plurals name="dvr_full_schedule_card_view_content" formatted="false" msgid="790788122541080768">
+      <item quantity="other">%1$d ថ្ងៃបន្ទាប់</item>
+      <item quantity="one">%1$d ថ្ងៃបន្ទាប់</item>
+    </plurals>
+    <plurals name="dvr_program_duration" formatted="false" msgid="6742119148312354741">
+      <item quantity="other">%1$d នាទី</item>
+      <item quantity="one">%1$d នាទី</item>
+    </plurals>
+    <plurals name="dvr_count_new_recordings" formatted="false" msgid="3569310208305402815">
+      <item quantity="other">ការថតថ្មី %1$d</item>
+      <item quantity="one">ការថតថ្មី %1$d</item>
+    </plurals>
+    <plurals name="dvr_count_recordings" formatted="false" msgid="7417379223468131391">
+      <item quantity="other">ការថត %1$d</item>
+      <item quantity="one">ការថត %1$d</item>
+    </plurals>
+    <plurals name="dvr_count_scheduled_recordings" formatted="false" msgid="1650330290765214511">
+      <item quantity="other">ការថតដែលបានកំណត់ពេល %1$d</item>
+      <item quantity="one">ការថតដែលបានកំណត់ពេល %1$d</item>
+    </plurals>
+    <string name="dvr_detail_watch" msgid="7085694764364338215">"ទស្សនា"</string>
+    <string name="dvr_detail_play_from_beginning" msgid="8475543568260411836">"ចាក់ពីដំបូង"</string>
+    <string name="dvr_detail_resume_play" msgid="875591300274416373">"ចាក់​បន្ត"</string>
+    <string name="dvr_detail_delete" msgid="4535881013528321898">"លុប"</string>
+    <string name="dvr_detail_series_delete" msgid="4831926831670312674">"លុបការថត"</string>
+    <string name="dvr_detail_series_resume" msgid="6935136228671386246">"បន្ត"</string>
+    <string name="dvr_detail_series_season_title" msgid="5474850936497854790">"វគ្គ <xliff:g id="SEASON_NUMBER">%1$s</xliff:g>"</string>
+    <string name="dvr_detail_view_schedule" msgid="7137536927421904426">"មើលកាលវិភាគ"</string>
+    <string name="dvr_detail_read_more" msgid="2588920758094498544">"អាន​បន្ថែម"</string>
+    <string name="dvr_series_deletion_title" msgid="7672649492494507574">"លុបការថត"</string>
+    <string name="dvr_series_deletion_description" msgid="994839237906552969">"ជ្រើសភាគដែលអ្នកចង់លុប។ ពួកវាមិនអាចស្តារឡើវិញបានទេបន្ទាប់ពីលុបរួចហើយ។"</string>
+    <string name="dvr_series_deletion_no_recordings" msgid="481210819034514">"មិនមានការថតដែលត្រូវលុបទេ"</string>
+    <string name="dvr_series_select_watched" msgid="3608122404146716502">"ជ្រើសភាគដែលបានមើល"</string>
+    <string name="dvr_series_select_all" msgid="5415749261739544048">"ជ្រើសភាគទាំងអស់"</string>
+    <string name="dvr_series_deselect_all" msgid="1680395960166387572">"ដោះការជ្រើសភាគទាំងអស់"</string>
+    <string name="dvr_series_watched_info_minutes" msgid="5656926431901526030">"បានមើល <xliff:g id="WATCHED">%1$d</xliff:g> នៅនាទីទី <xliff:g id="DURATION">%2$d</xliff:g>"</string>
+    <string name="dvr_series_watched_info_seconds" msgid="2667537184197566662">"បានមើល <xliff:g id="WATCHED">%1$d</xliff:g> នៅវិនាទីទី <xliff:g id="DURATION">%2$d</xliff:g>"</string>
+    <string name="dvr_series_never_watched" msgid="6086008065876122655">"មិនដែលមើល"</string>
+    <plurals name="dvr_msg_episodes_deleted" formatted="false" msgid="5627112959798353905">
+      <item quantity="other">ភាគចំនួន %1$d ក្នុងចំណោម %2$d ត្រូវបានលុប</item>
+      <item quantity="one">ភាគចំនួន %1$d ក្នុងចំណោម %2$d ត្រូវបានលុប</item>
+    </plurals>
+    <string name="dvr_series_settings_priority" msgid="5836437092774185710">"អាទិភាព"</string>
+    <string name="dvr_series_settings_priority_highest" msgid="1072006447796648382">"ខ្ពស់បំផុត"</string>
+    <string name="dvr_series_settings_priority_lowest" msgid="6003996497908810225">"ទាបបំផុត"</string>
+    <string name="dvr_series_settings_priority_rank" msgid="667778382820956116">"លេខ <xliff:g id="RANK">%1$d</xliff:g>"</string>
+    <string name="dvr_series_settings_channels" msgid="3164900110165729909">"ប៉ុស្តិ៍"</string>
+    <string name="dvr_series_settings_channels_all" msgid="656434955168572976">"មួយណាក៏បាន"</string>
+    <string name="dvr_priority_title" msgid="1537886929061487213">"ជ្រើសអាទិភាព"</string>
+    <string name="dvr_priority_description" msgid="8362040921417154645">"នៅពេលដែលមានកម្មវិធីដែលត្រូវថតច្រើនពេកក្នុងពេលតែមួយ នោះមានតែកម្មវិធីដែលមានអាទិភាពខ្ពស់ជាងប៉ុណ្ណោះដែលនឹងត្រូវថត។"</string>
+    <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"រក្សាទុក"</string>
+    <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"ការថតមួយដងមានអាទិភាពខ្ពស់បំផុត"</string>
+    <string name="dvr_action_cancel" msgid="8094060199570272625">"បោះបង់"</string>
+    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"បោះបង់"</string>
+    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"បំភ្លេច"</string>
+    <string name="dvr_action_stop" msgid="1378723485295471381">"បញ្ឈប់"</string>
+    <string name="dvr_action_view_schedules" msgid="7442990695392774263">"មើលកាលវិភាគថត"</string>
+    <string name="dvr_action_record_episode" msgid="8596182676610326327">"កម្មវិធីមួយនេះ"</string>
+    <string name="dvr_action_record_episode_from_now_description" msgid="5125122951529985697">"ឥឡូវនេះ - <xliff:g id="ENDTIME">%1$s</xliff:g>"</string>
+    <string name="dvr_action_record_series" msgid="8501991316179436899">"វគ្គទាំងមូល…"</string>
+    <string name="dvr_action_record_anyway" msgid="991470058034937231">"កាលវិភាគទោះយ៉ាងណាក៏ដោយ"</string>
+    <string name="dvr_action_record_instead" msgid="6821164728752215738">"ថតកម្មវិធីនេះជំនួសវិញ"</string>
+    <string name="dvr_action_record_cancel" msgid="8644254745772185288">"បោះបង់ការថតនេះ"</string>
+    <string name="dvr_action_watch_now" msgid="7181211920959075976">"មើលឥឡូវនេះ"</string>
+    <string name="dvr_epg_program_recordable" msgid="609229576209476903">"អាចថតបាន"</string>
+    <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"បានកំណត់ពេលការថត"</string>
+    <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"ការថតជាន់ម៉ោងគ្នា"</string>
+    <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"ការថត"</string>
+    <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"បានបរាជ័យក្នុងការថត"</string>
+    <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"កំពុងអានកម្មវិធីដើម្បីបង្កើតកាលវិភាគថត"</string>
+    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"កំពុងអានកម្មវិធី"</string>
+    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
+    <skip />
+    <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR ត្រូវការទំហំផ្ទុកបន្ថែមទៀត"</string>
+    <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"អ្នកនឹងអាចថតកម្មវិធីដោយប្រើ DVR។ ទោះបីជាយ៉ាងណាក៏ដោយ ឥឡូវនេះមិនមានទំហំផ្ទុកគ្រប់គ្រាន់នៅលើឧបករណ៍របស់អ្នកដើម្បីអនុញ្ញាតឲ្យ DVR ដំណើរការនោះទេ។ សូមភ្ជាប់ទៅឧបករណ៍ផ្ទុកខាងក្រៅដែលមានទំហំផ្ទុក <xliff:g id="STORAGE_SIZE">%1$s</xliff:g>GB ឬធំជាងនេះ បន្ទាប់មកអនុវត្តតាមជំហានទាំងនេះដើម្បីសម្អាតវាក្នុងនាមជាឧបករណ៍ផ្ទុក។"</string>
+    <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"ឧបករណ៍ផ្ទុកដែលបានបាត់"</string>
+    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"ឧបករណ៍ផ្ទុកមួយចំនួនដែលប្រើដោយ DVR បានបាត់បង់។ សូមភ្ជាប់ថាសផ្ទុកផ្នែកខាងក្រៅដែលអ្នកបានប្រើពីមុន ដើម្បីបើកដំណើរការ DVR ឡើងវិញ ឬអ្នកអាចជ្រើសរើសធ្វើការបំភ្លេចឧបករណ៍ផ្ទុកនេះ ប្រសិនបើវាមិនអាចប្រើបានតទៅទៀត។"</string>
+    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"បំភ្លេចឧបករណ៍ផ្ទុកឬ?"</string>
+    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"មាតិកា និងកាលវិភាគដែលបានថតទុករបស់អ្នកទាំងអស់នឹងបាត់បង់។"</string>
+    <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"បញ្ឈប់ការថតឬ?"</string>
+    <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"មាតិកាដែលបានថតនឹងត្រូវបានរក្សាទុក"</string>
+    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
+    <skip />
+    <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"ការថតបានកំណត់ពេលហើយ ប៉ុន្តែមានម៉ោងជាន់គ្នា"</string>
+    <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"ការថតបានចាប់ផ្តើមប៉ុន្តែវាជាន់គ្នា"</string>
+    <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> នឹងត្រូវបានថត។"</string>
+    <string name="dvr_channel_conflict_dialog_description_prefix" msgid="212344250779878791">"<xliff:g id="CHANNELNAME">%1$s</xliff:g> កំពុងត្រូវបានថត។"</string>
+    <string name="dvr_program_conflict_dialog_description_1" msgid="2278200346765501164">"ផ្នែកមួយចំនួននៃ <xliff:g id="CONFLICTPROGRAMNAME">%1$s</xliff:g> នឹងមិនត្រូវបានថតទេ។"</string>
+    <string name="dvr_program_conflict_dialog_description_2" msgid="5648524408147235696">"ផ្នែកមួយចំនួននៃ <xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g> និង <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g> នឹងមិនត្រូវបានថតទេ។"</string>
+    <string name="dvr_program_conflict_dialog_description_3" msgid="6879199850098595108">"ផ្នែកមួយចំនួននៃ <xliff:g id="CONFLICTPROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2">%2$s</xliff:g> និងកាលវិភាគមួយទៀតនឹងមិនត្រូវបានថតទេ។"</string>
+    <plurals name="dvr_program_conflict_dialog_description_many" formatted="false" msgid="1008340710252647947">
+      <item quantity="other">ផ្នែកមួយចំនួននៃ <xliff:g id="CONFLICTPROGRAMNAME_1_2">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_3">%2$s</xliff:g> និងកាលវិភាគ %3$d ទៀតនឹងមិនត្រូវបានថតទេ។</item>
+      <item quantity="one">ផ្នែកមួយចំនួននៃ <xliff:g id="CONFLICTPROGRAMNAME_1_0">%1$s</xliff:g>, <xliff:g id="CONFLICTPROGRAMNAME_2_1">%2$s</xliff:g> និងកាលវិភាគ %3$d ទៀតនឹងមិនត្រូវបានថតទេ។</item>
+    </plurals>
+    <string name="dvr_schedule_dialog_title" msgid="5235629824986156058">"តើអ្នកចង់ថតដែរទេ?"</string>
+    <string name="dvr_channel_record_duration_dialog_title" msgid="4601361040431047918">"តើអ្នកចង់ថតរយៈពេលប៉ុន្មានដែរ?"</string>
+    <string name="dvr_already_scheduled_dialog_title" msgid="4525318291210934311">"បានកំណត់ពេលរួចហើយ"</string>
+    <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"កម្មវិធីដូចគ្នានេះត្រូវបានកំណត់ពេលថតរួចហើយនៅម៉ោង <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g>"</string>
+    <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"បានថតរួចហើយ"</string>
+    <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"កម្មវិធីនេះត្រូវបានថតរួចហើយ។ វាអាចប្រើបាននៅក្នុងបណ្ណាល័យ DVR ។"</string>
+    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
+    <skip />
+    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
+    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
+    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_program_not_found" msgid="3282879532038010202">"រកមិនឃើញកម្មវិធីដែលបានថតទេ"</string>
+    <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"ការថតដែលពាក់ព័ន្ធ"</string>
+    <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(គ្មានការពិពណ៌នាអំពីកម្មវិធីទេ)"</string>
+    <plurals name="dvr_schedules_section_subtitle" formatted="false" msgid="9180744010405976007">
+      <item quantity="other">ការថត %1$d</item>
+      <item quantity="one">ការថត %1$d</item>
+    </plurals>
+    <string name="dvr_schedules_information_separator" msgid="1669116853379998479">" / "</string>
+    <string name="dvr_schedules_deletion_info" msgid="2837586459900271031">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> ត្រូវបានលុបចេញពីកាលវិភាគថត"</string>
+    <string name="dvr_schedules_tuner_conflict_will_be_partially_recorded" msgid="5280490298546908729">"នឹងមិនត្រូវបានថតពេញលេញនោះទេដោយសារតែអង្គរាវប៉ុស្តិ៍ជាន់គ្នា។"</string>
+    <string name="dvr_schedules_tuner_conflict_will_not_be_recorded_info" msgid="5065400564003201095">"នឹងមិនត្រូវបានថតនោះទេដោយសារតែអង្គរាវប៉ុស្តិ៍ជាន់គ្នា។"</string>
+    <string name="dvr_schedules_empty_state" msgid="1291529283469462741">"មិនទាន់មានការថតនៅក្នុងកាលវិភាគនៅឡើយទេ។\nអ្នកអាចកំណត់ពេលថតចេញពីការណែនាំកម្មវិធីនេះ។"</string>
+    <plurals name="dvr_series_schedules_header_description" formatted="false" msgid="9077188267856194114">
+      <item quantity="other">ការជាន់ម៉ោងថត %1$d</item>
+      <item quantity="one">ការជាន់ម៉ោងថត %1$d</item>
+    </plurals>
+    <string name="dvr_series_schedules_settings" msgid="4868501926847903985">"ការកំណត់វគ្គ"</string>
+    <string name="dvr_series_schedules_start" msgid="8458768834047133835">"ចាប់ផ្តើមថតវគ្គ"</string>
+    <string name="dvr_series_schedules_stop" msgid="3427479298317584961">"ឈប់ថតវគ្គ"</string>
+    <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"បញ្ឈប់ការថតវគ្គឬ?"</string>
+    <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"ភាគដែលបានថតនឹងនៅតែមាននៅក្នុងបណ្ណាល័យ DVR ។"</string>
+    <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"បញ្ឈប់"</string>
+    <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"មិនមានផ្តល់ជូនភាគណាមួយទេ។\nពួកវានឹងត្រូវបានថតបន្ទាប់ពីមានផ្តល់ជូន។"</string>
+    <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
+      <item quantity="other">(%1$d នាទី)</item>
+      <item quantity="one">(%1$d នាទី) </item>
+    </plurals>
+    <string name="dvr_date_today" msgid="7691050705354303471">"ថ្ងៃនេះ"</string>
+    <string name="dvr_date_tomorrow" msgid="4136735681186981844">"ថ្ងៃស្អែក"</string>
+    <string name="dvr_date_yesterday" msgid="2127672919053118239">"ម្សិលមិញ"</string>
+    <string name="dvr_date_today_time" msgid="8359696776305244535">"<xliff:g id="TIME_RANGE">%1$s</xliff:g> ថ្ងៃនេះ"</string>
+    <string name="dvr_date_tomorrow_time" msgid="8364654556105292594">"<xliff:g id="TIME_RANGE">%1$s</xliff:g> ថ្ងៃស្អែក"</string>
+    <string name="program_guide_critic_score" msgid="340530743913585150">"ពិន្ទុ"</string>
 </resources>
