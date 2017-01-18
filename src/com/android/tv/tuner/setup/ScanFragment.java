@@ -42,7 +42,7 @@ import com.android.tv.tuner.ChannelScanFileParser;
 import com.android.tv.tuner.TunerHal;
 import com.android.tv.tuner.R;
 import com.android.tv.tuner.TunerPreferences;
-import com.android.tv.tuner.data.nano.Channel;
+import com.android.tv.tuner.data.Channel;
 import com.android.tv.tuner.data.PsipData;
 import com.android.tv.tuner.data.TunerChannel;
 import com.android.tv.tuner.source.FileTsStreamer;
