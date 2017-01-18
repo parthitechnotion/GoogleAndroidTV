@@ -18,7 +18,7 @@ package com.android.tv.tuner.source;
 
 import android.content.Context;
 
-import com.android.tv.tuner.data.nano.Channel;
+import com.android.tv.tuner.data.Channel;
 import com.android.tv.tuner.data.TunerChannel;
 import com.android.tv.tuner.tvinput.EventDetector;
 

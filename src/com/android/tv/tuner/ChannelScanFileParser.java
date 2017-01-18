@@ -18,7 +18,7 @@ package com.android.tv.tuner;
 
 import android.util.Log;
 
-import com.android.tv.tuner.data.nano.Channel;
+import com.android.tv.tuner.data.Channel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
