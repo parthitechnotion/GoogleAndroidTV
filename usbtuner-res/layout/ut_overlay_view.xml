@@ -50,7 +50,7 @@
         android:layout_marginRight="10dp"
         android:gravity="right|top"
         android:textSize="14sp" />
-    <com.google.android.tv.tuner.cc.CaptionLayout
+    <com.android.tv.tuner.cc.CaptionLayout
         android:id="@+id/caption"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
