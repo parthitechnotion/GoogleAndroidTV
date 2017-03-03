@@ -57,7 +57,8 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     icu4j-usbtuner \
     lib-exoplayer \
     tv-common \
-
+    legacy-android-test \
+    junit
 
 
 LOCAL_JAVACFLAGS := -Xlint:deprecation -Xlint:unchecked
