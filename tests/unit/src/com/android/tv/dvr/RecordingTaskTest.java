@@ -21,10 +21,10 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.longThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.longThat;
 
 import android.os.Build;
 import android.os.Handler;
@@ -43,9 +43,9 @@ import com.android.tv.testing.dvr.RecordingTestUtils;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.compat.ArgumentMatcher;
 
 import java.util.concurrent.TimeUnit;
 
@@ -157,7 +157,7 @@ public class RecordingTaskTest extends AndroidTestCase {
     private static ArgumentMatcher<Message> messageMatchesWhat(final int what) {
         return new ArgumentMatcher<Message>() {
             @Override
-            public boolean matches(Object argument) {
+            public boolean matchesObject(Object argument) {
                 Message message = (Message) argument;
                 return message.what == what;
             }

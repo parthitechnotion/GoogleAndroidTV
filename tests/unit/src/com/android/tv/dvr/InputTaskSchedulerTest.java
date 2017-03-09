@@ -19,6 +19,7 @@ package com.android.tv.dvr;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -142,7 +143,7 @@ public class InputTaskSchedulerTest extends AndroidTestCase {
         verify(mRecordingTasks.get(0), timeout((int) LISTENER_TIMEOUT_MS).times(1)).start();
         // The first schedule should not be stopped because the second one should wait for the end
         // of the first schedule.
-        verify(mRecordingTasks.get(0), timeout((int) LISTENER_TIMEOUT_MS).never()).stop();
+        verify(mRecordingTasks.get(0), after((int) LISTENER_TIMEOUT_MS).never()).stop();
     }
 
     public void testAddSchedule_consecutiveNoFail() throws Exception {
@@ -162,9 +163,9 @@ public class InputTaskSchedulerTest extends AndroidTestCase {
                         LOW_PRIORITY, startTimeMs, endTimeMs));
         mScheduler.handleBuildSchedule();
         verify(mRecordingTasks.get(0), timeout((int) LISTENER_TIMEOUT_MS).times(1)).start();
-        verify(mRecordingTasks.get(0), timeout((int) LISTENER_TIMEOUT_MS).never()).stop();
+        verify(mRecordingTasks.get(0), after((int) LISTENER_TIMEOUT_MS).never()).stop();
         // The second schedule should not fail because it can starts after the first one finishes.
-        verify(mDataManager, timeout((int) LISTENER_TIMEOUT_MS).never())
+        verify(mDataManager, after((int) LISTENER_TIMEOUT_MS).never())
                 .changeState(any(ScheduledRecording.class),
                         eq(ScheduledRecording.STATE_RECORDING_FAILED));
     }
@@ -186,7 +187,7 @@ public class InputTaskSchedulerTest extends AndroidTestCase {
                         HIGH_PRIORITY, startTimeMs, endTimeMs));
         mScheduler.handleBuildSchedule();
         verify(mRecordingTasks.get(0), timeout((int) LISTENER_TIMEOUT_MS).times(1)).start();
-        verify(mRecordingTasks.get(0), timeout((int) LISTENER_TIMEOUT_MS).never()).stop();
+        verify(mRecordingTasks.get(0), after((int) LISTENER_TIMEOUT_MS).never()).stop();
         // The second schedule should wait until the first one finishes rather than creating a new
         // session even though there are available tuners.
         assertTrue(mRecordingTasks.size() == 1);
@@ -199,7 +200,7 @@ public class InputTaskSchedulerTest extends AndroidTestCase {
         mScheduler.handleAddSchedule(r);
         mScheduler.handleBuildSchedule();
         mScheduler.handleUpdateSchedule(r);
-        verify(mRecordingTasks.get(0), timeout((int) LISTENER_TIMEOUT_MS).never()).cancel();
+        verify(mRecordingTasks.get(0), after((int) LISTENER_TIMEOUT_MS).never()).cancel();
     }
 
     public void testUpdateSchedule_cancel() throws Exception {
