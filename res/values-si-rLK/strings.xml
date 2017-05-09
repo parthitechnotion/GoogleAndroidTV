@@ -20,9 +20,8 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"මොනෝ"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"ස්ටීරියෝ"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"ධාවක පාලන"</string>
-    <string name="menu_title_channels" msgid="1801845517674690003">"මෑත නාලිකා"</string>
+    <string name="menu_title_channels" msgid="1949045451672990132">"නාලිකා"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"රූපවාහිනී විකල්ප"</string>
-    <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP විකල්ප"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"මෙම නාලිකාව සඳහා Play පාලන ලද නොහැකිය"</string>
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"ධාවනය හෝ විරාමය කරන්න"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"වේගයෙන් ඉදිරියට"</string>
@@ -35,33 +34,15 @@
     <string name="options_item_closed_caption" msgid="5945274655046367170">"වසන ලද ශිර්ෂ"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"දර්ශන ආකාරය"</string>
     <string name="options_item_pip" msgid="3951350386626879645">"PIP"</string>
-    <string name="options_item_pip_on" msgid="4647247480009077381">"සක්‍රියයි"</string>
-    <string name="options_item_pip_off" msgid="8799500161592387451">"අක්‍රිය කරන්න"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"බහු-ශ්‍රව්‍ය"</string>
     <string name="options_item_more_channels" msgid="971040969622943300">"තවත් නාලිකා ගන්න"</string>
     <string name="options_item_settings" msgid="7623205838542400074">"සැකසීම්"</string>
-    <string name="pip_options_item_source" msgid="1050948525825308652">"මුල්‍ය"</string>
-    <string name="pip_options_item_swap" msgid="7245362207353732048">"මාරු කරන්න"</string>
-    <string name="pip_options_item_swap_on" msgid="5647182616484983505">"සක්‍රියයි"</string>
-    <string name="pip_options_item_swap_off" msgid="3023597229417709768">"අක්‍රිය කරන්න"</string>
-    <string name="pip_options_item_sound" msgid="3107034283791231648">"ශබ්දය"</string>
-    <string name="pip_options_item_sound_main" msgid="1063937534112558691">"මූලික"</string>
-    <string name="pip_options_item_sound_pip_window" msgid="435064142351853008">"PIP කවුළුව"</string>
-    <string name="pip_options_item_layout" msgid="5126206342060967651">"පිරිසැලසුම"</string>
-    <string name="pip_options_item_layout_bottom_right" msgid="5256839015192920238">"පහළ දකුණ"</string>
-    <string name="pip_options_item_layout_top_right" msgid="3585067214787055279">"ඉහළ දකුණ"</string>
-    <string name="pip_options_item_layout_top_left" msgid="2173997010201637462">"ඉහළ වම"</string>
-    <string name="pip_options_item_layout_bottom_left" msgid="1727197877968915329">"පහළ වම"</string>
-    <string name="pip_options_item_layout_side_by_side" msgid="9009784972740915779">"පැතෙන් පැත්තට"</string>
-    <string name="pip_options_item_size" msgid="5662894110243750158">"ප්‍රමාණය"</string>
-    <string name="pip_options_item_size_big" msgid="6303301565563444718">"ලොකු"</string>
-    <string name="pip_options_item_size_small" msgid="7393731186585004206">"කුඩා"</string>
-    <string name="side_panel_title_pip_input_source" msgid="8722544967592970296">"මූලය අදානය කරන්න"</string>
     <string name="input_long_label_for_tuner" msgid="3423514011918382209">"TV (ඇන්ටනාව/කේබලය)"</string>
     <string name="no_program_information" msgid="1049844207745145132">"වැඩසටහන් තොරතුරු නැත"</string>
     <string name="program_title_for_no_information" msgid="384451471906070101">"තොරතුරු නැත."</string>
     <string name="program_title_for_blocked_channel" msgid="5358005891746983819">"නාලිකාව අවහිර කරන ලදි"</string>
-    <string name="default_language" msgid="4122326459624337928">"නොදන්නා භාෂාව"</string>
+    <string name="multi_audio_unknown_language" msgid="8639884627225598143">"නොදන්නා භාෂාව"</string>
+    <string name="closed_caption_unknown_language" msgid="4745445516930229353">"වැසූ සිරස්තල %1$d"</string>
     <string name="side_panel_title_closed_caption" msgid="2513905054082568780">"වැසූ සිරස්තල"</string>
     <string name="closed_caption_option_item_off" msgid="4824009036785647753">"අක්‍රිය කරන්න"</string>
     <string name="closed_caption_system_settings" msgid="1856974607743827178">"ආකෘතිකරණය අභිරුචි කරන්න"</string>
@@ -135,6 +116,10 @@
     </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"එම PIN එක වැරදිය. නැවත උත්සාහ කරන්න."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"PIN එක ගැලපී නැත"</string>
+    <string name="postal_code_guidance_title" msgid="4144793072363879833">"ඔබේ ZIP කේතය ඇතුළු කරන්න."</string>
+    <string name="postal_code_guidance_description" msgid="4224511147377561572">"සජීව නාලිකා යෙදුම TV නාලිකා සඳහා සම්පූර්ණ වැඩසටහන් මාර්ගෝපදේශයක් සැපයීමට ZIP කේතය භාවිත කරනු ඇත."</string>
+    <string name="postal_code_action_description" msgid="4428720607051109105">"ඔබේ ZIP කේතය ඇතුළු කරන්න"</string>
+    <string name="postal_code_invalid_warning" msgid="923373584458340746">"වලංගු නොවන ZIP කේතයකි"</string>
     <string name="side_panel_title_settings" msgid="8244327316510918755">"සැකසීම්"</string>
     <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"නාලිකා ලැයිස්තුව අභිමත කරන්න"</string>
     <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"ඔබගේ වැඩසටහන් මාර්ගෝපදේශය සඳහා නාලිකා තෝරන්න"</string>
@@ -143,6 +128,7 @@
     <string name="settings_parental_controls" msgid="5449397921700749317">"මාපිය පාලන"</string>
     <string name="settings_menu_licenses" msgid="1257646083838406103">"විවෘත මූලාශ්‍ර බලපත්‍ර"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"විවෘත මූලාශ්‍ර වරපත්"</string>
+    <string name="settings_send_feedback" msgid="6897217561193701829">"ප්‍රතිපෝෂණය යවන්න"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"අනුවාදය"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"මෙම නාලිකාව නැරඹිමට දකුණ ඔබා PIN එක ඇතුළු කරන්න"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"මෙම වැඩසටහන නැරඹිමට දකුණ ඔබා PIN එක ඇතුළු කරන්න"</string>
@@ -181,8 +167,6 @@
     <string name="intro_description" msgid="7806473686446937307">"TV මෙනුවට පිවිසීමට "<b>"SELECT ඔබන්න"</b>"."</string>
     <string name="msg_no_input" msgid="3897674146985427865">"TV ආදානය සොයාගැනීමට නොහැකි විය"</string>
     <string name="msg_no_specific_input" msgid="2688885987104249852">"TV ආදානය සොයාගත නොහැක"</string>
-    <string name="msg_no_pip_support" msgid="161508628996629445">"PIP සහාය දක්වන්නේ නැත"</string>
-    <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"PIP සමඟ පෙන්වූ විට අදානයක් එහි නොතිබේ"</string>
     <string name="msg_not_passthrough_input" msgid="4502101097091087411">"සුසරක වර්ගය ගැලපෙන්නේ නැත; කරුණාකර සුසර කරන වර්ගයේ TV අදානය සඳහා සජීවී නාලිකා යෙදුම දමන්න."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"සුසර කිරීම අසාර්ථක වුණි"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"මෙම ක්‍රියාව හැසිරවීමට යෙදුමක් සොයාගත්තේ නැත"</string>
@@ -259,8 +243,6 @@
     <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"සුරකින්න"</string>
     <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"එක්-වරක පටිගත කිරීම්වලට වැඩිම ප්‍රමුඛතාව ඇත"</string>
     <string name="dvr_action_cancel" msgid="8094060199570272625">"අවලංගු කර."</string>
-    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"අවලංගු කරන්න"</string>
-    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"අමතක කරන්න"</string>
     <string name="dvr_action_stop" msgid="1378723485295471381">"නතර කරන්න"</string>
     <string name="dvr_action_view_schedules" msgid="7442990695392774263">"පටිගත කිරීමේ කාල සටහන බලන්න"</string>
     <string name="dvr_action_record_episode" msgid="8596182676610326327">"මෙම තනි වැඩසටහන"</string>
@@ -270,25 +252,29 @@
     <string name="dvr_action_record_instead" msgid="6821164728752215738">"ඒ වෙනුවට මෙය පටිගත කරන්න"</string>
     <string name="dvr_action_record_cancel" msgid="8644254745772185288">"මෙම පටිගත කිරීම අවලංගු කරන්න"</string>
     <string name="dvr_action_watch_now" msgid="7181211920959075976">"දැන් නරඹන්න"</string>
+    <string name="dvr_action_delete_recordings" msgid="850785346795261671">"පටිගත කිරීම් මකන්න..."</string>
     <string name="dvr_epg_program_recordable" msgid="609229576209476903">"පටිගත කළ හැකි"</string>
     <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"පටිගත කිරීම කාල සටහන්ගතයි"</string>
     <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"පටිගත කිරීමේ ගැටුම"</string>
     <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"පටිගත කරමින්"</string>
     <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"පටිගත කිරීම අසාර්ථක විය"</string>
     <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"පටිගත කිරීමේ කාලසටහන් සෑදීමට වැඩසටහන් කියවමින්"</string>
-    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"කියවීමේ වැඩසටහන්"</string>
-    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
-    <skip />
+    <string name="dvr_series_progress_message_reading_programs" msgid="2961615820635219355">"කියවීමේ වැඩසටහන්"</string>
+    <string name="dvr_error_insufficient_space_action_view_recent_recordings" msgid="137918938589787623">"මෑත පටිගත කිරීම් බලන්න"</string>
+    <string name="dvr_error_insufficient_space_title_one_recording" msgid="759510175792505150">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> හි පටිගත කිරීම අසම්පූර්ණයි."</string>
+    <string name="dvr_error_insufficient_space_title_two_recordings" msgid="5518578722556227631">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> සහ <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> හි පටිගත කිරීම් අසම්පූර්ණයි."</string>
+    <string name="dvr_error_insufficient_space_title_three_or_more_recordings" msgid="5104901174884754363">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> සහ <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> හි පටිගත කිරීම් අසම්පූර්ණයි."</string>
+    <string name="dvr_error_insufficient_space_description_one_recording" msgid="9092549220659026111">"ප්‍රමාණවත් නොවන ගබඩාව නිසා <xliff:g id="PROGRAMNAME">%1$s</xliff:g> හි පටිගත කිරීම සම්පූර්ණ නොකරන ලදී."</string>
+    <string name="dvr_error_insufficient_space_description_two_recordings" msgid="7712799694720979003">"ප්‍රමාණවත් නොවන ගබඩාව නිසා <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> සහ <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> හි පටිගත කිරීම් සම්පූර්ණ නොකරන ලදී."</string>
+    <string name="dvr_error_insufficient_space_description_three_or_more_recordings" msgid="7877855707777832128">"ප්‍රමාණවත් නොවන ගබඩාව නිසා <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> සහ <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> හි පටිගත කිරීම් සම්පූර්ණ නොකරන ලදී."</string>
     <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR සඳහා වැඩිපුර ගබඩාව අවශ්‍යයි"</string>
     <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"ඔබට DVR සමගින් වැඩසටහන් පටිගත කිරීමට හැකි වනු ඇත. කෙසේ වෙතත් දැන් DVR ක්‍රියා කිරීම සඳහා ඔබේ උපාංගයේ ප්‍රමාණවත් තරම් ගබඩාව නැත. කරුණාකර <xliff:g id="STORAGE_SIZE">%1$s</xliff:g>GB හෝ ඊට වඩා විශාල බාහිර ධාවකයක් සම්බන්ධ කර එය උපාංග ගබඩාව ලෙස ෆෝමැට් කිරීමට පහත පියවර අනුගමනය කරන්න."</string>
+    <string name="dvr_error_no_free_space_title" msgid="881897873932403512">"ප්‍රමාණවත් තරම් ගබඩා ඉඩ නැත"</string>
+    <string name="dvr_error_no_free_space_description" msgid="6406038381803431564">"ප්‍රමාණවත් තරම් ගබඩා ඉඩ නොමැති නිසා මෙම වැඩසටහන පටිගත කළ නොහැකි වනු ඇත. පවතින පටිගත කිරීම් සමහරක් මැකීම උත්සාහ කරන්න."</string>
     <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"අස්ථානගත ගබඩාව"</string>
-    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"DVR මගින් භාවිත කළ ගබඩා සමහරක් අස්ථානගතය. කරුණාකර DVR නැවත-සබල කිරීමට ඔබ පෙරදී භාවිත කළ බාහිර drive සම්බන්ධ කරන්න. විකල්පව, එය තවදුරටත් ලබා ගත නොහැකි නම් ඔබට ගබඩාව අමතක කිරීමට තේරිය හැකිය."</string>
-    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"ගබඩාව අමතකද?"</string>
-    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"ඔබේ පටිගත කළ සියලු අන්තර්ගත සහ කාල සටහන් අහිමි වනු ඇත."</string>
     <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"පටිගත කිරීම නවත්වන්නද?"</string>
     <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"පටිගත කළ අන්තර්ගතය සුරැකෙනු ඇත."</string>
-    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
-    <skip />
+    <string name="dvr_stop_recording_dialog_description_on_conflict" msgid="7876857267536083760">"මෙම වැඩසටහන සමගින් වන ගැටුම් නිසා <xliff:g id="PROGRAMNAME">%1$s</xliff:g> හි පටිගත කිරීම නවත්වන ලදී. පටිගත කරන ලද අන්තර්ගතය සුරකිනු ඇත."</string>
     <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"පටිගත කිරීම කාල සටහන්ගත කර ඇති නමුත් ගැටුම් ඇත"</string>
     <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"පටිගත කිරීම ආරම්භ කර ඇති නමුත් ගැටුම් ඇත"</string>
     <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> පටිගත කරනු ඇත."</string>
@@ -306,14 +292,27 @@
     <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"එම වැඩසටහනම <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g>ට පටිගත කිරීමට කාල සටහන්ගත කර ඇත."</string>
     <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"දැනටමත් පටිගත කර ඇත"</string>
     <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"මෙම වැඩසටහන දැනටමත් පටිගත කර ඇත. එය DVR පුස්තකාලය තුළදී ලබා ගත හැකිය."</string>
-    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
-    <skip />
-    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_series_recording_dialog_title" msgid="3521956660855853797">"මාලා පටිගත කිරීම කාලසටහන්ගත කරන ලදී"</string>
+    <plurals name="dvr_series_scheduled_no_conflict" formatted="false" msgid="6909096418632555251">
+      <item quantity="one">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_3">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත.</item>
+      <item quantity="other">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_3">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත.</item>
+    </plurals>
+    <plurals name="dvr_series_recording_scheduled_only_this_series_conflict" formatted="false" msgid="2341548158607418515">
+      <item quantity="one">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_3">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත. ඒවායින් <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g>ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+      <item quantity="other">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_3">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත. ඒවායින් <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g>ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_this_and_other_series_conflict" formatted="false" msgid="6123651855499916154">
+      <item quantity="one">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_4">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත. මෙම මාලාවෙහි සහ වෙනත් මාලාවල කථාංග <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g>ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+      <item quantity="other">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_4">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත. මෙම මාලාවෙහි සහ වෙනත් මාලාවල කථාංග <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g>ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_one_conflict" formatted="false" msgid="8628389493339609682">
+      <item quantity="one">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_3">%2$s</xliff:g> සඳහා කාලසටහන්ගත කර ඇත. වෙනත් මාලාවල කථාංග 1ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+      <item quantity="other">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_3">%2$s</xliff:g> සඳහා කාලසටහන්ගත කර ඇත. වෙනත් මාලාවල කථාංග 1ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_many_conflicts" formatted="false" msgid="1601104768354168073">
+      <item quantity="one">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_4">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත. වෙනත් මාලාවේ කථාංග <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g>ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+      <item quantity="other">පටිගත කිරීම් <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g>ක් <xliff:g id="SERIESNAME_4">%2$s</xliff:g> සඳහා කාල සටහන්ගත කර ඇත. වෙනත් මාලාවේ කථාංග <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g>ක් ගැටුම් නිසා පටිගත නොකරනු ඇත.</item>
+    </plurals>
     <string name="dvr_program_not_found" msgid="3282879532038010202">"පටිගත කළ වැඩසටහන හමු නොවීය."</string>
     <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"අදාළ පටිගත කිරීම්"</string>
     <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(වැඩසටහන් විස්තරය නැත)"</string>
@@ -336,6 +335,7 @@
     <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"මාලා පටිගත කිරීම නවත්වන්නද?"</string>
     <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"පටිගත කළ කථාංග DVR පුස්තකාලය තුළ ලබා ගත හැකිව පවතිනු ඇත."</string>
     <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"නවත්වන්න"</string>
+    <string name="dvr_series_schedules_stopped_empty_state" msgid="1464244804664395151">"දැන් ගුවනේ කථාංග නැත."</string>
     <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"ලබා ගත හැකි කථාංග නැත.\nඒවා ලබා ගත හැකි වූ විට පටිගත කරනු ඇත."</string>
     <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
       <item quantity="one">(මිනිත්තු %1$d)</item>

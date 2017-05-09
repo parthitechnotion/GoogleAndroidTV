@@ -18,6 +18,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="action_text_done" msgid="298287050387266501">"पूर्ण झाले"</string>
+    <string name="action_text_skip" msgid="9158414021827546309">"वगळा"</string>
     <string name="display_episode_number_format" msgid="6040735693510854344">"हंगाम<xliff:g id="SEASON_NUMBER">%1$s</xliff:g>: भाग<xliff:g id="EPISODE_NUMBER">%2$s</xliff:g>"</string>
     <string name="display_episode_number_format_no_season_number" msgid="8393554269654325741">"भाग<xliff:g id="EPISODE_NUMBER">%1$s</xliff:g>"</string>
     <string name="display_episode_title_format" msgid="5041103178918130554">"हंगाम<xliff:g id="SEASON_NUMBER">%1$s</xliff:g>: भाग. <xliff:g id="EPISODE_NUMBER">%2$s</xliff:g> <xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>

@@ -48,13 +48,13 @@
 
 base_version_major := 1
 # Change this for each branch
-base_version_minor := 11
+base_version_minor := 13
 
 # code_version_major will overflow at 22
 code_version_major := $(shell echo $$(($(base_version_major)+3)))
 
 # x86 and arm sometimes don't match.
-code_version_build := 011
+code_version_build := 016
 #####################################################
 #####################################################
 # Collect automatic version code parameters

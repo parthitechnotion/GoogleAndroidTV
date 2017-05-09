@@ -27,7 +27,7 @@ import com.android.tv.Features;
 import com.android.tv.TvActivity;
 import com.android.tv.TvApplication;
 import com.android.tv.common.feature.CommonFeatures;
-import com.android.tv.dvr.DvrRecordingService;
+import com.android.tv.dvr.recorder.DvrRecordingService;
 import com.android.tv.recommendation.NotificationService;
 import com.android.tv.util.OnboardingUtils;
 import com.android.tv.util.SetupUtils;

@@ -52,9 +52,8 @@ import com.android.tv.data.DisplayMode;
 import com.android.tv.util.TvSettings;
 
 /**
- * The TvViewUiManager is responsible for handling UI layouting and animation of main and PIP
- * TvViews. It also control the settings regarding TvView UI such as display mode, PIP layout,
- * and PIP size.
+ * The TvViewUiManager is responsible for handling UI layouting and animation of main TvView.
+ * It also control the settings regarding TvView UI such as display mode.
  */
 public class TvViewUiManager {
     private static final String TAG = "TvViewManager";
@@ -69,18 +68,11 @@ public class TvViewUiManager {
     private final Resources mResources;
     private final FrameLayout mContentView;
     private final TunableTvView mTvView;
-    private final TunableTvView mPipView;
     private final TvOptionsManager mTvOptionsManager;
-    private final int mTvViewPapWidth;
     private final int mTvViewShrunkenStartMargin;
     private final int mTvViewShrunkenEndMargin;
-    private final int mTvViewPapStartMargin;
-    private final int mTvViewPapEndMargin;
     private int mWindowWidth;
     private int mWindowHeight;
-    private final int mPipViewHorizontalMargin;
-    private final int mPipViewTopMargin;
-    private final int mPipViewBottomMargin;
     private final SharedPreferences mSharedPreferences;
     private final TimeInterpolator mLinearOutSlowIn;
     private final TimeInterpolator mFastOutLinearIn;
@@ -113,9 +105,6 @@ public class TvViewUiManager {
     private boolean mIsUnderShrunkenTvView;
     private int mTvViewStartMargin;
     private int mTvViewEndMargin;
-    private int mPipLayout;
-    private int mPipSize;
-    private boolean mPipStarted;
     private ObjectAnimator mTvViewAnimator;
     private FrameLayout.LayoutParams mTvViewLayoutParams;
     // TV view's position when the display mode is FULL. It is used to compute PIP location relative
@@ -130,12 +119,11 @@ public class TvViewUiManager {
     private int mAppliedTvViewEndMargin;
     private float mAppliedVideoDisplayAspectRatio;
 
-    public TvViewUiManager(Context context, TunableTvView tvView, TunableTvView pipView,
+    public TvViewUiManager(Context context, TunableTvView tvView,
             FrameLayout contentView, TvOptionsManager tvOptionManager) {
         mContext = context;
         mResources = mContext.getResources();
         mTvView = tvView;
-        mPipView = pipView;
         mContentView = contentView;
         mTvOptionsManager = tvOptionManager;
 
@@ -147,18 +135,12 @@ public class TvViewUiManager {
         mWindowWidth = size.x;
         mWindowHeight = size.y;
 
-        // Have an assumption that PIP and TvView Shrinking happens only in full screen.
+        // Have an assumption that TvView Shrinking happens only in full screen.
         mTvViewShrunkenStartMargin = mResources
                 .getDimensionPixelOffset(R.dimen.shrunken_tvview_margin_start);
         mTvViewShrunkenEndMargin =
                 mResources.getDimensionPixelOffset(R.dimen.shrunken_tvview_margin_end)
                         + mResources.getDimensionPixelSize(R.dimen.side_panel_width);
-        int papMarginHorizontal = mResources
-                .getDimensionPixelOffset(R.dimen.papview_margin_horizontal);
-        int papSpacing = mResources.getDimensionPixelOffset(R.dimen.papview_spacing);
-        mTvViewPapWidth = (mWindowWidth - papSpacing) / 2 - papMarginHorizontal;
-        mTvViewPapStartMargin = papMarginHorizontal + mTvViewPapWidth + papSpacing;
-        mTvViewPapEndMargin = papMarginHorizontal;
         mTvViewFrame = createMarginLayoutParams(0, 0, 0, 0);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -167,11 +149,6 @@ public class TvViewUiManager {
                 .loadInterpolator(mContext, android.R.interpolator.linear_out_slow_in);
         mFastOutLinearIn = AnimationUtils
                 .loadInterpolator(mContext, android.R.interpolator.fast_out_linear_in);
-
-        mPipViewHorizontalMargin = mResources
-                .getDimensionPixelOffset(R.dimen.pipview_margin_horizontal);
-        mPipViewTopMargin = mResources.getDimensionPixelOffset(R.dimen.pipview_margin_top);
-        mPipViewBottomMargin = mResources.getDimensionPixelOffset(R.dimen.pipview_margin_bottom);
     }
 
     public void onConfigurationChanged(final int windowWidth, final int windowHeight) {
@@ -200,18 +177,11 @@ public class TvViewUiManager {
      */
     public void startShrunkenTvView() {
         mIsUnderShrunkenTvView = true;
+        mTvView.setIsUnderShrunken(true);
 
         mTvViewStartMarginBeforeShrunken = mTvViewStartMargin;
         mTvViewEndMarginBeforeShrunken = mTvViewEndMargin;
-        if (mPipStarted && getPipLayout() == TvSettings.PIP_LAYOUT_SIDE_BY_SIDE) {
-            float sidePanelWidth = mResources.getDimensionPixelOffset(R.dimen.side_panel_width);
-            float factor = 1.0f - sidePanelWidth / mWindowWidth;
-            int startMargin = (int) (mTvViewPapStartMargin * factor);
-            int endMargin = (int) (mTvViewPapEndMargin * factor + sidePanelWidth);
-            setTvViewMargin(startMargin, endMargin);
-        } else {
-            setTvViewMargin(mTvViewShrunkenStartMargin, mTvViewShrunkenEndMargin);
-        }
+        setTvViewMargin(mTvViewShrunkenStartMargin, mTvViewShrunkenEndMargin);
         mDisplayModeBeforeShrunken = setDisplayMode(DisplayMode.MODE_NORMAL, false, true);
     }
 
@@ -221,6 +191,7 @@ public class TvViewUiManager {
      */
     public void endShrunkenTvView() {
         mIsUnderShrunkenTvView = false;
+        mTvView.setIsUnderShrunken(false);
         setTvViewMargin(mTvViewStartMarginBeforeShrunken, mTvViewEndMarginBeforeShrunken);
         setDisplayMode(mDisplayModeBeforeShrunken, false, true);
     }
@@ -327,120 +298,6 @@ public class TvViewUiManager {
     }
 
     /**
-     * Returns the current PIP layout. The layout should be one of
-     * {@link TvSettings#PIP_LAYOUT_BOTTOM_RIGHT}, {@link TvSettings#PIP_LAYOUT_TOP_RIGHT},
-     * {@link TvSettings#PIP_LAYOUT_TOP_LEFT}, {@link TvSettings#PIP_LAYOUT_BOTTOM_LEFT} and
-     * {@link TvSettings#PIP_LAYOUT_SIDE_BY_SIDE}.
-     */
-    public int getPipLayout() {
-        return mPipLayout;
-    }
-
-    /**
-     * Sets the PIP layout. The layout should be one of
-     * {@link TvSettings#PIP_LAYOUT_BOTTOM_RIGHT}, {@link TvSettings#PIP_LAYOUT_TOP_RIGHT},
-     * {@link TvSettings#PIP_LAYOUT_TOP_LEFT}, {@link TvSettings#PIP_LAYOUT_BOTTOM_LEFT} and
-     * {@link TvSettings#PIP_LAYOUT_SIDE_BY_SIDE}.
-     *
-     * @param storeInPreference if true, the stored value will be restored by
-     *                          {@link #restorePipLayout()}.
-     */
-    public void setPipLayout(int pipLayout, boolean storeInPreference) {
-        mPipLayout = pipLayout;
-        if (storeInPreference) {
-            TvSettings.setPipLayout(mContext, pipLayout);
-        }
-        updatePipView(mTvViewFrame);
-        if (mPipLayout == TvSettings.PIP_LAYOUT_SIDE_BY_SIDE) {
-            setTvViewMargin(mTvViewPapStartMargin, mTvViewPapEndMargin);
-            setDisplayMode(DisplayMode.MODE_NORMAL, false, false);
-        } else {
-            setTvViewMargin(0, 0);
-            restoreDisplayMode(false);
-        }
-        mTvOptionsManager.onPipLayoutChanged(pipLayout);
-    }
-
-    /**
-     * Restores the PIP layout which {@link #setPipLayout} lastly stores.
-     */
-    public void restorePipLayout() {
-        setPipLayout(TvSettings.getPipLayout(mContext), false);
-    }
-
-    /**
-     * Called when PIP is started.
-     */
-    public void onPipStart() {
-        mPipStarted = true;
-        updatePipView();
-        mPipView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Called when PIP is stopped.
-     */
-    public void onPipStop() {
-        setTvViewMargin(0, 0);
-        mPipView.setVisibility(View.GONE);
-        mPipStarted = false;
-    }
-
-    /**
-     * Called when PIP is resumed.
-     */
-    public void showPipForResume() {
-        mPipView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Called when PIP is paused.
-     */
-    public void hidePipForPause() {
-        if (mPipLayout != TvSettings.PIP_LAYOUT_SIDE_BY_SIDE) {
-            mPipView.setVisibility(View.GONE);
-        }
-    }
-
-    /**
-     * Updates PIP view. It is usually called, when video resolution in PIP is updated.
-     */
-    public void updatePipView() {
-        updatePipView(mTvViewFrame);
-    }
-
-    /**
-     * Returns the size of the PIP view.
-     */
-    public int getPipSize() {
-        return mPipSize;
-    }
-
-    /**
-     * Sets PIP size and applies it immediately.
-     *
-     * @param pipSize           PIP size. The value should be one of {@link TvSettings#PIP_SIZE_BIG}
-     *                          and {@link TvSettings#PIP_SIZE_SMALL}.
-     * @param storeInPreference if true, the stored value will be restored by
-     *                          {@link #restorePipSize()}.
-     */
-    public void setPipSize(int pipSize, boolean storeInPreference) {
-        mPipSize = pipSize;
-        if (storeInPreference) {
-            TvSettings.setPipSize(mContext, pipSize);
-        }
-        updatePipView(mTvViewFrame);
-        mTvOptionsManager.onPipSizeChanged(pipSize);
-    }
-
-    /**
-     * Restores the PIP size which {@link #setPipSize} lastly stores.
-     */
-    public void restorePipSize() {
-        setPipSize(TvSettings.getPipSize(mContext), false);
-    }
-
-    /**
      * This margins will be applied when applyDisplayMode is called.
      */
     private void setTvViewMargin(int tvViewStartMargin, int tvViewEndMargin) {
@@ -540,113 +397,6 @@ public class TvViewUiManager {
             } else {
                 mTvView.setLayoutParams(layoutParams);
             }
-            updatePipView(mTvViewFrame);
-        }
-    }
-
-    /**
-     * The redlines assume that the ratio of the TV screen is 16:9. If the radio is not 16:9, the
-     * layout of PAP can be broken.
-     */
-    @SuppressLint("RtlHardcoded")
-    private void updatePipView(MarginLayoutParams tvViewFrame) {
-        if (!mPipStarted) {
-            return;
-        }
-        int width;
-        int height;
-        int startMargin;
-        int endMargin;
-        int topMargin;
-        int bottomMargin;
-        int gravity;
-
-        if (mPipLayout == TvSettings.PIP_LAYOUT_SIDE_BY_SIDE) {
-            gravity = Gravity.CENTER_VERTICAL | Gravity.START;
-            height = tvViewFrame.height;
-            float videoDisplayAspectRatio = mPipView.getVideoDisplayAspectRatio();
-            if (videoDisplayAspectRatio <= 0f) {
-                width = tvViewFrame.width;
-            } else {
-                width = (int) (height * videoDisplayAspectRatio);
-                if (width > tvViewFrame.width) {
-                    width = tvViewFrame.width;
-                }
-            }
-            startMargin = mResources.getDimensionPixelOffset(R.dimen.papview_margin_horizontal)
-                    * tvViewFrame.width / mTvViewPapWidth + (tvViewFrame.width - width) / 2;
-            endMargin = 0;
-            topMargin = 0;
-            bottomMargin = 0;
-        } else {
-            int tvViewWidth = tvViewFrame.width;
-            int tvViewHeight = tvViewFrame.height;
-            int tvStartMargin = tvViewFrame.getMarginStart();
-            int tvEndMargin = tvViewFrame.getMarginEnd();
-            int tvTopMargin = tvViewFrame.topMargin;
-            int tvBottomMargin = tvViewFrame.bottomMargin;
-            float horizontalScaleFactor = (float) tvViewWidth / mWindowWidth;
-            float verticalScaleFactor = (float) tvViewHeight / mWindowHeight;
-
-            int maxWidth;
-            if (mPipSize == TvSettings.PIP_SIZE_SMALL) {
-                maxWidth = (int) (mResources.getDimensionPixelSize(R.dimen.pipview_small_size_width)
-                        * horizontalScaleFactor);
-                height = (int) (mResources.getDimensionPixelSize(R.dimen.pipview_small_size_height)
-                        * verticalScaleFactor);
-            } else if (mPipSize == TvSettings.PIP_SIZE_BIG) {
-                maxWidth = (int) (mResources.getDimensionPixelSize(R.dimen.pipview_large_size_width)
-                        * horizontalScaleFactor);
-                height = (int) (mResources.getDimensionPixelSize(R.dimen.pipview_large_size_height)
-                        * verticalScaleFactor);
-            } else {
-                throw new IllegalArgumentException("Invalid PIP size: " + mPipSize);
-            }
-            float videoDisplayAspectRatio = mPipView.getVideoDisplayAspectRatio();
-            if (videoDisplayAspectRatio <= 0f) {
-                width = maxWidth;
-            } else {
-                width = (int) (height * videoDisplayAspectRatio);
-                if (width > maxWidth) {
-                    width = maxWidth;
-                }
-            }
-
-            startMargin = tvStartMargin + (int) (mPipViewHorizontalMargin * horizontalScaleFactor);
-            endMargin = tvEndMargin + (int) (mPipViewHorizontalMargin * horizontalScaleFactor);
-            topMargin = tvTopMargin + (int) (mPipViewTopMargin * verticalScaleFactor);
-            bottomMargin = tvBottomMargin + (int) (mPipViewBottomMargin * verticalScaleFactor);
-
-            switch (mPipLayout) {
-                case TvSettings.PIP_LAYOUT_TOP_LEFT:
-                    gravity = Gravity.TOP | Gravity.LEFT;
-                    break;
-                case TvSettings.PIP_LAYOUT_TOP_RIGHT:
-                    gravity = Gravity.TOP | Gravity.RIGHT;
-                    break;
-                case TvSettings.PIP_LAYOUT_BOTTOM_LEFT:
-                    gravity = Gravity.BOTTOM | Gravity.LEFT;
-                    break;
-                case TvSettings.PIP_LAYOUT_BOTTOM_RIGHT:
-                    gravity = Gravity.BOTTOM | Gravity.RIGHT;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid PIP location: " + mPipLayout);
-            }
-        }
-
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mPipView.getLayoutParams();
-        if (lp.width != width || lp.height != height || lp.getMarginStart() != startMargin
-                || lp.getMarginEnd() != endMargin || lp.topMargin != topMargin
-                || lp.bottomMargin != bottomMargin || lp.gravity != gravity) {
-            lp.width = width;
-            lp.height = height;
-            lp.setMarginStart(startMargin);
-            lp.setMarginEnd(endMargin);
-            lp.topMargin = topMargin;
-            lp.bottomMargin = bottomMargin;
-            lp.gravity = gravity;
-            mPipView.setLayoutParams(lp);
         }
     }
 
@@ -696,7 +446,6 @@ public class TvViewUiManager {
                 mLastAnimatedTvViewFrame = new MarginLayoutParams(0, 0);
                 interpolateMarginsRelative(mLastAnimatedTvViewFrame,
                         mOldTvViewFrame, mTvViewFrame, fraction);
-                updatePipView(mLastAnimatedTvViewFrame);
             }
         });
     }

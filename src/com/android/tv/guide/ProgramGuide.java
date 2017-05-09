@@ -48,7 +48,7 @@ import com.android.tv.ChannelTuner;
 import com.android.tv.Features;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
-import com.android.tv.analytics.DurationTimer;
+import com.android.tv.util.DurationTimer;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.ChannelDataManager;

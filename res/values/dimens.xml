@@ -193,7 +193,7 @@
     <dimen name="program_guide_table_header_row_height">40dp</dimen>
     <dimen name="program_guide_table_header_row_font_size">16sp</dimen>
     <dimen name="program_guide_table_header_row_fade_length">24dp</dimen>
-    <dimen name="program_guide_table_header_row_overlap">-52dp</dimen>
+    <dimen name="program_guide_table_header_row_overlap">-72dp</dimen>
     <dimen name="program_guide_table_item_row_height">64dp</dimen>
     <dimen name="program_guide_table_item_padding">16dp</dimen>
     <dimen name="program_guide_table_item_compound_drawable_padding">8dp</dimen>
@@ -222,8 +222,6 @@
     <dimen name="program_guide_table_detail_dvr_margin_start_without_track">0dp</dimen>
     <dimen name="program_guide_table_detail_dvr_icon_margin_top">0.5dp</dimen>
     <dimen name="program_guide_table_detail_dvr_drawable_padding">4dp</dimen>
-    <dimen name="program_guide_table_detail_meta_margin_start">12dp</dimen>
-    <dimen name="program_guide_table_detail_meta_margin_bottom">4sp</dimen>
     <dimen name="program_guide_table_detail_critic_scores_margin_start">6dp</dimen>
     <dimen name="program_guide_table_detail_critic_score_margin_start">6dp</dimen>
     <dimen name="program_guide_table_detail_critic_score_logo_dimen">10dp</dimen>
@@ -246,23 +244,9 @@
     <dimen name="shrunken_tvview_block_icon_height">60dp</dimen>
     <dimen name="shrunken_tvview_block_vertical_spacing">24dp</dimen>
 
-    <!-- PIP view -->
-    <dimen name="pipview_margin_horizontal">56dp</dimen>
-    <dimen name="pipview_margin_top">27dp</dimen>
-    <dimen name="pipview_margin_bottom">27dp</dimen>
-    <dimen name="pipview_small_size_width">240dp</dimen>
-    <dimen name="pipview_small_size_height">135dp</dimen>
-    <dimen name="pipview_large_size_width">384dp</dimen>
-    <dimen name="pipview_large_size_height">216dp</dimen>
-
-    <!-- PAP View -->
-    <dimen name="papview_margin_horizontal">20dp</dimen>
-    <dimen name="papview_spacing">24dp</dimen>
-
     <!-- Edit channels -->
     <dimen name="shrunken_tvview_margin_start">56dp</dimen>
     <dimen name="shrunken_tvview_margin_end">32dp</dimen>
-    <dimen name="shrunken_tvview_height">288dp</dimen>
 
     <!-- Channel banner -->
     <dimen name="channel_banner_width">696dp</dimen>
@@ -276,7 +260,7 @@
     <dimen name="channel_banner_channel_logo_height">44dp</dimen>
     <dimen name="channel_banner_channel_logo_margin_start">8dp</dimen>
     <dimen name="channel_banner_input_logo_size">16dp</dimen>
-    <dimen name="channel_banner_program_description_width">536dp</dimen>
+    <dimen name="channel_banner_program_description_width">456dp</dimen>
     <dimen name="channel_banner_program_large_text_size">28sp</dimen>
     <dimen name="channel_banner_program_medium_text_size">20sp</dimen>
     <dimen name="channel_banner_program_large_margin_top">-10sp</dimen>
@@ -292,6 +276,7 @@
 
     <!-- Input banner -->
     <dimen name="input_banner_item_height">48dp</dimen>
+    <dimen name="input_banner_item_label_max_width">324dp</dimen>
 
     <!-- Keypad channel switch -->
     <dimen name="keypad_channel_switch_channel_number_text_size">
@@ -338,9 +323,7 @@
 
     <!-- DVR screens -->
     <eat-comment />
-    <dimen name="dvr_card_layout_width">196dp</dimen>
-
-    <!--DVR schedules list-->
+    <!-- DVR schedules list -->
     <dimen name="dvr_schedules_layout_padding">132dp</dimen>
     <dimen name="dvr_schedules_row_divider_height">1dp</dimen>
     <dimen name="dvr_schedules_item_width">960dp</dimen>
@@ -351,9 +334,7 @@
     <dimen name="dvr_schedules_item_time_start_padding">32dp</dimen>
     <dimen name="dvr_schedules_item_time_margin">14dp</dimen>
     <dimen name="dvr_schedules_item_info_top_margin">15dp</dimen>
-    <dimen name="dvr_schedules_item_conflict_info_top_margin">12dp</dimen>
     <dimen name="dvr_schedules_item_conflict_info_bottom_margin">15dp</dimen>
-    <dimen name="dvr_schedules_item_schedule_width">56dp</dimen>
     <dimen name="dvr_schedules_item_delete_width">46dp</dimen>
     <dimen name="dvr_schedules_item_section_margin">32dp</dimen>
     <dimen name="dvr_schedules_item_icon_size">18dp</dimen>
@@ -363,26 +344,29 @@
     <dimen name="dvr_schedules_header_margin_bottom">24dp</dimen>
     <dimen name="dvr_schedules_header_subtitle_margin_top">5dp</dimen>
     <dimen name="dvr_schedules_header_icon_container_width">143dp</dimen>
-    <dimen name="dvr_schedules_header_icon_size">32dp</dimen>
     <dimen name="dvr_schedules_header_icon_horizontal_margin">12dp</dimen>
     <dimen name="dvr_schedules_warning_icon_padding">4dp</dimen>
 
-    <!-- card width - margin-->
-    <dimen name="dvr_card_image_layout_width">192dp</dimen>
-    <dimen name="dvr_card_image_layout_height">108dp</dimen>
-    <dimen name="dvr_card_progress_height">2dp</dimen>
+    <!-- DVR Library -->
+    <dimen name="dvr_library_expanded_row_height">175dp</dimen>
+    <dimen name="dvr_library_card_image_layout_width">144dp</dimen>
+    <dimen name="dvr_library_card_image_layout_height">108dp</dimen>
+    <dimen name="dvr_library_card_progress_height">2dp</dimen>
+    <dimen name="dvr_library_card_folded_title_height">20dp</dimen>
+    <dimen name="dvr_library_card_expanded_title_height">36.5dp</dimen>
 
     <!-- DVR playback fragment -->
-    <dimen name="dvr_related_recordings_width">146dp</dimen>
-    <dimen name="dvr_related_recordings_height">82dp</dimen>
+    <dimen name="dvr_related_recordings_width">108dp</dimen>
+    <dimen name="dvr_related_recordings_height">81dp</dimen>
     <!-- This value is used to adjust position of DVR playback controls row when there is no
          program description -->
     <dimen name="dvr_playback_controls_extra_padding_top">27.5dp</dimen>
     <!-- This value is used to adjust position of DVR playback overlay fragment when there is no
          related recordings -->
-    <dimen name="dvr_playback_fragment_extra_padding_top">48dp</dimen>
-    <dimen name="lb_playback_controls_padding_top">265dp</dimen>
-    <dimen name="lb_playback_controls_padding_bottom">40dp</dimen>
+    <dimen name="dvr_playback_overlay_padding_top_no_related_row">48dp</dimen>
+    <!-- This value is used to adjust position of DVR playback overlay fragment when there is
+         secondary controls row -->
+    <dimen name="dvr_playback_overlay_padding_top_no_secondary_row">36dp</dimen>
 
     <!-- details fragment -->
     <dimen name="dvr_details_poster_width">219dp</dimen>

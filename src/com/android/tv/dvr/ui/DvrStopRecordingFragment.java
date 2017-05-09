@@ -33,7 +33,7 @@ import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.dvr.DvrDataManager.ScheduledRecordingListener;
-import com.android.tv.dvr.ScheduledRecording;
+import com.android.tv.dvr.data.ScheduledRecording;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -131,15 +131,8 @@ public class DvrStopRecordingFragment extends DvrGuidedStepFragment {
         String title = getString(R.string.dvr_stop_recording_dialog_title);
         String description;
         if (mStopReason == REASON_ON_CONFLICT) {
-            String programTitle = mSchedule.getProgramTitle();
-            if (TextUtils.isEmpty(programTitle)) {
-                ChannelDataManager channelDataManager =
-                        TvApplication.getSingletons(getActivity()).getChannelDataManager();
-                Channel channel = channelDataManager.getChannel(mSchedule.getChannelId());
-                programTitle = channel.getDisplayName();
-            }
             description = getString(R.string.dvr_stop_recording_dialog_description_on_conflict,
-                    mSchedule.getProgramTitle());
+                    mSchedule.getProgramDisplayTitle(getContext()));
         } else {
             description = getString(R.string.dvr_stop_recording_dialog_description);
         }

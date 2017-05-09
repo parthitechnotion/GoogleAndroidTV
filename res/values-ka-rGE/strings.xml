@@ -20,9 +20,8 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"მონო"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"სტერეო"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"ჩართვის კონტროლი"</string>
-    <string name="menu_title_channels" msgid="1801845517674690003">"უახლესი არხები"</string>
+    <string name="menu_title_channels" msgid="1949045451672990132">"არხები"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"TV პარამეტრები"</string>
-    <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP პარამეტრები"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"ამ არხისთვის არ არის ხელმისაწვდომი ჩართვის კონტროლი"</string>
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"დაკვრა ან პაუზა"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"წინ გადახვევა"</string>
@@ -35,33 +34,15 @@
     <string name="options_item_closed_caption" msgid="5945274655046367170">"დახურ.წარწერები"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"ჩვენების რეჟიმი"</string>
     <string name="options_item_pip" msgid="3951350386626879645">"PIP"</string>
-    <string name="options_item_pip_on" msgid="4647247480009077381">"ჩართული"</string>
-    <string name="options_item_pip_off" msgid="8799500161592387451">"გამორთული"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"მულტი-აუდიო"</string>
     <string name="options_item_more_channels" msgid="971040969622943300">"მეტი არხის მიღება"</string>
     <string name="options_item_settings" msgid="7623205838542400074">"პარამეტრები"</string>
-    <string name="pip_options_item_source" msgid="1050948525825308652">"წყარო"</string>
-    <string name="pip_options_item_swap" msgid="7245362207353732048">"შენაცვლება"</string>
-    <string name="pip_options_item_swap_on" msgid="5647182616484983505">"ჩართული"</string>
-    <string name="pip_options_item_swap_off" msgid="3023597229417709768">"გამორთული"</string>
-    <string name="pip_options_item_sound" msgid="3107034283791231648">"ხმა"</string>
-    <string name="pip_options_item_sound_main" msgid="1063937534112558691">"მთავარი"</string>
-    <string name="pip_options_item_sound_pip_window" msgid="435064142351853008">"PIP ფანჯარა"</string>
-    <string name="pip_options_item_layout" msgid="5126206342060967651">"განლაგება"</string>
-    <string name="pip_options_item_layout_bottom_right" msgid="5256839015192920238">"ქვედა მარჯვენა"</string>
-    <string name="pip_options_item_layout_top_right" msgid="3585067214787055279">"ზედა მარჯვენა"</string>
-    <string name="pip_options_item_layout_top_left" msgid="2173997010201637462">"ზედა მარცხენა"</string>
-    <string name="pip_options_item_layout_bottom_left" msgid="1727197877968915329">"ქვედა მარცხენა"</string>
-    <string name="pip_options_item_layout_side_by_side" msgid="9009784972740915779">"გვერდი-გვერდ"</string>
-    <string name="pip_options_item_size" msgid="5662894110243750158">"ზომა"</string>
-    <string name="pip_options_item_size_big" msgid="6303301565563444718">"დიდი"</string>
-    <string name="pip_options_item_size_small" msgid="7393731186585004206">"პატარა"</string>
-    <string name="side_panel_title_pip_input_source" msgid="8722544967592970296">"შემავალი წყარო"</string>
     <string name="input_long_label_for_tuner" msgid="3423514011918382209">"ტელევიზია (ანტენა/კაბელი)"</string>
     <string name="no_program_information" msgid="1049844207745145132">"პროგრამის ინფორმაცია არ არის"</string>
     <string name="program_title_for_no_information" msgid="384451471906070101">"ინფორმაცია არ არის ხელმისაწვდომი"</string>
     <string name="program_title_for_blocked_channel" msgid="5358005891746983819">"დაბლოკილი არხი"</string>
-    <string name="default_language" msgid="4122326459624337928">"უცნობი ენა"</string>
+    <string name="multi_audio_unknown_language" msgid="8639884627225598143">"უცნობი ენა"</string>
+    <string name="closed_caption_unknown_language" msgid="4745445516930229353">"დახურული სუბტიტრები %1$d"</string>
     <string name="side_panel_title_closed_caption" msgid="2513905054082568780">"დახურული სუბტიტრები"</string>
     <string name="closed_caption_option_item_off" msgid="4824009036785647753">"გამორთულია"</string>
     <string name="closed_caption_system_settings" msgid="1856974607743827178">"ფორმატირების მორგება"</string>
@@ -135,6 +116,10 @@
     </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"ეს PIN არასწორი იყო. ისევ სცადეთ."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"სცადეთ ისევ, PIN არ შეესაბამება"</string>
+    <string name="postal_code_guidance_title" msgid="4144793072363879833">"შეიყვანეთ თქვენი ZIP კოდი."</string>
+    <string name="postal_code_guidance_description" msgid="4224511147377561572">"სატელევიზიო არხების სრული პროგრამის სახელმძღვანელოს მისაწოდებლად, Live TV აპი ZIP კოდს გამოიყენებს."</string>
+    <string name="postal_code_action_description" msgid="4428720607051109105">"შეიყვანეთ თქვენი ZIP კოდი"</string>
+    <string name="postal_code_invalid_warning" msgid="923373584458340746">"არასწორი ZIP კოდი"</string>
     <string name="side_panel_title_settings" msgid="8244327316510918755">"პარამეტრები"</string>
     <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"არხების სიის მორგება"</string>
     <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"აირჩიეთ არხები პროგრამის სახელმძღვანელოსთვის"</string>
@@ -143,6 +128,7 @@
     <string name="settings_parental_controls" msgid="5449397921700749317">"მშობელთა კონტროლი"</string>
     <string name="settings_menu_licenses" msgid="1257646083838406103">"ღია კოდის ლიცენზიები"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ღია კოდის ლიცენზიები"</string>
+    <string name="settings_send_feedback" msgid="6897217561193701829">"გამოხმაურება"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"ვერსია"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ამ არხის საყურებლად დააჭირეთ „მარჯვენას“ და შეიყვანოთ თქვენი PIN"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"ამ პროგრამის საყურებლად დააჭირეთ „მარჯვენას“ და შეიყვანოთ თქვენი PIN"</string>
@@ -181,8 +167,6 @@
     <string name="intro_description" msgid="7806473686446937307"><b>"დააჭირეთ არჩევას"</b>" სატელევიზიო მენიუზე წვდომისთვის."</string>
     <string name="msg_no_input" msgid="3897674146985427865">"TV შეყვანა ვერ მოიძებნა."</string>
     <string name="msg_no_specific_input" msgid="2688885987104249852">"TV შეყვანა ვერ იძებნება."</string>
-    <string name="msg_no_pip_support" msgid="161508628996629445">"არ არის PIP-ის მხარდაჭერა."</string>
-    <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"PIP-ში გამოსაჩენი შემავალი სიგნალი მიუწვდომელია."</string>
     <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ტიუნერის ტიპი არ არის შესაფერისი; გთხოვთ გაუშვით პირდაპირი არხების აპი, სატელევიზიო შეტანის ტიუნერის ტიპისათვის."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"არხების დაჭერა ვერ მოხერხდა."</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"ამ მოქმედების შესასრულებლად აპი ვერ მოიძებნა."</string>
@@ -259,8 +243,6 @@
     <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"შენახვა"</string>
     <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"ერთჯერად ჩანაწერებს მიენიჭოს მეტი პრიორიტეტი"</string>
     <string name="dvr_action_cancel" msgid="8094060199570272625">"გაუქმება"</string>
-    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"გაუქმება"</string>
-    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"დავიწყება"</string>
     <string name="dvr_action_stop" msgid="1378723485295471381">"შეწყვეტა"</string>
     <string name="dvr_action_view_schedules" msgid="7442990695392774263">"ჩაწერის განრიგის ნახვა"</string>
     <string name="dvr_action_record_episode" msgid="8596182676610326327">"მხოლოდ ეს პროგრამა"</string>
@@ -270,25 +252,29 @@
     <string name="dvr_action_record_instead" msgid="6821164728752215738">"სანაცვლოდ, ჩაიწეროს ეს"</string>
     <string name="dvr_action_record_cancel" msgid="8644254745772185288">"ამ ჩანაწერის გაუქმება"</string>
     <string name="dvr_action_watch_now" msgid="7181211920959075976">"ახლავე ყურება"</string>
+    <string name="dvr_action_delete_recordings" msgid="850785346795261671">"ჩანაწერების წაშლა…"</string>
     <string name="dvr_epg_program_recordable" msgid="609229576209476903">"შესაძლებელია ჩაწერა"</string>
     <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"ჩაწერა დაგეგმილია"</string>
     <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"ჩაწერის კონფლიქტი"</string>
     <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"მიმდინარეობს ჩაწერა"</string>
     <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"ჩაწერა ვერ მოხერხდა"</string>
     <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"მიმდინარეობს პროგრამების წაკითხვა ჩაწერის განრიგების შესაქმნელად"</string>
-    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"მიმდინარეობს პროგრამების წაკითხვა"</string>
-    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
-    <skip />
+    <string name="dvr_series_progress_message_reading_programs" msgid="2961615820635219355">"მიმდინარეობს პროგრამების წაკითხვა"</string>
+    <string name="dvr_error_insufficient_space_action_view_recent_recordings" msgid="137918938589787623">"ბოლო ჩანაწერების ნახვა"</string>
+    <string name="dvr_error_insufficient_space_title_one_recording" msgid="759510175792505150">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> არასრულად ჩაიწერა."</string>
+    <string name="dvr_error_insufficient_space_title_two_recordings" msgid="5518578722556227631">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> და <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> არასრულად ჩაიწერა."</string>
+    <string name="dvr_error_insufficient_space_title_three_or_more_recordings" msgid="5104901174884754363">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> და <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> არასრულად ჩაიწერა."</string>
+    <string name="dvr_error_insufficient_space_description_one_recording" msgid="9092549220659026111">"არასაკმარისი მეხსიერების გამო, <xliff:g id="PROGRAMNAME">%1$s</xliff:g> არასრულად ჩაიწერა."</string>
+    <string name="dvr_error_insufficient_space_description_two_recordings" msgid="7712799694720979003">"არასაკმარისი მეხსიერების გამო, <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> და <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> არასრულად ჩაიწერა."</string>
+    <string name="dvr_error_insufficient_space_description_three_or_more_recordings" msgid="7877855707777832128">"არასაკმარისი მეხსიერების გამო, <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> და <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> არასრულად ჩაიწერა."</string>
     <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR მეტ მეხსიერებას საჭიროებს"</string>
     <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"DVR-ის მეშვეობით პროგრამების ჩაწერა შესაძლებელია, თუმცა თქვენს მოწყობილობაზე ამჟამად ხელმისაწვდომი მეხსიერება DVR-ის მუშაობისთვის არასაკმარისია. გთხოვთ, დააკავშიროთ <xliff:g id="STORAGE_SIZE">%1$s</xliff:g> გბაიტი ან მეტი მოცულობის დისკწამყვანი და მიჰყვეთ ინსტრუქციას, რომელიც დაგეხმარებათ, დააფორმატოთ ის მოწყობილობის მეხსიერების სახით."</string>
+    <string name="dvr_error_no_free_space_title" msgid="881897873932403512">"მეხსიერება არასაკმარისია"</string>
+    <string name="dvr_error_no_free_space_description" msgid="6406038381803431564">"ეს პროგრამა ვერ ჩაიწერება არასაკმარისი მეხსიერების გამო. ცადეთ არსებული ჩანაწერების წაშლა."</string>
     <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"აკლია მეხსიერება"</string>
-    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"DVR-ის მიერ გამოყენებული მეხსიერების ნაწილი ვერ მოიძებნა. DVR-ის ხელახლა ჩასართავად, გთხოვთ, დააკავშიროთ გარე დისკი, რომლითაც ადრე სარგებლობდით. თუ მეხსიერება ხელმისაწვდომი აღარ არის, შეგიძლიათ მეხსიერების დავიწყება აირჩიოთ."</string>
-    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"გსურთ მეხსიერების დავიწყება?"</string>
-    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"მთელი თქვენი ჩაწერილი კონტენტი და ყველა განრიგი დაიკარგება."</string>
     <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"გსურთ ჩაწერის შეწყვეტა?"</string>
     <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"ჩაწერილი კონტენტი შეინახება."</string>
-    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
-    <skip />
+    <string name="dvr_stop_recording_dialog_description_on_conflict" msgid="7876857267536083760">"„<xliff:g id="PROGRAMNAME">%1$s</xliff:g>“-ის ჩაწერა შეწყდება ამ პროგრამასთან კონფლიქტის გამო. ჩაწერილი კონტენტი შეინახება."</string>
     <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"ჩაწერა დაგეგმილია, თუმცა ის კონფლიქტშია"</string>
     <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"ჩაწერა დაიწყო, თუმცა ის კონფლიქტშია"</string>
     <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> ჩაიწერება."</string>
@@ -306,14 +292,27 @@
     <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"იგივე პროგრამა უკვე დაიგეგმა ჩასაწერად <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g>-ზე."</string>
     <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"უკვე ჩაწერილია"</string>
     <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"ეს პროგრამა უკვე ჩაწერილია და DVR ბიბლიოთეკაშია ხელმისაწვდომი."</string>
-    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
-    <skip />
-    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_series_recording_dialog_title" msgid="3521956660855853797">"სერიალის ჩაწერა დაგეგმილია"</string>
+    <plurals name="dvr_series_scheduled_no_conflict" formatted="false" msgid="6909096418632555251">
+      <item quantity="other">„<xliff:g id="SERIESNAME_3">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ჩანაწერი.</item>
+      <item quantity="one">„<xliff:g id="SERIESNAME_1">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ჩანაწერი.</item>
+    </plurals>
+    <plurals name="dvr_series_recording_scheduled_only_this_series_conflict" formatted="false" msgid="2341548158607418515">
+      <item quantity="other">„<xliff:g id="SERIESNAME_3">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ჩანაწერი. <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g> მათგანი ვერ ჩაიწერება კონფლიქტების გამო.</item>
+      <item quantity="one">„<xliff:g id="SERIESNAME_1">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ჩანაწერი. ის ვერ ჩაიწერება კონფლიქტების გამო.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_this_and_other_series_conflict" formatted="false" msgid="6123651855499916154">
+      <item quantity="other">„<xliff:g id="SERIESNAME_4">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ჩანაწერი. ამ სერიალის <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ეპიზოდი და სხვა სერიალები ვერ ჩაიწერება კონფლიქტების გამო.</item>
+      <item quantity="one">„<xliff:g id="SERIESNAME_1">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ჩანაწერი. ამ სერიალის <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> ეპიზოდი და სხვა სერიალები ვერ ჩაიწერება კონფლიქტების გამო.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_one_conflict" formatted="false" msgid="8628389493339609682">
+      <item quantity="other">„<xliff:g id="SERIESNAME_3">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ჩანაწერი. სხვა სერიალის 1 ეპიზოდი ვერ ჩაიწერება კონფლიქტების გამო.</item>
+      <item quantity="one">„<xliff:g id="SERIESNAME_1">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ჩანაწერი. სხვა სერიალის 1 ეპიზოდი ვერ ჩაიწერება კონფლიქტების გამო.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_many_conflicts" formatted="false" msgid="1601104768354168073">
+      <item quantity="other">„<xliff:g id="SERIESNAME_4">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ჩანაწერი. სხვა სერიალების <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ეპიზოდი ვერ ჩაიწერება კონფლიქტების გამო.</item>
+      <item quantity="one">„<xliff:g id="SERIESNAME_1">%2$s</xliff:g>“-სთვის დაიგეგმა <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ჩანაწერი. სხვა სერიალების <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> ეპიზოდი ვერ ჩაიწერება კონფლიქტების გამო.</item>
+    </plurals>
     <string name="dvr_program_not_found" msgid="3282879532038010202">"ჩაწერილი პროგრამა ვერ მოიძებნა."</string>
     <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"დაკავშირებული ჩანაწერები"</string>
     <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(პროგრამის აღწერა არ არის)"</string>
@@ -336,6 +335,7 @@
     <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"გსურთ სერიალის ჩაწერის შეწყვეტა?"</string>
     <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"ჩაწერილი ეპიზოდები DVR ბიბლიოთეკაში კვლავ იქნება ხელმისაწვდომი."</string>
     <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"შეწყვეტა"</string>
+    <string name="dvr_series_schedules_stopped_empty_state" msgid="1464244804664395151">"ამჟამად ეთერში არცერთი ეპიზოდი არ გადის."</string>
     <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"ეპიზოდები მიუწვდომელია.\nმათი ჩაწერა მოხდება მაშინ, როცა ისინი ხელმისაწვდომი გახდება."</string>
     <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
       <item quantity="other">(%1$d წუთი)</item>

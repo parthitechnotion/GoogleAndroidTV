@@ -27,7 +27,7 @@ import com.android.tv.TvApplication;
 import com.android.tv.common.SoftPreconditions;
 import com.android.tv.data.Channel;
 import com.android.tv.dvr.DvrManager;
-import com.android.tv.dvr.ScheduledRecording;
+import com.android.tv.dvr.data.ScheduledRecording;
 import com.android.tv.dvr.ui.DvrConflictFragment.DvrChannelRecordConflictFragment;
 
 import java.util.ArrayList;

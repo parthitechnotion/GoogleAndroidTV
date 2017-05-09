@@ -44,8 +44,8 @@ import com.android.tv.analytics.Tracker;
 import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.data.Channel;
 import com.android.tv.dvr.DvrManager;
-import com.android.tv.dvr.DvrUiHelper;
-import com.android.tv.dvr.ScheduledRecording;
+import com.android.tv.dvr.data.ScheduledRecording;
+import com.android.tv.dvr.ui.DvrUiHelper;
 import com.android.tv.guide.ProgramManager.TableEntry;
 import com.android.tv.util.ToastUtils;
 import com.android.tv.util.Utils;
@@ -106,18 +106,19 @@ public class ProgramItemView extends TextView {
                 }, entry.getWidth() > ((ProgramItemView) view).mMaxWidthForRipple ? 0
                         : view.getResources()
                                 .getInteger(R.integer.program_guide_ripple_anim_duration));
-            } else if (CommonFeatures.DVR.isEnabled(view.getContext())) {
+            } else if (entry.program != null && CommonFeatures.DVR.isEnabled(view.getContext())) {
                 DvrManager dvrManager = singletons.getDvrManager();
                 if (entry.entryStartUtcMillis > System.currentTimeMillis()
                         && dvrManager.isProgramRecordable(entry.program)) {
                     if (entry.scheduledRecording == null) {
-                        if (DvrUiHelper.checkStorageStatusAndShowErrorMessage(tvActivity,
-                                channel.getInputId())
-                                && DvrUiHelper.handleCreateSchedule(tvActivity, entry.program)) {
-                            String msg = view.getContext().getString(
-                                    R.string.dvr_msg_program_scheduled, entry.program.getTitle());
-                            ToastUtils.show(view.getContext(), msg, Toast.LENGTH_SHORT);
-                        }
+                        DvrUiHelper.checkStorageStatusAndShowErrorMessage(tvActivity,
+                                channel.getInputId(), new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        DvrUiHelper.requestRecordingFutureProgram(tvActivity,
+                                                entry.program, false);
+                                    }
+                                });
                     } else {
                         dvrManager.removeScheduledRecording(entry.scheduledRecording);
                         String msg = view.getResources().getString(

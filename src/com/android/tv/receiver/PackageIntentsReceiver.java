@@ -19,8 +19,10 @@ package com.android.tv.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 
 import com.android.tv.TvApplication;
+import com.android.tv.util.Partner;
 
 /**
  * A class for handling the broadcast intents from PackageManager.
@@ -31,5 +33,9 @@ public class PackageIntentsReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         TvApplication.setCurrentRunningProcess(context, true);
         ((TvApplication) context.getApplicationContext()).handleInputCountChanged();
+
+        Uri uri = intent.getData();
+        final String packageName = (uri != null ? uri.getSchemeSpecificPart() : null);
+        Partner.reset(context, packageName);
     }
 }

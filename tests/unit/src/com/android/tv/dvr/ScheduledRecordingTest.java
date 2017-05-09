@@ -26,6 +26,7 @@ import android.util.Range;
 
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
+import com.android.tv.dvr.data.ScheduledRecording;
 import com.android.tv.testing.dvr.RecordingTestUtils;
 
 import junit.framework.TestCase;

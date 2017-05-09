@@ -37,6 +37,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import com.android.tv.analytics.Analytics;
+import com.android.tv.util.Debug;
 import com.android.tv.analytics.StubAnalytics;
 import com.android.tv.analytics.StubAnalytics;
 import com.android.tv.analytics.Tracker;
@@ -53,10 +54,10 @@ import com.android.tv.data.ProgramDataManager;
 import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.dvr.DvrDataManagerImpl;
 import com.android.tv.dvr.DvrManager;
-import com.android.tv.dvr.DvrRecordingService;
 import com.android.tv.dvr.DvrScheduleManager;
 import com.android.tv.dvr.DvrStorageStatusManager;
 import com.android.tv.dvr.DvrWatchedPositionManager;
+import com.android.tv.dvr.recorder.DvrRecordingService;
 import com.android.tv.tuner.TunerPreferences;
 import com.android.tv.tuner.tvinput.TunerTvInputService;
 import com.android.tv.tuner.util.TunerInputInfoUtils;
@@ -106,6 +107,8 @@ public class TvApplication extends Application implements ApplicationSingletons 
 
     @Override
     public void onCreate() {
+        Debug.getTimer(Debug.TAG_START_UP_TIMER).start();
+        Debug.getTimer(Debug.TAG_START_UP_TIMER).log("TvApplication.onCreate start");
         super.onCreate();
         SharedPreferencesUtils.initialize(this, new Runnable() {
             @Override
@@ -149,13 +152,13 @@ public class TvApplication extends Application implements ApplicationSingletons 
             mAnalytics = StubAnalytics.getInstance(this);
         }
         mTracker = mAnalytics.getDefaultTracker();
-        mTvInputManagerHelper = new TvInputManagerHelper(this);
-        mTvInputManagerHelper.start();
+        getTvInputManagerHelper();
         // In SetupFragment, transitions are set in the constructor. Because the fragment can be
         // created in Activity.onCreate() by the framework, SetupAnimationHelper should be
         // initialized here before Activity.onCreate() is called.
         SetupAnimationHelper.initialize(this);
         Log.i(TAG, "Started Live TV " + mVersionName);
+        Debug.getTimer(Debug.TAG_START_UP_TIMER).log("TvApplication.onCreate end");
     }
 
     private void setCurrentRunningProcess(boolean isMainProcess) {
@@ -167,8 +170,10 @@ public class TvApplication extends Application implements ApplicationSingletons 
         if (CommonFeatures.DVR.isEnabled(this)) {
             mDvrStorageStatusManager = new DvrStorageStatusManager(this, mRunningInMainProcess);
         }
+        // Fetch remote config
+        getSingletons(this).getRemoteConfig().fetch(null);
         if (mRunningInMainProcess) {
-            mTvInputManagerHelper.addCallback(new TvInputCallback() {
+            getTvInputManagerHelper().addCallback(new TvInputCallback() {
                 @Override
                 public void onInputAdded(String inputId) {
                     if (Features.TUNER.isEnabled(TvApplication.this) && TextUtils.equals(inputId,
@@ -268,7 +273,7 @@ public class TvApplication extends Application implements ApplicationSingletons 
     @Override
     public ChannelDataManager getChannelDataManager() {
         if (mChannelDataManager == null) {
-            mChannelDataManager = new ChannelDataManager(this, mTvInputManagerHelper);
+            mChannelDataManager = new ChannelDataManager(this, getTvInputManagerHelper());
             mChannelDataManager.start();
         }
         return mChannelDataManager;
@@ -314,6 +319,10 @@ public class TvApplication extends Application implements ApplicationSingletons 
      */
     @Override
     public TvInputManagerHelper getTvInputManagerHelper() {
+        if (mTvInputManagerHelper == null) {
+            mTvInputManagerHelper = new TvInputManagerHelper(this);
+            mTvInputManagerHelper.start();
+        }
         return mTvInputManagerHelper;
     }
 

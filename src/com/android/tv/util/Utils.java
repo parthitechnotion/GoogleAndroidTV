@@ -44,11 +44,13 @@ import android.view.View;
 import com.android.tv.ApplicationSingletons;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
+import com.android.tv.common.BuildConfig;
 import com.android.tv.common.SoftPreconditions;
 import com.android.tv.data.Channel;
 import com.android.tv.data.GenreItems;
 import com.android.tv.data.Program;
 import com.android.tv.data.StreamInfo;
+import com.android.tv.experiments.Experiments;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -83,9 +85,6 @@ public class Utils {
     public static final String EXTRA_KEY_RECORDED_PROGRAM_PIN_CHECKED =
             "recorded_program_pin_checked";
 
-    // Query parameter in the intent of starting MainActivity.
-    public static final String PARAM_SOURCE = "source";
-
     private static final String PATH_CHANNEL = "channel";
     private static final String PATH_PROGRAM = "program";
 
@@ -97,6 +96,8 @@ public class Utils {
             "last_watched_tuner_input_id";
     private static final String PREF_KEY_RECORDING_FAILED_REASONS =
             "recording_failed_reasons";
+    private static final String PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET =
+            "failed_scheduled_recording_info_set";
 
     private static final int VIDEO_SD_WIDTH = 704;
     private static final int VIDEO_SD_HEIGHT = 480;
@@ -114,6 +115,7 @@ public class Utils {
     private static final int AUDIO_CHANNEL_SURROUND_8 = 8;
 
     private static final long RECORDING_FAILED_REASON_NONE = 0;
+    private static final long HALF_MINUTE_MS = TimeUnit.SECONDS.toMillis(30);
     private static final long ONE_DAY_MS = TimeUnit.DAYS.toMillis(1);
 
     // Hardcoded list for known bundled inputs not written by OEM/SOCs.
@@ -207,6 +209,28 @@ public class Utils {
     }
 
     /**
+     * Adds the info of failed scheduled recording.
+     */
+    public static void addFailedScheduledRecordingInfo(Context context,
+            String scheduledRecordingInfo) {
+        Set<String> failedScheduledRecordingInfoSet = getFailedScheduledRecordingInfoSet(context);
+        failedScheduledRecordingInfoSet.add(scheduledRecordingInfo);
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putStringSet(PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET,
+                        failedScheduledRecordingInfoSet)
+                .apply();
+    }
+
+    /**
+     * Clears the failed scheduled recording info set.
+     */
+    public static void clearFailedScheduledRecordingInfoSet(Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .remove(PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET)
+                .apply();
+    }
+
+    /**
      * Clears recording failed reason.
      */
     public static void clearRecordingFailedReason(Context context, int reason) {
@@ -243,6 +267,14 @@ public class Utils {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getLong(PREF_KEY_RECORDING_FAILED_REASONS,
                         RECORDING_FAILED_REASON_NONE);
+    }
+
+    /**
+     * Returns the failed scheduled recordings info set.
+     */
+    public static Set<String> getFailedScheduledRecordingInfoSet(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getStringSet(PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET, new HashSet<>());
     }
 
     /**
@@ -333,6 +365,14 @@ public class Utils {
     }
 
     /**
+     * Returns the round off minutes when convert milliseconds to minutes.
+     */
+    public static int getRoundOffMinsFromMs(long millis) {
+        // Round off the result by adding half minute to the original ms.
+        return (int) TimeUnit.MILLISECONDS.toMinutes(millis + HALF_MINUTE_MS);
+    }
+
+    /**
      * Returns duration string according to the date & time format.
      * If {@code startUtcMillis} and {@code endUtcMills} are equal,
      * formatted time will be returned instead.
@@ -392,16 +432,18 @@ public class Utils {
                 : DateUtils.formatDateRange(context, startUtcMillis, endUtcMillis + 1, flag);
     }
 
-    @VisibleForTesting
+    /**
+     * Checks if two given time (in milliseconds) are in the same day with regard to the
+     * locale timezone.
+     */
     public static boolean isInGivenDay(long dayToMatchInMillis, long subjectTimeInMillis) {
-        final long DAY_IN_MS = TimeUnit.DAYS.toMillis(1);
         TimeZone timeZone = Calendar.getInstance().getTimeZone();
         long offset = timeZone.getRawOffset();
         if (timeZone.inDaylightTime(new Date(dayToMatchInMillis))) {
             offset += timeZone.getDSTSavings();
         }
-        return Utils.floorTime(dayToMatchInMillis + offset, DAY_IN_MS)
-                == Utils.floorTime(subjectTimeInMillis + offset, DAY_IN_MS);
+        return Utils.floorTime(dayToMatchInMillis + offset, ONE_DAY_MS)
+                == Utils.floorTime(subjectTimeInMillis + offset, ONE_DAY_MS);
     }
 
     /**
@@ -523,7 +565,7 @@ public class Utils {
         if (track.getType() != TvTrackInfo.TYPE_AUDIO) {
             throw new IllegalArgumentException("Not an audio track: " + track);
         }
-        String language = context.getString(R.string.default_language);
+        String language = context.getString(R.string.multi_audio_unknown_language);
         if (!TextUtils.isEmpty(track.getLanguage())) {
             language = new Locale(track.getLanguage()).getDisplayName();
         } else {
@@ -859,5 +901,12 @@ public class Utils {
             genres[i] = GenreItems.getCanonicalGenre(canonicalGenreIds[i]);
         }
         return Genres.encode(genres);
+    }
+
+    /**
+     * Returns true if the current user is a developer.
+     */
+    public static boolean isDeveloper() {
+        return BuildConfig.ENG || Experiments.ENABLE_DEVELOPER_FEATURES.get();
     }
 }

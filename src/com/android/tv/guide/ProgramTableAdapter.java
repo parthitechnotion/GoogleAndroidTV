@@ -45,19 +45,21 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.accessibility.AccessibilityManager;
+import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.tv.R;
 import com.android.tv.TvApplication;
+import com.android.tv.common.TvCommonUtils;
 import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
 import com.android.tv.data.Program.CriticScore;
 import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.dvr.DvrManager;
-import com.android.tv.dvr.ScheduledRecording;
+import com.android.tv.dvr.data.ScheduledRecording;
 import com.android.tv.guide.ProgramManager.TableEntriesUpdatedListener;
 import com.android.tv.parental.ParentalControlSettings;
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter;
@@ -241,16 +243,6 @@ public class ProgramTableAdapter extends RecyclerView.Adapter<ProgramTableAdapte
         notifyItemChanged(channelIndex, true);
     }
 
-    @Override
-    public void onViewAttachedToWindow(ProgramRowHolder holder) {
-        holder.onAttachedToWindow();
-    }
-
-    @Override
-    public void onViewDetachedFromWindow(ProgramRowHolder holder) {
-        holder.onDetachedFromWindow();
-    }
-
     // TODO: make it static
     public class ProgramRowHolder extends RecyclerView.ViewHolder
             implements ProgramRow.ChildFocusListener {
@@ -312,11 +304,40 @@ public class ProgramTableAdapter extends RecyclerView.Adapter<ProgramTableAdapte
         private final ImageView mInputLogoView;
 
         private boolean mIsInputLogoVisible;
+        private AccessibilityStateChangeListener mAccessibilityStateChangeListener =
+                new AccessibilityManager.AccessibilityStateChangeListener() {
+                    @Override
+                    public void onAccessibilityStateChanged(boolean enable) {
+                        enable &= !TvCommonUtils.isRunningInTest();
+                        mDetailView.setFocusable(enable);
+                        mChannelHeaderView.setFocusable(enable);
+                    }
+                };
 
         public ProgramRowHolder(View itemView) {
             super(itemView);
 
             mContainer = (ViewGroup) itemView;
+            mContainer.addOnAttachStateChangeListener(
+                    new View.OnAttachStateChangeListener() {
+                        @Override
+                        public void onViewAttachedToWindow(View v) {
+                            mContainer
+                                    .getViewTreeObserver()
+                                    .addOnGlobalFocusChangeListener(mGlobalFocusChangeListener);
+                            mAccessibilityManager.addAccessibilityStateChangeListener(
+                                    mAccessibilityStateChangeListener);
+                        }
+
+                        @Override
+                        public void onViewDetachedFromWindow(View v) {
+                            mContainer
+                                    .getViewTreeObserver()
+                                    .removeOnGlobalFocusChangeListener(mGlobalFocusChangeListener);
+                            mAccessibilityManager.removeAccessibilityStateChangeListener(
+                                    mAccessibilityStateChangeListener);
+                        }
+                    });
             mProgramRow = (ProgramRow) mContainer.findViewById(R.id.row);
 
             mDetailView = (ViewGroup) mContainer.findViewById(R.id.detail);
@@ -339,16 +360,11 @@ public class ProgramTableAdapter extends RecyclerView.Adapter<ProgramTableAdapte
             mChannelLogoView = (ImageView) mContainer.findViewById(R.id.channel_logo);
             mChannelBlockView = (ImageView) mContainer.findViewById(R.id.channel_block);
             mInputLogoView = (ImageView) mContainer.findViewById(R.id.input_logo);
-            mDetailView.setFocusable(mAccessibilityManager.isEnabled());
-            mChannelHeaderView.setFocusable(mAccessibilityManager.isEnabled());
-            mAccessibilityManager.addAccessibilityStateChangeListener(
-                    new AccessibilityManager.AccessibilityStateChangeListener() {
-                        @Override
-                        public void onAccessibilityStateChanged(boolean enable) {
-                            mDetailView.setFocusable(enable);
-                            mChannelHeaderView.setFocusable(enable);
-                        }
-                    });
+            // TODO: Find a better way to handle talk back.
+            boolean accessibilityEnabled = mAccessibilityManager.isEnabled()
+                    && !TvCommonUtils.isRunningInTest();
+            mDetailView.setFocusable(accessibilityEnabled);
+            mChannelHeaderView.setFocusable(accessibilityEnabled);
         }
 
         public void onBind(int position) {
@@ -506,16 +522,6 @@ public class ProgramTableAdapter extends RecyclerView.Adapter<ProgramTableAdapte
                             mDetailInAnimator = null;
                         }
                     });
-        }
-
-        private void onAttachedToWindow() {
-            mContainer.getViewTreeObserver()
-                    .addOnGlobalFocusChangeListener(mGlobalFocusChangeListener);
-        }
-
-        private void onDetachedFromWindow() {
-            mContainer.getViewTreeObserver()
-                    .removeOnGlobalFocusChangeListener(mGlobalFocusChangeListener);
         }
 
         private void updateDetailView() {

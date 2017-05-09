@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.dvr.DvrStorageStatusManager;
+import com.android.tv.dialog.HalfSizedDialogFragment;
 import com.android.tv.dvr.ui.DvrConflictFragment.DvrChannelWatchConflictFragment;
 import com.android.tv.dvr.ui.DvrConflictFragment.DvrProgramConflictFragment;
 import com.android.tv.guide.ProgramGuide;
@@ -162,6 +163,17 @@ public class DvrHalfSizedDialogFragment extends HalfSizedDialogFragment {
         @Override
         protected DvrGuidedStepFragment onCreateGuidedStepFragment() {
             return new DvrMissingStorageErrorFragment();
+        }
+    }
+
+    /**
+     * A dialog fragment to show error message when there is no enough free space to record.
+     */
+    public static class DvrNoFreeSpaceErrorDialogFragment
+            extends DvrGuidedStepDialogFragment {
+        @Override
+        protected DvrGuidedStepFragment onCreateGuidedStepFragment() {
+            return new DvrGuidedStepFragment.DvrNoFreeSpaceErrorFragment();
         }
     }
 

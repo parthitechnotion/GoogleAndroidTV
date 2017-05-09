@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
@@ -55,7 +56,6 @@ public class AppLinkCardView extends BaseCardView<Channel> {
     private final int mIconColorFilter;
 
     private ImageView mImageView;
-    private View mGradientView;
     private TextView mAppInfoView;
     private View mMetaViewHolder;
     private Channel mChannel;
@@ -102,35 +102,115 @@ public class AppLinkCardView extends BaseCardView<Channel> {
         int linkType = mChannel.getAppLinkType(getContext());
         mIntent = mChannel.getAppLinkIntent(getContext());
 
+        CharSequence appLabel = null;
+        mImageView.setForeground(null);
         switch (linkType) {
             case Channel.APP_LINK_TYPE_CHANNEL:
                 setText(mChannel.getAppLinkText());
                 mAppInfoView.setVisibility(VISIBLE);
-                mGradientView.setVisibility(VISIBLE);
                 mAppInfoView.setCompoundDrawablePadding(mIconPadding);
-                mAppInfoView.setCompoundDrawables(null, null, null, null);
-                mAppInfoView.setText(mPackageManager.getApplicationLabel(appInfo));
+                mAppInfoView.setCompoundDrawablesRelative(null, null, null, null);
+                appLabel = mTvInputManagerHelper.getTvInputApplicationLabel(channel.getInputId());
+                if (appLabel != null) {
+                    mAppInfoView.setText(appLabel);
+                } else {
+                    new AsyncTask<Void, Void, CharSequence>() {
+                        private final String mLoadTvInputId = mChannel.getInputId();
+
+                        @Override
+                        protected CharSequence doInBackground(Void... params) {
+                            if (appInfo != null) {
+                                return mPackageManager.getApplicationLabel(appInfo);
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(CharSequence appLabel) {
+                            mTvInputManagerHelper.setTvInputApplicationLabel(
+                                    mLoadTvInputId, appLabel);
+                            if (mLoadTvInputId != mChannel.getInputId() || !isAttachedToWindow()) {
+                                return;
+                            }
+                            mAppInfoView.setText(appLabel);
+                        }
+                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
                 if (!TextUtils.isEmpty(mChannel.getAppLinkIconUri())) {
                     mChannel.loadBitmap(getContext(), Channel.LOAD_IMAGE_TYPE_APP_LINK_ICON,
-                            mIconWidth, mIconHeight, createChannelLogoCallback(this, mChannel,
-                                    Channel.LOAD_IMAGE_TYPE_APP_LINK_ICON));
+                            mIconWidth, mIconHeight,
+                            createChannelLogoCallback(
+                                    this, mChannel, Channel.LOAD_IMAGE_TYPE_APP_LINK_ICON));
                 } else if (appInfo.icon != 0) {
-                    Drawable appIcon = mPackageManager.getApplicationIcon(appInfo);
-                    BitmapUtils.setColorFilterToDrawable(mIconColorFilter, appIcon);
-                    appIcon.setBounds(0, 0, mIconWidth, mIconHeight);
-                    mAppInfoView.setCompoundDrawables(appIcon, null, null, null);
+                    Drawable appIcon =
+                            mTvInputManagerHelper.getTvInputApplicationIcon(mChannel.getInputId());
+                    if (appIcon != null) {
+                        BitmapUtils.setColorFilterToDrawable(mIconColorFilter, appIcon);
+                        appIcon.setBounds(0, 0, mIconWidth, mIconHeight);
+                        mAppInfoView.setCompoundDrawablesRelative(appIcon, null, null, null);
+                    } else {
+                        new AsyncTask<Void, Void, Drawable>() {
+                            private final String mLoadTvInputId = mChannel.getInputId();
+
+                            @Override
+                            protected Drawable doInBackground(Void... params) {
+                                if (appInfo != null) {
+                                    return mPackageManager.getApplicationIcon(appInfo);
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Drawable appIcon) {
+                                mTvInputManagerHelper.setTvInputApplicationIcon(
+                                        mLoadTvInputId, appIcon);
+                                if (mLoadTvInputId != mChannel.getInputId()
+                                        || !isAttachedToWindow()) {
+                                    return;
+                                }
+                                BitmapUtils.setColorFilterToDrawable(mIconColorFilter, appIcon);
+                                appIcon.setBounds(0, 0, mIconWidth, mIconHeight);
+                                mAppInfoView.setCompoundDrawablesRelative(appIcon, null, null, null);
+                            }
+                        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    }
                 }
                 break;
             case Channel.APP_LINK_TYPE_APP:
-                setText(getContext().getString(
-                        R.string.channels_item_app_link_app_launcher,
-                        mPackageManager.getApplicationLabel(appInfo)));
+                appLabel = mTvInputManagerHelper.getTvInputApplicationLabel(mChannel.getInputId());
+                if (appLabel != null) {
+                    setText(getContext()
+                            .getString(R.string.channels_item_app_link_app_launcher, appLabel));
+                } else {
+                    new AsyncTask<Void, Void, CharSequence>() {
+                        private final String mLoadTvInputId = mChannel.getInputId();
+
+                        @Override
+                        protected CharSequence doInBackground(Void... params) {
+                            if (appInfo != null) {
+                                return mPackageManager.getApplicationLabel(appInfo);
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(CharSequence appLabel) {
+                            mTvInputManagerHelper.setTvInputApplicationLabel(
+                                    mLoadTvInputId, appLabel);
+                            if (mLoadTvInputId != mChannel.getInputId() || !isAttachedToWindow()) {
+                                return;
+                            }
+                            setText(getContext()
+                                    .getString(
+                                            R.string.channels_item_app_link_app_launcher,
+                                            appLabel));
+                        }
+                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
                 mAppInfoView.setVisibility(GONE);
-                mGradientView.setVisibility(GONE);
                 break;
             default:
                 mAppInfoView.setVisibility(GONE);
-                mGradientView.setVisibility(GONE);
                 Log.d(TAG, "Should not be here.");
         }
 
@@ -148,8 +228,6 @@ public class AppLinkCardView extends BaseCardView<Channel> {
         } else {
             setCardImageWithBanner(appInfo);
         }
-        // Call super.onBind() at the end intentionally. In order to correctly handle extension of
-        // text view, text should be set before calling super.onBind.
         super.onBind(channel, selected);
     }
 
@@ -182,13 +260,14 @@ public class AppLinkCardView extends BaseCardView<Channel> {
                 }
             }
             BitmapUtils.setColorFilterToDrawable(mIconColorFilter, drawable);
-            mAppInfoView.setCompoundDrawables(drawable, null, null, null);
+            mAppInfoView.setCompoundDrawablesRelative(drawable, null, null, null);
         } else if (type == Channel.LOAD_IMAGE_TYPE_APP_LINK_POSTER_ART) {
             if (bitmap == null) {
                 setCardImageWithBanner(
                         mTvInputManagerHelper.getTvInputAppInfo(mChannel.getInputId()));
             } else {
                 mImageView.setImageBitmap(bitmap);
+                mImageView.setForeground(getContext().getDrawable(R.drawable.card_image_gradient));
                 if (mChannel.getAppLinkColor() == 0) {
                     extractAndSetMetaViewBackgroundColor(bitmap);
                 }
@@ -200,7 +279,6 @@ public class AppLinkCardView extends BaseCardView<Channel> {
     protected void onFinishInflate() {
         super.onFinishInflate();
         mImageView = (ImageView) findViewById(R.id.image);
-        mGradientView = findViewById(R.id.image_gradient);
         mAppInfoView = (TextView) findViewById(R.id.app_info);
         mMetaViewHolder = findViewById(R.id.app_link_text_holder);
     }
@@ -209,37 +287,85 @@ public class AppLinkCardView extends BaseCardView<Channel> {
     // 1) Provided poster art image, 2) Activity banner, 3) Activity icon, 4) Application banner,
     // 5) Application icon, and 6) default image.
     private void setCardImageWithBanner(ApplicationInfo appInfo) {
-        Drawable banner = null;
-        if (mIntent != null) {
-            try {
-                banner = mPackageManager.getActivityBanner(mIntent);
-                if (banner == null) {
-                    banner = mPackageManager.getActivityIcon(mIntent);
+        new AsyncTask<Void, Void, Drawable>() {
+            private String mLoadTvInputId = mChannel.getInputId();
+            @Override
+            protected Drawable doInBackground(Void... params) {
+                Drawable banner = null;
+                if (mIntent != null) {
+                    try {
+                        banner = mPackageManager.getActivityBanner(mIntent);
+                        if (banner == null) {
+                            banner = mPackageManager.getActivityIcon(mIntent);
+                        }
+                    } catch (PackageManager.NameNotFoundException e) {
+                        // do nothing.
+                    }
                 }
-            } catch (PackageManager.NameNotFoundException e) {
-                // do nothing.
+                return banner;
             }
-        }
 
-        if (banner == null && appInfo != null) {
-            if (appInfo.banner != 0) {
-                banner = mPackageManager.getApplicationBanner(appInfo);
+            @Override
+            protected void onPostExecute(Drawable banner) {
+                if (mLoadTvInputId != mChannel.getInputId() || !isAttachedToWindow()) {
+                    return;
+                }
+                if (banner != null) {
+                    setCardImageWithBannerInternal(banner);
+                } else {
+                    setCardImageWithApplicationInfoBanner(appInfo);
+                }
             }
-            if (banner == null && appInfo.icon != 0) {
-                banner = mPackageManager.getApplicationIcon(appInfo);
-            }
-        }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 
+    private void setCardImageWithApplicationInfoBanner(ApplicationInfo appInfo) {
+        Drawable appBanner =
+                mTvInputManagerHelper.getTvInputApplicationBanner(mChannel.getInputId());
+        if (appBanner != null) {
+            setCardImageWithBannerInternal(appBanner);
+        } else {
+            new AsyncTask<Void, Void, Drawable>() {
+                private final String mLoadTvInputId = mChannel.getInputId();
+                @Override
+                protected Drawable doInBackground(Void... params) {
+                    Drawable banner = null;
+                    if (appInfo != null) {
+                        if (appInfo.banner != 0) {
+                            banner = mPackageManager.getApplicationBanner(appInfo);
+                        }
+                        if (banner == null && appInfo.icon != 0) {
+                            banner = mPackageManager.getApplicationIcon(appInfo);
+                        }
+                    }
+                    return banner;
+                }
+
+                @Override
+                protected void onPostExecute(Drawable banner) {
+                    mTvInputManagerHelper.setTvInputApplicationBanner(
+                            mLoadTvInputId, banner);
+                    if (mLoadTvInputId != mChannel.getInputId() || !isAttachedToWindow()) {
+                        return;
+                    }
+                    setCardImageWithBannerInternal(banner);
+                }
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+    }
+
+    private void setCardImageWithBannerInternal(Drawable banner) {
         if (banner == null) {
             mImageView.setImageResource(R.drawable.ic_recent_thumbnail_default);
             mImageView.setBackgroundResource(R.color.channel_card);
         } else {
-            Bitmap bitmap =
-                    Bitmap.createBitmap(mCardImageWidth, mCardImageHeight, Bitmap.Config.ARGB_8888);
+            Bitmap bitmap = Bitmap.createBitmap(
+                    mCardImageWidth, mCardImageHeight, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             banner.setBounds(0, 0, mCardImageWidth, mCardImageHeight);
             banner.draw(canvas);
             mImageView.setImageDrawable(banner);
+            mImageView.setForeground(getContext().getDrawable(R.drawable.card_image_gradient));
             if (mChannel.getAppLinkColor() == 0) {
                 extractAndSetMetaViewBackgroundColor(bitmap);
             }

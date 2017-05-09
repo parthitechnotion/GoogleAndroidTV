@@ -31,7 +31,6 @@ import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.recommendation.Recommender;
 import com.android.tv.util.SetupUtils;
 import com.android.tv.util.TvInputManagerHelper;
-import com.android.tv.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,8 +129,6 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
 
     @Override
     public void onBindViewHolder(MyViewHolder viewHolder, int position) {
-        super.onBindViewHolder(viewHolder, position);
-
         int viewType = getItemViewType(position);
         if (viewType == R.layout.menu_card_guide) {
             viewHolder.itemView.setOnClickListener(mGuideOnClickListener);
@@ -147,6 +144,7 @@ public class ChannelsRowAdapter extends ItemListRowView.ItemListAdapter<Channel>
             viewHolder.itemView.setTag(getItemList().get(position));
             viewHolder.itemView.setOnClickListener(mChannelOnClickListener);
         }
+        super.onBindViewHolder(viewHolder, position);
     }
 
     @Override

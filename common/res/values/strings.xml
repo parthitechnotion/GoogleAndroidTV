@@ -17,6 +17,7 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="action_text_done">Done</string>
+    <string name="action_text_skip">Skip</string>
     <!-- The episode display format with season and episode number used in series details view. -->
     <string name="display_episode_number_format">S<xliff:g id="season_number" example="1">%1$s</xliff:g>: Ep.<xliff:g id="episode_number" example="1">%2$s</xliff:g></string>
     <!-- The episode display format with episode number used in series details view. -->

@@ -256,7 +256,7 @@ public class FileTsStreamer implements TsStreamer {
          * Returns whether the current pid filter is empty or not.
          */
         public boolean isFilterEmpty() {
-            return mPids.size() > 0;
+            return mPids.size() == 0;
         }
 
         /**

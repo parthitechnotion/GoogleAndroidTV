@@ -226,7 +226,6 @@ public class ChannelTest extends AndroidTestCase {
      * See <a href="http://b/23031603">b/23031603</a>.
      */
     public void testComparatorLabel() {
-
         TvInputManagerHelper manager = Mockito.mock(TvInputManagerHelper.class);
         Mockito.when(manager.isPartnerInput(Matchers.anyString())).thenAnswer(
                 new Answer<Boolean>() {
@@ -252,6 +251,29 @@ public class ChannelTest extends AndroidTestCase {
                 new Channel.Builder().setDescription("B").setInputId("1").build());
 
         comparatorTester.test();
+    }
+
+    public void testNormalizeChannelNumber() {
+        assertNormalizedDisplayNumber(null, null);
+        assertNormalizedDisplayNumber("", "");
+        assertNormalizedDisplayNumber("1", "1");
+        assertNormalizedDisplayNumber("abcde", "abcde");
+        assertNormalizedDisplayNumber("1-1", "1-1");
+        assertNormalizedDisplayNumber("1.1", "1-1");
+        assertNormalizedDisplayNumber("1 1", "1-1");
+        assertNormalizedDisplayNumber("1\u058a1", "1-1");
+        assertNormalizedDisplayNumber("1\u05be1", "1-1");
+        assertNormalizedDisplayNumber("1\u14001", "1-1");
+        assertNormalizedDisplayNumber("1\u18061", "1-1");
+        assertNormalizedDisplayNumber("1\u20101", "1-1");
+        assertNormalizedDisplayNumber("1\u20111", "1-1");
+        assertNormalizedDisplayNumber("1\u20121", "1-1");
+        assertNormalizedDisplayNumber("1\u20131", "1-1");
+        assertNormalizedDisplayNumber("1\u20141", "1-1");
+    }
+
+    private void assertNormalizedDisplayNumber(String displayNumber, String normalized) {
+        assertEquals(normalized, Channel.normalizeDisplayNumber(displayNumber));
     }
 
     private class TestChannelComparator extends Channel.DefaultComparator {

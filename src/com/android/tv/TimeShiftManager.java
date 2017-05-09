@@ -887,10 +887,11 @@ public class TimeShiftManager {
             }
 
             long fetchStartTimeMs = Utils.floorTime(startTimeMs, MAX_DUMMY_PROGRAM_DURATION);
-            boolean needToLoad = addDummyPrograms(fetchStartTimeMs,
-                    endTimeMs + PREFETCH_DURATION_FOR_NEXT);
+            long fetchEndTimeMs = Utils.ceilTime(endTimeMs + PREFETCH_DURATION_FOR_NEXT,
+                    MAX_DUMMY_PROGRAM_DURATION);
+            boolean needToLoad = addDummyPrograms(fetchStartTimeMs, fetchEndTimeMs);
             if (needToLoad) {
-                Range<Long> period = Range.create(fetchStartTimeMs, endTimeMs);
+                Range<Long> period = Range.create(fetchStartTimeMs, fetchEndTimeMs);
                 mProgramLoadQueue.add(period);
                 startTaskIfNeeded();
             }
@@ -1012,7 +1013,7 @@ public class TimeShiftManager {
             for (int i = 0, j = 0; i < mPrograms.size() && j < loadedPrograms.size(); ++j) {
                 Program loadedProgram = loadedPrograms.get(j);
                 // Skip previous programs.
-                while (program.getEndTimeUtcMillis() < loadedProgram.getStartTimeUtcMillis()) {
+                while (program.getEndTimeUtcMillis() <= loadedProgram.getStartTimeUtcMillis()) {
                     // Reached end of mPrograms.
                     if (++i == mPrograms.size()) {
                         return;

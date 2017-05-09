@@ -384,10 +384,15 @@ public class MenuLayoutManager {
         mSelectedPosition = position;
         if (DEBUG) dumpChildren("startRowAnimation()");
 
-        MenuRowView currentView = mMenuRowViews.get(position);
         // Show the children of the next row.
-        currentView.getTitleView().setVisibility(View.VISIBLE);
-        currentView.getContentsView().setVisibility(View.VISIBLE);
+        final MenuRowView currentView = mMenuRowViews.get(position);
+        TextView currentTitleView = currentView.getTitleView();
+        View currentContentsView = currentView.getContentsView();
+        currentTitleView.setVisibility(View.VISIBLE);
+        currentContentsView.setVisibility(View.VISIBLE);
+        if (currentView instanceof PlayControlsRowView) {
+            ((PlayControlsRowView) currentView).onPreselected();
+        }
         // Request focus after the new contents view shows up.
         mMenuView.requestFocus();
         if (mTempTitleViewForOld == null) {
@@ -407,7 +412,7 @@ public class MenuLayoutManager {
 
         // Old row.
         MenuRow oldRow = mMenuRows.get(oldPosition);
-        MenuRowView oldView = mMenuRowViews.get(oldPosition);
+        final MenuRowView oldView = mMenuRowViews.get(oldPosition);
         View oldContentsView = oldView.getContentsView();
         // Old contents view.
         animators.add(createAlphaAnimator(oldContentsView, 1.0f, 0.0f, 1.0f, mLinearOutSlowIn)
@@ -468,8 +473,6 @@ public class MenuLayoutManager {
         }
         // Current row.
         Rect currentLayoutRect = new Rect(layouts.get(position));
-        TextView currentTitleView = currentView.getTitleView();
-        View currentContentsView = currentView.getContentsView();
         currentContentsView.setAlpha(0.0f);
         if (scrollDown) {
             // Current title view.
@@ -572,9 +575,8 @@ public class MenuLayoutManager {
                 for (ViewPropertyValueHolder holder : propertyValuesAfterAnimation) {
                     holder.property.set(holder.view, holder.value);
                 }
-                oldTitleView.setVisibility(View.VISIBLE);
-                mMenuRowViews.get(oldPosition).onDeselected();
-                mMenuRowViews.get(position).onSelected(true);
+                oldView.onDeselected();
+                currentView.onSelected(true);
                 mTempTitleViewForOld.setVisibility(View.GONE);
                 mTempTitleViewForCurrent.setVisibility(View.GONE);
                 layout(mMenuView.getLeft(), mMenuView.getTop(), mMenuView.getRight(),

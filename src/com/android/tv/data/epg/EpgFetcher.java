@@ -16,13 +16,11 @@
 
 package com.android.tv.data.epg;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Address;
 import android.media.tv.TvContentRating;
@@ -46,9 +44,11 @@ import com.android.tv.TvApplication;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.data.Channel;
 import com.android.tv.data.ChannelDataManager;
+import com.android.tv.data.ChannelLogoFetcher;
 import com.android.tv.data.InternalDataUtils;
 import com.android.tv.data.Lineup;
 import com.android.tv.data.Program;
+import com.android.tv.tuner.util.PostalCodeUtils;
 import com.android.tv.util.LocationUtils;
 import com.android.tv.util.RecurringRunner;
 import com.android.tv.util.Utils;
@@ -56,8 +56,10 @@ import com.android.tv.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -69,14 +71,27 @@ public class EpgFetcher {
     private static final boolean DEBUG = false;
 
     private static final int MSG_FETCH_EPG = 1;
+    private static final int MSG_FAST_FETCH_EPG = 2;
 
     private static final long EPG_PREFETCH_RECURRING_PERIOD_MS = TimeUnit.HOURS.toMillis(4);
     private static final long EPG_READER_INIT_WAIT_MS = TimeUnit.MINUTES.toMillis(1);
     private static final long LOCATION_INIT_WAIT_MS = TimeUnit.SECONDS.toMillis(10);
     private static final long LOCATION_ERROR_WAIT_MS = TimeUnit.HOURS.toMillis(1);
+    private static final long NO_INFO_FETCHED_WAIT_MS = TimeUnit.SECONDS.toMillis(10);
     private static final long PROGRAM_QUERY_DURATION = TimeUnit.DAYS.toMillis(30);
 
+    private static final long PROGRAM_FETCH_SHORT_DURATION_SEC = TimeUnit.HOURS.toSeconds(3);
+    private static final long PROGRAM_FETCH_LONG_DURATION_SEC = TimeUnit.DAYS.toSeconds(2)
+            + EPG_PREFETCH_RECURRING_PERIOD_MS / 1000;
+
+    // This equals log2(EPG_PREFETCH_RECURRING_PERIOD_MS / NO_INFO_FETCHED_WAIT_MS + 1),
+    // since we will double waiting time every other trial, therefore this limit the maximum
+    // waiting time less than half of EPG_PREFETCH_RECURRING_PERIOD_MS.
+    private static final int NO_INFO_RETRY_LIMIT = 31 - Integer.numberOfLeadingZeros(
+            (int) (EPG_PREFETCH_RECURRING_PERIOD_MS / NO_INFO_FETCHED_WAIT_MS + 1));
+
     private static final int BATCH_OPERATION_COUNT = 100;
+    private static final int QUERY_CHANNEL_COUNT = 50;
 
     private static final String SUPPORTED_COUNTRY_CODE = Locale.US.getCountry();
     private static final String CONTENT_RATING_SEPARATOR = ",";
@@ -96,8 +111,11 @@ public class EpgFetcher {
     private EpgFetcherHandler mHandler;
     private RecurringRunner mRecurringRunner;
     private boolean mStarted;
+    private boolean mScanningChannels;
+    private int mFetchRetryCount;
 
     private long mLastEpgTimestamp = -1;
+    // @GuardedBy("this")
     private String mLineupId;
 
     public static synchronized EpgFetcher getInstance(Context context) {
@@ -122,21 +140,33 @@ public class EpgFetcher {
             @Override
             public void onLoadFinished() {
                 if (DEBUG) Log.d(TAG, "ChannelDataManager.onLoadFinished()");
-                handleChannelChanged();
+                if (!mScanningChannels) {
+                    handleChannelChanged();
+                }
             }
 
             @Override
             public void onChannelListUpdated() {
                 if (DEBUG) Log.d(TAG, "ChannelDataManager.onChannelListUpdated()");
-                handleChannelChanged();
+                if (!mScanningChannels) {
+                    handleChannelChanged();
+                }
             }
 
             @Override
             public void onChannelBrowsableChanged() {
                 if (DEBUG) Log.d(TAG, "ChannelDataManager.onChannelBrowsableChanged()");
-                handleChannelChanged();
+                if (!mScanningChannels) {
+                    handleChannelChanged();
+                }
             }
         });
+        // Warm up to get address, because the first call of getCurrentAddress is usually failed.
+        try {
+            LocationUtils.getCurrentAddress(mContext);
+        } catch (SecurityException | IOException e) {
+            // Do nothing
+        }
     }
 
     private void handleChannelChanged() {
@@ -145,7 +175,9 @@ public class EpgFetcher {
                 stop();
             }
         } else {
-            start();
+            if (canStart()) {
+                start();
+            }
         }
     }
 
@@ -173,17 +205,14 @@ public class EpgFetcher {
         if (!TextUtils.isEmpty(getLastLineupId())) {
             return true;
         }
-        if (mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (DEBUG) Log.d(TAG, "No permission to check the current location.");
-            return false;
+        if (!TextUtils.isEmpty(PostalCodeUtils.getLastPostalCode(mContext))) {
+            return true;
         }
-
         try {
             Address address = LocationUtils.getCurrentAddress(mContext);
             if (address != null
                     && !TextUtils.equals(address.getCountryCode(), SUPPORTED_COUNTRY_CODE)) {
-                if (DEBUG) Log.d(TAG, "Country not supported: " + address.getCountryCode());
+                Log.i(TAG, "Country not supported: " + address.getCountryCode());
                 return false;
             }
         } catch (SecurityException e) {
@@ -197,9 +226,13 @@ public class EpgFetcher {
 
     /**
      * Starts fetching EPG.
+     *
+     * @param resetNextRunTime if true, next run time is reset, so EPG will be fetched
+     *                        {@link #EPG_PREFETCH_RECURRING_PERIOD_MS} later.
+     *                        otherwise, EPG is fetched when this method is called.
      */
     @MainThread
-    public void start() {
+    private void startInternal(boolean resetNextRunTime) {
         if (DEBUG) Log.d(TAG, "start()");
         if (mStarted) {
             if (DEBUG) Log.d(TAG, "EpgFetcher thread already started.");
@@ -215,19 +248,35 @@ public class EpgFetcher {
         mHandler = new EpgFetcherHandler(handlerThread.getLooper(), this);
         mRecurringRunner = new RecurringRunner(mContext, EPG_PREFETCH_RECURRING_PERIOD_MS,
                 new EpgRunner(), null);
-        mRecurringRunner.start();
+        mRecurringRunner.start(resetNextRunTime);
         if (DEBUG) Log.d(TAG, "EpgFetcher thread started successfully.");
+    }
+
+    @MainThread
+    public void start() {
+        if (System.currentTimeMillis() - getLastUpdatedEpgTimestamp() >
+                EPG_PREFETCH_RECURRING_PERIOD_MS) {
+            startImmediately(false);
+        } else {
+            startInternal(false);
+        }
     }
 
     /**
      * Starts fetching EPG immediately if possible without waiting for the timer.
+     *
+     * @param clearStoredLineupId if true, stored lineup id will be clear before fetching EPG.
      */
     @MainThread
-    public void startImmediately() {
-        start();
+    public void startImmediately(boolean clearStoredLineupId) {
+        startInternal(true);
         if (mStarted) {
+            if (clearStoredLineupId) {
+                if (DEBUG) Log.d(TAG, "Clear stored lineup id: " + mLineupId);
+                setLastLineupId(null);
+            }
             if (DEBUG) Log.d(TAG, "Starting fetcher immediately");
-            fetchEpg();
+            postFetchRequest(true, 0);
         }
     }
 
@@ -246,48 +295,71 @@ public class EpgFetcher {
         mHandler.getLooper().quit();
     }
 
-    private void fetchEpg() {
-        fetchEpg(0);
+    /**
+     * Notifies EPG fetcher that channel scanning is started.
+     */
+    @MainThread
+    public void onChannelScanStarted() {
+        stop();
+        mScanningChannels = true;
     }
 
-    private void fetchEpg(long delay) {
-        mHandler.removeMessages(MSG_FETCH_EPG);
-        mHandler.sendEmptyMessageDelayed(MSG_FETCH_EPG, delay);
+    /**
+     * Notifies EPG fetcher that channel scanning is finished.
+     */
+    @MainThread
+    public void onChannelScanFinished() {
+        mScanningChannels = false;
+        start();
+    }
+
+    private void postFetchRequest(boolean fastFetch, long delay) {
+        int msg = fastFetch ? MSG_FAST_FETCH_EPG : MSG_FETCH_EPG;
+        mHandler.removeMessages(msg);
+        mHandler.sendEmptyMessageDelayed(msg, delay);
     }
 
     private void onFetchEpg() {
+        onFetchEpg(false);
+    }
+
+    private void onFetchEpg(boolean fastFetch) {
         if (DEBUG) Log.d(TAG, "Start fetching EPG.");
         if (!mEpgReader.isAvailable()) {
-            if (DEBUG) Log.d(TAG, "EPG reader is not temporarily available.");
-            fetchEpg(EPG_READER_INIT_WAIT_MS);
+            Log.i(TAG, "EPG reader is not temporarily available.");
+            postFetchRequest(fastFetch, EPG_READER_INIT_WAIT_MS);
             return;
         }
         String lineupId = getLastLineupId();
         if (lineupId == null) {
-            Address address;
             try {
-                address = LocationUtils.getCurrentAddress(mContext);
+                PostalCodeUtils.updatePostalCode(mContext);
             } catch (IOException e) {
-                if (DEBUG) Log.d(TAG, "Couldn't get the current location.", e);
-                fetchEpg(LOCATION_ERROR_WAIT_MS);
-                return;
+                if (TextUtils.isEmpty(PostalCodeUtils.getLastPostalCode(mContext))) {
+                    if (DEBUG) Log.d(TAG, "Couldn't get the current location.", e);
+                    postFetchRequest(fastFetch, LOCATION_ERROR_WAIT_MS);
+                    return;
+                }
             } catch (SecurityException e) {
-                Log.w(TAG, "No permission to get the current location.");
+                if (TextUtils.isEmpty(PostalCodeUtils.getLastPostalCode(mContext))) {
+                    Log.w(TAG, "No permission to get the current location.");
+                    return;
+                }
+            } catch (PostalCodeUtils.NoPostalCodeException e) {
+                Log.i(TAG, "Failed to get the current postal code.");
+                postFetchRequest(fastFetch, LOCATION_INIT_WAIT_MS);
                 return;
             }
-            if (address == null) {
-                if (DEBUG) Log.d(TAG, "Null address returned.");
-                fetchEpg(LOCATION_INIT_WAIT_MS);
-                return;
-            }
-            if (DEBUG) Log.d(TAG, "Current location is " + address);
+            String postalCode = PostalCodeUtils.getLastPostalCode(mContext);
+            if (DEBUG) Log.d(TAG, "The current postal code is " + postalCode);
 
-            lineupId = getLineupForAddress(address);
+            lineupId = pickLineupForPostalCode(postalCode);
             if (lineupId != null) {
-                if (DEBUG) Log.d(TAG, "Saving lineup " + lineupId + "found for " + address);
+                Log.i(TAG, "Selecting the lineup " + lineupId);
                 setLastLineupId(lineupId);
             } else {
-                if (DEBUG) Log.d(TAG, "No lineup found for " + address);
+                Log.i(TAG, "Failed to get lineup id");
+                retryFetchEpg(fastFetch);
                 return;
             }
         }
@@ -299,48 +371,109 @@ public class EpgFetcher {
             return;
         }
 
-        boolean updated = false;
         List<Channel> channels = mEpgReader.getChannels(lineupId);
-        for (Channel channel : channels) {
-            List<Program> programs = new ArrayList<>(mEpgReader.getPrograms(channel.getId()));
-            Collections.sort(programs);
-            if (DEBUG) {
-                Log.d(TAG, "Fetched " + programs.size() + " programs for channel " + channel);
+        if (channels.isEmpty()) {
+            Log.i(TAG, "Failed to get EPG channels.");
+            retryFetchEpg(fastFetch);
+            return;
+        }
+        mFetchRetryCount = 0;
+        if (!fastFetch) {
+            for (Channel channel : channels) {
+                if (!mStarted) {
+                    break;
+                }
+                List<Program> programs = new ArrayList<>(mEpgReader.getPrograms(channel.getId()));
+                Collections.sort(programs);
+                Log.i(TAG, "Fetched " + programs.size() + " programs for channel " + channel);
+                updateEpg(channel.getId(), programs);
             }
-            if (updateEpg(channel.getId(), programs)) {
-                updated = true;
-            }
+            setLastUpdatedEpgTimestamp(epgTimestamp);
+        } else {
+            handleFastFetch(channels, PROGRAM_FETCH_SHORT_DURATION_SEC);
+            if (DEBUG) Log.d(TAG, "First fast fetch Done.");
+            handleFastFetch(channels, PROGRAM_FETCH_LONG_DURATION_SEC);
+            if (DEBUG) Log.d(TAG, "Second fast fetch Done.");
         }
 
-        final boolean epgUpdated = updated;
-        setLastUpdatedEpgTimestamp(epgTimestamp);
-        mHandler.removeMessages(MSG_FETCH_EPG);
+        if (!fastFetch) {
+            mHandler.removeMessages(MSG_FETCH_EPG);
+        }
         if (DEBUG) Log.d(TAG, "Fetching EPG is finished.");
+        // Start to fetch channel logos after epg fetching finished.
+        ChannelLogoFetcher.startFetchingChannelLogos(mContext, channels);
     }
 
-    @Nullable
-    private String getLineupForAddress(Address address) {
-        String lineup = null;
-        if (TextUtils.equals(address.getCountryCode(), SUPPORTED_COUNTRY_CODE)) {
-            String postalCode = address.getPostalCode();
-            if (!TextUtils.isEmpty(postalCode)) {
-                lineup = getLineupForPostalCode(postalCode);
+    private void retryFetchEpg(boolean fastFetch) {
+        if (mFetchRetryCount < NO_INFO_RETRY_LIMIT) {
+            postFetchRequest(fastFetch, NO_INFO_FETCHED_WAIT_MS * 1 << mFetchRetryCount);
+            mFetchRetryCount++;
+        } else {
+            mFetchRetryCount = 0;
+        }
+    }
+
+    private void handleFastFetch(List<Channel> channels, long duration) {
+        List<Long> channelIds = new ArrayList<>(channels.size());
+        for (Channel channel : channels) {
+            channelIds.add(channel.getId());
+        }
+        Map<Long, List<Program>> allPrograms = new HashMap<>();
+        List<Long> queryChannelIds = new ArrayList<>(QUERY_CHANNEL_COUNT);
+        for (Long channelId : channelIds) {
+            queryChannelIds.add(channelId);
+            if (queryChannelIds.size() >= QUERY_CHANNEL_COUNT) {
+                allPrograms.putAll(
+                        new HashMap<>(mEpgReader.getPrograms(queryChannelIds, duration)));
+                queryChannelIds.clear();
             }
         }
-        return lineup;
+        if (!queryChannelIds.isEmpty()) {
+            allPrograms.putAll(
+                    new HashMap<>(mEpgReader.getPrograms(queryChannelIds, duration)));
+        }
+        for (Channel channel : channels) {
+            List<Program> programs = allPrograms.get(channel.getId());
+            if (programs == null) continue;
+            Collections.sort(programs);
+            Log.i(TAG, "Fast fetched " + programs.size() + " programs for channel " + channel);
+            updateEpg(channel.getId(), programs);
+        }
     }
 
     @Nullable
-    private String getLineupForPostalCode(String postalCode) {
+    private String pickLineupForPostalCode(String postalCode) {
         List<Lineup> lineups = mEpgReader.getLineups(postalCode);
+        int maxCount = 0;
+        String maxLineupId = null;
         for (Lineup lineup : lineups) {
-            // TODO(EPG): handle more than OTA digital
-            if (lineup.type == Lineup.LINEUP_BROADCAST_DIGITAL) {
-                if (DEBUG) Log.d(TAG, "Setting lineup to " + lineup.name  + "("  + lineup.id + ")");
-                return lineup.id;
+            int count = getMatchedChannelCount(lineup.id);
+            Log.i(TAG, lineup.name + " ("  + lineup.id + ") - " + count + " matches");
+            if (count > maxCount) {
+                maxCount = count;
+                maxLineupId = lineup.id;
             }
         }
-        return null;
+        return maxLineupId;
+    }
+
+    private int getMatchedChannelCount(String lineupId) {
+        // Construct a list of display numbers for existing channels.
+        List<Channel> channels = mChannelDataManager.getChannelList();
+        if (channels.isEmpty()) {
+            if (DEBUG) Log.d(TAG, "No existing channel to compare");
+            return 0;
+        }
+        List<String> numbers = new ArrayList<>(channels.size());
+        for (Channel c : channels) {
+            // We only support local channels from physical tuners.
+            if (c.isPhysicalTunerChannel()) {
+                numbers.add(c.getDisplayNumber());
+            }
+        }
+
+        numbers.retainAll(mEpgReader.getChannelNumbers(lineupId));
+        return numbers.size();
     }
 
     private long getLastUpdatedEpgTimestamp() {
@@ -357,16 +490,16 @@ public class EpgFetcher {
                 KEY_LAST_UPDATED_EPG_TIMESTAMP, timestamp).commit();
     }
 
-    private String getLastLineupId() {
+    synchronized private String getLastLineupId() {
         if (mLineupId == null) {
             mLineupId = PreferenceManager.getDefaultSharedPreferences(mContext)
                     .getString(KEY_LAST_LINEUP_ID, null);
         }
-        if (DEBUG) Log.d(TAG, "Last lineup_id " + mLineupId);
+        if (DEBUG) Log.d(TAG, "Last lineup is " + mLineupId);
         return mLineupId;
     }
 
-    private void setLastLineupId(String lineupId) {
+    synchronized private void setLastLineupId(String lineupId) {
         mLineupId = lineupId;
         PreferenceManager.getDefaultSharedPreferences(mContext).edit()
                 .putString(KEY_LAST_LINEUP_ID, lineupId).commit();
@@ -381,19 +514,9 @@ public class EpgFetcher {
         long startTimeMs = System.currentTimeMillis();
         long endTimeMs = startTimeMs + PROGRAM_QUERY_DURATION;
         List<Program> oldPrograms = queryPrograms(channelId, startTimeMs, endTimeMs);
-        Program currentOldProgram = oldPrograms.size() > 0 ? oldPrograms.get(0) : null;
         int oldProgramsIndex = 0;
         int newProgramsIndex = 0;
-        // Skip the past programs. They will be automatically removed by the system.
-        if (currentOldProgram != null) {
-            long oldStartTimeUtcMillis = currentOldProgram.getStartTimeUtcMillis();
-            for (Program program : newPrograms) {
-                if (program.getEndTimeUtcMillis() > oldStartTimeUtcMillis) {
-                    break;
-                }
-                newProgramsIndex++;
-            }
-        }
+
         // Compare the new programs with old programs one by one and update/delete the old one
         // or insert new program if there is no matching program in the database.
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
@@ -439,7 +562,7 @@ public class EpgFetcher {
             }
             if (addNewProgram) {
                 ops.add(ContentProviderOperation
-                        .newInsert(TvContract.Programs.CONTENT_URI)
+                        .newInsert(Programs.CONTENT_URI)
                         .withValues(toContentValues(newProgram))
                         .build());
             }
@@ -501,27 +624,25 @@ public class EpgFetcher {
     @SuppressWarnings("deprecation")
     private static ContentValues toContentValues(Program program) {
         ContentValues values = new ContentValues();
-        values.put(TvContract.Programs.COLUMN_CHANNEL_ID, program.getChannelId());
-        putValue(values, TvContract.Programs.COLUMN_TITLE, program.getTitle());
-        putValue(values, TvContract.Programs.COLUMN_EPISODE_TITLE, program.getEpisodeTitle());
+        values.put(Programs.COLUMN_CHANNEL_ID, program.getChannelId());
+        putValue(values, Programs.COLUMN_TITLE, program.getTitle());
+        putValue(values, Programs.COLUMN_EPISODE_TITLE, program.getEpisodeTitle());
         if (BuildCompat.isAtLeastN()) {
-            putValue(values, TvContract.Programs.COLUMN_SEASON_DISPLAY_NUMBER,
-                    program.getSeasonNumber());
-            putValue(values, TvContract.Programs.COLUMN_EPISODE_DISPLAY_NUMBER,
-                    program.getEpisodeNumber());
+            putValue(values, Programs.COLUMN_SEASON_DISPLAY_NUMBER, program.getSeasonNumber());
+            putValue(values, Programs.COLUMN_EPISODE_DISPLAY_NUMBER, program.getEpisodeNumber());
         } else {
-            putValue(values, TvContract.Programs.COLUMN_SEASON_NUMBER, program.getSeasonNumber());
-            putValue(values, TvContract.Programs.COLUMN_EPISODE_NUMBER, program.getEpisodeNumber());
+            putValue(values, Programs.COLUMN_SEASON_NUMBER, program.getSeasonNumber());
+            putValue(values, Programs.COLUMN_EPISODE_NUMBER, program.getEpisodeNumber());
         }
-        putValue(values, TvContract.Programs.COLUMN_SHORT_DESCRIPTION, program.getDescription());
-        putValue(values, TvContract.Programs.COLUMN_POSTER_ART_URI, program.getPosterArtUri());
-        putValue(values, TvContract.Programs.COLUMN_THUMBNAIL_URI, program.getThumbnailUri());
+        putValue(values, Programs.COLUMN_SHORT_DESCRIPTION, program.getDescription());
+        putValue(values, Programs.COLUMN_LONG_DESCRIPTION, program.getLongDescription());
+        putValue(values, Programs.COLUMN_POSTER_ART_URI, program.getPosterArtUri());
+        putValue(values, Programs.COLUMN_THUMBNAIL_URI, program.getThumbnailUri());
         String[] canonicalGenres = program.getCanonicalGenres();
         if (canonicalGenres != null && canonicalGenres.length > 0) {
-            putValue(values, TvContract.Programs.COLUMN_CANONICAL_GENRE,
-                    Genres.encode(canonicalGenres));
+            putValue(values, Programs.COLUMN_CANONICAL_GENRE, Genres.encode(canonicalGenres));
         } else {
-            putValue(values, TvContract.Programs.COLUMN_CANONICAL_GENRE, "");
+            putValue(values, Programs.COLUMN_CANONICAL_GENRE, "");
         }
         TvContentRating[] ratings = program.getContentRatings();
         if (ratings != null && ratings.length > 0) {
@@ -530,14 +651,13 @@ public class EpgFetcher {
                 sb.append(CONTENT_RATING_SEPARATOR);
                 sb.append(ratings[i].flattenToString());
             }
-            putValue(values, TvContract.Programs.COLUMN_CONTENT_RATING, sb.toString());
+            putValue(values, Programs.COLUMN_CONTENT_RATING, sb.toString());
         } else {
-            putValue(values, TvContract.Programs.COLUMN_CONTENT_RATING, "");
+            putValue(values, Programs.COLUMN_CONTENT_RATING, "");
         }
-        values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS,
-                program.getStartTimeUtcMillis());
-        values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, program.getEndTimeUtcMillis());
-        putValue(values, TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA,
+        values.put(Programs.COLUMN_START_TIME_UTC_MILLIS, program.getStartTimeUtcMillis());
+        values.put(Programs.COLUMN_END_TIME_UTC_MILLIS, program.getEndTimeUtcMillis());
+        putValue(values, Programs.COLUMN_INTERNAL_PROVIDER_DATA,
                 InternalDataUtils.serializeInternalProviderData(program));
         return values;
     }
@@ -569,6 +689,9 @@ public class EpgFetcher {
                 case MSG_FETCH_EPG:
                     epgFetcher.onFetchEpg();
                     break;
+                case MSG_FAST_FETCH_EPG:
+                    epgFetcher.onFetchEpg(true);
+                    break;
                 default:
                     super.handleMessage(msg);
                     break;
@@ -579,7 +702,7 @@ public class EpgFetcher {
     private class EpgRunner implements Runnable {
         @Override
         public void run() {
-            fetchEpg();
+            postFetchRequest(false, 0);
         }
     }
 }

@@ -426,6 +426,7 @@ public class NotificationService extends Service implements Recommender.Listener
                 : 100 - (int) (programLeftTimsMs * 100 / programDurationMs);
         Intent intent = new Intent(Intent.ACTION_VIEW, channel.getUri());
         intent.putExtra(TUNE_PARAMS_RECOMMENDATION_TYPE, mRecommendationType);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         final PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         // This callback will run on the main thread.

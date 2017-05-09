@@ -44,64 +44,72 @@ public class SetupPassthroughActivity extends Activity {
 
     private TvInputInfo mTvInputInfo;
     private Intent mActivityAfterCompletion;
+    private boolean mEpgFetcherDuringScan;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        if (DEBUG) Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        SoftPreconditions.checkState(
-                intent.getAction().equals(TvCommonConstants.INTENT_ACTION_INPUT_SETUP));
         ApplicationSingletons appSingletons = TvApplication.getSingletons(this);
         TvInputManagerHelper inputManager = appSingletons.getTvInputManagerHelper();
+        Intent intent = getIntent();
         String inputId = intent.getStringExtra(TvCommonConstants.EXTRA_INPUT_ID);
         mTvInputInfo = inputManager.getTvInputInfo(inputId);
-        if (DEBUG) Log.d(TAG, "TvInputId " + inputId + " / TvInputInfo " + mTvInputInfo);
-        if (mTvInputInfo == null) {
-            Log.w(TAG, "There is no input with the ID " + inputId + ".");
-            finish();
-            return;
-        }
-        Intent setupIntent = intent.getExtras().getParcelable(TvCommonConstants.EXTRA_SETUP_INTENT);
-        if (DEBUG) Log.d(TAG, "Setup activity launch intent: " + setupIntent);
-        if (setupIntent == null) {
-            Log.w(TAG, "The input (" + mTvInputInfo.getId() + ") doesn't have setup.");
-            finish();
-            return;
-        }
-        SetupUtils.grantEpgPermission(this, mTvInputInfo.getServiceInfo().packageName);
         mActivityAfterCompletion = intent.getParcelableExtra(
                 TvCommonConstants.EXTRA_ACTIVITY_AFTER_COMPLETION);
-        if (DEBUG) Log.d(TAG, "Activity after completion " + mActivityAfterCompletion);
-        // If EXTRA_SETUP_INTENT is not removed, an infinite recursion happens during
-        // setupIntent.putExtras(intent.getExtras()).
-        Bundle extras = intent.getExtras();
-        extras.remove(TvCommonConstants.EXTRA_SETUP_INTENT);
-        setupIntent.putExtras(extras);
-        try {
-            startActivityForResult(setupIntent, REQUEST_START_SETUP_ACTIVITY);
-        } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Can't find activity: " + setupIntent.getComponent());
-            finish();
-            return;
+        boolean needToFetchEpg = Utils.isInternalTvInput(this, mTvInputInfo.getId())
+                && Experiments.CLOUD_EPG.get();
+        if (needToFetchEpg) {
+            // In case when the activity is restored, this flag should be restored as well.
+            mEpgFetcherDuringScan = true;
         }
-        if (Utils.isInternalTvInput(this, mTvInputInfo.getId()) && Experiments.CLOUD_EPG.get()) {
-            EpgFetcher.getInstance(this).stop();
+        if (savedInstanceState == null) {
+            SoftPreconditions.checkState(
+                    intent.getAction().equals(TvCommonConstants.INTENT_ACTION_INPUT_SETUP));
+            if (DEBUG) Log.d(TAG, "TvInputId " + inputId + " / TvInputInfo " + mTvInputInfo);
+            if (mTvInputInfo == null) {
+                Log.w(TAG, "There is no input with the ID " + inputId + ".");
+                finish();
+                return;
+            }
+            Intent setupIntent =
+                    intent.getExtras().getParcelable(TvCommonConstants.EXTRA_SETUP_INTENT);
+            if (DEBUG) Log.d(TAG, "Setup activity launch intent: " + setupIntent);
+            if (setupIntent == null) {
+                Log.w(TAG, "The input (" + mTvInputInfo.getId() + ") doesn't have setup.");
+                finish();
+                return;
+            }
+            SetupUtils.grantEpgPermission(this, mTvInputInfo.getServiceInfo().packageName);
+            if (DEBUG) Log.d(TAG, "Activity after completion " + mActivityAfterCompletion);
+            // If EXTRA_SETUP_INTENT is not removed, an infinite recursion happens during
+            // setupIntent.putExtras(intent.getExtras()).
+            Bundle extras = intent.getExtras();
+            extras.remove(TvCommonConstants.EXTRA_SETUP_INTENT);
+            setupIntent.putExtras(extras);
+            try {
+                startActivityForResult(setupIntent, REQUEST_START_SETUP_ACTIVITY);
+            } catch (ActivityNotFoundException e) {
+                Log.e(TAG, "Can't find activity: " + setupIntent.getComponent());
+                finish();
+                return;
+            }
+            if (needToFetchEpg) {
+                EpgFetcher.getInstance(this).onChannelScanStarted();
+            }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (mTvInputInfo != null && Utils.isInternalTvInput(this, mTvInputInfo.getId())
-                && Experiments.CLOUD_EPG.get()) {
-            EpgFetcher.getInstance(this).start();
-        }
-        super.onDestroy();
     }
 
     @Override
     public void onActivityResult(int requestCode, final int resultCode, final Intent data) {
+        if (DEBUG) Log.d(TAG, "onActivityResult");
         boolean setupComplete = requestCode == REQUEST_START_SETUP_ACTIVITY
                 && resultCode == Activity.RESULT_OK;
+        // Tells EpgFetcher that channel source setup is finished.
+        if (mEpgFetcherDuringScan) {
+            EpgFetcher.getInstance(this).onChannelScanFinished();
+            mEpgFetcherDuringScan = false;
+        }
         if (!setupComplete) {
             setResult(resultCode, data);
             finish();

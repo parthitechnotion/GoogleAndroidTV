@@ -39,7 +39,6 @@ public class MainActivityTest extends BaseMainActivityTestCase {
         waitUntilChannelLoadingFinish();
         List<Channel> channelList = mActivity.getChannelDataManager().getChannelList();
         assertTrue("Expected at least one channel", channelList.size() > 0);
-        assertFalse("PIP disabled", mActivity.isPipEnabled());
     }
 
     public void testTuneToChannel() throws Throwable {

@@ -18,6 +18,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="action_text_done" msgid="298287050387266501">"完成"</string>
+    <string name="action_text_skip" msgid="9158414021827546309">"跳过"</string>
     <string name="display_episode_number_format" msgid="6040735693510854344">"第 <xliff:g id="SEASON_NUMBER">%1$s</xliff:g> 季：第 <xliff:g id="EPISODE_NUMBER">%2$s</xliff:g> 集"</string>
     <string name="display_episode_number_format_no_season_number" msgid="8393554269654325741">"第 <xliff:g id="EPISODE_NUMBER">%1$s</xliff:g> 集"</string>
     <string name="display_episode_title_format" msgid="5041103178918130554">"第 <xliff:g id="SEASON_NUMBER">%1$s</xliff:g> 季第 <xliff:g id="EPISODE_NUMBER">%2$s</xliff:g> 集：<xliff:g id="EPISODE_TITLE">%3$s</xliff:g>"</string>

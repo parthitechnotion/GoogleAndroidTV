@@ -21,6 +21,7 @@ import android.support.test.filters.SmallTest;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
+import com.android.tv.dvr.data.ScheduledRecording;
 import com.android.tv.testing.FakeClock;
 import com.android.tv.testing.dvr.RecordingTestUtils;
 

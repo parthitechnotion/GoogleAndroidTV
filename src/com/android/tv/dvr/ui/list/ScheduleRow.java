@@ -20,12 +20,12 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.android.tv.common.SoftPreconditions;
-import com.android.tv.dvr.ScheduledRecording;
+import com.android.tv.dvr.data.ScheduledRecording;
 
 /**
  * A class for schedule recording row.
  */
-public class ScheduleRow {
+class ScheduleRow {
     private final SchedulesHeaderRow mHeaderRow;
     @Nullable private ScheduledRecording mSchedule;
     private boolean mStopRecordingRequested;

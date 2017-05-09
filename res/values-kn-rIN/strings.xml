@@ -20,9 +20,8 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"ಮೊನೊ"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"ಸ್ಟೀರಿಯೋ"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Play ನಿಯಂತ್ರಣಗಳು"</string>
-    <string name="menu_title_channels" msgid="1801845517674690003">"ಇತ್ತೀಚಿನ ಚಾನಲ್‌ಗಳು"</string>
-    <string name="menu_title_options" msgid="7184594626814914022">"TV ಆಯ್ಕೆಗಳು"</string>
-    <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP ಆಯ್ಕೆಗಳು"</string>
+    <string name="menu_title_channels" msgid="1949045451672990132">"ಚಾನಲ್‌ಗಳು"</string>
+    <string name="menu_title_options" msgid="7184594626814914022">"ಟಿವಿ ಆಯ್ಕೆಗಳು"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"ಈ ಚಾನಲ್‌ಗೆ ಪ್ಲೇ ನಿಯಂತ್ರಣಗಳು ಲಭ್ಯವಿಲ್ಲ"</string>
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"ಪ್ಲೇ ಮಾಡಿ ಅಥವಾ ವಿರಾಮಗೊಳಿಸಿ"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"ವೇಗವಾಗಿ ಮುಂದಕ್ಕೆ"</string>
@@ -35,33 +34,15 @@
     <string name="options_item_closed_caption" msgid="5945274655046367170">"ಮುಚ್ಚಿದ ಶೀರ್ಷಿಕೆಗಳು"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"ಪ್ರದರ್ಶನ ಮೋಡ್"</string>
     <string name="options_item_pip" msgid="3951350386626879645">"PIP"</string>
-    <string name="options_item_pip_on" msgid="4647247480009077381">"ಆನ್"</string>
-    <string name="options_item_pip_off" msgid="8799500161592387451">"ಆಫ್"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"ಬಹು-ಆಡಿಯೊ"</string>
     <string name="options_item_more_channels" msgid="971040969622943300">"ಹೆಚ್ಚು ಚಾನಲ್‌ ಪಡೆ"</string>
     <string name="options_item_settings" msgid="7623205838542400074">"ಸೆಟ್ಟಿಂಗ್‌ಗಳು"</string>
-    <string name="pip_options_item_source" msgid="1050948525825308652">"ಮೂಲ"</string>
-    <string name="pip_options_item_swap" msgid="7245362207353732048">"ಸ್ವ್ಯಾಪ್‌ ಮಾಡು"</string>
-    <string name="pip_options_item_swap_on" msgid="5647182616484983505">"ಆನ್"</string>
-    <string name="pip_options_item_swap_off" msgid="3023597229417709768">"ಆಫ್"</string>
-    <string name="pip_options_item_sound" msgid="3107034283791231648">"ಶಬ್ದ"</string>
-    <string name="pip_options_item_sound_main" msgid="1063937534112558691">"ಪ್ರಮುಖ"</string>
-    <string name="pip_options_item_sound_pip_window" msgid="435064142351853008">"PIP ವಿಂಡೋ"</string>
-    <string name="pip_options_item_layout" msgid="5126206342060967651">"ಲೇಔಟ್"</string>
-    <string name="pip_options_item_layout_bottom_right" msgid="5256839015192920238">"ಕೆಳಗಿನ ಬಲಭಾಗ"</string>
-    <string name="pip_options_item_layout_top_right" msgid="3585067214787055279">"ಮೇಲಿನ ಬಲಭಾಗ"</string>
-    <string name="pip_options_item_layout_top_left" msgid="2173997010201637462">"ಮೇಲಿನ ಎಡಭಾಗ"</string>
-    <string name="pip_options_item_layout_bottom_left" msgid="1727197877968915329">"ಕೆಳಗಿನ ಎಡಭಾಗ"</string>
-    <string name="pip_options_item_layout_side_by_side" msgid="9009784972740915779">"ಅಕ್ಕ ಪಕ್ಕ"</string>
-    <string name="pip_options_item_size" msgid="5662894110243750158">"ಗಾತ್ರ"</string>
-    <string name="pip_options_item_size_big" msgid="6303301565563444718">"ದೊಡ್ಡದು"</string>
-    <string name="pip_options_item_size_small" msgid="7393731186585004206">"ಸಣ್ಣ"</string>
-    <string name="side_panel_title_pip_input_source" msgid="8722544967592970296">"ಇನ್‌ಪುಟ್ ಮೂಲ"</string>
-    <string name="input_long_label_for_tuner" msgid="3423514011918382209">"TV (ಆಂಟೆನಾ/ಕೇಬಲ್)"</string>
+    <string name="input_long_label_for_tuner" msgid="3423514011918382209">"ಟಿವಿ (ಆಂಟೆನಾ/ಕೇಬಲ್)"</string>
     <string name="no_program_information" msgid="1049844207745145132">"ಯಾವುದೇ ಕಾರ್ಯಕ್ರಮದ ಮಾಹಿತಿ ಇಲ್ಲ"</string>
     <string name="program_title_for_no_information" msgid="384451471906070101">"ಯಾವುದೇ ಮಾಹಿತಿ ಇಲ್ಲ"</string>
     <string name="program_title_for_blocked_channel" msgid="5358005891746983819">"ನಿರ್ಬಂಧಿಸಲಾದ ಚಾನಲ್"</string>
-    <string name="default_language" msgid="4122326459624337928">"ಅಪರಿಚಿತ ಭಾಷೆ"</string>
+    <string name="multi_audio_unknown_language" msgid="8639884627225598143">"ಅಪರಿಚಿತ ಭಾಷೆ"</string>
+    <string name="closed_caption_unknown_language" msgid="4745445516930229353">"ಮುಚ್ಚಿದ ಶೀರ್ಷಿಕೆಗಳು %1$d"</string>
     <string name="side_panel_title_closed_caption" msgid="2513905054082568780">"ಮುಚ್ಚಿದ ಶೀರ್ಷಿಕೆಗಳು"</string>
     <string name="closed_caption_option_item_off" msgid="4824009036785647753">"ಆಫ್"</string>
     <string name="closed_caption_system_settings" msgid="1856974607743827178">"ಫಾರ್ಮ್ಯಾಟ್‌ ಮಾಡುವಿಕೆ ವೈಯಕ್ತೀಕರಿಸಿ"</string>
@@ -135,6 +116,10 @@
     </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"ಆ PIN ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, PIN ಹೊಂದಾಣಿಕೆಯಾಗುವುದಿಲ್ಲ"</string>
+    <string name="postal_code_guidance_title" msgid="4144793072363879833">"ನಿಮ್ಮ ಪಿನ್ ಕೋಡ್ ನಮೂದಿಸಿ."</string>
+    <string name="postal_code_guidance_description" msgid="4224511147377561572">"ಲೈವ್ ಚಾನಲ್‌ಗಳ ಅಪ್ಲಿಕೇಶನ್ ಟಿವಿ ಚಾನಲ್‌ಗಳಿಗೆ ಸಂಪೂರ್ಣ ಕಾರ್ಯಕ್ರಮ ಮಾರ್ಗದರ್ಶನವನ್ನು ಒದಗಿಸಲು ಪಿನ್ ಕೋಡ್ ಅನ್ನು ಬಳಸುತ್ತದೆ."</string>
+    <string name="postal_code_action_description" msgid="4428720607051109105">"ನಿಮ್ಮ ಪಿನ್ ಕೋಡ್ ನಮೂದಿಸಿ"</string>
+    <string name="postal_code_invalid_warning" msgid="923373584458340746">"ಅಮಾನ್ಯ ಪಿನ್‌ ಕೋಡ್"</string>
     <string name="side_panel_title_settings" msgid="8244327316510918755">"ಸೆಟ್ಟಿಂಗ್‌ಗಳು"</string>
     <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"ಚಾನಲ್‌ಪಟ್ಟಿ ಕಸ್ಟಮೈಸ್‌"</string>
     <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"ನಿಮ್ಮ ಕಾರ್ಯಕ್ರಮ ಸೂಚಿಗಾಗಿ ಚಾನಲ್‌ಗಳನ್ನು ಆರಿಸಿ"</string>
@@ -143,6 +128,7 @@
     <string name="settings_parental_controls" msgid="5449397921700749317">"ಪೋಷಕ ನಿಯಂತ್ರಣಗಳು"</string>
     <string name="settings_menu_licenses" msgid="1257646083838406103">"ಮುಕ್ತ ಮೂಲ ಪರವಾನಗಿಗಳು"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ಮುಕ್ತ ಮೂಲ ಪರವಾನಗಿಗಳು"</string>
+    <string name="settings_send_feedback" msgid="6897217561193701829">"ಪ್ರತಿಕ್ರಿಯೆ ಕಳುಹಿಸಿ"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"ಆವೃತ್ತಿ"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ಈ ಚಾನಲ್ ಅನ್ನು ವೀಕ್ಷಿಸಲು, ಬಲಕ್ಕೆ ಒತ್ತಿ ಮತ್ತು ನಿಮ್ಮ PIN ಅನ್ನು ನಮೂದಿಸಿ"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"ಈ ಕಾರ್ಯಕ್ರಮವನ್ನು ವೀಕ್ಷಿಸಲು, ಬಲಕ್ಕೆ ಒತ್ತಿ ಮತ್ತು ನಿಮ್ಮ PIN ಅನ್ನು ನಮೂದಿಸಿ"</string>
@@ -178,12 +164,10 @@
     <string name="new_sources_action_skip" msgid="2501296961258184330">"ಸರಿ, ಅರ್ಥವಾಯಿತು"</string>
     <!-- no translation found for intro_title (251772896916795556) -->
     <skip />
-    <string name="intro_description" msgid="7806473686446937307">"TV ಮೆನುವನ್ನು ಪ್ರವೇಶಿಸಲು "<b>"ಆಯ್ಕೆ ಮಾಡು ಒತ್ತಿರಿ"</b>"."</string>
-    <string name="msg_no_input" msgid="3897674146985427865">"ಯಾವುದೇ TV ಇನ್‌ಪುಟ್ ಕಂಡುಬಂದಿಲ್ಲ"</string>
-    <string name="msg_no_specific_input" msgid="2688885987104249852">"TV ಇನ್‌ಪುಟ್ ಹುಡುಕಲಾಗಲಿಲ್ಲ"</string>
-    <string name="msg_no_pip_support" msgid="161508628996629445">"PIP ಬೆಂಬಲಿತವಾಗಿಲ್ಲ"</string>
-    <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"PIP ನೊಂದಿಗೆ ತೋರಿಸಬಹುದಾದ ಯಾವುದೇ ಇನ್‌ಪುಟ್ ಲಭ್ಯವಿಲ್ಲ"</string>
-    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ಟ್ಯೂನರ್ ಪ್ರಕಾರವು ಹೊಂದಿಕೆಯಾಗುವುದಿಲ್ಲ. ದಯವಿಟ್ಟು ಟ್ಯೂನರ್ ಪ್ರಕಾರದ TV ಇನ್‌ಪುಟ್‌ಗೆ ಲೈವ್‌ ಚಾನಲ್‌ಗಳ ಅಪ್ಲಿಕೇಶನ್‌ ಪ್ರಾರಂಭಿಸಿ."</string>
+    <string name="intro_description" msgid="7806473686446937307">"ಟಿವಿ ಮೆನುವನ್ನು ಪ್ರವೇಶಿಸಲು "<b>"ಆಯ್ಕೆ ಮಾಡು ಒತ್ತಿರಿ"</b>"."</string>
+    <string name="msg_no_input" msgid="3897674146985427865">"ಯಾವುದೇ ಟಿವಿ ಇನ್‌ಪುಟ್ ಕಂಡುಬಂದಿಲ್ಲ"</string>
+    <string name="msg_no_specific_input" msgid="2688885987104249852">"ಟಿವಿ ಇನ್‌ಪುಟ್ ಹುಡುಕಲಾಗಲಿಲ್ಲ"</string>
+    <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ಟ್ಯೂನರ್ ಪ್ರಕಾರವು ಹೊಂದಿಕೆಯಾಗುವುದಿಲ್ಲ. ದಯವಿಟ್ಟು ಟ್ಯೂನರ್ ಪ್ರಕಾರದ ಟಿವಿ ಇನ್‌ಪುಟ್‌ಗೆ ಲೈವ್‌ ಚಾನಲ್‌ಗಳ ಅಪ್ಲಿಕೇಶನ್‌ ಪ್ರಾರಂಭಿಸಿ."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"ಟ್ಯೂನ್ ವಿಫಲವಾಗಿದೆ"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"ಈ ಕ್ರಿಯೆಯನ್ನು ನಿರ್ವಹಿಸಲು ಯಾವುದೇ ಅಪ್ಲಿಕೇಶನ್‌ ಕಂಡುಬಂದಿಲ್ಲ."</string>
     <string name="msg_all_channels_hidden" msgid="777397634062471936">"ಎಲ್ಲ ಮೂಲ ಚಾನಲ್‌ಗಳನ್ನು ಮರೆಮಾಡಲಾಗಿದೆ.\nವೀಕ್ಷಿಸಲು ಕನಿಷ್ಠ ಒಂದು ಚಾನಲ್‌‌ ಅನ್ನು ಆಯ್ಕೆಮಾಡಿ."</string>
@@ -258,9 +242,7 @@
     <string name="dvr_priority_description" msgid="8362040921417154645">"ಏಕ ಕಾಲದಲ್ಲಿ ರೆಕಾರ್ಡ್‌ ಮಾಡಲು ಸಾಕಷ್ಟು ಕಾರ್ಯಕ್ರಮಗಳು ಇದ್ದ ಸಂದರ್ಭದಲ್ಲಿ, ಹೆಚ್ಚಿನ ಆದ್ಯತೆ ಇರುವುದನ್ನು ಮಾತ್ರ ರೆಕಾರ್ಡ್‌ ಮಾಡಲಾಗುತ್ತದೆ."</string>
     <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"ಉಳಿಸು"</string>
     <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"ಒಂದು ಬಾರಿ ಮಾಡಿದ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳು ಹೆಚ್ಚಿನ ಆದ್ಯತೆ ಹೊಂದಿರುತ್ತದೆ"</string>
-    <string name="dvr_action_cancel" msgid="8094060199570272625">"ರದ್ದುಮಾಡು"</string>
-    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"ರದ್ದುಮಾಡಿ"</string>
-    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"ಮರೆತುಬಿಡು"</string>
+    <string name="dvr_action_cancel" msgid="8094060199570272625">"ರದ್ದುಮಾಡಿ"</string>
     <string name="dvr_action_stop" msgid="1378723485295471381">"ನಿಲ್ಲಿಸು"</string>
     <string name="dvr_action_view_schedules" msgid="7442990695392774263">"ರೆಕಾರ್ಡಿಂಗ್ ವೇಳಾಪಟ್ಟಿ ವೀಕ್ಷಿಸಿ"</string>
     <string name="dvr_action_record_episode" msgid="8596182676610326327">"ಈ ಏಕೈಕ ಪ್ರೋಗ್ರಾಂ"</string>
@@ -270,25 +252,29 @@
     <string name="dvr_action_record_instead" msgid="6821164728752215738">"ಬದಲಿಗೆ ಇದನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಿ"</string>
     <string name="dvr_action_record_cancel" msgid="8644254745772185288">"ಈ ರೆಕಾರ್ಡಿಂಗ್ ರದ್ದುಗೊಳಿಸಿ"</string>
     <string name="dvr_action_watch_now" msgid="7181211920959075976">"ಈಗ ವೀಕ್ಷಿಸಿ"</string>
+    <string name="dvr_action_delete_recordings" msgid="850785346795261671">"ರೆಕಾರ್ಡಿಂಗ್‌‌ಗಳನ್ನು ಅಳಿಸಿ..."</string>
     <string name="dvr_epg_program_recordable" msgid="609229576209476903">"ರೆಕಾರ್ಡ್ ಮಾಡಬಹುದಾದ"</string>
     <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"ರೆಕಾರ್ಡಿಂಗ್ ನಿಗದಿಪಡಿಸಲಾಗಿದೆ"</string>
     <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"ರೆಕಾರ್ಡಿಂಗ್ ಸಂಘರ್ಷ"</string>
     <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"ರೆಕಾರ್ಡ್ ಆಗುತ್ತಿದೆ"</string>
     <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"ರೆಕಾರ್ಡಿಂಗ್ ವಿಫಲವಾಗಿದೆ"</string>
     <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"ರೆಕಾರ್ಡಿಂಗ್ ವೇಳಾಪಟ್ಟಿಗಳನ್ನು ರಚಿಸಲು ಪ್ರೋಗ್ರಾಂಗಳನ್ನು ರೀಡ್‌ ಮಾಡಲಾಗುತ್ತಿದೆ"</string>
-    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"ಪ್ರೋಗ್ರಾಂಗಳನ್ನು ರೀಡ್‌ ಮಾಡಲಾಗುತ್ತಿದೆ"</string>
-    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
-    <skip />
+    <string name="dvr_series_progress_message_reading_programs" msgid="2961615820635219355">"ಪ್ರೋಗ್ರಾಂಗಳನ್ನು ರೀಡ್‌ ಮಾಡಲಾಗುತ್ತಿದೆ"</string>
+    <string name="dvr_error_insufficient_space_action_view_recent_recordings" msgid="137918938589787623">"ಇತ್ತೀಚಿನ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ವೀಕ್ಷಿಸಿ"</string>
+    <string name="dvr_error_insufficient_space_title_one_recording" msgid="759510175792505150">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> ನ ರೆಕಾರ್ಡಿಂಗ್ ಅಪೂರ್ಣವಾಗಿದೆ."</string>
+    <string name="dvr_error_insufficient_space_title_two_recordings" msgid="5518578722556227631">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> ಮತ್ತು <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ನ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳು ಅಪೂರ್ಣವಾಗಿವೆ."</string>
+    <string name="dvr_error_insufficient_space_title_three_or_more_recordings" msgid="5104901174884754363">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ಮತ್ತು <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> ನ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳು ಅಪೂರ್ಣವಾಗಿವೆ."</string>
+    <string name="dvr_error_insufficient_space_description_one_recording" msgid="9092549220659026111">"ಸಾಕಷ್ಟು ಸಂಗ್ರಹಣೆ ಇಲ್ಲದಿರುವ ಕಾರಣ <xliff:g id="PROGRAMNAME">%1$s</xliff:g> ನ ರೆಕಾರ್ಡಿಂಗ್ ಪೂರ್ಣಗೊಂಡಿಲ್ಲ."</string>
+    <string name="dvr_error_insufficient_space_description_two_recordings" msgid="7712799694720979003">"ಸಾಕಷ್ಟು ಸಂಗ್ರಹಣೆ ಇಲ್ಲದಿರುವ ಕಾರಣ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> ಮತ್ತು <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ನ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳು ಪೂರ್ಣಗೊಂಡಿಲ್ಲ."</string>
+    <string name="dvr_error_insufficient_space_description_three_or_more_recordings" msgid="7877855707777832128">"ಸಾಕಷ್ಟು ಸಂಗ್ರಹಣೆ ಇಲ್ಲದಿರುವ ಕಾರಣ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ಮತ್ತು <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> ನ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳು ಪೂರ್ಣಗೊಂಡಿಲ್ಲ."</string>
     <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR ಗೆ ಹೆಚ್ಚಿನ ಸಂಗ್ರಹಣೆಯ ಅಗತ್ಯವಿದೆ"</string>
     <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"DVR ಮೂಲಕ ಪ್ರೋಗ್ರಾಂಗಳನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲು ನಿಮಗೆ ಸಾಧ್ಯವಾಗುತ್ತದೆ. ಅದಾಗ್ಯೂ DVR ಗೆ ಕೆಲಸ ಮಾಡಲು ಇದೀಗ ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿ ಸಾಕಷ್ಟು ಸ್ಥಳಾವಕಾಶವಿಲ್ಲ. ದಯವಿಟ್ಟು <xliff:g id="STORAGE_SIZE">%1$s</xliff:g>GB ಅಥವಾ ಅದಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಬಾಹ್ಯ ಡ್ರೈವ್‌ಗೆ ಸಂಪರ್ಕಪಡಿಸಿ ಮತ್ತು ಸಾಧನ ಸಂಗ್ರಹಣೆಯಂತೆ ಫಾರ್ಮ್ಯಾಟ್‌ ಮಾಡಲು ಹಂತಗಳನ್ನು ಅನುಸರಿಸಿ."</string>
+    <string name="dvr_error_no_free_space_title" msgid="881897873932403512">"ಸಾಕಷ್ಟು ಸಂಗ್ರಹಣೆಯಿಲ್ಲ"</string>
+    <string name="dvr_error_no_free_space_description" msgid="6406038381803431564">"ಸಾಕಷ್ಟು ಸಂಗ್ರಹಣೆ ಇಲ್ಲದಿರುವ ಕಾರಣ ಈ ಕಾರ್ಯಕ್ರಮವನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ. ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಕೆಲವು ರೆಕಾರ್ಡಿಂಗ್ ಅಳಿಸಲು ಪ್ರಯತ್ನಿಸಿ."</string>
     <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"ಸಂಗ್ರಹಣೆ ಕಾಣೆಯಾಗಿದೆ"</string>
-    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"DVR ಮೂಲಕ ಬಳಸಲಾದ ಕೆಲವು ಸಂಗ್ರಹಣೆಯು ಕಾಣೆಯಾಗಿದೆ. ನೀವು DVR ಮರು-ಸಕ್ರಿಯಗೊಳಿಸುವ ಮೊದಲು ಬಳಸಲಾದ ಬಾಹ್ಯ ಡ್ರೈವ್ ಅನ್ನು ಸಂಪರ್ಕಪಡಿಸಿ. ಪರ್ಯಾಯವಾಗಿ, ಇನ್ನೂ ಮುಂದೆ ಲಭ್ಯವಿಲ್ಲದಿದ್ದರೆ ಸಂಗ್ರಹಣೆಯನ್ನು ಮರೆಯಲು ನೀವು ಆಯ್ಕೆಮಾಡಬಹುದು."</string>
-    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"ಸಂಗ್ರಹಣೆಯನ್ನು ಮರೆತಿರುವಿರಾ?"</string>
-    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"ನಿಮ್ಮ ಎಲ್ಲಾ ರೆಕಾರ್ಡ್ ಮಾಡಲಾದ ವಿಷಯ ಮತ್ತು ವೇಳಾಪಟ್ಟಿಗಳು ಕಳೆದುಹೋಗುತ್ತವೆ."</string>
     <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸುವುದೇ?"</string>
     <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"ರೆಕಾರ್ಡ್‌ ಮಾಡಲಾದ ವಿಷಯವನ್ನು ಉಳಿಸಲಾಗುತ್ತದೆ."</string>
-    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
-    <skip />
+    <string name="dvr_stop_recording_dialog_description_on_conflict" msgid="7876857267536083760">"ಈ ಕಾರ್ಯಕ್ರಮದ ಜೊತೆಗೆ ರೆಕಾರ್ಡಿಂಗ್ ಸಂಘರ್ಷಿಸುವ ಕಾರಣದಿಂದಾಗಿ <xliff:g id="PROGRAMNAME">%1$s</xliff:g> ರೆಕಾರ್ಡಿಂಗ್ ಅನ್ನು ನಿಲ್ಲಿಸಲಾಗುವುದು. ರೆಕಾರ್ಡ್ ಮಾಡಲಾದ ವಿಷಯವನ್ನು ಉಳಿಸಲಾಗುವುದು."</string>
     <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"ರೆಕಾರ್ಡಿಂಗ್ ನಿಗದಿಪಡಿಸಲಾಗಿದೆ ಆದರೆ ಸಂಘರ್ಷಣೆಗಳನ್ನು ಹೊಂದಿದೆ"</string>
     <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"ರೆಕಾರ್ಡಿಂಗ್ ಪ್ರಾರಂಭಿಸಲಾಗಿದೆ ಆದರೆ ಸಂಘರ್ಷಣೆಗಳನ್ನು ಹೊಂದಿದೆ"</string>
     <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> ಅನ್ನು ರೆಕಾರ್ಡ್‌ ಮಾಡಲಾಗುತ್ತದೆ."</string>
@@ -306,14 +292,27 @@
     <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"ಅದೇ ಕಾರ್ಯಕ್ರಮವನ್ನು ಈಗಾಗಲೇ <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g> ಸಮಯಕ್ಕೆ ರೆಕಾರ್ಡ್ ಮಾಡಲು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ."</string>
     <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"ಈಗಾಗಲೇ ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗಿದೆ"</string>
     <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"ಈ ಪ್ರೋಗ್ರಾಂ ಅನ್ನು ಈಗಾಗಲೇ ರೆಕಾರ್ಡ್‌ ಮಾಡಲಾಗಿದೆ. ಇದು DVR ಲೈಬ್ರರಿಯಲ್ಲಿ ಲಭ್ಯವಿದೆ."</string>
-    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
-    <skip />
-    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_series_recording_dialog_title" msgid="3521956660855853797">"ಸರಣಿ ರೆಕಾರ್ಡಿಂಗ್ ನಿಗದಿಪಡಿಸಲಾಗಿದೆ"</string>
+    <plurals name="dvr_series_scheduled_no_conflict" formatted="false" msgid="6909096418632555251">
+      <item quantity="one"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ.</item>
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ.</item>
+    </plurals>
+    <plurals name="dvr_series_recording_scheduled_only_this_series_conflict" formatted="false" msgid="2341548158607418515">
+      <item quantity="one"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಅವುಗಳಲ್ಲಿ <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g> ಅನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಅವುಗಳಲ್ಲಿ <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g> ಅನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_this_and_other_series_conflict" formatted="false" msgid="6123651855499916154">
+      <item quantity="one"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಈ ಸರಣಿಯ ಮತ್ತು ಇತರ ಸರಣಿಯ <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ಸಂಚಿಕೆಗಳನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+      <item quantity="other"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಈ ಸರಣಿಯ ಮತ್ತು ಇತರ ಸರಣಿಯ <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ಸಂಚಿಕೆಗಳನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_one_conflict" formatted="false" msgid="8628389493339609682">
+      <item quantity="one"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಇತರ ಸರಣಿಯ 1 ಸಂಚಿಕೆಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಇತರ ಸರಣಿಯ 1 ಸಂಚಿಕೆಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_many_conflicts" formatted="false" msgid="1601104768354168073">
+      <item quantity="one"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಇತರ ಸರಣಿಯ <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ಸಂಚಿಕೆಗಳನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+      <item quantity="other"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> ಗೆ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ನಿಗದಿಪಡಿಸಲಾಗಿದೆ. ಸಂಘರ್ಷಗಳ ಕಾರಣದಿಂದಾಗಿ ಇತರ ಸರಣಿಯ <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ಸಂಚಿಕೆಗಳನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</item>
+    </plurals>
     <string name="dvr_program_not_found" msgid="3282879532038010202">"ರೆಕಾರ್ಡ್‌ ಮಾಡಲಾದ ಕಾರ್ಯಕ್ರಮ ಕಂಡುಬಂದಿಲ್ಲ."</string>
     <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"ಸಂಬಂಧಿಸಿದ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳು"</string>
     <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(ಯಾವುದೇ ಪ್ರೋಗ್ರಾಂ ವಿವರಣೆಯಿಲ್ಲ)"</string>
@@ -336,6 +335,7 @@
     <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"ಸರಣಿ ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸುವುದೇ?"</string>
     <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"ರೆಕಾರ್ಡ್‌ ಮಾಡಲಾದ ಭಾಗಗಳು DVR ಲೈಬ್ರರಿಯಲ್ಲಿ ಲಭ್ಯವಿರುತ್ತವೆ."</string>
     <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"ನಿಲ್ಲಿಸಿ"</string>
+    <string name="dvr_series_schedules_stopped_empty_state" msgid="1464244804664395151">"ಈಗ ಪ್ರಸಾರ ಮಾಡಲು ಯಾವುದೇ ಸಂಚಿಕೆಗಳಿಲ್ಲ."</string>
     <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"ಯಾವುದೇ ಸಂಚಿಕೆಗಳು ಲಭ್ಯವಿಲ್ಲ.\nಅವುಗಳು ಒಮ್ಮೆ ಲಭ್ಯವಾದಾಗ ಅವುಗಳನ್ನು ರೆಕಾರ್ಡ್‌ ಮಾಡಲಾಗುತ್ತದೆ."</string>
     <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
       <item quantity="one">(%1$d ನಿಮಿಷಗಳು)</item>

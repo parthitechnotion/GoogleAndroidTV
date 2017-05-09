@@ -56,9 +56,10 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v17-leanback \
     icu4j-usbtuner \
     lib-exoplayer \
+    lib-exoplayer-v2 \
+    lib-exoplayer-v2-ext-ffmpeg \
     tv-common \
-    legacy-android-test \
-    junit
+
 
 
 LOCAL_JAVACFLAGS := -Xlint:deprecation -Xlint:unchecked
@@ -96,16 +97,18 @@ LOCAL_SDK_VERSION := system_current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
+
 #############################################################
 # Pre-built dependency jars
 #############################################################
-
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := \
     lib-exoplayer:libs/exoplayer.jar \
+    lib-exoplayer-v2:libs/exoplayer_v2.jar \
+    lib-exoplayer-v2-ext-ffmpeg:libs/exoplayer_v2_ext_ffmpeg.jar \
 
 
 include $(BUILD_MULTI_PREBUILT)

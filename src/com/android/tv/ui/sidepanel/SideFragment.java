@@ -26,24 +26,26 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.tv.MainActivity;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
-import com.android.tv.analytics.DurationTimer;
+import com.android.tv.util.DurationTimer;
 import com.android.tv.analytics.HasTrackerLabel;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.data.ChannelDataManager;
 import com.android.tv.data.ProgramDataManager;
 import com.android.tv.util.SystemProperties;
+import com.android.tv.util.ViewCache;
 
 import java.util.List;
 
 public abstract class SideFragment extends Fragment implements HasTrackerLabel {
     public static final int INVALID_POSITION = -1;
 
-    private static final int RECYCLED_VIEW_POOL_SIZE = 7;
+    private static final int PRELOADED_VIEW_SIZE = 7;
     private static final int[] PRELOADED_VIEW_IDS = {
         R.layout.option_item_radio_button,
         R.layout.option_item_channel_lock,
@@ -51,7 +53,8 @@ public abstract class SideFragment extends Fragment implements HasTrackerLabel {
         R.layout.option_item_channel_check
     };
 
-    private static RecyclerView.RecycledViewPool sRecycledViewPool;
+    private static RecyclerView.RecycledViewPool sRecycledViewPool =
+            new RecyclerView.RecycledViewPool();
 
     private VerticalGridView mListView;
     private ItemAdapter mAdapter;
@@ -89,13 +92,6 @@ public abstract class SideFragment extends Fragment implements HasTrackerLabel {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        if (sRecycledViewPool == null) {
-            // sRecycledViewPool should be initialized by calling preloadRecycledViews()
-            // before the entering animation of this fragment starts,
-            // because it takes long time and if it is called after the animation starts (e.g. here)
-            // it can affect the animation.
-            throw new IllegalStateException("The RecyclerView pool has not been initialized.");
-        }
         View view = inflater.inflate(getFragmentLayoutResourceId(), container, false);
 
         TextView textView = (TextView) view.findViewById(R.id.side_panel_title);
@@ -236,30 +232,27 @@ public abstract class SideFragment extends Fragment implements HasTrackerLabel {
     }
 
     /**
-     * Preloads the view holders.
+     * Preloads the item views.
      */
-    public static void preloadRecycledViews(Context context) {
-        if (sRecycledViewPool != null) {
-            return;
-        }
-        sRecycledViewPool = new RecyclerView.RecycledViewPool();
+    public static void preloadItemViews(Context context) {
         LayoutInflater inflater =
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        // Use a fake parent to make the layoutParams set correctly.
+        ViewGroup fakeParent = new LinearLayout(context);
         for (int id : PRELOADED_VIEW_IDS) {
-            sRecycledViewPool.setMaxRecycledViews(id, RECYCLED_VIEW_POOL_SIZE);
-            for (int j = 0; j < RECYCLED_VIEW_POOL_SIZE; ++j) {
-                ItemAdapter.ViewHolder viewHolder = new ItemAdapter.ViewHolder(
-                        inflater.inflate(id, null, false));
-                sRecycledViewPool.putRecycledView(viewHolder);
+            sRecycledViewPool.setMaxRecycledViews(id, PRELOADED_VIEW_SIZE);
+            for (int j = 0; j < PRELOADED_VIEW_SIZE; ++j) {
+                View view = inflater.inflate(id, fakeParent, false);
+                ViewCache.getInstance().putView(id, view);
             }
         }
     }
 
     /**
-     * Releases the pre-loaded view holders.
+     * Releases the recycled view pool.
      */
-    public static void releasePreloadedRecycledViews() {
-        sRecycledViewPool = null;
+    public static void releaseRecycledViewPool() {
+        sRecycledViewPool.clear();
     }
 
     private static class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
@@ -278,7 +271,11 @@ public abstract class SideFragment extends Fragment implements HasTrackerLabel {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(mLayoutInflater.inflate(viewType, parent, false));
+            View view = ViewCache.getInstance().getView(viewType);
+            if (view == null) {
+                view = mLayoutInflater.inflate(viewType, parent, false);
+            }
+            return new ViewHolder(view);
         }
 
         @Override

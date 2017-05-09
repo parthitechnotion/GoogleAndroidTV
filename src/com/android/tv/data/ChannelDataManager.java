@@ -21,10 +21,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.AssetFileDescriptor;
 import android.database.ContentObserver;
+import android.database.sqlite.SQLiteException;
 import android.media.tv.TvContract;
 import android.media.tv.TvContract.Channels;
 import android.media.tv.TvInputManager.TvInputCallback;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -43,6 +47,8 @@ import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.TvInputManagerHelper;
 import com.android.tv.util.Utils;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -192,7 +198,6 @@ public class ChannelDataManager {
         mStarted = false;
         mDbLoadFinished = false;
 
-        ChannelLogoFetcher.stopFetchingChannelLogos();
         mInputManager.removeCallback(mTvInputCallback);
         mContentResolver.unregisterContentObserver(mChannelObserver);
         mHandler.removeCallbacksAndMessages(null);
@@ -590,6 +595,36 @@ public class ChannelDataManager {
         }
     }
 
+    private class checkChannelLogoExistTask extends AsyncTask<Void, Void, Boolean> {
+        private final Channel mChannel;
+
+        public checkChannelLogoExistTask(Channel channel) {
+            mChannel = channel;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            boolean result = false;
+            try {
+                AssetFileDescriptor f = mContext.getContentResolver().openAssetFileDescriptor(
+                        TvContract.buildChannelLogoUri(mChannel.getId()), "r");
+                result = true;
+                f.close();
+            } catch (SQLiteException | IOException | NullPointerException e) {
+                // File not found or asset file not found.
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            ChannelWrapper wrapper = mChannelWrapperMap.get(mChannel.getId());
+            if (wrapper != null) {
+                wrapper.mChannel.setChannelLogoExist(result);
+            }
+        }
+    }
+
     private final class QueryAllChannelsTask extends AsyncDbTask.AsyncChannelQueryTask {
 
         public QueryAllChannelsTask(ContentResolver contentResolver) {
@@ -625,6 +660,8 @@ public class ChannelDataManager {
                 boolean newlyAdded = !removedChannelIds.remove(channelId);
                 ChannelWrapper channelWrapper;
                 if (newlyAdded) {
+                    new checkChannelLogoExistTask(channel)
+                            .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                     channelWrapper = new ChannelWrapper(channel);
                     mChannelWrapperMap.put(channel.getId(), channelWrapper);
                     if (!channelWrapper.mInputRemoved) {
@@ -640,9 +677,9 @@ public class ChannelDataManager {
                         // {@link #applyUpdatedValuesToDb} is called. Therefore, the value
                         // between DB and ChannelDataManager could be different for a while.
                         // Therefore, we'll keep the values in ChannelDataManager.
-                        channelWrapper.mChannel.copyFrom(channel);
                         channel.setBrowsable(oldChannel.isBrowsable());
                         channel.setLocked(oldChannel.isLocked());
+                        channelWrapper.mChannel.copyFrom(channel);
                         if (!channelWrapper.mInputRemoved) {
                             channelUpdated = true;
                             updatedChannelWrappers.add(channelWrapper);
@@ -693,7 +730,6 @@ public class ChannelDataManager {
                 r.run();
             }
             mPostRunnablesAfterChannelUpdate.clear();
-            ChannelLogoFetcher.startFetchingChannelLogos(mContext);
         }
     }
 

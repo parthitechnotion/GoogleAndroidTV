@@ -38,6 +38,8 @@ import com.android.tv.search.LocalSearchProvider.SearchResult;
 import com.android.tv.util.PermissionUtils;
 import com.android.tv.util.Utils;
 
+import junit.framework.Assert;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -189,6 +191,10 @@ public class TvProviderSearch implements SearchInterface {
     @WorkerThread
     private List<SearchResult> searchChannels(String query, String[] columnForExactMatching,
             String[] columnForPartialMatching, Set<Long> channelsFound, int limit) {
+        Assert.assertTrue(
+                (columnForExactMatching != null && columnForExactMatching.length > 0) ||
+                (columnForPartialMatching != null && columnForPartialMatching.length > 0));
+
         String[] projection = {
                 Channels._ID,
                 Channels.COLUMN_DISPLAY_NUMBER,
@@ -308,6 +314,10 @@ public class TvProviderSearch implements SearchInterface {
             String[] columnForPartialMatching, Set<Long> channelsFound, int limit) {
         if (DEBUG) Log.d(TAG, "Searching programs: '" + query + "'");
         long time = SystemClock.elapsedRealtime();
+        Assert.assertTrue(
+                (columnForExactMatching != null && columnForExactMatching.length > 0) ||
+                (columnForPartialMatching != null && columnForPartialMatching.length > 0));
+
         String[] projection = {
                 Programs.COLUMN_CHANNEL_ID,
                 Programs.COLUMN_TITLE,
@@ -402,9 +412,7 @@ public class TvProviderSearch implements SearchInterface {
     }
 
     private String buildIntentData(long channelId) {
-        return TvContract.buildChannelUri(channelId).buildUpon()
-                .appendQueryParameter(Utils.PARAM_SOURCE, SOURCE_TV_SEARCH)
-                .build().toString();
+        return TvContract.buildChannelUri(channelId).toString();
     }
 
     private boolean isRatingBlocked(String ratings) {

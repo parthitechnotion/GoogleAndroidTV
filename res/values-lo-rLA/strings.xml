@@ -20,9 +20,8 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"​ໂມ​ໂນ"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"ສະ​ເຕ​ຣິ​ໂອ"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"ຄວບ​ຄຸມ​ການ​ຫຼິ້ນ"</string>
-    <string name="menu_title_channels" msgid="1801845517674690003">"ຊ່ອງ​ບໍ່ດົນ​ມານີ້"</string>
+    <string name="menu_title_channels" msgid="1949045451672990132">"​ຊ່ອງ"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"ໂຕເລືອກ​ໂທລະພາບ"</string>
-    <string name="menu_title_pip_options" msgid="4252934960762407689">"​ຕົວ​ເລືອກ PIP"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"ຫຼິ້ນ​ການ​ຄວບ​ຄຸມ​ບໍ່​ມີ​ໃຫ້​ສຳ​ລັບ​ຊ່ອງ​ນີ້"</string>
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"ຫຼິ້ນ​ ຫລື​ຢຸດ​ຊົ່ວ​ຄາວ"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"ເລື່ອນ​ໄປ​ໜ້າ"</string>
@@ -35,33 +34,15 @@
     <string name="options_item_closed_caption" msgid="5945274655046367170">"ຄຳ​ບັນຍາຍ​ແບບ​ປິດ"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"ໂໝດ​ການ​ສະແດງຜົນ"</string>
     <string name="options_item_pip" msgid="3951350386626879645">"PIP"</string>
-    <string name="options_item_pip_on" msgid="4647247480009077381">"​ເປີດ"</string>
-    <string name="options_item_pip_off" msgid="8799500161592387451">"ປິດ"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"ຫຼາຍສຽງ"</string>
     <string name="options_item_more_channels" msgid="971040969622943300">"ເອົາຊ່ອງເພີ່ມເຕີມ"</string>
     <string name="options_item_settings" msgid="7623205838542400074">"ການ​ຕັ້ງ​ຄ່າ"</string>
-    <string name="pip_options_item_source" msgid="1050948525825308652">"ທີ່​ມາ"</string>
-    <string name="pip_options_item_swap" msgid="7245362207353732048">"ສະຫຼັບ"</string>
-    <string name="pip_options_item_swap_on" msgid="5647182616484983505">"​ເປີດ"</string>
-    <string name="pip_options_item_swap_off" msgid="3023597229417709768">"ປິດ"</string>
-    <string name="pip_options_item_sound" msgid="3107034283791231648">"ສຽງ"</string>
-    <string name="pip_options_item_sound_main" msgid="1063937534112558691">"ຫຼັກ"</string>
-    <string name="pip_options_item_sound_pip_window" msgid="435064142351853008">"ໜ້າ​ຕ່າງ PIP"</string>
-    <string name="pip_options_item_layout" msgid="5126206342060967651">"ຮູບ​ແບບ"</string>
-    <string name="pip_options_item_layout_bottom_right" msgid="5256839015192920238">"ເບື້ອງ​ຂວາ​ທາງ​ລຸ່ມ"</string>
-    <string name="pip_options_item_layout_top_right" msgid="3585067214787055279">"ເບື້ອງ​ຂວາ​ດ້ານ​ເທິງ"</string>
-    <string name="pip_options_item_layout_top_left" msgid="2173997010201637462">"ເບື້ອງ​ຊ້າຍ​ດ້ານ​ເທິງ"</string>
-    <string name="pip_options_item_layout_bottom_left" msgid="1727197877968915329">"ເບື້ອງ​ຊ້າຍທາງ​ລຸ່ມ"</string>
-    <string name="pip_options_item_layout_side_by_side" msgid="9009784972740915779">"ເທື່ອ​ລະ​ດ້ານ"</string>
-    <string name="pip_options_item_size" msgid="5662894110243750158">"ຂະໜາດ"</string>
-    <string name="pip_options_item_size_big" msgid="6303301565563444718">"ໃຫຍ່"</string>
-    <string name="pip_options_item_size_small" msgid="7393731186585004206">"ນ້ອຍ"</string>
-    <string name="side_panel_title_pip_input_source" msgid="8722544967592970296">"​ແຫຼ່ງ​ສັນ​ຍານ"</string>
     <string name="input_long_label_for_tuner" msgid="3423514011918382209">"TV (ເສົາ​ສັນ​ຍານ/ສາຍ​ເຄ​ເບິນ)"</string>
     <string name="no_program_information" msgid="1049844207745145132">"ບໍ່​ມີ​ຂໍ້​ມູນ​ລາຍ​ການ"</string>
     <string name="program_title_for_no_information" msgid="384451471906070101">"ບໍ່ມີຂໍ້ມູນ"</string>
     <string name="program_title_for_blocked_channel" msgid="5358005891746983819">"ຊ່ອງ​ທີ່​ຖືກບ​ລັອກ"</string>
-    <string name="default_language" msgid="4122326459624337928">"ພາ​ສາ​ບໍ່​ຮູ້​ຈັກ"</string>
+    <string name="multi_audio_unknown_language" msgid="8639884627225598143">"ພາ​ສາ​ບໍ່​ຮູ້​ຈັກ"</string>
+    <string name="closed_caption_unknown_language" msgid="4745445516930229353">"ຄຳບັນຍາຍ %1$d"</string>
     <string name="side_panel_title_closed_caption" msgid="2513905054082568780">"ຄຳ​ບັນຍາຍ​ແບບ​ປິດ"</string>
     <string name="closed_caption_option_item_off" msgid="4824009036785647753">"ປິດ"</string>
     <string name="closed_caption_system_settings" msgid="1856974607743827178">"ປັບແຕ່ງການຈັດຮູບແບບ"</string>
@@ -135,6 +116,10 @@
     </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"ລະຫັດ PIN ນັ້ນບໍ່​ຖືກ​ຕ້ອງ, ກະ​ລຸ​ນາລອງ​ໃຫມ່​ອີກ​ຄັ້ງ."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"ລະ​ຫັດ PIN ບໍ່​ກົງ​ກັນ, ກະ​ລຸ​ນາ​ລອງ​ໃໝ່."</string>
+    <string name="postal_code_guidance_title" msgid="4144793072363879833">"ລະບຸລະຫັດ ZIP ຂອງທ່ານ."</string>
+    <string name="postal_code_guidance_description" msgid="4224511147377561572">"ແອັບ Live TV ຈະໃຊ້ລະຫັດ ZIP ເພື່ອສະໜອງຄຳແນະນຳລາຍການທີ່ສົມບູນໃຫ້ກັບຊ່ອງໂທລະທັດຕ່າງໆ."</string>
+    <string name="postal_code_action_description" msgid="4428720607051109105">"ໃສ່ລະຫັດ ZIP ຂອງທ່ານ"</string>
+    <string name="postal_code_invalid_warning" msgid="923373584458340746">"ລະຫັດ ZIP ບໍ່ຖືກຕ້ອງ"</string>
     <string name="side_panel_title_settings" msgid="8244327316510918755">"ການ​ຕັ້ງ​ຄ່າ"</string>
     <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"ປັບແຕ່ງ​ລາຍ​ຊື່​ຊ່ອງ"</string>
     <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"ເລືອກ​ຊ່ອງ​ສຳລັບການ​ແນະນຳລາຍການ​ຂອງ​ທ່ານ"</string>
@@ -143,6 +128,7 @@
     <string name="settings_parental_controls" msgid="5449397921700749317">"ການ​ຄວບຄຸມ​ຂອງພໍ່ແມ່"</string>
     <string name="settings_menu_licenses" msgid="1257646083838406103">"​ໃບ​ອະ​ນຸ​ຍາດ​ Open source"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"​ໃບ​ອະ​ນຸ​ຍາດ​ແຫຼ່ງ​ເປີດ"</string>
+    <string name="settings_send_feedback" msgid="6897217561193701829">"ສົ່ງຄຳຕິຊົມ"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"ເວີຊັນ"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"​ເພື່ອ​ເບິ່ງ​ຊ່ອງ​ນີ້, ກົດ​ປຸ່ມ ຂວາ ແລະ ປ້ອນ​ລະ​ຫັດ PIN ຂອງ​ທ່ານ"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"​ເພື່ອ​ເບິ່ງ​ລາຍ​ການ​ນີ້, ໃຫ້ກົດ​ປຸ່ມ ຂວາ ແລະ ປ້ອນ​ລະ​ຫັດ PIN ຂອງ​ທ່ານ"</string>
@@ -181,8 +167,6 @@
     <string name="intro_description" msgid="7806473686446937307"><b>"ກົດ SELECT"</b>" ເພື່ອ​ເຂົ້າ​ຫາ​ເມ​ນູ TV."</string>
     <string name="msg_no_input" msgid="3897674146985427865">"ບໍ່​ພົບການ​ປ້ອນ​ເຂົ້າ TV"</string>
     <string name="msg_no_specific_input" msgid="2688885987104249852">"ບໍ່​ສາ​ມາດ​ຊອກ​ຫາການ​ປ້ອນ​ເຂົ້າ TV ​ໄດ້"</string>
-    <string name="msg_no_pip_support" msgid="161508628996629445">"ບໍ່​ຮອງ​ຮັບ PIP"</string>
-    <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"ບໍ່ມີການຮັບສັນຍານທີ່ສາມາດສະແດງໄດ້ດ້ວຍຮູບພາບຊ້ອນຮູບພາບ PIP"</string>
     <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ປະ​ເພດ​ເຄື່ອງ​ຈູນ​ບໍ່​ເໝາະ​ສົມ; ກະ​ລຸ​ນາ​ເປີດ​ໃຊ້​ແອັບ​ຊ່ອງ​ສົດ​ສຳ​ລັບ​ການ​ປ້ອນ​ເຂົ້າ TV ປະ​ເພດ​ເຄື່ອງ​ຈູນ."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"ການ​ປັບ​ຊ່ອງ​ລົ້ມ​ເຫລວ"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"ບໍ່ພົບແອັບຯທີ່ໃຊ້ເພື່ອດຳເນີນການ."</string>
@@ -259,8 +243,6 @@
     <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"ບັນທຶກ"</string>
     <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"ການບັນທຶກຕາມເວລາມີຄວາມສຳຄັນສູງສຸດ"</string>
     <string name="dvr_action_cancel" msgid="8094060199570272625">"​ຍົກເລີກ"</string>
-    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"ຍົກເລີກ"</string>
-    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"ລືມ"</string>
     <string name="dvr_action_stop" msgid="1378723485295471381">"ຢຸດ"</string>
     <string name="dvr_action_view_schedules" msgid="7442990695392774263">"ເບິ່ງຕາຕາລາງການບັນທຶກ"</string>
     <string name="dvr_action_record_episode" msgid="8596182676610326327">"ນີ້ເປັນລາຍການດ່ຽວ"</string>
@@ -270,25 +252,29 @@
     <string name="dvr_action_record_instead" msgid="6821164728752215738">"ບັນທຶກອັນນີ້ແທນ"</string>
     <string name="dvr_action_record_cancel" msgid="8644254745772185288">"ຍົກເລີກການບັນທຶກນີ້"</string>
     <string name="dvr_action_watch_now" msgid="7181211920959075976">"ເບິ່ງດຽວນີ້"</string>
+    <string name="dvr_action_delete_recordings" msgid="850785346795261671">"ລຶບການບັນທຶກອອກ…"</string>
     <string name="dvr_epg_program_recordable" msgid="609229576209476903">"ບັນທຶກໄດ້"</string>
     <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"ຕັ້ງເວລາບັນທຶກແລ້ວ"</string>
     <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"ເກີດຄວາມຂັດແຍ່ງໃນການບັນທຶກ"</string>
     <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"ກຳລັງບັນທຶກ"</string>
     <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"ບັນທຶກບໍ່ສຳເລັດ"</string>
     <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"ກຳລັງອ່ານເນື້ອຫາລາຍການເພື່ອຕັ້ງເວລາບັນທຶກ"</string>
-    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"ກຳລັງອ່ານລາຍການ"</string>
-    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
-    <skip />
+    <string name="dvr_series_progress_message_reading_programs" msgid="2961615820635219355">"ກຳລັງອ່ານລາຍການ"</string>
+    <string name="dvr_error_insufficient_space_action_view_recent_recordings" msgid="137918938589787623">"ເບິ່ງການບັນທຶກຫຼ້າສຸດ"</string>
+    <string name="dvr_error_insufficient_space_title_one_recording" msgid="759510175792505150">"ບັນທຶກ <xliff:g id="PROGRAMNAME">%1$s</xliff:g> ບໍ່ສົມບູນ."</string>
+    <string name="dvr_error_insufficient_space_title_two_recordings" msgid="5518578722556227631">"ບັນທຶກ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> ແລະ <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ບໍ່ສົມບູນ."</string>
+    <string name="dvr_error_insufficient_space_title_three_or_more_recordings" msgid="5104901174884754363">"ບັນທຶກ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ແລະ <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> ບໍ່ສົມບູນ."</string>
+    <string name="dvr_error_insufficient_space_description_one_recording" msgid="9092549220659026111">"ບັນທຶກ <xliff:g id="PROGRAMNAME">%1$s</xliff:g> ບໍ່ສຳເລັດເນື່ອງຈາກບ່ອນຈັດເກັບຂໍ້ມູນບໍ່ພຽງພໍ."</string>
+    <string name="dvr_error_insufficient_space_description_two_recordings" msgid="7712799694720979003">"ບັນທຶກ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g> ແລະ <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ບໍ່ສຳເລັດເນື່ອງຈາກບ່ອນຈັດເກັບຂໍ້ມູນບໍ່ພຽງພໍ."</string>
+    <string name="dvr_error_insufficient_space_description_three_or_more_recordings" msgid="7877855707777832128">"ບັນທຶກ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> ແລະ <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> ບໍ່ສຳເລັດເນື່ອງຈາກບ່ອນຈັດເກັບຂໍ້ມູນບໍ່ພຽງພໍ."</string>
     <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR ຕ້ອງໃຊ້ບ່ອນຈັດເກັບຂໍ້ມູນເພີ່ມເຕີມ"</string>
     <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"ທ່ານຈະສາມາດບັນທຶກລາຍການດ້ວຍ DVR ໄດ້. ຢ່າງໃດກໍຕາມ, ອຸປະກອນຂອງທ່ານບໍ່ມີບ່ອນຈັດເກັບຂໍ້ມູນພຽງພໍໃຫ້ DVR ເຮັດວຽກໄດ້. ກະລຸນາເຊື່ອມຕໍ່ຫາໄດຣຟ໌ພາຍນອກທີ່ມີຂະໜາດ <xliff:g id="STORAGE_SIZE">%1$s</xliff:g>GB ຫຼືໃຫຍ່ກວ່າ ແລ້ວເຮັດຕາມຂັ້ນຕອນໃນການໃຊ້ມັນເປັນອຸປະກອນຈັດເກັບຂໍ້ມູນ."</string>
+    <string name="dvr_error_no_free_space_title" msgid="881897873932403512">"ບ່ອນຈັດເກັບຂໍ້ມູນບໍ່ພຽງພໍ"</string>
+    <string name="dvr_error_no_free_space_description" msgid="6406038381803431564">"ຈະບໍ່ບັນທຶກລາຍການນີ້ເນື່ອງຈາກມີບ່ອນຈັດເກັບຂໍ້ມູນບໍ່ພຽງພໍ. ໃຫ້ລອງລຶບການບັນທຶກບາງອັນອອກກ່ອນ."</string>
     <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"ບໍ່ພົບບ່ອນຈັດເກັບຂໍ້ມູນ"</string>
-    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"ບໍ່ພົບບ່ອນຈັດເກັບຂໍ້ມູນບາງອັນທີ່ໃຊ້ໂດຍ DVR. ກະລຸນາເຊື່ອມຕໍ່ໄດຣຟ໌ພາຍນອກທີ່ທ່ານໃຊ້ກ່ອນຈະເປີດໃຊ້ DVR ຄືນໃໝ່. ຫຼືອີກວິທີໜຶ່ງ, ທ່ານສາມາດເລືອກໃຫ້ລືມບ່ອນຈັດເກັບຂໍ້ມູນດັ່ງກ່າວໄດ້ຫາກມັນບໍ່ມີໃຫ້ໃຊ້ອີກຕໍ່ໄປແລ້ວ."</string>
-    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"ລືມການຈັດເກັບຂໍ້ມູນບໍ?"</string>
-    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"ທ່ານຈະສູນເສຍເນື້ອຫາ ແລະ ການຕັ້ງເວລາທັງໝົດທີ່ທ່ານບັນທຶກໄວ້ແລ້ວ."</string>
     <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"ຢຸດການບັນທຶກໄວ້ບໍ?"</string>
     <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"ເນື້ອຫາທີ່ອັດໄວ້ແລ້ວຈະຖືກບັຍທຶກໄວ້."</string>
-    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
-    <skip />
+    <string name="dvr_stop_recording_dialog_description_on_conflict" msgid="7876857267536083760">"ການບັນທຶກ <xliff:g id="PROGRAMNAME">%1$s</xliff:g> ຈະຖືກຢຸດໄວ້ເພາະມັນຂັດແຍ່ງກັບລາຍການນີ້. ເນື້ອຫາທີ່ບັນທຶກໄປແລ້ວຈະຖືກຈັດເກັບໄວ້."</string>
     <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"ຕັ້ງເວລາການບັນທຶກແລ້ວແຕ່ມີຂໍ້ຂັດແຍ່ງເກີດຂຶ້ນ"</string>
     <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"ເລີ່ມການບັນທຶກແລ້ວແຕ່ມີຂໍ້ຂັດແຍ່ງ"</string>
     <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> ຈະຖືກບັນທຶກໄວ້."</string>
@@ -306,14 +292,27 @@
     <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"ລາຍການດຽວກັນນີ້ໄດ້ຕັ້ງເວລາໃຫ້ບັນທຶກໄວ້ແລ້ວເວລາ <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g>."</string>
     <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"ບັນທຶກໄປກ່ອນແລ້ວ"</string>
     <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"ລາຍການນີ້ຖືກບັນທຶກໄປກ່ອນແລ້ວ. ມັນສາມາດເບິ່ງໄດ້ໃນຫ້ອງສະໝຸດ DVR."</string>
-    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
-    <skip />
-    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_series_recording_dialog_title" msgid="3521956660855853797">"ຕັ້ງເວລາບັນທຶກຊີຣີແລ້ວ"</string>
+    <plurals name="dvr_series_scheduled_no_conflict" formatted="false" msgid="6909096418632555251">
+      <item quantity="other">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_3">%2$s</xliff:g> ແລ້ວ.</item>
+      <item quantity="one">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_1">%2$s</xliff:g> ແລ້ວ.</item>
+    </plurals>
+    <plurals name="dvr_series_recording_scheduled_only_this_series_conflict" formatted="false" msgid="2341548158607418515">
+      <item quantity="other">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_3">%2$s</xliff:g> ແລ້ວ. <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g> ລາຍການຈະບໍ່ຖືກບັນທຶກເນື່ອງຈາກມີຂໍ້ຂັດແຍ່ງ.</item>
+      <item quantity="one">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_1">%2$s</xliff:g> ແລ້ວ. ມັນຈະບໍ່ຖືກບັນທຶກເນື່ອງຈາກມີຂໍ້ຂັດແຍ່ງ.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_this_and_other_series_conflict" formatted="false" msgid="6123651855499916154">
+      <item quantity="other">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_4">%2$s</xliff:g> ແລ້ວ. ຈະບໍ່ບັນທຶກເອັບພິໂສດ <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ຕອນຂອງຊີຣີອື່ນເນື່ອງຈາກເວລາຂັດແຍ່ງກັນ.</item>
+      <item quantity="one">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_1">%2$s</xliff:g> ແລ້ວ. ຈະບໍ່ບັນທຶກເອັບພິໂສດ <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> ຕອນຂອງຊີຣີອື່ນເນື່ອງຈາກເວລາຂັດແຍ່ງກັນ.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_one_conflict" formatted="false" msgid="8628389493339609682">
+      <item quantity="other">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_3">%2$s</xliff:g> ແລ້ວ. ຈະບໍ່ບັນທຶກເອັບພິໂສດ 1 ຕອນຂອງຊີຣີອື່ນເນື່ອງຈາກເວລາຂັດແຍ່ງກັນ.</item>
+      <item quantity="one">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_1">%2$s</xliff:g> ແລ້ວ. ຈະບໍ່ບັນທຶກເອັບພິໂສດ 1 ຕອນຂອງຊີຣີອື່ນເນື່ອງຈາກເວລາຂັດແຍ່ງກັນ.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_many_conflicts" formatted="false" msgid="1601104768354168073">
+      <item quantity="other">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_4">%2$s</xliff:g> ແລ້ວ. ຈະບໍ່ບັນທຶກເອັບພິໂສດ <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ຕອນຂອງຊີຣີອື່ນເນື່ອງຈາກເວລາຂັດແຍ່ງກັນ.</item>
+      <item quantity="one">ຕັ້ງເວລາບັນທຶກ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ລາຍການສຳລັບ <xliff:g id="SERIESNAME_1">%2$s</xliff:g> ແລ້ວ. ຈະບໍ່ບັນທຶກເອັບພິໂສດ <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> ຕອນຂອງຊີຣີອື່ນເນື່ອງຈາກເວລາຂັດແຍ່ງກັນ.</item>
+    </plurals>
     <string name="dvr_program_not_found" msgid="3282879532038010202">"ບໍ່ພົບໂປຣແກຣມທີ່ບັນທຶໄວ້."</string>
     <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"ການບັນທຶກທີ່ກ່ຽວຂ້ອງ"</string>
     <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(ບໍ່ມີຄຳອະທິບາຍລາຍການ)"</string>
@@ -336,6 +335,7 @@
     <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"ຢຸດການບັນທຶກຊີຣີບໍ່?"</string>
     <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"ເອັບພິໂສດທີ່ບັນທຶກໄວ້ແລ້ວຈະຍັງຄົງສາມາດເບິ່ງໄດ້ໃນຫ້ອງສະໝຸດ DVR ຢູ່."</string>
     <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"ຢຸດ"</string>
+    <string name="dvr_series_schedules_stopped_empty_state" msgid="1464244804664395151">"ບໍ່ມີເອັບພິໂສດໃດທີ່ກຳລັງສາຍຢູ່ໃນຕອນນີ້."</string>
     <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"ຍັງບໍ່ມີເອບພິໂສດທີ່ສາມາດເບິ່ງໄດ້ເທື່ອ.\nພວກມັນຈະຖືກບັນທຶອຶກເມື່ອມີການສາຍ."</string>
     <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
       <item quantity="other">(%1$d ນາທີ)</item>

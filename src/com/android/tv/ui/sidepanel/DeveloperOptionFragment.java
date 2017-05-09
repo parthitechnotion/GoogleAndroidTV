@@ -18,8 +18,6 @@ package com.android.tv.ui.sidepanel;
 
 import android.accounts.Account;
 import android.app.Activity;
-import android.app.ApplicationErrorReport;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -27,6 +25,7 @@ import android.widget.Toast;
 import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.common.BuildConfig;
+import com.android.tv.common.feature.CommonFeatures;
 import com.android.tv.data.epg.EpgFetcher;
 import com.android.tv.experiments.Experiments;
 import com.android.tv.tuner.TunerPreferences;
@@ -54,6 +53,14 @@ public class DeveloperOptionFragment extends SideFragment {
     @Override
     protected List<Item> getItemList() {
         List<Item> items = new ArrayList<>();
+        if (CommonFeatures.DVR.isEnabled(getContext())) {
+            items.add(new ActionItem(getString(R.string.dev_item_dvr_history)) {
+                @Override
+                protected void onSelected() {
+                    getMainActivity().getOverlayManager().showDvrHistoryDialog();
+                }
+            });
+        }
         if (BuildConfig.ENG) {
             items.add(new ActionItem(getString(R.string.dev_item_watch_history)) {
                 @Override
@@ -62,18 +69,6 @@ public class DeveloperOptionFragment extends SideFragment {
                 }
             });
         }
-        items.add(new ActionItem(getString(R.string.dev_item_send_feedback)) {
-            @Override
-            protected void onSelected() {
-                Intent intent = new Intent(Intent.ACTION_APP_ERROR);
-                ApplicationErrorReport report = new ApplicationErrorReport();
-                report.packageName = report.processName = getContext().getPackageName();
-                report.time = System.currentTimeMillis();
-                report.type = ApplicationErrorReport.TYPE_NONE;
-                intent.putExtra(Intent.EXTRA_BUG_REPORT, report);
-                startActivityForResult(intent, 0);
-            }
-        });
         items.add(new SwitchItem(getString(R.string.dev_item_store_ts_on),
                 getString(R.string.dev_item_store_ts_off),
                 getString(R.string.dev_item_store_ts_description)) {

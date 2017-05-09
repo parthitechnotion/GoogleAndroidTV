@@ -45,7 +45,6 @@ public class ChannelCardView extends BaseCardView<Channel> {
     private final int mCardImageHeight;
 
     private ImageView mImageView;
-    private View mGradientView;
     private TextView mChannelNumberNameView;
     private ProgressBar mProgressBar;
     private Channel mChannel;
@@ -71,7 +70,6 @@ public class ChannelCardView extends BaseCardView<Channel> {
     protected void onFinishInflate() {
         super.onFinishInflate();
         mImageView = (ImageView) findViewById(R.id.image);
-        mGradientView = findViewById(R.id.image_gradient);
         mChannelNumberNameView = (TextView) findViewById(R.id.channel_number_and_name);
         mProgressBar = (ProgressBar) findViewById(R.id.progress);
     }
@@ -88,7 +86,7 @@ public class ChannelCardView extends BaseCardView<Channel> {
         mChannelNumberNameView.setVisibility(VISIBLE);
         mImageView.setImageResource(R.drawable.ic_recent_thumbnail_default);
         mImageView.setBackgroundResource(R.color.channel_card);
-        mGradientView.setVisibility(View.GONE);
+        mImageView.setForeground(null);
         mProgressBar.setVisibility(GONE);
 
         setTextViewEnabled(true);
@@ -101,8 +99,6 @@ public class ChannelCardView extends BaseCardView<Channel> {
         }
 
         updateProgramInformation();
-        // Call super.onBind() at the end intentionally. In order to correctly handle extension of
-        // text view, text should be set before calling super.onBind.
         super.onBind(channel, selected);
     }
 
@@ -123,7 +119,7 @@ public class ChannelCardView extends BaseCardView<Channel> {
 
     private void updatePosterArt(Bitmap posterArt) {
         mImageView.setImageBitmap(posterArt);
-        mGradientView.setVisibility(View.VISIBLE);
+        mImageView.setForeground(getContext().getDrawable(R.drawable.card_image_gradient));
     }
 
     private void updateProgramInformation() {

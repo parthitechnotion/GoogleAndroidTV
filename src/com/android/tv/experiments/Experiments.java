@@ -23,11 +23,16 @@ import com.android.tv.common.BuildConfig;
 /**
  * Set of experiments visible in AOSP.
  *
- * <p>
- * This file is maintained by hand.
+ * <p>This file is maintained by hand.
  */
 public final class Experiments {
     public static final ExperimentFlag<Boolean> CLOUD_EPG = createFlag(
+            true);
+
+    /**
+     * Use network tuner if it is available and there is no other tuner types.
+     */
+    public static final ExperimentFlag<Boolean> NETWORK_TUNER = createFlag(
             false);
 
     /**

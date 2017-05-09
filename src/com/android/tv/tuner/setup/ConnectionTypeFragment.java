@@ -36,6 +36,24 @@ public class ConnectionTypeFragment extends SetupMultiPaneFragment {
             "com.android.tv.tuner.setup.ConnectionTypeFragment";
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        ((TunerSetupActivity) getActivity()).generateTunerHal();
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        ((TunerSetupActivity) getActivity()).generateTunerHal();
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        ((TunerSetupActivity) getActivity()).clearTunerHal();
+        super.onDestroy();
+    }
+
+    @Override
     protected SetupGuidedStepFragment onCreateContentFragment() {
         return new ContentFragment();
     }

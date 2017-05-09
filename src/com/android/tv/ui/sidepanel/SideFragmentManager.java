@@ -99,7 +99,6 @@ public class SideFragmentManager {
      * Shows the given {@link SideFragment}.
      */
     public void show(SideFragment sideFragment, boolean showEnterAnimation) {
-        SideFragment.preloadRecycledViews(mActivity);
         if (isHiding()) {
             mHideAnimator.end();
         }
@@ -178,7 +177,6 @@ public class SideFragmentManager {
      * @param withAnimation specifies if animation should be shown.
      */
     public void showSidePanel(boolean withAnimation) {
-        SideFragment.preloadRecycledViews(mActivity);
         if (mFragmentCount == 0) {
             return;
         }

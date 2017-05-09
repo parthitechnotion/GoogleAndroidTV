@@ -20,9 +20,8 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"മോണോ"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"സ്‌റ്റീരിയോ"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"പ്ലേ നിയന്ത്രണങ്ങൾ"</string>
-    <string name="menu_title_channels" msgid="1801845517674690003">"ഏറ്റവും പുതിയ ചാനലുകൾ"</string>
+    <string name="menu_title_channels" msgid="1949045451672990132">"ചാനലുകൾ"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"ടിവി ഓപ്‌ഷനുകൾ"</string>
-    <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP ഓ‌പ്‌ഷനുകൾ"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"ഈ ചാനലിന് പ്ലേ നിയന്ത്രണങ്ങൾ ലഭ്യമല്ല"</string>
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"പ്ലേ ചെയ്യുക അല്ലെങ്കിൽ താല്‍‌ക്കാലികമായി നിര്‍‌ത്തുക"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"വേഗത്തിലുള്ള കൈമാറൽ"</string>
@@ -35,33 +34,15 @@
     <string name="options_item_closed_caption" msgid="5945274655046367170">"അടച്ച അടിക്കുറിപ്പുകൾ"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"ഡിസ്‌പ്ലേ മോഡ്"</string>
     <string name="options_item_pip" msgid="3951350386626879645">"PIP"</string>
-    <string name="options_item_pip_on" msgid="4647247480009077381">"ഓണാണ്"</string>
-    <string name="options_item_pip_off" msgid="8799500161592387451">"ഓഫാണ്"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"മൾട്ടി ഓഡിയോ"</string>
     <string name="options_item_more_channels" msgid="971040969622943300">"കൂടുതൽ ചാനൽ സ്വീകരിക്കൂ"</string>
     <string name="options_item_settings" msgid="7623205838542400074">"ക്രമീകരണം"</string>
-    <string name="pip_options_item_source" msgid="1050948525825308652">"ഉറവിടം"</string>
-    <string name="pip_options_item_swap" msgid="7245362207353732048">"സ്വാപ്പുചെയ്യുക"</string>
-    <string name="pip_options_item_swap_on" msgid="5647182616484983505">"ഓണാണ്"</string>
-    <string name="pip_options_item_swap_off" msgid="3023597229417709768">"ഓഫാണ്"</string>
-    <string name="pip_options_item_sound" msgid="3107034283791231648">"ശബ്ദം"</string>
-    <string name="pip_options_item_sound_main" msgid="1063937534112558691">"പ്രധാന വിൻഡോ"</string>
-    <string name="pip_options_item_sound_pip_window" msgid="435064142351853008">"PIP വിൻഡോ"</string>
-    <string name="pip_options_item_layout" msgid="5126206342060967651">"ലേ‌ഔട്ട്"</string>
-    <string name="pip_options_item_layout_bottom_right" msgid="5256839015192920238">"ചുവടെ വലതുഭാഗത്ത്"</string>
-    <string name="pip_options_item_layout_top_right" msgid="3585067214787055279">"മുകളില്‍‌ വലതുഭാഗത്ത്"</string>
-    <string name="pip_options_item_layout_top_left" msgid="2173997010201637462">"മുകളില്‍‌ ഇടതുഭാഗത്ത്"</string>
-    <string name="pip_options_item_layout_bottom_left" msgid="1727197877968915329">"ചുവടെ ഇടതുഭാഗത്ത്"</string>
-    <string name="pip_options_item_layout_side_by_side" msgid="9009784972740915779">"വശങ്ങളിലായി"</string>
-    <string name="pip_options_item_size" msgid="5662894110243750158">"വലുപ്പം"</string>
-    <string name="pip_options_item_size_big" msgid="6303301565563444718">"വലുത്"</string>
-    <string name="pip_options_item_size_small" msgid="7393731186585004206">"ചെറുത്"</string>
-    <string name="side_panel_title_pip_input_source" msgid="8722544967592970296">"ഇൻപുട്ട് ഉറവിടം"</string>
     <string name="input_long_label_for_tuner" msgid="3423514011918382209">"ടിവി (ആന്റിന/കേബിൾ)"</string>
     <string name="no_program_information" msgid="1049844207745145132">"പ്രോഗ്രാം വിവരമൊന്നുമില്ല"</string>
     <string name="program_title_for_no_information" msgid="384451471906070101">"വിവരമൊന്നുമില്ല"</string>
     <string name="program_title_for_blocked_channel" msgid="5358005891746983819">"തടഞ്ഞ ചാനൽ"</string>
-    <string name="default_language" msgid="4122326459624337928">"അറിയാത്ത ഭാഷ"</string>
+    <string name="multi_audio_unknown_language" msgid="8639884627225598143">"അറിയാത്ത ഭാഷ"</string>
+    <string name="closed_caption_unknown_language" msgid="4745445516930229353">"അടച്ച അടിക്കുറിപ്പുകൾ %1$d"</string>
     <string name="side_panel_title_closed_caption" msgid="2513905054082568780">"അടച്ച അടിക്കുറിപ്പുകൾ"</string>
     <string name="closed_caption_option_item_off" msgid="4824009036785647753">"ഓഫ്"</string>
     <string name="closed_caption_system_settings" msgid="1856974607743827178">"ഫോർമാറ്റുചെയ്യൽ ഇഷ്‌ടാനുസൃതമാക്കുക"</string>
@@ -133,6 +114,10 @@
     </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"നൽകിയ പിൻ തെറ്റാണ്. വീണ്ടും ശ്രമിക്കുക."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"പിൻ യോജിക്കുന്നില്ല, വീണ്ടും ശ്രമിക്കുക"</string>
+    <string name="postal_code_guidance_title" msgid="4144793072363879833">"നിങ്ങളുടെ തപാൽ കോഡ് നൽകുക."</string>
+    <string name="postal_code_guidance_description" msgid="4224511147377561572">"ടിവി ചാനലുകൾക്ക് സമ്പൂർണ്ണ പ്രോഗ്രാം ഗൈഡ് നൽകുന്നതിന് തത്സമയ ചാനലുകൾ ആപ്പ്, തപാൽ കോഡ് ഉപയോഗിക്കും."</string>
+    <string name="postal_code_action_description" msgid="4428720607051109105">"നിങ്ങളുടെ തപാൽ കോഡ് നൽകുക"</string>
+    <string name="postal_code_invalid_warning" msgid="923373584458340746">"തെറ്റായ തപാൽ കോഡ്"</string>
     <string name="side_panel_title_settings" msgid="8244327316510918755">"ക്രമീകരണം"</string>
     <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"ചാനൽ ലിസ്റ്റ് ഇഷ്‌ടാനുസൃതമാക്കൂ"</string>
     <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"നിങ്ങളുടെ പ്രോഗ്രാം ഗൈഡിനായി ചാനലുകൾ തിരഞ്ഞെടുക്കുക"</string>
@@ -141,6 +126,7 @@
     <string name="settings_parental_controls" msgid="5449397921700749317">"രക്ഷാകർതൃ നിയന്ത്രണങ്ങൾ"</string>
     <string name="settings_menu_licenses" msgid="1257646083838406103">"ഓപ്പൺ സോഴ്‌സ് ലൈസൻസ്"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"ഓപ്പൺ സോഴ്‌സ് ലൈസൻസുകൾ"</string>
+    <string name="settings_send_feedback" msgid="6897217561193701829">"ഫീഡ്‍ബാക്ക് അയയ്ക്കുക"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"പതിപ്പ്"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"ഈ ചാനൽ കാണുന്നതിന് വലതുവശത്ത് അമർത്തിക്കൊണ്ട് നിങ്ങളുടെ പിൻ നൽകുക"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"ഈ പ്രോഗ്രാം കാണുന്നതിന് വലതുവശത്ത് അമർത്തിക്കൊണ്ട് നിങ്ങളുടെ പിൻ നൽകുക"</string>
@@ -179,8 +165,6 @@
     <string name="intro_description" msgid="7806473686446937307">"ടിവി മെനു ആക്‌സസ്സ് ചെയ്യാൻ "<b>"\'തിരഞ്ഞെടുക്കുക\' അമർത്തുക"</b>"."</string>
     <string name="msg_no_input" msgid="3897674146985427865">"ടിവി ഇൻപുട്ടൊന്നും കണ്ടെത്തിയില്ല"</string>
     <string name="msg_no_specific_input" msgid="2688885987104249852">"ടിവി ഇൻപുട്ട് കണ്ടെത്താനാകില്ല"</string>
-    <string name="msg_no_pip_support" msgid="161508628996629445">"PIP പിന്തുണയ്‌ക്കുന്നില്ല"</string>
-    <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"PIP-യിൽ കാണിക്കാനാകുന്ന ഇൻപുട്ടൊന്നും ലഭ്യമല്ല"</string>
     <string name="msg_not_passthrough_input" msgid="4502101097091087411">"ട്യൂണർ തരം അനുയോജ്യമല്ല. ട്യൂണർ തരം ടിവി ഇൻപുട്ടിനായി തത്സമയ ചാനലുകളുടെ അപ്ലിക്കേഷൻ സമാരംഭിക്കുക."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"ട്യൂൺ ചെയ്യൽ പരാജയപ്പെട്ടു"</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"ഈ പ്രവർത്തനം കൈകാര്യം ചെയ്യാൻ ആപ്പുകളൊന്നും കണ്ടെത്തിയില്ല."</string>
@@ -257,8 +241,6 @@
     <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"സംരക്ഷിക്കുക"</string>
     <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"ഒറ്റത്തവണ റെക്കോർഡിംഗുകൾക്ക് ഏറ്റവും ഉയർന്ന മുൻഗണന"</string>
     <string name="dvr_action_cancel" msgid="8094060199570272625">"റദ്ദാക്കൂ"</string>
-    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"റദ്ദാക്കുക"</string>
-    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"മറക്കുക"</string>
     <string name="dvr_action_stop" msgid="1378723485295471381">"നിർത്തുക"</string>
     <string name="dvr_action_view_schedules" msgid="7442990695392774263">"റെക്കോർഡിംഗ് ഷെഡ്യൂൾ കാണുക"</string>
     <string name="dvr_action_record_episode" msgid="8596182676610326327">"ഈ ഒരൊറ്റ പ്രോഗ്രാം"</string>
@@ -268,25 +250,29 @@
     <string name="dvr_action_record_instead" msgid="6821164728752215738">"പകരം, ഇത് റെക്കോർഡ് ചെയ്യുക"</string>
     <string name="dvr_action_record_cancel" msgid="8644254745772185288">"ഈ റെക്കോർഡിംഗ് റദ്ദാക്കുക"</string>
     <string name="dvr_action_watch_now" msgid="7181211920959075976">"ഇപ്പോൾ കാണുക"</string>
+    <string name="dvr_action_delete_recordings" msgid="850785346795261671">"റെക്കോർഡിംഗുകൾ ഇല്ലാതാക്കുക…"</string>
     <string name="dvr_epg_program_recordable" msgid="609229576209476903">"റെക്കോർഡുചെയ്യാവുന്നത്"</string>
     <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"റെക്കോർഡിംഗ് ഷെഡ്യൂൾചെയ്‌തു"</string>
     <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"റെക്കോർഡിംഗ് പൊരുത്തക്കേട്"</string>
     <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"റെക്കോർഡിംഗ്"</string>
     <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"റെക്കോർഡുചെയ്യൽ പരാജയപ്പെട്ടു"</string>
     <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"റെക്കോർഡിംഗ് ഷെഡ്യൂളുകൾ സൃഷ്ടിക്കാൻ പ്രോഗ്രാമുകൾ വായിക്കുന്നു"</string>
-    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"വായനാ പ്രോഗ്രാമുകൾ"</string>
-    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
-    <skip />
+    <string name="dvr_series_progress_message_reading_programs" msgid="2961615820635219355">"വായനാ പ്രോഗ്രാമുകൾ"</string>
+    <string name="dvr_error_insufficient_space_action_view_recent_recordings" msgid="137918938589787623">"സമീപകാല റെക്കോർഡിംഗുകൾ കാണുക"</string>
+    <string name="dvr_error_insufficient_space_title_one_recording" msgid="759510175792505150">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> റെക്കോർഡുചെയ്യൽ പൂർണ്ണമായില്ല."</string>
+    <string name="dvr_error_insufficient_space_title_two_recordings" msgid="5518578722556227631">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> എന്നിവയുടെ റെക്കോർഡുചെയ്യൽ പൂർണ്ണമായില്ല."</string>
+    <string name="dvr_error_insufficient_space_title_three_or_more_recordings" msgid="5104901174884754363">"<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g>, <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> എന്നിവയുടെ റെക്കോർഡുചെയ്യൽ പൂർണ്ണമായില്ല."</string>
+    <string name="dvr_error_insufficient_space_description_one_recording" msgid="9092549220659026111">"വേണ്ടത്ര സ്റ്റോറേജ് ഇല്ലാത്തതിനാൽ <xliff:g id="PROGRAMNAME">%1$s</xliff:g> റെക്കോർഡുചെയ്യൽ പൂർത്തിയായില്ല."</string>
+    <string name="dvr_error_insufficient_space_description_two_recordings" msgid="7712799694720979003">"വേണ്ടത്ര സ്റ്റോറേജ് ഇല്ലാത്തതിനാൽ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g> എന്നിവയുടെ റെക്കോർഡുചെയ്യൽ പൂർത്തിയായില്ല."</string>
+    <string name="dvr_error_insufficient_space_description_three_or_more_recordings" msgid="7877855707777832128">"വേണ്ടത്ര സ്റ്റോറേജ് ഇല്ലാത്തതിനാൽ <xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>, <xliff:g id="PROGRAMNAME_2">%2$s</xliff:g>, <xliff:g id="PROGRAMNAME_3">%3$s</xliff:g> എന്നിവയുടെ റെക്കോർഡുചെയ്യൽ പൂർത്തിയായില്ല."</string>
     <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR-ന് കൂടുതൽ സ്റ്റോറേജ് ആവശ്യമാണ്"</string>
     <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"DVR ഉപയോഗിച്ച് നിങ്ങൾക്ക് പ്രോഗ്രാമുകൾ റെക്കോർഡുചെയ്യാനാകും. എന്നിരുന്നാലും, DVR പ്രവർത്തിക്കുന്നതിന് നിങ്ങളുടെ ഉപകരണത്തിൽ ഇപ്പോൾ വേണ്ടത്ര സ്റ്റോറേജ് ഇല്ല. <xliff:g id="STORAGE_SIZE">%1$s</xliff:g>GB-യോ കൂടുതലോ ഉള്ള ഒരു എക്സ്റ്റേണൽ ഡ്രൈവ് കണക്റ്റുചെയ്യുകയും ഉപകരണ സ്റ്റോറേജായി അത് ഫോർമാറ്റുചെയ്യുന്നതിന് നിർദ്ദേശങ്ങൾ പിന്തുടരുകയും ചെയ്യുക."</string>
+    <string name="dvr_error_no_free_space_title" msgid="881897873932403512">"മതിയായ സ്റ്റോറേജ് ഇല്ല"</string>
+    <string name="dvr_error_no_free_space_description" msgid="6406038381803431564">"മതിയായ സ്റ്റോറേജ് ഇല്ലാത്തതിനാൽ ഈ പ്രോഗ്രാം റെക്കോർഡ് ചെയ്യപ്പെടില്ല. നിലവിലുള്ള റെക്കോർഡിംഗുകളിൽ ചിലത് ഇല്ലാതാക്കിക്കൊണ്ട് ശ്രമിച്ചുനോക്കുക."</string>
     <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"നഷ്ടമായ സ്റ്റോറേജ്"</string>
-    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"DVR ഉപയോഗിക്കുന്ന സ്റ്റോറേജിന്റെ ചിലത് നഷ്ടമായിരിക്കുന്നു. വീണ്ടും DVR പ്രവർത്തനക്ഷമമാക്കുന്നതിന്, നിങ്ങൾ മുമ്പ് ഉപയോഗിച്ച എക്സ്റ്റേണൽ ഡ്രൈവ് കണക്റ്റുചെയ്യുക. സ്റ്റോറേജ് തുടർന്നങ്ങോട്ട് ലഭ്യമല്ലെങ്കിൽ, ഇതരമാർഗ്ഗമെന്ന നിലയിൽ, നിങ്ങൾക്ക് മറക്കുന്നതിന് തിരഞ്ഞെടുക്കാവുന്നതാണ്."</string>
-    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"സ്റ്റോറേജ് മറക്കണോ?"</string>
-    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"നിങ്ങളുടെ റെക്കോർഡ് ചെയ്തിട്ടുള്ള എല്ലാ ഉള്ളടക്കവും ഷെഡ്യൂളുകളും നഷ്ടപ്പെടും."</string>
     <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"റെക്കോർഡിംഗ് നിർത്തണോ?"</string>
     <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"റെക്കോർഡുചെയ്തിട്ടുള്ള ഉള്ളടക്കം സംരക്ഷിക്കപ്പെടും."</string>
-    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
-    <skip />
+    <string name="dvr_stop_recording_dialog_description_on_conflict" msgid="7876857267536083760">"ഈ പ്രോഗ്രാമുമായി പൊരുത്തക്കേട് ഉള്ളതിനാൽ  <xliff:g id="PROGRAMNAME">%1$s</xliff:g> എന്ന പ്രോഗ്രാമിന്റെ റെക്കോർഡിംഗ് അവസാനിപ്പിക്കും. റെക്കോർഡുചെയ്ത ഉള്ളടക്കം സംരക്ഷിക്കപ്പെടും."</string>
     <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"റെക്കോർഡിംഗ് ഷെഡ്യൂൾ ചെയ്തിരിക്കുന്നു, എന്നാൽ പൊരുത്തക്കേടുകൾ ഉണ്ട്"</string>
     <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"റെക്കോർഡിംഗ് ആരംഭിച്ചിരിക്കുന്നു, എന്നാൽ പൊരുത്തക്കേടുകൾ ഉണ്ട്"</string>
     <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"<xliff:g id="PROGRAMNAME">%1$s</xliff:g> റെക്കോർഡുചെയ്യപ്പെടും."</string>
@@ -304,14 +290,27 @@
     <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"ഇതേ പ്രോഗ്രാം <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g>-ന് റെക്കോർഡ് ചെയ്യുന്നതിനായി ഇതിനകം തന്നെ ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്."</string>
     <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"ഇതിനകം തന്നെ റെക്കോർഡ് ചെയ്തു"</string>
     <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"ഈ പ്രോഗ്രാം ഇതിനകം തന്നെ റെക്കോർഡ് ചെയ്തിട്ടുണ്ട്. DVR ലൈഒബ്രറിയിൽ ഇത് ലഭ്യമാണ്."</string>
-    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
-    <skip />
-    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_series_recording_dialog_title" msgid="3521956660855853797">"പരമ്പരയുടെ റെക്കോർഡിംഗ് ഷെഡ്യൂൾ ചെയ്‌തു"</string>
+    <plurals name="dvr_series_scheduled_no_conflict" formatted="false" msgid="6909096418632555251">
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> റെക്കോർഡിംഗുകൾ ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> റെക്കോർഡിംഗ് ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്.</item>
+    </plurals>
+    <plurals name="dvr_series_recording_scheduled_only_this_series_conflict" formatted="false" msgid="2341548158607418515">
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> റെക്കോർഡിംഗുകൾ ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ അവയിലെ <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g> എണ്ണം റെക്കോർഡുചെയ്യപ്പെടില്ല.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> റെക്കോർഡിംഗ് ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ അത് റെക്കോർഡ് ചെയ്യപ്പെടില്ല.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_this_and_other_series_conflict" formatted="false" msgid="6123651855499916154">
+      <item quantity="other"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> റെക്കോർഡിംഗുകൾ ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ ഈ പരമ്പരയുടെയും മറ്റ് പരമ്പരയുടെയും <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> എപ്പിസോഡുകൾ റെക്കോർഡുചെയ്യപ്പെടില്ല.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> റെക്കോർഡിംഗ് ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ ഈ പരമ്പരയുടെയും മറ്റ് പരമ്പരയുടെയും <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> എപ്പിസോഡുകൾ റെക്കോർഡുചെയ്യപ്പെടില്ല.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_one_conflict" formatted="false" msgid="8628389493339609682">
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> റെക്കോർഡിംഗുകൾ ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ മറ്റ് പരമ്പരയുടെ ഒരു എപ്പിസോഡ് റെക്കോർഡുചെയ്യപ്പെടില്ല.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> റെക്കോർഡിംഗ് ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ മറ്റ് പരമ്പരയുടെ ഒരു എപ്പിസോഡ് റെക്കോർഡുചെയ്യപ്പെടില്ല.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_many_conflicts" formatted="false" msgid="1601104768354168073">
+      <item quantity="other"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> റെക്കോർഡിംഗുകൾ ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ മറ്റ് പരമ്പരകളുടെ <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> എപ്പിസോഡുകൾ റെക്കോർഡുചെയ്യപ്പെടില്ല.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> എന്ന പരമ്പരയുടെ <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> റെക്കോർഡിംഗ് ഷെഡ്യൂൾ ചെയ്തിട്ടുണ്ട്. പൊരുത്തക്കേടുകൾ ഉള്ളതിനാൽ മറ്റ് പരമ്പരകളുടെ <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> എപ്പിസോഡുകൾ റെക്കോർഡുചെയ്യപ്പെടില്ല.</item>
+    </plurals>
     <string name="dvr_program_not_found" msgid="3282879532038010202">"റെക്കോർഡുചെയ്ത പ്രോഗ്രാം കണ്ടെത്തിയില്ല."</string>
     <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"ബന്ധപ്പെട്ട റെക്കോർഡിംഗുകൾ"</string>
     <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(പ്രോഗ്രാം വിവരണമില്ല)"</string>
@@ -334,6 +333,7 @@
     <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"സീരീസ് റെക്കോർഡുചെയ്യുന്നത് നിർത്തണോ?"</string>
     <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"റെക്കോർഡുചെയ്ത എപ്പിസോഡുകൾ DVR ലൈബ്രറിയിൽ ലഭ്യമാകുന്നത് തുടരും."</string>
     <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"നിർത്തുക"</string>
+    <string name="dvr_series_schedules_stopped_empty_state" msgid="1464244804664395151">"എപ്പിസോഡുകളൊന്നും ഇപ്പോൾ പ്രക്ഷേപണം ചെയ്യുന്നില്ല."</string>
     <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"എപ്പിസോഡുകളൊന്നും ലഭ്യമല്ല.\nലഭ്യമായിക്കഴിഞ്ഞാൽ അവ റെക്കോർഡ് ചെയ്യപ്പെടും."</string>
     <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
       <item quantity="other">(%1$d മിനിറ്റ്)</item>

@@ -39,6 +39,7 @@ public class TunerPreferences {
 
     private static final String PREFS_KEY_CHANNEL_DATA_VERSION = "channel_data_version";
     private static final String PREFS_KEY_SCANNED_CHANNEL_COUNT = "scanned_channel_count";
+    private static final String PREFS_KEY_LAST_POSTAL_CODE = "last_postal_code";
     private static final String PREFS_KEY_SCAN_DONE = "scan_done";
     private static final String PREFS_KEY_LAUNCH_SETUP = "launch_setup";
     private static final String PREFS_KEY_STORE_TS_STREAM = "store_ts_stream";
@@ -86,8 +87,7 @@ public class TunerPreferences {
     /**
      * Releases the resources.
      */
-    @MainThread
-    public static void release(Context context) {
+    public static synchronized void release(Context context) {
         if (useContentProvider(context) && sContentObserver != null) {
             context.getContentResolver().unregisterContentObserver(sContentObserver);
         }
@@ -99,7 +99,8 @@ public class TunerPreferences {
      * This preferences is used across processes, so the preferences should be loaded again when the
      * databases changes.
      */
-    public static synchronized void loadPreferences(Context context) {
+    @MainThread
+    public static void loadPreferences(Context context) {
         if (sLoadPreferencesTask != null
                 && sLoadPreferencesTask.getStatus() != AsyncTask.Status.FINISHED) {
             sLoadPreferencesTask.cancel(true);
@@ -113,8 +114,7 @@ public class TunerPreferences {
         return TisConfiguration.isPackagedWithLiveChannels(context);
     }
 
-    @MainThread
-    public static int getChannelDataVersion(Context context) {
+    public static synchronized int getChannelDataVersion(Context context) {
         SoftPreconditions.checkState(sInitialized);
         if (useContentProvider(context)) {
             return sPreferenceValues.getInt(PREFS_KEY_CHANNEL_DATA_VERSION,
@@ -126,8 +126,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static void setChannelDataVersion(Context context, int version) {
+    public static synchronized void setChannelDataVersion(Context context, int version) {
         if (useContentProvider(context)) {
             setPreference(context, PREFS_KEY_CHANNEL_DATA_VERSION, version);
         } else {
@@ -137,8 +136,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static int getScannedChannelCount(Context context) {
+    public static synchronized int getScannedChannelCount(Context context) {
         SoftPreconditions.checkState(sInitialized);
         if (useContentProvider(context)) {
             return sPreferenceValues.getInt(PREFS_KEY_SCANNED_CHANNEL_COUNT);
@@ -148,8 +146,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static void setScannedChannelCount(Context context, int channelCount) {
+    public static synchronized void setScannedChannelCount(Context context, int channelCount) {
         if (useContentProvider(context)) {
             setPreference(context, PREFS_KEY_SCANNED_CHANNEL_COUNT, channelCount);
         } else {
@@ -159,8 +156,25 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static boolean isScanDone(Context context) {
+    public static synchronized String getLastPostalCode(Context context) {
+        SoftPreconditions.checkState(sInitialized);
+        if (useContentProvider(context)) {
+            return sPreferenceValues.getString(PREFS_KEY_LAST_POSTAL_CODE);
+        } else {
+            return getSharedPreferences(context).getString(PREFS_KEY_LAST_POSTAL_CODE, null);
+        }
+    }
+
+    public static synchronized void setLastPostalCode(Context context, String postalCode) {
+        if (useContentProvider(context)) {
+            setPreference(context, PREFS_KEY_LAST_POSTAL_CODE, postalCode);
+        } else {
+            getSharedPreferences(context).edit()
+                    .putString(PREFS_KEY_LAST_POSTAL_CODE, postalCode).apply();
+        }
+    }
+
+    public static synchronized boolean isScanDone(Context context) {
         SoftPreconditions.checkState(sInitialized);
         if (useContentProvider(context)) {
             return sPreferenceValues.getBoolean(PREFS_KEY_SCAN_DONE);
@@ -170,8 +184,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static void setScanDone(Context context) {
+    public static synchronized void setScanDone(Context context) {
         if (useContentProvider(context)) {
             setPreference(context, PREFS_KEY_SCAN_DONE, true);
         } else {
@@ -181,8 +194,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static boolean shouldShowSetupActivity(Context context) {
+    public static synchronized boolean shouldShowSetupActivity(Context context) {
         SoftPreconditions.checkState(sInitialized);
         if (useContentProvider(context)) {
             return sPreferenceValues.getBoolean(PREFS_KEY_LAUNCH_SETUP);
@@ -192,8 +204,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static void setShouldShowSetupActivity(Context context, boolean need) {
+    public static synchronized void setShouldShowSetupActivity(Context context, boolean need) {
         if (useContentProvider(context)) {
             setPreference(context, PREFS_KEY_LAUNCH_SETUP, need);
         } else {
@@ -203,8 +214,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static boolean getStoreTsStream(Context context) {
+    public static synchronized boolean getStoreTsStream(Context context) {
         SoftPreconditions.checkState(sInitialized);
         if (useContentProvider(context)) {
             return sPreferenceValues.getBoolean(PREFS_KEY_STORE_TS_STREAM, false);
@@ -214,8 +224,7 @@ public class TunerPreferences {
         }
     }
 
-    @MainThread
-    public static void setStoreTsStream(Context context, boolean shouldStore) {
+    public static synchronized void setStoreTsStream(Context context, boolean shouldStore) {
         if (useContentProvider(context)) {
             setPreference(context, PREFS_KEY_STORE_TS_STREAM, shouldStore);
         } else {
@@ -229,8 +238,23 @@ public class TunerPreferences {
         return context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    @MainThread
-    private static void setPreference(final Context context, final String key, final String value) {
+    private static synchronized void setPreference(Context context, String key, String value) {
+        sPreferenceValues.putString(key, value);
+        savePreference(context, key, value);
+    }
+
+    private static synchronized void setPreference(Context context, String key, int value) {
+        sPreferenceValues.putInt(key, value);
+        savePreference(context, key, Integer.toString(value));
+    }
+
+    private static synchronized void setPreference(Context context, String key, boolean value) {
+        sPreferenceValues.putBoolean(key, value);
+        savePreference(context, key, Boolean.toString(value));
+    }
+
+    private static void savePreference(final Context context, final String key,
+            final String value) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -247,18 +271,6 @@ public class TunerPreferences {
                 return null;
             }
         }.execute();
-    }
-
-    @MainThread
-    private static void setPreference(Context context, String key, int value) {
-        sPreferenceValues.putInt(key, value);
-        setPreference(context, key, Integer.toString(value));
-    }
-
-    @MainThread
-    private static void setPreference(Context context, String key, boolean value) {
-        sPreferenceValues.putBoolean(key, value);
-        setPreference(context, key, Boolean.toString(value));
     }
 
     private static class LoadPreferencesTask extends AsyncTask<Void, Void, Bundle> {
@@ -292,6 +304,9 @@ public class TunerPreferences {
                             case PREFS_KEY_STORE_TS_STREAM:
                                 bundle.putBoolean(key, Boolean.parseBoolean(value));
                                 break;
+                            case PREFS_KEY_LAST_POSTAL_CODE:
+                                bundle.putString(key, value);
+                                break;
                         }
                     }
                 }
@@ -303,8 +318,10 @@ public class TunerPreferences {
         }
 
         @Override
-        protected void onPostExecute(Bundle bundle) {
-            sPreferenceValues.putAll(bundle);
+        protected synchronized void onPostExecute(Bundle bundle) {
+            if (bundle != null) {
+                sPreferenceValues.putAll(bundle);
+            }
         }
     }
 }

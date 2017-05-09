@@ -35,6 +35,7 @@ public final class SharedPreferencesUtils {
     public static final String SHARED_PREF_RECURRING_RUNNER = "sharedPreferencesRecurringRunner";
     public static final String SHARED_PREF_EPG = "epg_preferences";
     public static final String SHARED_PREF_SERIES_RECORDINGS = "seriesRecordings";
+    public static final String SHARED_PREF_CHANNEL_LOGO_URIS = "channelLogoUris";
 
     private static boolean sInitializeCalled;
 

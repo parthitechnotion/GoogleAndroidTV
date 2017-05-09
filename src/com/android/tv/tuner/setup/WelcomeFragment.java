@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import com.android.tv.common.ui.setup.SetupGuidedStepFragment;
 import com.android.tv.common.ui.setup.SetupMultiPaneFragment;
 import com.android.tv.tuner.R;
+import com.android.tv.tuner.TunerHal;
 import com.android.tv.tuner.TunerPreferences;
 import com.android.tv.tuner.util.TunerInputInfoUtils;
 
@@ -41,7 +42,9 @@ public class WelcomeFragment extends SetupMultiPaneFragment {
 
     @Override
     protected SetupGuidedStepFragment onCreateContentFragment() {
-        return new ContentFragment();
+        ContentFragment fragment = new ContentFragment();
+        fragment.setArguments(getArguments());
+        return fragment;
     }
 
     @Override
@@ -70,20 +73,33 @@ public class WelcomeFragment extends SetupMultiPaneFragment {
         public Guidance onCreateGuidance(Bundle savedInstanceState) {
             String title;
             String description;
+            int tunerType = getArguments().getInt(TunerSetupActivity.KEY_TUNER_TYPE,
+                    TunerHal.TUNER_TYPE_BUILT_IN);
             if (mChannelCountOnPreference == 0) {
-                if (TunerInputInfoUtils.isBuiltInTuner(getActivity())) {
-                    title = getString(R.string.bt_setup_new_title);
-                    description = getString(R.string.bt_setup_new_description);
-                } else {
-                    title = getString(R.string.ut_setup_new_title);
-                    description = getString(R.string.ut_setup_new_description);
+                switch (tunerType) {
+                    case TunerHal.TUNER_TYPE_USB:
+                        title = getString(R.string.ut_setup_new_title);
+                        description = getString(R.string.ut_setup_new_description);
+                        break;
+                    case TunerHal.TUNER_TYPE_NETWORK:
+                        title = getString(R.string.nt_setup_new_title);
+                        description = getString(R.string.nt_setup_new_description);
+                        break;
+                    default:
+                        title = getString(R.string.bt_setup_new_title);
+                        description = getString(R.string.bt_setup_new_description);
                 }
             } else {
                 title = getString(R.string.bt_setup_again_title);
-                if (TunerInputInfoUtils.isBuiltInTuner(getActivity())) {
-                    description = getString(R.string.bt_setup_again_description);
-                } else {
-                    description = getString(R.string.ut_setup_again_description);
+                switch (tunerType) {
+                    case TunerHal.TUNER_TYPE_USB:
+                        description = getString(R.string.ut_setup_again_description);
+                        break;
+                    case TunerHal.TUNER_TYPE_NETWORK:
+                        description = getString(R.string.nt_setup_again_description);
+                        break;
+                    default:
+                        description = getString(R.string.bt_setup_again_description);
                 }
             }
             return new Guidance(title, description, null, null);

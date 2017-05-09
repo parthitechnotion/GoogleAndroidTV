@@ -98,8 +98,8 @@ public class AudioTrackMonitor {
         long now = SystemClock.elapsedRealtime();
         if (mExpireMs != 0 && now >= mExpireMs) {
             if (DEBUG) {
-                long sampleDuration = (mTotalCount - 1) *
-                        Ac3PassthroughTrackRenderer.AC3_SAMPLE_DURATION_US / 1000;
+                long sampleDuration =
+                        (mTotalCount - 1) * Ac3DefaultTrackRenderer.AC3_SAMPLE_DURATION_US / 1000;
                 long totalDuration = now - mStartMs;
                 StringBuilder ptsBuilder = new StringBuilder();
                 ptsBuilder.append("PTS received ").append(mSampleCount).append(", ")

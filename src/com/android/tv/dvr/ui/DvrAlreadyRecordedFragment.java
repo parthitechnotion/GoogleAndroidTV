@@ -28,11 +28,9 @@ import android.widget.Toast;
 
 import com.android.tv.R;
 import com.android.tv.TvApplication;
-import com.android.tv.dvr.RecordedProgram;
 import com.android.tv.data.Program;
 import com.android.tv.dvr.DvrManager;
-import com.android.tv.dvr.DvrUiHelper;
-import com.android.tv.util.Utils;
+import com.android.tv.dvr.data.RecordedProgram;
 
 import java.util.List;
 

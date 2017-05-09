@@ -31,8 +31,8 @@ import com.android.tv.R;
 import com.android.tv.TvApplication;
 import com.android.tv.dvr.DvrDataManager;
 import com.android.tv.dvr.DvrManager;
-import com.android.tv.dvr.ScheduledRecording;
-import com.android.tv.dvr.SeriesRecording;
+import com.android.tv.dvr.data.ScheduledRecording;
+import com.android.tv.dvr.data.SeriesRecording;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -42,14 +42,14 @@ public class ChannelNumberTest extends TestCase {
      */
     public void testParseChannelNumber() {
         assertNull(parseChannelNumber(""));
-        assertNull(parseChannelNumber(" "));
+        assertNull(parseChannelNumber("-"));
         assertNull(parseChannelNumber("abcd12"));
         assertNull(parseChannelNumber("12abcd"));
         assertNull(parseChannelNumber("-12"));
         assertChannelEquals(parseChannelNumber("1"), "1", false, "");
-        assertChannelEquals(parseChannelNumber("1234 4321"), "1234", true, "4321");
+        assertChannelEquals(parseChannelNumber("1234-4321"), "1234", true, "4321");
         assertChannelEquals(parseChannelNumber("3-4"), "3", true, "4");
-        assertChannelEquals(parseChannelNumber("5.6"), "5", true, "6");
+        assertChannelEquals(parseChannelNumber("5-6"), "5", true, "6");
     }
 
     /**
@@ -59,13 +59,11 @@ public class ChannelNumberTest extends TestCase {
         new ComparableTester<ChannelNumber>()
                 .addEquivalentGroup(parseChannelNumber("1"), parseChannelNumber("1"))
                 .addEquivalentGroup(parseChannelNumber("2"))
-                .addEquivalentGroup(parseChannelNumber("2 1"), parseChannelNumber("2.1"),
-                        parseChannelNumber("2-1"))
+                .addEquivalentGroup(parseChannelNumber("2-1"))
                 .addEquivalentGroup(parseChannelNumber("2-2"))
                 .addEquivalentGroup(parseChannelNumber("2-10"))
                 .addEquivalentGroup(parseChannelNumber("3"))
-                .addEquivalentGroup(parseChannelNumber("4"), parseChannelNumber("4 0"),
-                        parseChannelNumber("4.0"), parseChannelNumber("4-0"))
+                .addEquivalentGroup(parseChannelNumber("4"), parseChannelNumber("4-0"))
                 .addEquivalentGroup(parseChannelNumber("10"))
                 .addEquivalentGroup(parseChannelNumber("100"))
                 .test();

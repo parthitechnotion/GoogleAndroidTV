@@ -20,6 +20,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.tv.TvContract;
+import android.os.AsyncTask;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -31,27 +33,57 @@ import com.android.tv.TvApplication;
 public class GlobalKeyReceiver extends BroadcastReceiver {
     private static final boolean DEBUG = false;
     private static final String TAG = "GlobalKeyReceiver";
+
     private static final String ACTION_GLOBAL_BUTTON = "android.intent.action.GLOBAL_BUTTON";
+    // Settings.Secure.USER_SETUP_COMPLETE is hidden.
+    private static final String SETTINGS_USER_SETUP_COMPLETE = "user_setup_complete";
+
+    private static boolean sUserSetupComplete;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         TvApplication.setCurrentRunningProcess(context, true);
+        Context appContext = context.getApplicationContext();
+        if (DEBUG) Log.d(TAG, "onReceive: " + intent);
+        if (sUserSetupComplete) {
+            handleIntent(appContext, intent);
+        } else {
+            new AsyncTask<Void, Void, Boolean>() {
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    return Settings.Secure.getInt(appContext.getContentResolver(),
+                            SETTINGS_USER_SETUP_COMPLETE, 0) != 0;
+                }
+
+                @Override
+                protected void onPostExecute(Boolean setupComplete) {
+                    if (DEBUG) Log.d(TAG, "Is setup complete: " + setupComplete);
+                    sUserSetupComplete = setupComplete;
+                    if (sUserSetupComplete) {
+                        handleIntent(appContext, intent);
+                    }
+                }
+            }.execute();
+        }
+    }
+
+    private void handleIntent(Context appContext, Intent intent) {
         if (ACTION_GLOBAL_BUTTON.equals(intent.getAction())) {
             KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            if (DEBUG) Log.d(TAG, "onReceive: " + event);
+            if (DEBUG) Log.d(TAG, "handleIntent: " + event);
             int keyCode = event.getKeyCode();
             int action = event.getAction();
             if (action == KeyEvent.ACTION_UP) {
                 switch (keyCode) {
                     case KeyEvent.KEYCODE_GUIDE:
-                        context.startActivity(
+                        appContext.startActivity(
                                 new Intent(Intent.ACTION_VIEW, TvContract.Programs.CONTENT_URI));
                         break;
                     case KeyEvent.KEYCODE_TV:
-                        ((TvApplication) context.getApplicationContext()).handleTvKey();
+                        ((TvApplication) appContext).handleTvKey();
                         break;
                     case KeyEvent.KEYCODE_TV_INPUT:
-                        ((TvApplication) context.getApplicationContext()).handleTvInputKey();
+                        ((TvApplication) appContext).handleTvInputKey();
                         break;
                     default:
                         // Do nothing

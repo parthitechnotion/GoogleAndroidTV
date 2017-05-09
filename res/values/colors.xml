@@ -109,6 +109,7 @@
 
     <!-- TV view -->
     <color name="tvview_block_text_color">#80EEEEEE</color>
+    <color name="tvview_block_image_color_filter">#99000000</color>
 
     <!-- Channel banner -->
     <color name="channel_banner_text_color">#FFEEEEEE</color>

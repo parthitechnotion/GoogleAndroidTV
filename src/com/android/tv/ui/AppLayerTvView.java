@@ -22,6 +22,7 @@ import android.util.AttributeSet;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.android.tv.util.Debug;
 import com.android.tv.experiments.Experiments;
 
 /**
@@ -58,5 +59,14 @@ public class AppLayerTvView extends TvView {
             ((SurfaceView) child).setSecure(!Experiments.ENABLE_DEVELOPER_FEATURES.get());
         }
         super.onViewAdded(child);
+    }
+
+    @Override
+    public void getLocationOnScreen(int[] outLocation) {
+        super.getLocationOnScreen(outLocation);
+
+        // The TvView.MySessionCallback.onSessionCreated() will call this method indirectly.
+        Debug.getTimer(Debug.TAG_START_UP_TIMER).log(
+                "AppLayerTvView.getLocationOnScreen, session created");
     }
 }

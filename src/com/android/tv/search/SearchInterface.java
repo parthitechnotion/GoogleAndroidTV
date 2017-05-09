@@ -24,8 +24,6 @@ import java.util.List;
  * Interface for channel and program search.
  */
 public interface SearchInterface {
-    String SOURCE_TV_SEARCH = "TvSearch";
-
     int ACTION_TYPE_AMBIGUOUS = 1;
     int ACTION_TYPE_SWITCH_CHANNEL = 2;
     int ACTION_TYPE_SWITCH_INPUT = 3;

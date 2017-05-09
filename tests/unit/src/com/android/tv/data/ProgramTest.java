@@ -19,13 +19,11 @@ import static android.media.tv.TvContract.Programs.Genres.COMEDY;
 import static android.media.tv.TvContract.Programs.Genres.FAMILY_KIDS;
 
 import com.android.tv.data.Program.CriticScore;
-import com.android.tv.dvr.SeriesRecording;
 
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract.Programs.Genres;
 import android.os.Parcel;
 import android.support.test.filters.SmallTest;
-import android.util.Log;
 
 import junit.framework.TestCase;
 

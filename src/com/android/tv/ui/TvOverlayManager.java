@@ -39,6 +39,7 @@ import com.android.tv.MainActivity.KeyHandlerResultType;
 import com.android.tv.R;
 import com.android.tv.TimeShiftManager;
 import com.android.tv.TvApplication;
+import com.android.tv.TvOptionsManager;
 import com.android.tv.analytics.Tracker;
 import com.android.tv.common.WeakHandler;
 import com.android.tv.common.feature.CommonFeatures;
@@ -46,13 +47,14 @@ import com.android.tv.common.ui.setup.OnActionClickListener;
 import com.android.tv.common.ui.setup.SetupFragment;
 import com.android.tv.common.ui.setup.SetupMultiPaneFragment;
 import com.android.tv.data.ChannelDataManager;
+import com.android.tv.dialog.DvrHistoryDialogFragment;
 import com.android.tv.dialog.FullscreenDialogFragment;
+import com.android.tv.dialog.HalfSizedDialogFragment;
 import com.android.tv.dialog.PinDialogFragment;
 import com.android.tv.dialog.RecentlyWatchedDialogFragment;
 import com.android.tv.dialog.SafeDismissDialogFragment;
 import com.android.tv.dvr.DvrDataManager;
-import com.android.tv.dvr.ui.DvrActivity;
-import com.android.tv.dvr.ui.HalfSizedDialogFragment;
+import com.android.tv.dvr.ui.browse.DvrBrowseActivity;
 import com.android.tv.guide.ProgramGuide;
 import com.android.tv.menu.Menu;
 import com.android.tv.menu.Menu.MenuShowReason;
@@ -163,6 +165,7 @@ public class TvOverlayManager {
     private static final Set<String> AVAILABLE_DIALOG_TAGS = new HashSet<>();
     static {
         AVAILABLE_DIALOG_TAGS.add(RecentlyWatchedDialogFragment.DIALOG_TAG);
+        AVAILABLE_DIALOG_TAGS.add(DvrHistoryDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(PinDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(FullscreenDialogFragment.DIALOG_TAG);
         AVAILABLE_DIALOG_TAGS.add(SettingsFragment.LicenseActionItem.DIALOG_TAG);
@@ -195,10 +198,10 @@ public class TvOverlayManager {
     private OnBackStackChangedListener mOnBackStackChangedListener;
 
     public TvOverlayManager(MainActivity mainActivity, ChannelTuner channelTuner,
-            TunableTvView tvView, KeypadChannelSwitchView keypadChannelSwitchView,
-            ChannelBannerView channelBannerView, InputBannerView inputBannerView,
-            SelectInputView selectInputView, ViewGroup sceneContainer,
-            ProgramGuideSearchFragment searchFragment) {
+            TunableTvView tvView, TvOptionsManager optionsManager,
+            KeypadChannelSwitchView keypadChannelSwitchView, ChannelBannerView channelBannerView,
+            InputBannerView inputBannerView, SelectInputView selectInputView,
+            ViewGroup sceneContainer, ProgramGuideSearchFragment searchFragment) {
         mMainActivity = mainActivity;
         mChannelTuner = channelTuner;
         ApplicationSingletons singletons = TvApplication.getSingletons(mainActivity);
@@ -225,7 +228,8 @@ public class TvOverlayManager {
         });
         // Menu
         MenuView menuView = (MenuView) mainActivity.findViewById(R.id.menu);
-        mMenu = new Menu(mainActivity, tvView, menuView, new MenuRowFactory(mainActivity, tvView),
+        mMenu = new Menu(mainActivity, tvView, optionsManager, menuView,
+                new MenuRowFactory(mainActivity, tvView),
                 new Menu.OnMenuVisibilityChangeListener() {
                     @Override
                     public void onMenuVisibilityChange(boolean visible) {
@@ -541,7 +545,7 @@ public class TvOverlayManager {
      * Shows DVR manager.
      */
     public void showDvrManager() {
-        Intent intent = new Intent(mMainActivity, DvrActivity.class);
+        Intent intent = new Intent(mMainActivity, DvrBrowseActivity.class);
         mMainActivity.startActivity(intent);
     }
 
@@ -561,6 +565,14 @@ public class TvOverlayManager {
     public void showRecentlyWatchedDialog() {
         showDialogFragment(RecentlyWatchedDialogFragment.DIALOG_TAG,
                 new RecentlyWatchedDialogFragment(), false);
+    }
+
+    /**
+     * Shows DVR history dialog.
+     */
+    public void showDvrHistoryDialog() {
+        showDialogFragment(DvrHistoryDialogFragment.DIALOG_TAG,
+                new DvrHistoryDialogFragment(), false);
     }
 
     /**
@@ -674,7 +686,7 @@ public class TvOverlayManager {
         }
         if ((flags & FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANELS) != 0) {
             // Keeps side panels.
-        } else if (mSideFragmentManager.isSidePanelVisible()) {
+        } else if (mSideFragmentManager.isActive()) {
             if ((flags & FLAG_HIDE_OVERLAYS_KEEP_SIDE_PANEL_HISTORY) != 0) {
                 mSideFragmentManager.hideSidePanel(withAnimation);
             } else {

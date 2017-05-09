@@ -20,9 +20,8 @@
     <string name="audio_channel_mono" msgid="8812941280022167428">"mono"</string>
     <string name="audio_channel_stereo" msgid="5798223286366598036">"stereo"</string>
     <string name="menu_title_play_controls" msgid="2490237359425190652">"Boshqaruv"</string>
-    <string name="menu_title_channels" msgid="1801845517674690003">"So‘nggi kanallar"</string>
+    <string name="menu_title_channels" msgid="1949045451672990132">"Kanallar"</string>
     <string name="menu_title_options" msgid="7184594626814914022">"TV sozlamalari"</string>
-    <string name="menu_title_pip_options" msgid="4252934960762407689">"PIP sozlamalari"</string>
     <string name="play_controls_unavailable" msgid="8900698593131693148">"Ushbu kanal uchun ijro etish boshqaruvlari mavjud emas"</string>
     <string name="play_controls_description_play_pause" msgid="7225542861669250558">"Ijro yoki pauza"</string>
     <string name="play_controls_description_fast_forward" msgid="4414963867482448652">"Oldinga tezkor o‘tkazish"</string>
@@ -35,33 +34,15 @@
     <string name="options_item_closed_caption" msgid="5945274655046367170">"Taglavhalar"</string>
     <string name="options_item_display_mode" msgid="7989243076748680140">"Ekran rejimi"</string>
     <string name="options_item_pip" msgid="3951350386626879645">"Kadr ustida kadr"</string>
-    <string name="options_item_pip_on" msgid="4647247480009077381">"Yoniq"</string>
-    <string name="options_item_pip_off" msgid="8799500161592387451">"O‘chiq"</string>
     <string name="options_item_multi_audio" msgid="5118851311937896923">"Ko‘p kanalli"</string>
     <string name="options_item_more_channels" msgid="971040969622943300">"Boshqa kanallar"</string>
     <string name="options_item_settings" msgid="7623205838542400074">"Sozlamalar"</string>
-    <string name="pip_options_item_source" msgid="1050948525825308652">"Manba"</string>
-    <string name="pip_options_item_swap" msgid="7245362207353732048">"Almashtirish"</string>
-    <string name="pip_options_item_swap_on" msgid="5647182616484983505">"Yoniq"</string>
-    <string name="pip_options_item_swap_off" msgid="3023597229417709768">"O‘chiq"</string>
-    <string name="pip_options_item_sound" msgid="3107034283791231648">"Ovoz"</string>
-    <string name="pip_options_item_sound_main" msgid="1063937534112558691">"Asosiy oyna"</string>
-    <string name="pip_options_item_sound_pip_window" msgid="435064142351853008">"PIP oynasi"</string>
-    <string name="pip_options_item_layout" msgid="5126206342060967651">"Joylashuvi"</string>
-    <string name="pip_options_item_layout_bottom_right" msgid="5256839015192920238">"Pastda o‘ngda"</string>
-    <string name="pip_options_item_layout_top_right" msgid="3585067214787055279">"Tepada o‘ngda"</string>
-    <string name="pip_options_item_layout_top_left" msgid="2173997010201637462">"Tepada chapda"</string>
-    <string name="pip_options_item_layout_bottom_left" msgid="1727197877968915329">"Pastda chapda"</string>
-    <string name="pip_options_item_layout_side_by_side" msgid="9009784972740915779">"Yonma-yon"</string>
-    <string name="pip_options_item_size" msgid="5662894110243750158">"O‘lchami"</string>
-    <string name="pip_options_item_size_big" msgid="6303301565563444718">"Katta"</string>
-    <string name="pip_options_item_size_small" msgid="7393731186585004206">"Kichik"</string>
-    <string name="side_panel_title_pip_input_source" msgid="8722544967592970296">"Kirish manbasi"</string>
     <string name="input_long_label_for_tuner" msgid="3423514011918382209">"TV (antenna/kabel)"</string>
     <string name="no_program_information" msgid="1049844207745145132">"Dastur haqida ma’l. yo‘q"</string>
     <string name="program_title_for_no_information" msgid="384451471906070101">"Ma’lumot yo‘q"</string>
     <string name="program_title_for_blocked_channel" msgid="5358005891746983819">"Bloklangan kanal"</string>
-    <string name="default_language" msgid="4122326459624337928">"Noma’lum til"</string>
+    <string name="multi_audio_unknown_language" msgid="8639884627225598143">"Noma’lum til"</string>
+    <string name="closed_caption_unknown_language" msgid="4745445516930229353">"Taglavhalar %1$d"</string>
     <string name="side_panel_title_closed_caption" msgid="2513905054082568780">"Taglavhalar"</string>
     <string name="closed_caption_option_item_off" msgid="4824009036785647753">"O‘chiq"</string>
     <string name="closed_caption_system_settings" msgid="1856974607743827178">"Formatlarni sozlash"</string>
@@ -97,7 +78,7 @@
     <string name="option_toggle_parental_controls_on" msgid="9122851821454622696">"Yoniq"</string>
     <string name="option_toggle_parental_controls_off" msgid="7797910199040440618">"O‘chiq"</string>
     <string name="option_channels_locked" msgid="5797855082297549907">"Kanallar bloklandi"</string>
-    <string name="option_channels_lock_all" msgid="6594512884477342940">"Barchasini bloklash"</string>
+    <string name="option_channels_lock_all" msgid="6594512884477342940">"Hammasini bloklash"</string>
     <string name="option_channels_unlock_all" msgid="6839513296447567623">"Blokdan chiqarish"</string>
     <string name="option_channels_subheader_hidden" msgid="4669425935426972078">"Berkitilgan kanallar"</string>
     <string name="option_program_restrictions" msgid="241342023067364108">"Yosh cheklovlari"</string>
@@ -135,6 +116,10 @@
     </plurals>
     <string name="pin_toast_wrong" msgid="2126295626095048746">"PIN-kod noto‘g‘ri, qaytadan urining."</string>
     <string name="pin_toast_not_match" msgid="4283624338659521768">"Qaytadan urinib ko‘ring, PIN-kod noto‘g‘ri"</string>
+    <string name="postal_code_guidance_title" msgid="4144793072363879833">"Pochta indeksini kiriting."</string>
+    <string name="postal_code_guidance_description" msgid="4224511147377561572">"Jonli efir ilovasi TV kanallari uchun to‘liq teledasturlarni taqdim etish uchun pochta indeksidan foydalanadi."</string>
+    <string name="postal_code_action_description" msgid="4428720607051109105">"Pochta indeksini kiriting"</string>
+    <string name="postal_code_invalid_warning" msgid="923373584458340746">"Pochta indeksi xato"</string>
     <string name="side_panel_title_settings" msgid="8244327316510918755">"Sozlamalar"</string>
     <string name="settings_channel_source_item_customize_channels" msgid="6115770679732624593">"Ro‘yxatni sozlash"</string>
     <string name="settings_channel_source_item_customize_channels_description" msgid="8966243790328235580">"Teledastur uchun kanallarni tanlash"</string>
@@ -143,6 +128,7 @@
     <string name="settings_parental_controls" msgid="5449397921700749317">"Ota-ona nazorati"</string>
     <string name="settings_menu_licenses" msgid="1257646083838406103">"Ochiq kodli DT litsenziyalari"</string>
     <string name="dialog_title_licenses" msgid="4471754920475076623">"Ochiq kodli DT litsenziyalari"</string>
+    <string name="settings_send_feedback" msgid="6897217561193701829">"Fikr-mulohaza yuborish"</string>
     <string name="settings_menu_version" msgid="2604030372029921403">"Versiyasi"</string>
     <string name="tvview_channel_locked" msgid="6486375335718400728">"Bu kanalni ko‘rish uchun o‘ngga qaragan chiziqni bosing va PIN kodni kiriting"</string>
     <string name="tvview_content_locked" msgid="391823084917017730">"Bu dasturni ko‘rish uchun o‘ngga qaragan chiziqni bosing va PIN kodni kiriting"</string>
@@ -181,8 +167,6 @@
     <string name="intro_description" msgid="7806473686446937307">"TV menyusiga kirish uchun "<b>"TANLASH tugmasini bosing"</b>"."</string>
     <string name="msg_no_input" msgid="3897674146985427865">"Hech qanday TV-kirish topilmadi"</string>
     <string name="msg_no_specific_input" msgid="2688885987104249852">"TV-kirishni topib bo‘lmadi"</string>
-    <string name="msg_no_pip_support" msgid="161508628996629445">"PIP qo‘llab-quvvatlanmaydi"</string>
-    <string name="msg_no_available_input_by_pip" msgid="7038191654524679666">"PIP bilan ko‘rsatish uchun hech qanday manba yo‘q"</string>
     <string name="msg_not_passthrough_input" msgid="4502101097091087411">"Tyuner turi mos kelmaydi. Agar TV-kirishdan foydalanayotgan bo‘lsangiz, “Jonli efir” ilovasini ishga tushiring."</string>
     <string name="msg_tune_failed" msgid="3277419551849972252">"Sozlashni amalga oshirib bo‘lmadi."</string>
     <string name="msg_missing_app" msgid="8291542072400042076">"Bu amalni bajara oladigan ilova topilmadi."</string>
@@ -259,8 +243,6 @@
     <string name="dvr_priority_button_action_save" msgid="4773524273649733008">"Saqlash"</string>
     <string name="dvr_priority_action_one_time_recording" msgid="8174297042282719478">"Bir martalik yozuvlarning muhimlilik darajasi yuqori"</string>
     <string name="dvr_action_cancel" msgid="8094060199570272625">"Bekor q-sh"</string>
-    <string name="dvr_action_error_cancel" msgid="6822474458738023531">"Bekor qilish"</string>
-    <string name="dvr_action_error_forget_storage" msgid="5869994565663655638">"O‘chirib tashlash"</string>
     <string name="dvr_action_stop" msgid="1378723485295471381">"To‘xtatish"</string>
     <string name="dvr_action_view_schedules" msgid="7442990695392774263">"Yozib olish jadvalini ko‘rish"</string>
     <string name="dvr_action_record_episode" msgid="8596182676610326327">"Faqat bu dastur"</string>
@@ -270,25 +252,29 @@
     <string name="dvr_action_record_instead" msgid="6821164728752215738">"Bu dasturni yozib olish"</string>
     <string name="dvr_action_record_cancel" msgid="8644254745772185288">"Bu yozib olishni bekor qilish"</string>
     <string name="dvr_action_watch_now" msgid="7181211920959075976">"Tomosha qilish"</string>
+    <string name="dvr_action_delete_recordings" msgid="850785346795261671">"Yozuvlarni o‘chirish…"</string>
     <string name="dvr_epg_program_recordable" msgid="609229576209476903">"Yozib olish mumkin"</string>
     <string name="dvr_epg_program_recording_scheduled" msgid="1367741844291055016">"Yozib olish rejalashtirildi"</string>
     <string name="dvr_epg_program_recording_conflict" msgid="4827911748865195373">"Yozib olish taymerida ziddiyat"</string>
     <string name="dvr_epg_program_recording_in_progress" msgid="2158340443975313745">"Yozib olish"</string>
     <string name="dvr_epg_program_recording_failed" msgid="5589124519442328896">"Yozib olib bo‘lmadi"</string>
     <string name="dvr_schedule_progress_message_reading_programs" msgid="6502513156469172313">"Yozib olish jadvallarini yaratish uchun dasturlar o‘qib chiqilmoqda"</string>
-    <string name="dvr_series_schedules_progress_message_reading_programs" msgid="7221275889560136115">"Dasturlar o‘qib chiqilmoqda"</string>
-    <!-- no translation found for dvr_series_schedules_progress_message_updating_programs (6670286486601662465) -->
-    <skip />
+    <string name="dvr_series_progress_message_reading_programs" msgid="2961615820635219355">"Dasturlar o‘qib chiqilmoqda"</string>
+    <string name="dvr_error_insufficient_space_action_view_recent_recordings" msgid="137918938589787623">"Oxirgi yozuvlarni ko‘rish"</string>
+    <string name="dvr_error_insufficient_space_title_one_recording" msgid="759510175792505150">"“<xliff:g id="PROGRAMNAME">%1$s</xliff:g>” to‘liq yozib olinmadi."</string>
+    <string name="dvr_error_insufficient_space_title_two_recordings" msgid="5518578722556227631">"“<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>” va “<xliff:g id="PROGRAMNAME_2">%2$s</xliff:g>” to‘liq yozib olinmadi."</string>
+    <string name="dvr_error_insufficient_space_title_three_or_more_recordings" msgid="5104901174884754363">"“<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>”, “<xliff:g id="PROGRAMNAME_2">%2$s</xliff:g>” va “<xliff:g id="PROGRAMNAME_3">%3$s</xliff:g>” to‘liq yozib olinmadi."</string>
+    <string name="dvr_error_insufficient_space_description_one_recording" msgid="9092549220659026111">"Xotirada joy kamligi tufayli “<xliff:g id="PROGRAMNAME">%1$s</xliff:g>” to‘liq yozib olinmadi."</string>
+    <string name="dvr_error_insufficient_space_description_two_recordings" msgid="7712799694720979003">"Xotirada joy kamligi tufayli “<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>” va “<xliff:g id="PROGRAMNAME_2">%2$s</xliff:g>” to‘liq yozib olinmadi."</string>
+    <string name="dvr_error_insufficient_space_description_three_or_more_recordings" msgid="7877855707777832128">"Xotirada joy kamligi tufayli “<xliff:g id="PROGRAMNAME_1">%1$s</xliff:g>”, “<xliff:g id="PROGRAMNAME_2">%2$s</xliff:g>” va “<xliff:g id="PROGRAMNAME_3">%3$s</xliff:g>” to‘liq yozib olinmadi."</string>
     <string name="dvr_error_small_sized_storage_title" msgid="5020225460011469011">"DVR uchun ko‘proq joy kerak"</string>
     <string name="dvr_error_small_sized_storage_description" msgid="8909789097974895119">"Dasturlarni DVR orqali yozib olish mumkin. Lekin hozir DVR ishlashi uchun qurilmangizda yetarli joy qolmadi. <xliff:g id="STORAGE_SIZE">%1$s</xliff:g> GB va undan katta hajmli tashqi xotira qurilmasini ulang va qurilma xotirasi sifatida formatlash uchun ko‘rsatmalarga amal qiling."</string>
+    <string name="dvr_error_no_free_space_title" msgid="881897873932403512">"Xotirada joy yetarli emas"</string>
+    <string name="dvr_error_no_free_space_description" msgid="6406038381803431564">"Joy yetarli bo‘lmagani uchun bu dasturni yozib bo‘lmaydi. Eski yozuvlarni bir nechtasini o‘chirib tashlab ko‘ring."</string>
     <string name="dvr_error_missing_storage_title" msgid="691914341845362669">"Xotira mavjud emas"</string>
-    <string name="dvr_error_missing_storage_description" msgid="1036680750969954236">"Xotira topilmadi. Videomagnitofonni qayta yoqishdan oldin tashqi xotirani ulang yoki undan foydalanib bo‘lmasa, xotirani o‘chirib tashlang."</string>
-    <string name="dvr_error_forget_storage_title" msgid="4996547357826788002">"Xotira o‘chirib tashlansinmi?"</string>
-    <string name="dvr_error_forget_storage_description" msgid="3973761741009546142">"Barcha yozib olingan kontentlar va jadvallar o‘chib ketadi."</string>
     <string name="dvr_stop_recording_dialog_title" msgid="2587018956502704278">"Yozib olish to‘xtatilsinmi?"</string>
     <string name="dvr_stop_recording_dialog_description" msgid="4637830189399967761">"Yozib olingan kontent saqlab qo‘yiladi."</string>
-    <!-- no translation found for dvr_stop_recording_dialog_description_on_conflict (7876857267536083760) -->
-    <skip />
+    <string name="dvr_stop_recording_dialog_description_on_conflict" msgid="7876857267536083760">"Bu dastur bilan ixtilof borligi uchun “<xliff:g id="PROGRAMNAME">%1$s</xliff:g>” dasturini yozib olish to‘xtatiladi. Yozib olingan qismi saqlab olinadi."</string>
     <string name="dvr_program_conflict_dialog_title" msgid="109323740107060379">"Yozib olish rejalashtirildi, lekin ixtiloflar bor"</string>
     <string name="dvr_channel_conflict_dialog_title" msgid="7461033430572027786">"Yozib olish jadvalida ixtiloflar bor"</string>
     <string name="dvr_program_conflict_dialog_description_prefix" msgid="5520062013211648196">"“<xliff:g id="PROGRAMNAME">%1$s</xliff:g>” dasturi yozib olinadi."</string>
@@ -306,14 +292,27 @@
     <string name="dvr_already_scheduled_dialog_description" msgid="8170126125996414810">"Bu dasturni allaqachon <xliff:g id="PROGRAMSTARTTIME">%1$s</xliff:g> da yozib olish rejalashtirilgan."</string>
     <string name="dvr_already_recorded_dialog_title" msgid="2760294707162057216">"Dastur allaqachon yozib olingan"</string>
     <string name="dvr_already_recorded_dialog_description" msgid="8966051583682746434">"Bu dastur allaqachon yozib olingan. U DVR kutubxonasida saqlanadi."</string>
-    <!-- no translation found for dvr_series_recording_dialog_title (3521956660855853797) -->
-    <skip />
-    <!-- no translation found for dvr_series_recording_scheduled_no_conflict (2796926724821316879) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_this_series_conflict (2800805130979023066) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_one_conflict (3632394665556633158) -->
-    <!-- no translation found for dvr_series_recording_scheduled_this_and_other_series_conflict (2331412040101938479) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_one_conflict (5213169239215104024) -->
-    <!-- no translation found for dvr_series_recording_scheduled_only_other_series_conflict (5159645486201045330) -->
+    <string name="dvr_series_recording_dialog_title" msgid="3521956660855853797">"Seriallarni yozib olish rejalashtirildi"</string>
+    <plurals name="dvr_series_scheduled_no_conflict" formatted="false" msgid="6909096418632555251">
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ta yozuv rejalashtirilgan.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ta yozuv rejalashtirilgan.</item>
+    </plurals>
+    <plurals name="dvr_series_recording_scheduled_only_this_series_conflict" formatted="false" msgid="2341548158607418515">
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun ulardan <xliff:g id="NUMBEROFCONFLICTRECORDINGS">%3$d</xliff:g> tasi yozib olinmaydi.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun u yozib olinmaydi.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_this_and_other_series_conflict" formatted="false" msgid="6123651855499916154">
+      <item quantity="other"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun bu serialning <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ta qismi va boshqa seriallar yozib olinmaydi.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun bu serialning <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> ta qismi va boshqa seriallar yozib olinmaydi.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_one_conflict" formatted="false" msgid="8628389493339609682">
+      <item quantity="other"><xliff:g id="SERIESNAME_3">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_2">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun boshqa seriallarning 1 ta qismi yozib olinmaydi.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun boshqa seriallarning 1 ta qismi yozib olinmaydi.</item>
+    </plurals>
+    <plurals name="dvr_series_scheduled_only_other_series_many_conflicts" formatted="false" msgid="1601104768354168073">
+      <item quantity="other"><xliff:g id="SERIESNAME_4">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_3">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun boshqa seriallarning <xliff:g id="NUMBEROFCONFLICTEPISODES_5">%3$d</xliff:g> ta qismi yozib olinmaydi.</item>
+      <item quantity="one"><xliff:g id="SERIESNAME_1">%2$s</xliff:g> uchun <xliff:g id="NUMBEROFRECORDINGS_0">%1$d</xliff:g> ta yozuv rejalashtirilgan. Ixtiloflar borligi uchun boshqa seriallarning <xliff:g id="NUMBEROFCONFLICTEPISODES_2">%3$d</xliff:g> ta qismi yozib olinmaydi.</item>
+    </plurals>
     <string name="dvr_program_not_found" msgid="3282879532038010202">"Yozib olingan dasturni topib bo‘lmadi."</string>
     <string name="dvr_playback_related_recordings" msgid="6978658039329924961">"Aloqador yozuvlar"</string>
     <string name="dvr_msg_no_program_description" msgid="2521723281247322645">"(Dastur haqida ma’lumot yo‘q)"</string>
@@ -336,6 +335,7 @@
     <string name="dvr_series_schedules_stop_dialog_title" msgid="4975886236535334420">"Yozib olish to‘xtatilsinmi?"</string>
     <string name="dvr_series_schedules_stop_dialog_description" msgid="7547266283366940085">"Yozib olingan qismlar DVR kutubxonasida saqlanadi."</string>
     <string name="dvr_series_schedules_stop_dialog_action_stop" msgid="2351839914865142478">"To‘xtatish"</string>
+    <string name="dvr_series_schedules_stopped_empty_state" msgid="1464244804664395151">"Hozir hech qaysi serial qismi efirga uzatilmayapti."</string>
     <string name="dvr_series_schedules_empty_state" msgid="3407962945399698707">"Hali serial qismi chiqmagan.\nEfirga chiqishi bilan yozib olinadi."</string>
     <plurals name="dvr_schedules_recording_duration" formatted="false" msgid="3701771573063918552">
       <item quantity="other">(%1$d daqiqa)</item>

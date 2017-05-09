@@ -21,10 +21,11 @@ import android.content.Context;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Lineup;
 import com.android.tv.data.Program;
-import com.android.tv.dvr.SeriesInfo;
+import com.android.tv.dvr.data.SeriesInfo;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A stub class to read EPG.
@@ -44,18 +45,28 @@ public class StubEpgReader implements EpgReader{
     }
 
     @Override
-    public List<Channel> getChannels(String lineupId) {
+    public List<Lineup> getLineups(String postalCode) {
         return Collections.emptyList();
     }
 
     @Override
-    public List<Lineup> getLineups(String postalCode) {
+    public List<String> getChannelNumbers(String lineupId) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<Channel> getChannels(String lineupId) {
         return Collections.emptyList();
     }
 
     @Override
     public List<Program> getPrograms(long channelId) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Map<Long, List<Program>> getPrograms(List<Long> channelIds, long duration) {
+        return Collections.emptyMap();
     }
 
     @Override

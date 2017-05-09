@@ -18,6 +18,7 @@ package com.android.tv.dvr;
 
 import android.support.test.filters.SmallTest;
 
+import com.android.tv.dvr.data.ScheduledRecording;
 import com.android.tv.testing.dvr.RecordingTestUtils;
 
 import junit.framework.TestCase;

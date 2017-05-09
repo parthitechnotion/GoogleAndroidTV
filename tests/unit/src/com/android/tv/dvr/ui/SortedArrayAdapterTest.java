@@ -32,10 +32,10 @@ import java.util.Objects;
 @SmallTest
 public class SortedArrayAdapterTest extends TestCase {
 
-    public static final TestData P1 = TestData.create(1, "one");
-    public static final TestData P2 = TestData.create(2, "before");
-    public static final TestData P3 = TestData.create(3, "other");
-    public static final TestData EXTRA = TestData.create(4, "extra");
+    public static final TestData P1 = TestData.create(1, "c");
+    public static final TestData P2 = TestData.create(2, "b");
+    public static final TestData P3 = TestData.create(3, "a");
+    public static final TestData EXTRA = TestData.create(4, "k");
     private TestSortedArrayAdapter mAdapter;
 
     @Override
@@ -111,6 +111,43 @@ public class SortedArrayAdapterTest extends TestCase {
         assertContentsInOrder(mAdapter, P1);
         mAdapter.remove(P1);
         assertEmpty();
+        mAdapter.add(P1);
+        mAdapter.add(P2);
+        mAdapter.add(P3);
+        assertContentsInOrder(mAdapter, P3, P2, P1);
+        mAdapter.removeItems(0, 2);
+        assertContentsInOrder(mAdapter, P1);
+        mAdapter.add(P2);
+        mAdapter.add(P3);
+        mAdapter.addExtraItem(EXTRA);
+        assertContentsInOrder(mAdapter, P3, P2, P1, EXTRA);
+        mAdapter.removeItems(1, 1);
+        assertContentsInOrder(mAdapter, P3, P1, EXTRA);
+        mAdapter.removeItems(1, 2);
+        assertContentsInOrder(mAdapter, P3);
+        mAdapter.addExtraItem(EXTRA);
+        mAdapter.addExtraItem(P2);
+        mAdapter.add(P1);
+        assertContentsInOrder(mAdapter, P3, P1, EXTRA, P2);
+        mAdapter.removeItems(1, 2);
+        assertContentsInOrder(mAdapter, P3, P2);
+        mAdapter.add(P1);
+        assertContentsInOrder(mAdapter, P3, P1, P2);
+    }
+
+    public void testReplace() {
+        mAdapter.add(P1);
+        mAdapter.add(P2);
+        assertNotEmpty();
+        assertContentsInOrder(mAdapter, P2, P1);
+        mAdapter.replace(1, P3);
+        assertContentsInOrder(mAdapter, P3, P2);
+        mAdapter.replace(0, P1);
+        assertContentsInOrder(mAdapter, P2, P1);
+        mAdapter.addExtraItem(EXTRA);
+        assertContentsInOrder(mAdapter, P2, P1, EXTRA);
+        mAdapter.replace(2, P3);
+        assertContentsInOrder(mAdapter, P2, P1, P3);
     }
 
     public void testChange_sorting() {
@@ -194,7 +231,7 @@ public class SortedArrayAdapterTest extends TestCase {
         }
 
         @Override
-        long getId(TestData item) {
+        protected long getId(TestData item) {
             return item.mId;
         }
     }

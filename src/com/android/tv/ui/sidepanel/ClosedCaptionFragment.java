@@ -82,8 +82,9 @@ public class ClosedCaptionFragment extends SideFragment {
             }
             mItems.add(item);
 
-            for (final TvTrackInfo track : tracks) {
-                item = new ClosedCaptionOptionItem(getLabel(track),
+            for (int i = 0; i < tracks.size(); i++) {
+                final TvTrackInfo track = tracks.get(i);
+                item = new ClosedCaptionOptionItem(getLabel(track, i),
                         CaptionSettings.OPTION_ON, track.getId(), track.getLanguage());
                 if (isEnabled && track.getId().equals(trackId)) {
                     item.setChecked(true);
@@ -172,11 +173,11 @@ public class ClosedCaptionFragment extends SideFragment {
         super.onDestroyView();
     }
 
-    private String getLabel(TvTrackInfo track) {
+    private String getLabel(TvTrackInfo track, int trackIndex) {
         if (track.getLanguage() != null) {
             return new Locale(track.getLanguage()).getDisplayName();
         }
-        return getString(R.string.default_language);
+        return getString(R.string.closed_caption_unknown_language, trackIndex + 1);
     }
 
     private class ClosedCaptionOptionItem extends RadioButtonItem {

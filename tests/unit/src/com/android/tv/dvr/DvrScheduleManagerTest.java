@@ -20,6 +20,8 @@ import android.support.test.filters.SmallTest;
 import android.test.MoreAsserts;
 import android.util.Range;
 
+import com.android.tv.dvr.DvrScheduleManager.ConflictInfo;
+import com.android.tv.dvr.data.ScheduledRecording;
 import com.android.tv.testing.dvr.RecordingTestUtils;
 
 import junit.framework.TestCase;
@@ -28,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Tests for {@link DvrScheduleManager}
@@ -586,49 +587,80 @@ public class DvrScheduleManagerTest extends TestCase {
                 RecordingTestUtils.createTestRecordingWithPriorityAndPeriod(++channelId,
                         --priority, 50L, 900L)
         ));
-        Map<ScheduledRecording, Boolean> conflictsInfo = DvrScheduleManager
-                .getConflictingSchedulesInfo(schedules, 1);
+        List<ConflictInfo> conflicts = DvrScheduleManager.getConflictingSchedulesInfo(schedules, 1);
 
-        assertNull(conflictsInfo.get(schedules.get(0)));
-        assertFalse(conflictsInfo.get(schedules.get(1)));
-        assertTrue(conflictsInfo.get(schedules.get(2)));
-        assertTrue(conflictsInfo.get(schedules.get(3)));
-        assertNull(conflictsInfo.get(schedules.get(4)));
-        assertTrue(conflictsInfo.get(schedules.get(5)));
-        assertNull(conflictsInfo.get(schedules.get(6)));
-        assertFalse(conflictsInfo.get(schedules.get(7)));
-        assertFalse(conflictsInfo.get(schedules.get(8)));
-        assertFalse(conflictsInfo.get(schedules.get(9)));
-        assertFalse(conflictsInfo.get(schedules.get(10)));
+        assertNotInList(schedules.get(0), conflicts);
+        assertFullConflict(schedules.get(1), conflicts);
+        assertPartialConflict(schedules.get(2), conflicts);
+        assertPartialConflict(schedules.get(3), conflicts);
+        assertNotInList(schedules.get(4), conflicts);
+        assertPartialConflict(schedules.get(5), conflicts);
+        assertNotInList(schedules.get(6), conflicts);
+        assertFullConflict(schedules.get(7), conflicts);
+        assertFullConflict(schedules.get(8), conflicts);
+        assertFullConflict(schedules.get(9), conflicts);
+        assertFullConflict(schedules.get(10), conflicts);
 
-        conflictsInfo = DvrScheduleManager
-                .getConflictingSchedulesInfo(schedules, 2);
+        conflicts = DvrScheduleManager.getConflictingSchedulesInfo(schedules, 2);
 
-        assertNull(conflictsInfo.get(schedules.get(0)));
-        assertNull(conflictsInfo.get(schedules.get(1)));
-        assertNull(conflictsInfo.get(schedules.get(2)));
-        assertNull(conflictsInfo.get(schedules.get(3)));
-        assertNull(conflictsInfo.get(schedules.get(4)));
-        assertNull(conflictsInfo.get(schedules.get(5)));
-        assertNull(conflictsInfo.get(schedules.get(6)));
-        assertFalse(conflictsInfo.get(schedules.get(7)));
-        assertFalse(conflictsInfo.get(schedules.get(8)));
-        assertFalse(conflictsInfo.get(schedules.get(9)));
-        assertTrue(conflictsInfo.get(schedules.get(10)));
+        assertNotInList(schedules.get(0), conflicts);
+        assertNotInList(schedules.get(1), conflicts);
+        assertNotInList(schedules.get(2), conflicts);
+        assertNotInList(schedules.get(3), conflicts);
+        assertNotInList(schedules.get(4), conflicts);
+        assertNotInList(schedules.get(5), conflicts);
+        assertNotInList(schedules.get(6), conflicts);
+        assertFullConflict(schedules.get(7), conflicts);
+        assertFullConflict(schedules.get(8), conflicts);
+        assertFullConflict(schedules.get(9), conflicts);
+        assertPartialConflict(schedules.get(10), conflicts);
 
-        conflictsInfo = DvrScheduleManager
-                .getConflictingSchedulesInfo(schedules, 3);
+        conflicts = DvrScheduleManager.getConflictingSchedulesInfo(schedules, 3);
 
-        assertNull(conflictsInfo.get(schedules.get(0)));
-        assertNull(conflictsInfo.get(schedules.get(1)));
-        assertNull(conflictsInfo.get(schedules.get(2)));
-        assertNull(conflictsInfo.get(schedules.get(3)));
-        assertNull(conflictsInfo.get(schedules.get(4)));
-        assertNull(conflictsInfo.get(schedules.get(5)));
-        assertNull(conflictsInfo.get(schedules.get(6)));
-        assertNull(conflictsInfo.get(schedules.get(7)));
-        assertTrue(conflictsInfo.get(schedules.get(8)));
-        assertNull(conflictsInfo.get(schedules.get(9)));
-        assertTrue(conflictsInfo.get(schedules.get(10)));
+        assertNotInList(schedules.get(0), conflicts);
+        assertNotInList(schedules.get(1), conflicts);
+        assertNotInList(schedules.get(2), conflicts);
+        assertNotInList(schedules.get(3), conflicts);
+        assertNotInList(schedules.get(4), conflicts);
+        assertNotInList(schedules.get(5), conflicts);
+        assertNotInList(schedules.get(6), conflicts);
+        assertNotInList(schedules.get(7), conflicts);
+        assertPartialConflict(schedules.get(8), conflicts);
+        assertNotInList(schedules.get(9), conflicts);
+        assertPartialConflict(schedules.get(10), conflicts);
+    }
+
+    private void assertNotInList(ScheduledRecording schedule, List<ConflictInfo> conflicts) {
+        for (ConflictInfo conflictInfo : conflicts) {
+            if (conflictInfo.schedule.equals(schedule)) {
+                fail(schedule + " conflicts with others.");
+            }
+        }
+    }
+
+    private void assertPartialConflict(ScheduledRecording schedule, List<ConflictInfo> conflicts) {
+        for (ConflictInfo conflictInfo : conflicts) {
+            if (conflictInfo.schedule.equals(schedule)) {
+                if (conflictInfo.partialConflict) {
+                    return;
+                } else {
+                    fail(schedule + " fully conflicts with others.");
+                }
+            }
+        }
+        fail(schedule + " doesn't conflict");
+    }
+
+    private void assertFullConflict(ScheduledRecording schedule, List<ConflictInfo> conflicts) {
+        for (ConflictInfo conflictInfo : conflicts) {
+            if (conflictInfo.schedule.equals(schedule)) {
+                if (!conflictInfo.partialConflict) {
+                    return;
+                } else {
+                    fail(schedule + " partially conflicts with others.");
+                }
+            }
+        }
+        fail(schedule + " doesn't conflict");
     }
 }

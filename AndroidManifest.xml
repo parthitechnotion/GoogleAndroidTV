@@ -113,17 +113,17 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.Setup.GuidedStep" />
 
-        <activity android:name=".dvr.ui.DvrActivity"
+        <activity android:name=".dvr.ui.browse.DvrBrowseActivity"
             android:configChanges="keyboard|keyboardHidden"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Leanback.Browse" />
 
-        <activity android:name=".dvr.DvrPlaybackActivity"
+        <activity android:name=".dvr.ui.playback.DvrPlaybackActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|orientation"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Leanback" />
 
-        <activity android:name=".dvr.ui.DvrDetailsActivity"
+        <activity android:name=".dvr.ui.browse.DvrDetailsActivity"
             android:configChanges="keyboard|keyboardHidden"
             android:theme="@style/Theme.TV.Dvr.Browse.Details" />
 
@@ -138,7 +138,7 @@
         <activity android:name=".dvr.ui.DvrSeriesScheduledDialogActivity"
             android:theme="@style/Theme.TV.dialog.HalfSizedDialog"/>
 
-        <activity android:name=".dvr.ui.DvrSchedulesActivity"
+        <activity android:name=".dvr.ui.list.DvrSchedulesActivity"
             android:configChanges="keyboard|keyboardHidden"
             android:theme="@style/Theme.Leanback.Details" />
 
@@ -229,12 +229,14 @@
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
                 <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
                 <action android:name="com.android.tv.action.APPLICATION_FIRST_LAUNCHED" />
+                <action android:name="com.android.tv.action.NETWORK_TUNER_ATTACHED" />
+                <action android:name="com.android.tv.action.NETWORK_TUNER_DETACHED" />
             </intent-filter>
         </receiver>
 
         <!-- DVR -->
-        <service android:name=".dvr.DvrRecordingService" android:label="@string/dvr_service_name"/>
-        <receiver android:name=".dvr.DvrStartRecordingReceiver"/>
+        <service android:name=".dvr.recorder.DvrRecordingService" android:label="@string/dvr_service_name"/>
+        <receiver android:name=".dvr.recorder.DvrStartRecordingReceiver"/>
 
         <service android:name=".tuner.tvinput.TunerStorageCleanUpService"
             android:permission="android.permission.BIND_JOB_SERVICE"

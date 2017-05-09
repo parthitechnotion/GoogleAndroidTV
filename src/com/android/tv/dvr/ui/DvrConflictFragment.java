@@ -34,10 +34,9 @@ import com.android.tv.TvApplication;
 import com.android.tv.common.SoftPreconditions;
 import com.android.tv.data.Channel;
 import com.android.tv.data.Program;
-import com.android.tv.dvr.ConflictChecker;
-import com.android.tv.dvr.ConflictChecker.OnUpcomingConflictChangeListener;
-import com.android.tv.dvr.DvrUiHelper;
-import com.android.tv.dvr.ScheduledRecording;
+import com.android.tv.dvr.recorder.ConflictChecker;
+import com.android.tv.dvr.recorder.ConflictChecker.OnUpcomingConflictChangeListener;
+import com.android.tv.dvr.data.ScheduledRecording;
 import com.android.tv.util.Utils;
 
 import java.util.ArrayList;

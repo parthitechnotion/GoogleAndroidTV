@@ -27,11 +27,18 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.os.BuildCompat;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.tv.common.feature.Feature;
 import com.android.tv.common.feature.GServiceFeature;
 import com.android.tv.common.feature.PropertyFeature;
+import com.android.tv.config.RemoteConfig;
+import com.android.tv.util.LocationUtils;
 import com.android.tv.util.PermissionUtils;
+import com.android.tv.util.Utils;
+
+import java.util.Locale;
 
 /**
  * List of {@link Feature} for the Live TV App.
@@ -39,6 +46,9 @@ import com.android.tv.util.PermissionUtils;
  * <p>Remove the {@code Feature} once it is launched.
  */
 public final class Features {
+    private static final String TAG = "Features";
+    private static final boolean DEBUG = false;
+
     /**
      * UI for opting in to analytics.
      *
@@ -61,6 +71,11 @@ public final class Features {
         @Override
         public boolean isEnabled(Context context) {
 
+            if (Utils.isDeveloper()) {
+                // we enable tuner for developers to test tuner in any platform.
+                return true;
+            }
+
             // This is special handling just for USB Tuner.
             // It does not require any N API's but relies on a improvements in N for AC3 support
             // After release, change class to this to just be {@link BuildCompat#isAtLeastN()}.
@@ -68,6 +83,25 @@ public final class Features {
         }
 
     };
+
+    /**
+     * Use network tuner if it is available and there is no other tuner types.
+     */
+    public static final Feature NETWORK_TUNER =
+            new Feature() {
+                @Override
+                public boolean isEnabled(Context context) {
+                    if (!TUNER.isEnabled(context)) {
+                        return false;
+                    }
+                    if (Utils.isDeveloper()) {
+                        // Network tuner will be enabled for developers.
+                        return true;
+                    }
+                    return Locale.US.getCountry().equalsIgnoreCase(
+                            LocationUtils.getCurrentCountry(context));
+                }
+            };
 
     private static final String GSERVICE_KEY_UNHIDE = "live_channels_unhide";
     /**
@@ -94,6 +128,36 @@ public final class Features {
             return mEnabled;
         }
     };
+
+    /**
+     * Use AC3 software decode.
+     */
+    public static final Feature AC3_SOFTWARE_DECODE =
+            new Feature() {
+                private final String[] SUPPORTED_COUNTRIES = {
+                };
+
+                private Boolean mEnabled;
+
+                @Override
+                public boolean isEnabled(Context context) {
+                    if (mEnabled == null) {
+                        if (mEnabled == null) {
+                            // We will not cache the result of fallback solution.
+                            String country = LocationUtils.getCurrentCountry(context);
+                            for (int i = 0; i < SUPPORTED_COUNTRIES.length; ++i) {
+                                if (SUPPORTED_COUNTRIES[i].equalsIgnoreCase(country)) {
+                                    return true;
+                                }
+                            }
+                            if (DEBUG) Log.d(TAG, "AC3 flag false after country check");
+                            return false;
+                        }
+                    }
+                    if (DEBUG) Log.d(TAG, "AC3 flag " + mEnabled);
+                    return mEnabled;
+                }
+            };
 
     /**
      * Enable a conflict dialog between currently watched channel and upcoming recording.
